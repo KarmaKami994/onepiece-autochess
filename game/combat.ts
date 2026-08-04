@@ -1,0 +1,1048 @@
+import {
+  DEFAULT_CONTENT,
+  getItemDefinition,
+  getUnitDefinition,
+} from "./content";
+import { hashSeed, nextRandom } from "./rng";
+import { getActiveTraitEffects } from "./traits";
+import type {
+  AbilityDefinition,
+  BattleEvent,
+  BattleOptions,
+  BattleResult,
+  BattleTeam,
+  BattleUnitSnapshot,
+  BattleUnitState,
+  GameContent,
+  Position,
+  TraitEffect,
+  UnitStats,
+} from "./types";
+
+interface CombatDefinition {
+  id: string;
+  stats: UnitStats;
+  ability: AbilityDefinition | null;
+}
+
+interface MutableBattleUnit {
+  id: string;
+  definitionId: string;
+  teamId: string;
+  star: 1 | 2 | 3;
+  x: number;
+  y: number;
+  hp: number;
+  maxHp: number;
+  shield: number;
+  energy: number;
+  attack: number;
+  defense: number;
+  range: number;
+  attackIntervalTicks: number;
+  moveIntervalTicks: number;
+  nextAttackTick: number;
+  nextMoveTick: number;
+  abilityPowerPercent: number;
+  criticalChancePercent: number;
+  dodgePercent: number;
+  omnivampPercent: number;
+  emergencyShieldPercent: number;
+  stackingAttackPercent: number;
+  emergencyShieldUsed: boolean;
+  stunUntilTick: number;
+  burnUntilTick: number;
+  burnNextTick: number;
+  burnPower: number;
+  burnSourceId: string | null;
+  lastDamagerId: string | null;
+  state: BattleUnitState;
+  ability: AbilityDefinition | null;
+}
+
+interface AttackIntent {
+  kind: "attack";
+  sourceId: string;
+  targetId: string;
+}
+
+interface CastIntent {
+  kind: "cast";
+  sourceId: string;
+  targetIds: string[];
+}
+
+interface MoveIntent {
+  kind: "move";
+  sourceId: string;
+  targetId: string;
+  to: Position;
+}
+
+type CombatIntent = AttackIntent | CastIntent | MoveIntent;
+
+function findDefinition(
+  id: string,
+  content: GameContent,
+): CombatDefinition | null {
+  const unit = getUnitDefinition(id, content);
+  if (unit) {
+    return { id: unit.id, stats: unit.stats, ability: unit.ability };
+  }
+  const enemy = content.enemies.find((candidate) => candidate.id === id);
+  return enemy
+    ? {
+        id: enemy.id,
+        stats: enemy.stats,
+        ability: enemy.ability ?? null,
+      }
+    : null;
+}
+
+function applyTraitEffect(
+  unit: MutableBattleUnit,
+  effect: TraitEffect,
+): void {
+  switch (effect.kind) {
+    case "max-health-percent": {
+      const added = Math.floor((unit.maxHp * effect.value) / 100);
+      unit.maxHp += added;
+      unit.hp += added;
+      break;
+    }
+    case "attack-speed-percent":
+      unit.attackIntervalTicks = Math.max(
+        1,
+        Math.round(
+          (unit.attackIntervalTicks * 100) / (100 + effect.value),
+        ),
+      );
+      break;
+    case "defense-flat":
+      unit.defense += effect.value;
+      break;
+    case "omnivamp-percent":
+      unit.omnivampPercent += effect.value;
+      break;
+    case "starting-energy":
+      unit.energy = Math.min(100, unit.energy + effect.value);
+      break;
+    case "attack-percent":
+      unit.attack = Math.floor((unit.attack * (100 + effect.value)) / 100);
+      break;
+    case "stacking-attack-percent":
+      unit.stackingAttackPercent += effect.value;
+      break;
+    case "emergency-shield-percent":
+      unit.emergencyShieldPercent += effect.value;
+      break;
+    case "dodge-percent":
+      unit.dodgePercent += effect.value;
+      break;
+    case "critical-chance-percent":
+      unit.criticalChancePercent += effect.value;
+      break;
+    case "ability-power-percent":
+      unit.abilityPowerPercent += effect.value;
+      break;
+    case "range-flat":
+      unit.range += effect.value;
+      break;
+    case "shield-flat":
+      unit.shield += effect.value;
+      break;
+  }
+}
+
+function createMutableUnits(
+  team: BattleTeam,
+  content: GameContent,
+): MutableBattleUnit[] {
+  const tickMs = content.config.combatTickMs;
+  const traitEffects = getActiveTraitEffects(
+    team.activeTraits ?? [],
+    content,
+  );
+  const result: MutableBattleUnit[] = [];
+  for (const setup of [...team.units].sort((left, right) =>
+    left.id.localeCompare(right.id),
+  )) {
+    const definition = findDefinition(setup.definitionId, content);
+    if (!definition) {
+      continue;
+    }
+    const statMultiplier =
+      content.config.starStatBasisPoints[setup.star - 1] ?? 10_000;
+    const maxHp = Math.max(
+      1,
+      Math.floor((definition.stats.health * statMultiplier) / 10_000),
+    );
+    const unit: MutableBattleUnit = {
+      id: setup.id,
+      definitionId: setup.definitionId,
+      teamId: team.id,
+      star: setup.star,
+      x: setup.position.x,
+      y: setup.position.y,
+      hp: maxHp,
+      maxHp,
+      shield: 0,
+      energy: 0,
+      attack: Math.max(
+        1,
+        Math.floor((definition.stats.attack * statMultiplier) / 10_000),
+      ),
+      defense: Math.max(
+        0,
+        Math.floor((definition.stats.defense * statMultiplier) / 10_000),
+      ),
+      range: definition.stats.range,
+      attackIntervalTicks: Math.max(
+        1,
+        Math.round(definition.stats.attackIntervalMs / tickMs),
+      ),
+      moveIntervalTicks: Math.max(
+        1,
+        Math.round(definition.stats.moveIntervalMs / tickMs),
+      ),
+      nextAttackTick: 0,
+      nextMoveTick: 0,
+      abilityPowerPercent: 0,
+      criticalChancePercent: 10,
+      dodgePercent: 0,
+      omnivampPercent: 0,
+      emergencyShieldPercent: 0,
+      stackingAttackPercent: 0,
+      emergencyShieldUsed: false,
+      stunUntilTick: 0,
+      burnUntilTick: 0,
+      burnNextTick: 0,
+      burnPower: 0,
+      burnSourceId: null,
+      lastDamagerId: null,
+      state: "seek",
+      ability: definition.ability,
+    };
+
+    for (const itemId of setup.items) {
+      const item = getItemDefinition(itemId, content);
+      if (!item) {
+        continue;
+      }
+      for (const effect of item.effects) {
+        switch (effect.kind) {
+          case "health-flat":
+            unit.maxHp += effect.value;
+            unit.hp += effect.value;
+            break;
+          case "attack-flat":
+            unit.attack += effect.value;
+            break;
+          case "defense-flat":
+            unit.defense += effect.value;
+            break;
+          case "attack-speed-percent":
+            unit.attackIntervalTicks = Math.max(
+              1,
+              Math.round(
+                (unit.attackIntervalTicks * 100) / (100 + effect.value),
+              ),
+            );
+            break;
+          case "critical-chance-percent":
+            unit.criticalChancePercent += effect.value;
+            break;
+          case "ability-power-percent":
+            unit.abilityPowerPercent += effect.value;
+            break;
+          case "starting-energy":
+            unit.energy = Math.min(100, unit.energy + effect.value);
+            break;
+          case "range-flat":
+            unit.range += effect.value;
+            break;
+          case "omnivamp-percent":
+            unit.omnivampPercent += effect.value;
+            break;
+        }
+      }
+    }
+    for (const effect of traitEffects) {
+      applyTraitEffect(unit, effect);
+    }
+    result.push(unit);
+  }
+  return result;
+}
+
+function distance(left: MutableBattleUnit, right: MutableBattleUnit): number {
+  return Math.abs(left.x - right.x) + Math.abs(left.y - right.y);
+}
+
+function alive(unit: MutableBattleUnit): boolean {
+  return unit.state !== "dead" && unit.hp > 0;
+}
+
+function chooseTarget(
+  source: MutableBattleUnit,
+  candidates: MutableBattleUnit[],
+  targeting: AbilityDefinition["targeting"] = "nearest-enemy",
+): MutableBattleUnit | null {
+  if (candidates.length === 0) {
+    return null;
+  }
+  const ordered = [...candidates].sort((left, right) => {
+    if (targeting === "farthest-enemy") {
+      return (
+        distance(source, right) - distance(source, left) ||
+        left.id.localeCompare(right.id)
+      );
+    }
+    if (
+      targeting === "lowest-health-enemy" ||
+      targeting === "lowest-health-ally"
+    ) {
+      const leftRatio = left.hp / Math.max(1, left.maxHp);
+      const rightRatio = right.hp / Math.max(1, right.maxHp);
+      return (
+        leftRatio - rightRatio ||
+        distance(source, left) - distance(source, right) ||
+        left.id.localeCompare(right.id)
+      );
+    }
+    return (
+      distance(source, left) - distance(source, right) ||
+      left.id.localeCompare(right.id)
+    );
+  });
+  return ordered[0] ?? null;
+}
+
+function abilityTargets(
+  source: MutableBattleUnit,
+  units: MutableBattleUnit[],
+  content: GameContent,
+): MutableBattleUnit[] {
+  const ability = source.ability;
+  if (!ability) {
+    return [];
+  }
+  const enemies = units.filter(
+    (unit) => alive(unit) && unit.teamId !== source.teamId,
+  );
+  const allies = units.filter(
+    (unit) => alive(unit) && unit.teamId === source.teamId,
+  );
+  if (ability.targeting === "self") {
+    return [source];
+  }
+  const candidateGroup =
+    ability.targeting === "lowest-health-ally" ? allies : enemies;
+  const primary = chooseTarget(source, candidateGroup, ability.targeting);
+  if (!primary) {
+    return [];
+  }
+  if (ability.pattern === "single" || ability.pattern === "single-ally") {
+    return [primary];
+  }
+  if (ability.pattern === "all-enemies") {
+    return [...candidateGroup].sort((left, right) =>
+      left.id.localeCompare(right.id),
+    );
+  }
+  if (ability.pattern === "adjacent") {
+    return candidateGroup
+      .filter(
+        (unit) =>
+          Math.max(Math.abs(unit.x - primary.x), Math.abs(unit.y - primary.y)) <=
+          1,
+      )
+      .sort((left, right) => left.id.localeCompare(right.id));
+  }
+  if (ability.pattern === "line") {
+    const ray = lineRayCells(
+      source,
+      primary,
+      content.config.boardWidth,
+      content.config.boardHeight,
+    );
+    const targets = candidateGroup.filter((unit) =>
+      ray.has(positionKey(unit.x, unit.y)),
+    );
+    return (targets.length > 0 ? targets : [primary]).sort((left, right) =>
+      left.id.localeCompare(right.id),
+    );
+  }
+  return [primary];
+}
+
+function positionKey(x: number, y: number): string {
+  return `${x},${y}`;
+}
+
+function lineRayCells(
+  source: Pick<MutableBattleUnit, "x" | "y">,
+  target: Pick<MutableBattleUnit, "x" | "y">,
+  boardWidth: number,
+  boardHeight: number,
+): Set<string> {
+  const vectorX = target.x - source.x;
+  const vectorY = target.y - source.y;
+  if (vectorX === 0 && vectorY === 0) {
+    return new Set([positionKey(target.x, target.y)]);
+  }
+  const cells = new Set<string>();
+  let x = source.x;
+  let y = source.y;
+  const stepX = Math.sign(vectorX);
+  const stepY = Math.sign(vectorY);
+  const absoluteX = Math.abs(vectorX);
+  const absoluteY = Math.abs(vectorY);
+  let crossedX = 0;
+  let crossedY = 0;
+
+  while (true) {
+    if (absoluteX === 0) {
+      y += stepY;
+      crossedY += 1;
+    } else if (absoluteY === 0) {
+      x += stepX;
+      crossedX += 1;
+    } else {
+      const nextX = (2 * crossedX + 1) * absoluteY;
+      const nextY = (2 * crossedY + 1) * absoluteX;
+      if (nextX <= nextY) {
+        x += stepX;
+        crossedX += 1;
+      }
+      if (nextY <= nextX) {
+        y += stepY;
+        crossedY += 1;
+      }
+    }
+    if (x < 0 || x >= boardWidth || y < 0 || y >= boardHeight) {
+      break;
+    }
+    cells.add(positionKey(x, y));
+  }
+  cells.add(positionKey(target.x, target.y));
+  return cells;
+}
+
+function chooseStep(
+  source: MutableBattleUnit,
+  target: MutableBattleUnit,
+  units: MutableBattleUnit[],
+  content: GameContent,
+): Position | null {
+  if (distance(source, target) <= source.range) {
+    return null;
+  }
+  const occupied = new Set(
+    units
+      .filter((unit) => alive(unit) && unit.id !== source.id)
+      .map((unit) => positionKey(unit.x, unit.y)),
+  );
+
+  type PathNode = Position & {
+    depth: number;
+    firstStep: Position | null;
+  };
+  const queue: PathNode[] = [
+    { x: source.x, y: source.y, depth: 0, firstStep: null },
+  ];
+  const visited = new Set<string>();
+  const goals: PathNode[] = [];
+  let goalDepth: number | null = null;
+  let readIndex = 0;
+
+  while (readIndex < queue.length) {
+    const current = queue[readIndex];
+    readIndex += 1;
+    if (goalDepth !== null && current.depth > goalDepth) {
+      break;
+    }
+    if (
+      current.firstStep &&
+      Math.abs(current.x - target.x) + Math.abs(current.y - target.y) <=
+        source.range
+    ) {
+      goalDepth = current.depth;
+      goals.push(current);
+      continue;
+    }
+    if (goalDepth !== null) {
+      continue;
+    }
+
+    const neighbors = [
+      { x: current.x - 1, y: current.y },
+      { x: current.x + 1, y: current.y },
+      { x: current.x, y: current.y - 1 },
+      { x: current.x, y: current.y + 1 },
+    ]
+      .filter(
+        (position) =>
+          position.x >= 0 &&
+          position.x < content.config.boardWidth &&
+          position.y >= 0 &&
+          position.y < content.config.boardHeight &&
+          !occupied.has(positionKey(position.x, position.y)) &&
+          !(
+            current.firstStep &&
+            position.x === source.x &&
+            position.y === source.y
+          ),
+      )
+      .sort(
+        (left, right) =>
+          Math.abs(left.x - target.x) +
+            Math.abs(left.y - target.y) -
+            (Math.abs(right.x - target.x) +
+              Math.abs(right.y - target.y)) ||
+          left.y - right.y ||
+          left.x - right.x,
+      );
+
+    for (const neighbor of neighbors) {
+      const firstStep = current.firstStep ?? neighbor;
+      const visitKey = `${positionKey(firstStep.x, firstStep.y)}|${positionKey(neighbor.x, neighbor.y)}`;
+      if (visited.has(visitKey)) {
+        continue;
+      }
+      visited.add(visitKey);
+      queue.push({
+        ...neighbor,
+        depth: current.depth + 1,
+        firstStep,
+      });
+    }
+  }
+  return (
+    goals.sort(
+      (left, right) =>
+        Math.abs(left.x - target.x) +
+          Math.abs(left.y - target.y) -
+          (Math.abs(right.x - target.x) +
+            Math.abs(right.y - target.y)) ||
+        left.y - right.y ||
+        left.x - right.x ||
+        left.firstStep!.y - right.firstStep!.y ||
+        left.firstStep!.x - right.firstStep!.x,
+    )[0]?.firstStep ?? null
+  );
+}
+
+export function remainingTeamHealthPercentage(
+  units: readonly Pick<BattleUnitSnapshot, "teamId" | "hp" | "maxHp">[],
+  teamId: string,
+): number {
+  const teamUnits = units.filter((unit) => unit.teamId === teamId);
+  const maximumHealth = teamUnits.reduce(
+    (sum, unit) => sum + Math.max(1, unit.maxHp),
+    0,
+  );
+  if (maximumHealth === 0) {
+    return 0;
+  }
+  const remainingHealth = teamUnits.reduce(
+    (sum, unit) => sum + Math.max(0, Math.min(unit.hp, unit.maxHp)),
+    0,
+  );
+  return remainingHealth / maximumHealth;
+}
+
+function toSnapshot(unit: MutableBattleUnit): BattleUnitSnapshot {
+  return {
+    id: unit.id,
+    definitionId: unit.definitionId,
+    teamId: unit.teamId,
+    star: unit.star,
+    x: unit.x,
+    y: unit.y,
+    hp: Math.max(0, unit.hp),
+    maxHp: unit.maxHp,
+    shield: Math.max(0, unit.shield),
+    energy: unit.energy,
+    attack: unit.attack,
+    defense: unit.defense,
+    range: unit.range,
+    state: unit.state,
+  };
+}
+
+export function simulateBattle(
+  teamA: BattleTeam,
+  teamB: BattleTeam,
+  options: BattleOptions,
+  content: GameContent = DEFAULT_CONTENT,
+): BattleResult {
+  let rngState = hashSeed(options.seed);
+  const maxTicks = options.maxTicks ?? content.config.combatMaxTicks;
+  const recordEvents = options.recordEvents ?? true;
+  const events: BattleEvent[] = [];
+  const emit = (event: BattleEvent): void => {
+    if (recordEvents) {
+      events.push(event);
+    }
+  };
+  const units = [
+    ...createMutableUnits(teamA, content),
+    ...createMutableUnits(teamB, content),
+  ].sort((left, right) => left.id.localeCompare(right.id));
+
+  const roll = (percent: number): boolean => {
+    if (percent <= 0) {
+      return false;
+    }
+    if (percent >= 100) {
+      return true;
+    }
+    const random = nextRandom(rngState);
+    rngState = random.state;
+    return random.value * 100 < percent;
+  };
+
+  const applyHeal = (
+    tick: number,
+    source: MutableBattleUnit,
+    target: MutableBattleUnit,
+    rawAmount: number,
+  ): void => {
+    if (!alive(target)) {
+      return;
+    }
+    const amount = Math.min(rawAmount, target.maxHp - target.hp);
+    if (amount <= 0) {
+      return;
+    }
+    target.hp += amount;
+    emit({
+      type: "heal",
+      tick,
+      sourceId: source.id,
+      targetId: target.id,
+      amount,
+    });
+  };
+
+  const applyShield = (
+    tick: number,
+    source: MutableBattleUnit,
+    target: MutableBattleUnit,
+    amount: number,
+  ): void => {
+    if (!alive(target) || amount <= 0) {
+      return;
+    }
+    target.shield += amount;
+    emit({
+      type: "shield",
+      tick,
+      sourceId: source.id,
+      targetId: target.id,
+      amount,
+    });
+  };
+
+  const applyDamage = (
+    tick: number,
+    source: MutableBattleUnit | null,
+    target: MutableBattleUnit,
+    rawAmount: number,
+    damageKind: "attack" | "ability" | "burn",
+  ): number => {
+    if (!alive(target)) {
+      return 0;
+    }
+    const mitigated = Math.max(
+      1,
+      Math.floor((rawAmount * 100) / (100 + Math.max(0, target.defense))),
+    );
+    const shieldDamage = Math.min(target.shield, mitigated);
+    target.shield -= shieldDamage;
+    const healthDamage = Math.min(target.hp, mitigated - shieldDamage);
+    target.hp -= healthDamage;
+    const dealt = shieldDamage + healthDamage;
+    if (source) {
+      target.lastDamagerId = source.id;
+      if (source.omnivampPercent > 0 && healthDamage > 0) {
+        applyHeal(
+          tick,
+          source,
+          source,
+          Math.floor((healthDamage * source.omnivampPercent) / 100),
+        );
+      }
+    }
+    if (dealt > 0) {
+      target.energy = Math.min(100, target.energy + 5);
+      emit({
+        type: "damage",
+        tick,
+        sourceId: source?.id ?? target.id,
+        targetId: target.id,
+        amount: dealt,
+        damageKind,
+      });
+    }
+    if (
+      target.hp > 0 &&
+      !target.emergencyShieldUsed &&
+      target.emergencyShieldPercent > 0 &&
+      target.hp * 100 <= target.maxHp * 30
+    ) {
+      target.emergencyShieldUsed = true;
+      const amount = Math.max(
+        1,
+        Math.floor(
+          (target.maxHp * target.emergencyShieldPercent) / 100,
+        ),
+      );
+      applyShield(tick, target, target, amount);
+      emit({
+        type: "status",
+        tick,
+        sourceId: target.id,
+        targetId: target.id,
+        status: "emergency-shield",
+        durationTicks: 0,
+      });
+    }
+    return healthDamage;
+  };
+
+  const processDeaths = (tick: number): void => {
+    for (const unit of units) {
+      if (unit.state === "dead" || unit.hp > 0) {
+        continue;
+      }
+      unit.state = "dead";
+      unit.hp = 0;
+      emit({
+        type: "death",
+        tick,
+        unitId: unit.id,
+        sourceId: unit.lastDamagerId,
+      });
+      const killer = units.find(
+        (candidate) => candidate.id === unit.lastDamagerId,
+      );
+      if (killer && killer.stackingAttackPercent > 0) {
+        killer.attack = Math.max(
+          killer.attack + 1,
+          Math.floor(
+            (killer.attack * (100 + killer.stackingAttackPercent)) / 100,
+          ),
+        );
+      }
+    }
+  };
+
+  emit({
+    type: "battle-start",
+    tick: 0,
+    teamAId: teamA.id,
+    teamBId: teamB.id,
+  });
+
+  let endTick = 0;
+  let timedOut = false;
+  for (let tick = 1; tick <= maxTicks; tick += 1) {
+    endTick = tick;
+    for (const unit of units) {
+      if (
+        alive(unit) &&
+        unit.burnPower > 0 &&
+        tick <= unit.burnUntilTick &&
+        tick >= unit.burnNextTick
+      ) {
+        const source =
+          units.find((candidate) => candidate.id === unit.burnSourceId) ??
+          null;
+        applyDamage(tick, source, unit, unit.burnPower, "burn");
+        unit.burnNextTick = tick + Math.round(1_000 / content.config.combatTickMs);
+      }
+    }
+    processDeaths(tick);
+
+    const livingA = units.some(
+      (unit) => alive(unit) && unit.teamId === teamA.id,
+    );
+    const livingB = units.some(
+      (unit) => alive(unit) && unit.teamId === teamB.id,
+    );
+    if (!livingA || !livingB) {
+      break;
+    }
+
+    const intents: CombatIntent[] = [];
+    for (const source of units) {
+      if (!alive(source)) {
+        continue;
+      }
+      if (tick < source.stunUntilTick) {
+        source.state = "stunned";
+        continue;
+      }
+      source.state = "seek";
+      if (source.ability && source.energy >= 100) {
+        const targets = abilityTargets(source, units, content);
+        if (targets.length > 0) {
+          source.state = "cast";
+          intents.push({
+            kind: "cast",
+            sourceId: source.id,
+            targetIds: targets.map((target) => target.id),
+          });
+          continue;
+        }
+      }
+      const target = chooseTarget(
+        source,
+        units.filter(
+          (candidate) =>
+            alive(candidate) && candidate.teamId !== source.teamId,
+        ),
+      );
+      if (!target) {
+        continue;
+      }
+      if (distance(source, target) <= source.range && tick >= source.nextAttackTick) {
+        source.state = "attack-windup";
+        intents.push({
+          kind: "attack",
+          sourceId: source.id,
+          targetId: target.id,
+        });
+        continue;
+      }
+      if (tick >= source.nextMoveTick) {
+        const step = chooseStep(source, target, units, content);
+        if (step) {
+          source.state = "move";
+          intents.push({
+            kind: "move",
+            sourceId: source.id,
+            targetId: target.id,
+            to: step,
+          });
+        }
+      }
+    }
+
+    for (const intent of intents.filter(
+      (candidate): candidate is CastIntent => candidate.kind === "cast",
+    )) {
+      const source = units.find((unit) => unit.id === intent.sourceId);
+      if (!source || !source.ability) {
+        continue;
+      }
+      const abilityDefinition = source.ability;
+      source.energy = 0;
+      source.nextAttackTick =
+        tick +
+        Math.max(
+          1,
+          Math.round(abilityDefinition.castTimeMs / content.config.combatTickMs),
+        );
+      emit({
+        type: "cast",
+        tick,
+        sourceId: source.id,
+        abilityId: abilityDefinition.id,
+        targetIds: intent.targetIds,
+      });
+      const abilityMultiplier =
+        content.config.starAbilityBasisPoints[source.star - 1] ?? 10_000;
+      const scaledPower = Math.max(
+        1,
+        Math.floor(
+          (abilityDefinition.power *
+            abilityMultiplier *
+            (100 + source.abilityPowerPercent)) /
+            1_000_000,
+        ),
+      );
+      for (const targetId of intent.targetIds) {
+        const target = units.find((unit) => unit.id === targetId);
+        if (!target) {
+          continue;
+        }
+        if (abilityDefinition.effect === "heal") {
+          applyHeal(tick, source, target, scaledPower);
+        } else if (abilityDefinition.effect === "shield") {
+          applyShield(tick, source, target, scaledPower);
+        } else {
+          const hits = Math.max(1, abilityDefinition.hits ?? 1);
+          for (let hit = 0; hit < hits; hit += 1) {
+            applyDamage(tick, source, target, scaledPower, "ability");
+          }
+          if (target.hp > 0 && abilityDefinition.stunMs) {
+            const durationTicks = Math.max(
+              1,
+              Math.round(
+                abilityDefinition.stunMs / content.config.combatTickMs,
+              ),
+            );
+            target.stunUntilTick = Math.max(
+              target.stunUntilTick,
+              tick + durationTicks,
+            );
+            emit({
+              type: "status",
+              tick,
+              sourceId: source.id,
+              targetId: target.id,
+              status: "stun",
+              durationTicks,
+            });
+          }
+          if (
+            target.hp > 0 &&
+            abilityDefinition.burnPower &&
+            abilityDefinition.burnDurationMs
+          ) {
+            const durationTicks = Math.max(
+              1,
+              Math.round(
+                abilityDefinition.burnDurationMs /
+                  content.config.combatTickMs,
+              ),
+            );
+            target.burnPower = Math.max(
+              target.burnPower,
+              Math.floor(
+                (abilityDefinition.burnPower *
+                  abilityMultiplier *
+                  (100 + source.abilityPowerPercent)) /
+                  1_000_000,
+              ),
+            );
+            target.burnUntilTick = Math.max(
+              target.burnUntilTick,
+              tick + durationTicks,
+            );
+            target.burnNextTick = tick + Math.round(1_000 / content.config.combatTickMs);
+            target.burnSourceId = source.id;
+            emit({
+              type: "status",
+              tick,
+              sourceId: source.id,
+              targetId: target.id,
+              status: "burn",
+              durationTicks,
+            });
+          }
+        }
+      }
+    }
+
+    for (const intent of intents.filter(
+      (candidate): candidate is AttackIntent => candidate.kind === "attack",
+    )) {
+      const source = units.find((unit) => unit.id === intent.sourceId);
+      const target = units.find((unit) => unit.id === intent.targetId);
+      if (!source || !target) {
+        continue;
+      }
+      source.nextAttackTick = tick + source.attackIntervalTicks;
+      source.state = "attack-recovery";
+      source.energy = Math.min(100, source.energy + 10);
+      if (roll(target.dodgePercent)) {
+        emit({
+          type: "attack",
+          tick,
+          sourceId: source.id,
+          targetId: target.id,
+          critical: false,
+        });
+        continue;
+      }
+      const critical = roll(source.criticalChancePercent);
+      emit({
+        type: "attack",
+        tick,
+        sourceId: source.id,
+        targetId: target.id,
+        critical,
+      });
+      applyDamage(
+        tick,
+        source,
+        target,
+        critical ? source.attack * 2 : source.attack,
+        "attack",
+      );
+    }
+
+    processDeaths(tick);
+
+    const reserved = new Set(
+      units.filter(alive).map((unit) => `${unit.x},${unit.y}`),
+    );
+    for (const intent of intents.filter(
+      (candidate): candidate is MoveIntent => candidate.kind === "move",
+    )) {
+      const source = units.find((unit) => unit.id === intent.sourceId);
+      if (!source || !alive(source)) {
+        continue;
+      }
+      const destinationKey = `${intent.to.x},${intent.to.y}`;
+      if (reserved.has(destinationKey)) {
+        continue;
+      }
+      const from = { x: source.x, y: source.y };
+      reserved.delete(`${source.x},${source.y}`);
+      reserved.add(destinationKey);
+      source.x = intent.to.x;
+      source.y = intent.to.y;
+      source.nextMoveTick = tick + source.moveIntervalTicks;
+      emit({
+        type: "unit-move",
+        tick,
+        unitId: source.id,
+        from,
+        to: intent.to,
+      });
+    }
+  }
+
+  const survivingA = units.filter(
+    (unit) => alive(unit) && unit.teamId === teamA.id,
+  );
+  const survivingB = units.filter(
+    (unit) => alive(unit) && unit.teamId === teamB.id,
+  );
+  let winner: BattleResult["winner"] = "draw";
+  let winnerId: string | null = null;
+  if (survivingA.length > 0 && survivingB.length === 0) {
+    winner = "a";
+    winnerId = teamA.id;
+  } else if (survivingB.length > 0 && survivingA.length === 0) {
+    winner = "b";
+    winnerId = teamB.id;
+  } else if (survivingA.length > 0 && survivingB.length > 0) {
+    timedOut = true;
+    const healthA = remainingTeamHealthPercentage(units, teamA.id);
+    const healthB = remainingTeamHealthPercentage(units, teamB.id);
+    if (Math.abs(healthA - healthB) > 0.000_001) {
+      winner = healthA > healthB ? "a" : "b";
+      winnerId = winner === "a" ? teamA.id : teamB.id;
+    }
+  }
+  emit({
+    type: "battle-end",
+    tick: endTick,
+    winnerId,
+    timedOut,
+  });
+  return {
+    winner,
+    winnerId,
+    timedOut,
+    durationTicks: endTick,
+    events,
+    finalUnits: units.map(toSnapshot),
+  };
+}

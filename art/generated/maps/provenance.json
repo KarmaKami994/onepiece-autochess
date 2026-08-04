@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-04",
+  "tool": "OpenAI built-in image generation",
+  "usage": "Private local fan-prototype battlefield backgrounds",
+  "assets": [
+    {
+      "id": "pirate-ship",
+      "source": "pirate-ship-source.png",
+      "derived": "../../../public/assets/maps/pirate-ship.png",
+      "prompt": "Original orthographic top-down pixel-art pirate ship deck battlefield; clear central 8x6-safe arena; deep navy ocean; perimeter-only ropes, barrels, mast bases and brass fittings; no grid, characters, UI, text, logos or emblems."
+    },
+    {
+      "id": "marine-harbor",
+      "source": "marine-harbor-source.png",
+      "derived": "../../../public/assets/maps/marine-harbor.png",
+      "prompt": "Original orthographic top-down pixel-art fortified marine harbor battlefield; clear central 8x6-safe arena; stone and timber pier with perimeter-only naval props; no franchise insignia, grid, characters, UI, text, logos or emblems."
+    }
+  ],
+  "processing": {
+    "script": "scripts/build_board_maps.mjs",
+    "outputSize": [1520, 840],
+    "runtimeDisplaySize": [760, 420],
+    "resampling": "nearest-neighbor"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "title": "Monkey D. Luffy sprite sheet",
+  "sourceGame": "One Piece: Gigant Battle!",
+  "sourcePage": "https://spritedatabase.net/file/12099",
+  "assetUrl": "https://spritedatabase.net/files/ds/2000/Sprite/MonkeyDLuffy.png",
+  "downloadedAt": "2026-08-04",
+  "dimensions": { "width": 772, "height": 5728 },
+  "sha256": "d77e40b80168e4533a27d22e2da55208435034267c9210597ecc5193d272113d",
+  "rightsBasis": "Project owner confirmed rights to use, adapt, and include the source and derived assets in the public repository in the Codex project conversation on 2026-08-04.",
+  "distribution": "Public source collaboration is permitted by the project owner; no public playable deployment is performed and no downstream asset license is granted.",
+  "processing": "The archived PNG remains unchanged. Runtime frames use exact #49557D removal, curated source rectangles, and explicit foot pivots without resampling or color changes."
+}

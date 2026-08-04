@@ -1,0 +1,52 @@
+{
+  "name": "grand-line-auto-chess",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "assets:maps": "node scripts/build_board_maps.mjs",
+    "assets:luffy": "powershell -ExecutionPolicy Bypass -File scripts/build_luffy_pilot.ps1",
+    "assets:luffy:v2": "powershell -ExecutionPolicy Bypass -File scripts/build_luffy_v2.ps1",
+    "assets:zoro": "powershell -ExecutionPolicy Bypass -File scripts/build_character_animation.ps1 -Character zoro",
+    "assets:nami": "powershell -ExecutionPolicy Bypass -File scripts/build_character_animation.ps1 -Character nami",
+    "assets:chopper": "powershell -ExecutionPolicy Bypass -File scripts/build_character_animation.ps1 -Character chopper",
+    "assets:character": "powershell -ExecutionPolicy Bypass -File scripts/build_character_animation.ps1",
+    "assets:roster": "powershell -ExecutionPolicy Bypass -File scripts/build_roster_animations.ps1",
+    "dev": "vinext dev",
+    "build": "vinext build",
+    "start": "vinext start",
+    "test": "vitest run --config vitest.config.ts --exclude tests/soak.test.ts",
+    "test:watch": "vitest --config vitest.config.ts",
+    "test:soak": "vitest run --config vitest.config.ts tests/soak.test.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
+  },
+  "dependencies": {
+    "next": "16.2.6",
+    "phaser": "4.2.1",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "1.37.1",
+    "@tailwindcss/postcss": "4.2.1",
+    "@types/node": "22.19.19",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.2",
+    "@vitejs/plugin-rsc": "0.5.26",
+    "eslint": "9.39.4",
+    "eslint-config-next": "16.2.6",
+    "sharp": "0.34.5",
+    "react-server-dom-webpack": "19.2.6",
+    "tailwindcss": "4.2.1",
+    "typescript": "5.9.3",
+    "vinext": "0.0.50",
+    "vite": "8.0.13",
+    "vitest": "^4.1.10",
+    "wrangler": "4.92.0"
+  },
+  "type": "module"
+}
