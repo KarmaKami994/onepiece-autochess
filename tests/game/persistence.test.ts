@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
   CURRENT_SAVE_SCHEMA_VERSION,
+  applyCommand,
   createMatch,
   createMemoryStorage,
   deserializeMatch,
+  getStageDefinition,
   loadMatch,
   migrateMatchState,
   removeSavedMatch,
@@ -49,6 +51,67 @@ describe("versioned local persistence", () => {
     expect(migrated.nextChoiceSerial).toBe(1);
     expect(
       migrated.players.every((player) => Array.isArray(player.finalCrew)),
+    ).toBe(true);
+  });
+
+  it("clears schema-three result logs without changing planning state", () => {
+    const state = createMatch("v3-planning-migration");
+    const human = state.players.find((player) => player.id === "player-1")!;
+    human.gold = 37;
+    human.shopLocked = true;
+    const legacy = structuredClone(state) as unknown as Record<string, unknown>;
+    legacy.schemaVersion = 3;
+    legacy.lastResults = [{ events: [{ type: "legacy-combat-event" }] }];
+
+    const migrated = migrateMatchState(legacy);
+
+    expect(migrated.schemaVersion).toBe(4);
+    expect(migrated.phase).toBe("preparation");
+    expect(migrated.lastResults).toEqual([]);
+    expect(migrated.players).toEqual(state.players);
+    expect(migrated.pool).toEqual(state.pool);
+    expect(migrated.rngState).toBe(state.rngState);
+  });
+
+  it("deterministically regenerates schema-three battles and preserves planning state", () => {
+    const state = createMatch("v3-battle-migration");
+    state.round = 5;
+    state.stageId = getStageDefinition(state.round).id;
+    const started = applyCommand(state, {
+      type: "END_PREPARATION",
+      playerId: "player-1",
+    });
+    if (!started.ok) throw new Error(started.error.message);
+    expect(started.state.phase).toBe("battle");
+
+    const legacy = structuredClone(started.state) as unknown as Record<
+      string,
+      unknown
+    >;
+    legacy.schemaVersion = 3;
+    legacy.lastResults = [{ events: [{ type: "legacy-combat-event" }] }];
+    const playersBefore = structuredClone(started.state.players);
+    const poolBefore = structuredClone(started.state.pool);
+    const pairingsBefore = structuredClone(started.state.pairings);
+    const rngBefore = started.state.rngState;
+
+    const first = migrateMatchState(legacy);
+    const second = migrateMatchState(legacy);
+
+    expect(first).toEqual(second);
+    expect(first.schemaVersion).toBe(4);
+    expect(first.phase).toBe("battle");
+    expect(first.players).toEqual(playersBefore);
+    expect(first.pool).toEqual(poolBefore);
+    expect(first.pairings).toEqual(pairingsBefore);
+    expect(first.rngState).toBe(rngBefore);
+    expect(first.lastResults).toHaveLength(started.state.pairings.length);
+    expect(
+      first.lastResults.every(
+        (result) =>
+          Array.isArray(result.initialUnits) &&
+          !JSON.stringify(result.events).includes("legacy-combat-event"),
+      ),
     ).toBe(true);
   });
 

@@ -982,16 +982,20 @@ kbd {
 .match-body {
   position: relative;
   z-index: 5;
+  isolation: isolate;
   display: grid;
   min-height: 0;
   padding: 6px 7px 5px;
   grid-template-columns: 190px minmax(650px, 1fr) 220px;
   gap: 6px;
+  background: #061923;
   overflow: hidden;
 }
 
 .left-rail,
 .right-rail {
+  position: relative;
+  z-index: 3;
   display: grid;
   min-width: 0;
   min-height: 0;
@@ -1202,64 +1206,126 @@ details.trait-building {
 
 .board-column {
   position: relative;
-  display: grid;
+  z-index: 2;
+  display: block;
   min-width: 0;
   min-height: 0;
-  grid-template-rows: 25px minmax(0, 1fr);
+  pointer-events: none;
 }
 
 .board-ribbon {
+  position: absolute;
+  z-index: 13;
+  top: 5px;
+  left: 50%;
   display: flex;
+  width: max-content;
+  max-width: calc(100% - 18px);
+  min-height: 25px;
+  padding: 0 12px;
   align-items: center;
   justify-content: center;
   gap: 9px;
+  border: 1px solid #91703d;
   color: #769897;
-  background: #061922;
+  background: #061922d9;
+  box-shadow: 2px 3px 0 #020b1099;
   font: 700 10px/1 "Courier New", monospace;
   letter-spacing: 0.06em;
+  transform: translateX(-50%);
+  white-space: nowrap;
 }
 
 .board-ribbon span.active { color: var(--gold); }
 .board-ribbon strong { color: #a9bcb8; font-weight: 700; }
 .board-ribbon i { width: 34px; height: 1px; background: #52696b; }
 
+.combat-hud {
+  position: absolute;
+  z-index: 14;
+  top: 32px;
+  right: 8px;
+  display: flex;
+  min-height: 30px;
+  padding: 4px 6px;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid #8f6d3a;
+  color: #d8c491;
+  background: #061922e8;
+  box-shadow: 2px 3px 0 #020b1099;
+  font: 900 9px/1 "Courier New", monospace;
+  letter-spacing: 0.06em;
+  pointer-events: auto;
+}
+
+.combat-hud-label {
+  color: #eabf64;
+}
+
+.combat-hud label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.combat-hud select {
+  min-width: 58px;
+  height: 22px;
+  padding: 0 3px;
+  border: 1px solid #6e8c8d;
+  border-radius: 0;
+  color: #eef5e9;
+  background: #0b3039;
+  font: 900 10px/1 "Courier New", monospace;
+  cursor: pointer;
+}
+
+.combat-hud select:focus-visible {
+  outline: 2px solid #f3d477;
+  outline-offset: 1px;
+}
+
+.combat-hud-key {
+  color: #82aaa8;
+  font-size: 8px;
+}
+
 .phaser-stage-frame {
-  position: relative;
+  position: absolute;
+  z-index: 0;
+  inset: 0;
   min-width: 0;
   min-height: 0;
-  border: 2px solid #99733a;
-  background: radial-gradient(circle at center, #0b3945, #061923);
+  border: 0;
+  background: #061923;
   box-shadow:
-    inset 0 0 0 2px #07161c,
-    inset 0 0 28px #02090d;
+    inset 0 0 48px #02090d99,
+    inset 0 0 0 1px #a47b3b55;
   overflow: hidden;
 }
 
 .phaser-stage-frame[data-board-skin="marine-harbor"] {
-  border-color: #8cb9c7;
   box-shadow:
-    inset 0 0 0 2px #07161c,
-    inset 0 0 28px #03131b;
+    inset 0 0 48px #03131b99,
+    inset 0 0 0 1px #8cb9c755;
 }
 
 .phaser-stage-frame[data-phase="battle"] {
-  border-color: #b44943;
   box-shadow:
-    inset 0 0 0 2px #2f1718,
-    inset 0 0 34px #8a282744;
+    inset 0 0 56px #8a282744,
+    inset 0 0 0 2px #b4494366;
 }
 
 .phaser-host {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
 }
 
 .phaser-host canvas {
   display: block;
-  margin: auto;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain;
   image-rendering: pixelated;
 }
 
@@ -2481,6 +2547,34 @@ details.trait-building {
   font: 700 10px/1.35 "Courier New", monospace;
 }
 
+.tutorial-combat-legend {
+  display: grid;
+  margin: 9px 0;
+  padding: 7px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px 8px;
+  border: 1px solid #596f70;
+  background: #061a22b8;
+  list-style: none;
+}
+
+.tutorial-combat-legend li {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 5px;
+  color: #b8ceca;
+  font: 800 9px/1.2 "Courier New", monospace;
+}
+
+.tutorial-combat-legend li span {
+  display: grid;
+  width: 18px;
+  flex: 0 0 18px;
+  place-items: center;
+  color: #f0cf72;
+}
+
 .tutorial-focus {
   position: relative;
   z-index: 35;
@@ -3401,6 +3495,19 @@ details.trait-building {
   .title-lockup {
     margin-left: 0;
   }
+
+  .combat-hud-key {
+    display: none;
+  }
+}
+
+.game-shell.reduced-motion *,
+.game-shell.reduced-motion *::before,
+.game-shell.reduced-motion *::after {
+  scroll-behavior: auto !important;
+  transition-duration: 0.01ms !important;
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

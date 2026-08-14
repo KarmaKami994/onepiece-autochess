@@ -22,6 +22,10 @@ import {
   isBoardSkin,
   type BoardSkin,
 } from "@/components/boardMapManifest";
+import {
+  resolvePurchaseSelection,
+  retainValidBoardSelection,
+} from "@/components/boardSelection";
 import "./game.css";
 
 type UnknownRecord = Record<string, unknown>;
@@ -50,6 +54,8 @@ type Settings = {
   volume: number;
   animationSpeed: number;
   particles: boolean;
+  combatNumbers: boolean;
+  reducedMotion: boolean;
   highContrast: boolean;
   boardSkin: BoardSkin;
 };
@@ -226,6 +232,8 @@ const DEFAULT_SETTINGS: Settings = {
   volume: 0.5,
   animationSpeed: 1,
   particles: true,
+  combatNumbers: true,
+  reducedMotion: false,
   highContrast: false,
   boardSkin: DEFAULT_BOARD_SKIN,
 };
@@ -591,6 +599,7 @@ function buildBoardUnits(
   player: UnknownRecord,
   opponent: UnknownRecord | null,
   definitions: Map<string, UnknownRecord>,
+  enemyDefinitions: Map<string, UnknownRecord>,
   traitDefinitions: Map<string, UnknownRecord>,
   itemDefinitions: Map<string, UnknownRecord>,
 ): { units: BoardUnit[]; views: Map<string, ShopUnitView> } {
@@ -696,6 +705,8 @@ function buildBoardUnits(
           : [],
         hp: numberValue(instance.currentHp ?? instance.hp, maxHp),
         maxHp,
+        shield: 0,
+        energy: 0,
         portrait: view.token,
       });
     });
@@ -714,6 +725,61 @@ function buildBoardUnits(
       stringValue(resultItem.awayPlayerId) === playerId
     );
   });
+  const mirrorBattle = stringValue(relevantResult?.playerBId) === humanId;
+  const initialSnapshots = recordValues(
+    relevantResult?.initialUnits ?? asRecord(relevantResult?.battle).initialUnits,
+  );
+  initialSnapshots.forEach((rawUnit) => {
+    const unit = asRecord(rawUnit);
+    const id = stringValue(unit.id ?? unit.unitId);
+    if (!id) return;
+    const definitionId = stringValue(
+      unit.definitionId ?? unit.contentId,
+      id.split(":").at(-1) ?? id,
+    );
+    const definition =
+      definitions.get(definitionId) ?? enemyDefinitions.get(definitionId) ?? {};
+    const view = unitView(definitionId, definition, traitDefinitions);
+    const team =
+      stringValue(unit.teamId) === humanId || id.startsWith(`${humanId}:`)
+        ? "player"
+        : "enemy";
+    const snapshotX = Math.min(7, Math.max(0, numberValue(unit.x, 0)));
+    const snapshotY = Math.min(5, Math.max(0, numberValue(unit.y, 0)));
+    const x = mirrorBattle ? 7 - snapshotX : snapshotX;
+    const y = mirrorBattle ? 5 - snapshotY : snapshotY;
+    const maxHp = Math.max(1, numberValue(unit.maxHp, 100));
+    const existing = result.find((candidate) => candidate.id === id);
+    views.set(id, view);
+    if (existing) {
+      existing.x = x;
+      existing.y = y;
+      existing.hp = Math.max(0, numberValue(unit.hp, maxHp));
+      existing.maxHp = maxHp;
+      existing.shield = Math.max(0, numberValue(unit.shield, 0));
+      existing.energy = Math.max(0, numberValue(unit.energy, 0));
+      return;
+    }
+    result.push({
+      id,
+      contentId: definitionId,
+      name: view.name,
+      shortName: view.shortName,
+      color: hashColor(definitionId),
+      team,
+      zone: "board",
+      x,
+      y,
+      slot: 0,
+      star: Math.max(1, numberValue(unit.star, 1)),
+      items: [],
+      hp: Math.max(0, numberValue(unit.hp, maxHp)),
+      maxHp,
+      shield: Math.max(0, numberValue(unit.shield, 0)),
+      energy: Math.max(0, numberValue(unit.energy, 0)),
+      portrait: view.token,
+    });
+  });
   const snapshots = recordValues(
     relevantResult?.finalUnits ?? relevantResult?.units,
   );
@@ -731,6 +797,8 @@ function buildBoardUnits(
         unit.hp ?? unit.currentHp,
         existing.maxHp,
       );
+      existing.finalShield = Math.max(0, numberValue(unit.shield, 0));
+      existing.finalEnergy = Math.max(0, numberValue(unit.energy, 0));
     }
   });
 
@@ -828,7 +896,7 @@ function normalizeEvents(
         stringValue(candidate.playerAId) === viewerId ||
         stringValue(candidate.playerBId) === viewerId,
     ) ?? results[0];
-  const events = recordValues(
+  const rawEvents = recordValues(
     result?.events ?? asRecord(result?.battle).events,
   ).filter((rawEvent) => {
     const rawKind = stringValue(
@@ -841,39 +909,129 @@ function normalizeEvents(
     asRecord(asRecord(content).config).combatTickMs,
     100,
   );
+  const definitionByBattleUnit = new Map<string, string>();
+  recordValues(
+    result?.initialUnits ?? result?.finalUnits ?? result?.units,
+  ).forEach((rawUnit) => {
+    const unit = asRecord(rawUnit);
+    definitionByBattleUnit.set(
+      stringValue(unit.id ?? unit.unitId),
+      stringValue(unit.definitionId ?? unit.contentId),
+    );
+  });
+  const allDefinitions = [
+    ...getDefinitionMap("units").values(),
+    ...getDefinitionMap("enemies").values(),
+  ];
+  const abilityById = new Map(
+    allDefinitions
+      .map((definition) => asRecord(definition.ability))
+      .filter((ability) => stringValue(ability.id))
+      .map((ability) => [stringValue(ability.id), ability] as const),
+  );
+  const criticalAttacks = new Set<string>();
+  rawEvents.forEach((rawEvent) => {
+    const event = asRecord(rawEvent);
+    const rawKind = stringValue(event.kind ?? event.type).toLowerCase();
+    if (rawKind === "attack" && booleanValue(event.critical)) {
+      criticalAttacks.add(
+        `${numberValue(event.tick)}:${stringValue(event.sourceId)}:${stringValue(event.targetId)}`,
+      );
+    }
+  });
+
   return {
-    events: events.map((rawEvent, index) => {
+    events: rawEvents.map((rawEvent, index) => {
       const event = asRecord(rawEvent);
       const rawKind = stringValue(event.kind ?? event.type, "attack").toLowerCase();
-      const kind: CombatFxEvent["kind"] = rawKind.includes("move")
-        ? "move"
-        : rawKind.includes("heal")
-          ? "heal"
-        : rawKind.includes("defeat") || rawKind.includes("death")
-          ? "defeat"
-           : rawKind.includes("ability") ||
-               rawKind.includes("skill") ||
-               rawKind.includes("cast") ||
-               rawKind.includes("shield") ||
-               rawKind.includes("status")
-            ? "ability"
-            : rawKind.includes("damage")
-              ? "damage"
-              : "attack";
+      const kind: CombatFxEvent["kind"] =
+        rawKind.includes("move")
+          ? "move"
+          : rawKind.includes("heal")
+            ? "heal"
+            : rawKind.includes("shield")
+              ? "shield"
+              : rawKind.includes("energy")
+                ? "energy"
+                : rawKind.includes("dodge")
+                  ? "dodge"
+                  : rawKind.includes("status")
+                    ? "status"
+                    : rawKind.includes("buff")
+                      ? "buff"
+                      : rawKind.includes("defeat") || rawKind.includes("death")
+                        ? "defeat"
+                        : rawKind.includes("ability") ||
+                            rawKind.includes("skill") ||
+                            rawKind.includes("cast")
+                          ? "cast"
+                          : rawKind.includes("damage")
+                            ? "damage"
+                            : "attack";
+      const sourceId = stringValue(
+        event.sourceId ?? event.attackerId ?? event.casterId ?? event.unitId,
+      );
+      const targetIds = (
+        Array.isArray(event.targetIds)
+          ? event.targetIds
+          : event.targetId !== undefined
+            ? [event.targetId]
+            : []
+      ).map(String);
+      const targetId = stringValue(
+        event.targetId ??
+          event.defenderId ??
+          targetIds[0] ??
+          (rawKind.includes("death") ? event.unitId : undefined),
+      );
+      const abilityId = stringValue(event.abilityId ?? event.skillId);
+      const ability = abilityById.get(abilityId) ?? {};
+      const definitionId = definitionByBattleUnit.get(sourceId);
+      const sourceDefinition = allDefinitions.find(
+        (definition) => stringValue(definition.id) === definitionId,
+      );
+      const sourceAbility = asRecord(sourceDefinition?.ability);
+      const pattern = stringValue(
+        ability.pattern ?? sourceAbility.pattern,
+        "single",
+      ).toLowerCase();
+      const telegraph: CombatFxEvent["telegraph"] =
+        pattern.includes("line") || pattern.includes("row")
+          ? "line"
+          : targetIds.length > 1 ||
+              pattern.includes("adjacent") ||
+              pattern.includes("area") ||
+              pattern.includes("cluster")
+            ? "area"
+            : "target";
+      const tick = Math.max(0, numberValue(event.tick, index));
+      const critical =
+        booleanValue(event.critical) ||
+        criticalAttacks.has(`${tick}:${sourceId}:${targetId}`);
       return {
         id: stringValue(event.id, `${numberValue(state.round)}-${index}`),
-        tick: Math.max(0, numberValue(event.tick, index)),
+        tick,
         kind,
-        sourceId: stringValue(
-          event.sourceId ?? event.attackerId ?? event.casterId ?? event.unitId,
-        ),
-        targetId: stringValue(
-          event.targetId ??
-            event.defenderId ??
-            (Array.isArray(event.targetIds) ? event.targetIds[0] : undefined) ??
-            (rawKind.includes("death") ? event.unitId : undefined),
-        ),
+        sourceId,
+        targetId,
+        targetIds,
         amount: numberValue(event.amount ?? event.damage ?? event.healing, 0),
+        healthDamage: numberValue(event.healthDamage, 0),
+        shieldDamage: numberValue(event.shieldDamage, 0),
+        damageKind: stringValue(event.damageKind),
+        critical,
+        abilityId,
+        abilityName: stringValue(
+          event.abilityName ?? ability.name ?? sourceAbility.name,
+          abilityId ? titleCase(abilityId) : "Crew Technique",
+        ),
+        telegraph,
+        status: stringValue(event.status),
+        durationTicks: Math.max(0, numberValue(event.durationTicks, 0)),
+        energyDelta: numberValue(event.amount ?? event.delta, 0),
+        energyValue: numberValue(event.value ?? event.energy, 0),
+        reason: stringValue(event.reason),
+        stat: stringValue(event.stat),
         label: stringValue(event.label),
         toX: rawKind.includes("move")
           ? mirrorCoordinates
@@ -1032,6 +1190,7 @@ function normalizeMatch(stateValue: unknown): MatchView {
     player,
     opponentRecord,
     unitDefinitions,
+    enemyDefinitions,
     traitDefinitions,
     itemDefinitions,
   );
@@ -1039,7 +1198,7 @@ function normalizeMatch(stateValue: unknown): MatchView {
     stringValue(stage.kind).toLowerCase() === "pve" &&
     !opponentRecord;
   const isPveBattle = isPveStage && rawPhase === "battle";
-  if (isPveBattle) {
+  if (isPveBattle && !board.units.some((unit) => unit.team === "enemy")) {
     let enemyIndex = 0;
     recordValues(stage.enemyWave).forEach((rawWave) => {
       const wave = asRecord(rawWave);
@@ -1070,6 +1229,8 @@ function normalizeMatch(stateValue: unknown): MatchView {
           items: [],
           hp: maxHp,
           maxHp,
+          shield: 0,
+          energy: 0,
           portrait: definitionView.token,
         });
         enemyIndex += 1;
@@ -1517,6 +1678,10 @@ export default function GameClient() {
     } else if (nextPhase !== "battle") {
       preBattleStateRef.current = null;
     }
+    const nextUnits = normalizeMatch(next).boardUnits;
+    setSelectedUnitId((current) =>
+      retainValidBoardSelection(current, nextUnits),
+    );
     setEngineStateReact(next);
   }, []);
 
@@ -1561,7 +1726,7 @@ export default function GameClient() {
         state: stableState,
         seed,
         updatedAt,
-        schemaVersion: numberValue(engine.CURRENT_SAVE_SCHEMA_VERSION, 3),
+        schemaVersion: numberValue(engine.CURRENT_SAVE_SCHEMA_VERSION, 4),
         contentVersion: stringValue(
           asRecord(stableState).contentVersion,
           "1.0.0",
@@ -1915,13 +2080,23 @@ export default function GameClient() {
         return;
       }
       const recruit = view.shop[shopIndex];
-      if (!recruit) return;
-      issueCommand(
+      if (!recruit || recruit.disabledReason) return;
+      const beforeUnits = view.boardUnits;
+      const accepted = issueCommand(
         { type: "BUY_UNIT", playerId: view.playerId, shopIndex },
         "coin",
         recruit.purchaseUpgrade
           ? `Recruited ${recruit.name} and merged to ${"★".repeat(recruit.purchaseUpgrade)}.`
           : `Recruited ${recruit.name} to the bench.`,
+      );
+      if (!accepted || !engineStateRef.current) return;
+      const nextView = normalizeMatch(engineStateRef.current);
+      setSelectedUnitId(
+        resolvePurchaseSelection(
+          beforeUnits,
+          nextView.boardUnits,
+          recruit.id,
+        ),
       );
     },
     [issueCommand, showToast, tutorialStep, view],
@@ -2120,8 +2295,22 @@ export default function GameClient() {
         else if (screen === "match") openSettings("match");
         return;
       }
-      if (screen !== "match" || !view || view.phase !== "preparation") return;
+      if (screen !== "match" || !view) return;
       const key = event.key.toLowerCase();
+      if (key === "enter") {
+        const mayStartTutorialBattle =
+          tutorialStep === "sail" && view.deployed >= 2;
+        if (
+          view.phase === "battle" ||
+          (view.phase === "preparation" &&
+            (tutorialStep === null || mayStartTutorialBattle))
+        ) {
+          event.preventDefault();
+          advanceRef.current();
+        }
+        return;
+      }
+      if (view.phase !== "preparation") return;
       if (tutorialStep && ["r", "l", "x"].includes(key)) {
         event.preventDefault();
         showToast(
@@ -2266,7 +2455,9 @@ export default function GameClient() {
 
   return (
     <main
-      className={`game-shell ${settings.highContrast ? "high-contrast" : ""}`}
+      className={`game-shell ${settings.highContrast ? "high-contrast" : ""} ${
+        settings.reducedMotion ? "reduced-motion" : ""
+      }`}
       aria-label="Grand Line Auto Chess"
     >
       <div className="ambient-sea" aria-hidden="true">
@@ -2372,6 +2563,7 @@ export default function GameClient() {
               }.`,
             );
           }}
+          onChangeSettings={setSettings}
           onAdvance={advancePhase}
           onSettings={() => openSettings("match")}
         />
@@ -2582,7 +2774,13 @@ function TutorialCoach({
 }) {
   const lessons: Record<
     TutorialStep,
-    { eyebrow: string; title: string; copy: string; hint: string }
+    {
+      eyebrow: string;
+      title: string;
+      copy: string;
+      hint: string;
+      legend?: Array<{ icon: string; text: string }>;
+    }
   > = {
     welcome: {
       eyebrow: "FIRST VOYAGE · 1 MINUTE",
@@ -2610,8 +2808,8 @@ function TutorialCoach({
     },
     sail: {
       eyebrow: "STEP 4 OF 6 · READY",
-      title: "SET SAIL",
-      copy: "Your formation is ready. Use the crimson Set Sail button to begin combat.",
+      title: "START THE BATTLE",
+      copy: "Your formation is ready. Use the crimson Start Battle button to begin combat.",
       hint: "Combat is automatic; your preparation decisions determine the outcome.",
     },
     "await-reward": {
@@ -2619,6 +2817,13 @@ function TutorialCoach({
       title: "WATCH THE PLAN UNFOLD",
       copy: "Your crew now moves, attacks, and casts abilities automatically.",
       hint: "The first Marine wave rewards a treasure when defeated.",
+      legend: [
+        { icon: "♥", text: "Health" },
+        { icon: "◆", text: "Energy — casts at 100" },
+        { icon: "⬡", text: "Shield" },
+        { icon: "🔥", text: "Burn" },
+        { icon: "✦", text: "Stun / protection" },
+      ],
     },
     treasure: {
       eyebrow: "STEP 5 OF 6 · TREASURE",
@@ -2682,6 +2887,16 @@ function TutorialCoach({
         <span className="tutorial-progress">{lesson.eyebrow}</span>
         <h2 id="tutorial-title">{lesson.title}</h2>
         <p>{lesson.copy}</p>
+        {lesson.legend && (
+          <ul className="tutorial-combat-legend" aria-label="Combat symbols">
+            {lesson.legend.map((entry) => (
+              <li key={entry.text}>
+                <span aria-hidden="true">{entry.icon}</span>
+                {entry.text}
+              </li>
+            ))}
+          </ul>
+        )}
         <small>{lesson.hint}</small>
         <div className="tutorial-actions">
           <button type="button" className="text-button" onClick={onSkip}>
@@ -2807,6 +3022,22 @@ function SettingsScreen({
             onChange={(particles) => onChange({ ...settings, particles })}
           />
           <SettingToggle
+            label="Combat numbers"
+            note="Damage, healing, shields, critical hits, and dodges"
+            checked={settings.combatNumbers}
+            onChange={(combatNumbers) =>
+              onChange({ ...settings, combatNumbers })
+            }
+          />
+          <SettingToggle
+            label="Reduced motion"
+            note="Removes lunges, shakes, and decorative combat motion"
+            checked={settings.reducedMotion}
+            onChange={(reducedMotion) =>
+              onChange({ ...settings, reducedMotion })
+            }
+          />
+          <SettingToggle
             label="High contrast"
             note="Brighter borders and stronger labels"
             checked={settings.highContrast}
@@ -2821,6 +3052,7 @@ function SettingsScreen({
           <span><kbd>R</kbd> Reroll</span>
           <span><kbd>L</kbd> Lock</span>
           <span><kbd>X</kbd> Buy XP</span>
+          <span><kbd>Enter</kbd> Start / skip battle</span>
           <span><kbd>Esc</kbd> Menu</span>
         </div>
         <div className="modal-actions">
@@ -2892,6 +3124,7 @@ function MatchScreen({
   onBuyXp,
   onSellSelected,
   onEquipItem,
+  onChangeSettings,
   onAdvance,
   onSettings,
 }: {
@@ -2912,6 +3145,7 @@ function MatchScreen({
   onBuyXp: () => void;
   onSellSelected: () => void;
   onEquipItem: (itemId: string) => void;
+  onChangeSettings: (settings: Settings) => void;
   onAdvance: () => void;
   onSettings: () => void;
 }) {
@@ -3005,7 +3239,23 @@ function MatchScreen({
         </div>
       </header>
 
-      <div className="match-body">
+      <div className="match-body" data-board-skin={settings.boardSkin}>
+        <PhaserBoard
+          units={view.boardUnits}
+          selectedId={selectedUnit?.id ?? null}
+          interactive={planning}
+          phase={view.phase}
+          capacity={view.capacity}
+          boardSkin={settings.boardSkin}
+          combatEvents={view.events}
+          eventSequence={view.eventSequence}
+          speed={settings.animationSpeed}
+          particles={settings.particles}
+          combatNumbers={settings.combatNumbers}
+          reducedMotion={settings.reducedMotion}
+          onMoveUnit={onMoveUnit}
+          onSelectUnit={onSelectUnit}
+        />
         <div className="left-rail">
           <TraitsPanel traits={view.traits} />
           <InventoryTray
@@ -3050,20 +3300,34 @@ function MatchScreen({
             <i />
             <span className={!planning ? "active" : ""}>COMBAT</span>
           </div>
-          <PhaserBoard
-            units={view.boardUnits}
-            selectedId={selectedUnit?.id ?? null}
-            interactive={planning}
-            phase={view.phase}
-            capacity={view.capacity}
-            boardSkin={settings.boardSkin}
-            combatEvents={view.events}
-            eventSequence={view.eventSequence}
-            speed={settings.animationSpeed}
-            particles={settings.particles}
-            onMoveUnit={onMoveUnit}
-            onSelectUnit={onSelectUnit}
-          />
+          {!planning && (
+            <div className="combat-hud" aria-label="Combat presentation controls">
+              <span className="combat-hud-label" aria-live="polite">
+                AUTO COMBAT
+              </span>
+              <label>
+                <span>SPEED</span>
+                <select
+                  value={settings.animationSpeed}
+                  onChange={(event) =>
+                    onChangeSettings({
+                      ...settings,
+                      animationSpeed: Number(event.target.value),
+                    })
+                  }
+                  aria-label="Battle animation speed"
+                >
+                  <option value={0.75}>0.75×</option>
+                  <option value={1}>1×</option>
+                  <option value={1.5}>1.5×</option>
+                  <option value={2}>2×</option>
+                </select>
+              </label>
+              <span className="combat-hud-key">
+                {settings.combatNumbers ? "NUMBERS ON" : "NUMBERS OFF"}
+              </span>
+            </div>
+          )}
         </div>
         <div className="right-rail">
           {selectedUnit && selectedDefinition && (
@@ -3143,7 +3407,12 @@ function MatchScreen({
                 key={`${unit?.id ?? "empty"}-${index}`}
                 unit={unit}
                 index={index}
-                disabled={!planning || !unit || !tutorialAllowsShop}
+                disabled={
+                  !planning ||
+                  !unit ||
+                  Boolean(unit.disabledReason) ||
+                  !tutorialAllowsShop
+                }
                 onBuy={() => onBuyUnit(index)}
               />
             ))}
@@ -3198,8 +3467,8 @@ function MatchScreen({
             onClick={onAdvance}
             data-tooltip={planning ? "End preparation early" : "Resolve battle"}
           >
-            <span>{planning ? "SET SAIL" : "CONTINUE"}</span>
-            <small>{planning ? "READY!" : "NEXT TIDE"}</small>
+            <span>{planning ? "START BATTLE" : "SKIP ANIMATION"}</span>
+            <small>{planning ? "READY!" : "RESOLVE NOW"}</small>
           </button>
         </div>
       </footer>

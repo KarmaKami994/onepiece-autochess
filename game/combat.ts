@@ -590,6 +590,25 @@ export function simulateBattle(
     ...createMutableUnits(teamA, content),
     ...createMutableUnits(teamB, content),
   ].sort((left, right) => left.id.localeCompare(right.id));
+  const initialUnits = units.map(toSnapshot);
+
+  const changeEnergy = (
+    tick: number,
+    unit: MutableBattleUnit,
+    requestedAmount: number,
+    reason: "attack" | "damaged" | "cast-reset",
+  ): void => {
+    const previous = unit.energy;
+    unit.energy = Math.max(0, Math.min(100, unit.energy + requestedAmount));
+    emit({
+      type: "energy",
+      tick,
+      unitId: unit.id,
+      amount: unit.energy - previous,
+      value: unit.energy,
+      reason,
+    });
+  };
 
   const roll = (percent: number): boolean => {
     if (percent <= 0) {
@@ -666,25 +685,27 @@ export function simulateBattle(
     const dealt = shieldDamage + healthDamage;
     if (source) {
       target.lastDamagerId = source.id;
-      if (source.omnivampPercent > 0 && healthDamage > 0) {
-        applyHeal(
-          tick,
-          source,
-          source,
-          Math.floor((healthDamage * source.omnivampPercent) / 100),
-        );
-      }
     }
     if (dealt > 0) {
-      target.energy = Math.min(100, target.energy + 5);
       emit({
         type: "damage",
         tick,
         sourceId: source?.id ?? target.id,
         targetId: target.id,
         amount: dealt,
+        healthDamage,
+        shieldDamage,
         damageKind,
       });
+      changeEnergy(tick, target, 5, "damaged");
+    }
+    if (source && source.omnivampPercent > 0 && healthDamage > 0) {
+      applyHeal(
+        tick,
+        source,
+        source,
+        Math.floor((healthDamage * source.omnivampPercent) / 100),
+      );
     }
     if (
       target.hp > 0 &&
@@ -729,12 +750,23 @@ export function simulateBattle(
         (candidate) => candidate.id === unit.lastDamagerId,
       );
       if (killer && killer.stackingAttackPercent > 0) {
+        const previousAttack = killer.attack;
         killer.attack = Math.max(
           killer.attack + 1,
           Math.floor(
             (killer.attack * (100 + killer.stackingAttackPercent)) / 100,
           ),
         );
+        emit({
+          type: "buff",
+          tick,
+          sourceId: killer.id,
+          targetId: killer.id,
+          stat: "attack",
+          amount: killer.attack - previousAttack,
+          value: killer.attack,
+          reason: "stacking-attack",
+        });
       }
     }
   };
@@ -839,7 +871,6 @@ export function simulateBattle(
         continue;
       }
       const abilityDefinition = source.ability;
-      source.energy = 0;
       source.nextAttackTick =
         tick +
         Math.max(
@@ -853,6 +884,7 @@ export function simulateBattle(
         abilityId: abilityDefinition.id,
         targetIds: intent.targetIds,
       });
+      changeEnergy(tick, source, -source.energy, "cast-reset");
       const abilityMultiplier =
         content.config.starAbilityBasisPoints[source.star - 1] ?? 10_000;
       const scaledPower = Math.max(
@@ -948,18 +980,8 @@ export function simulateBattle(
       }
       source.nextAttackTick = tick + source.attackIntervalTicks;
       source.state = "attack-recovery";
-      source.energy = Math.min(100, source.energy + 10);
-      if (roll(target.dodgePercent)) {
-        emit({
-          type: "attack",
-          tick,
-          sourceId: source.id,
-          targetId: target.id,
-          critical: false,
-        });
-        continue;
-      }
-      const critical = roll(source.criticalChancePercent);
+      const dodged = roll(target.dodgePercent);
+      const critical = dodged ? false : roll(source.criticalChancePercent);
       emit({
         type: "attack",
         tick,
@@ -967,6 +989,16 @@ export function simulateBattle(
         targetId: target.id,
         critical,
       });
+      changeEnergy(tick, source, 10, "attack");
+      if (dodged) {
+        emit({
+          type: "dodge",
+          tick,
+          sourceId: source.id,
+          targetId: target.id,
+        });
+        continue;
+      }
       applyDamage(
         tick,
         source,
@@ -1043,6 +1075,7 @@ export function simulateBattle(
     timedOut,
     durationTicks: endTick,
     events,
+    initialUnits,
     finalUnits: units.map(toSnapshot),
   };
 }

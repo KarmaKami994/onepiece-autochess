@@ -1,5 +1,8 @@
 import { DEFAULT_CONTENT, getStageDefinition } from "./content";
-import { CURRENT_SAVE_SCHEMA_VERSION } from "./engine";
+import {
+  CURRENT_SAVE_SCHEMA_VERSION,
+  regenerateBattleResults,
+} from "./engine";
 import type {
   GameContent,
   MatchState,
@@ -83,7 +86,20 @@ export function migrateMatchState(
 
   mutable.schemaVersion = CURRENT_SAVE_SCHEMA_VERSION;
   mutable.contentVersion = content.version;
-  return mutable as unknown as MatchState;
+  let migrated = mutable as unknown as MatchState;
+
+  if (version <= 3) {
+    // Version 4 adds initial snapshots and state-specific combat events. Old
+    // result logs cannot be upgraded field-by-field without inventing data.
+    // During combat we deterministically replay the already-created pairings;
+    // in every planning/choice phase the log is disposable and is cleared.
+    migrated =
+      migrated.phase === "battle"
+        ? regenerateBattleResults(migrated, content)
+        : { ...migrated, lastResults: [] };
+  }
+
+  return migrated;
 }
 
 export function serializeMatch(

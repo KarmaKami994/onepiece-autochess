@@ -182,6 +182,7 @@ describe("round and special-stage flow", () => {
         playerBDamage: 0,
         durationTicks: 1,
         events: [],
+        initialUnits: [],
         finalUnits: [],
       }),
     );
@@ -276,6 +277,7 @@ describe("elimination and phase guards", () => {
         playerBDamage: 0,
         durationTicks: 1,
         events: [],
+        initialUnits: [],
         finalUnits: [],
       },
     ];

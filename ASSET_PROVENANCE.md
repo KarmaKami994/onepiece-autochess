@@ -2,7 +2,54 @@
 
 ## Use and rights notice
 
-These images were created for a non-commercial, localhost-only fan prototype whose source repository is shared publicly for collaboration. This project is not affiliated with or endorsed by Eiichiro Oda, Shueisha, Toei Animation, or any other One Piece rights holder. One Piece character names and recognizable character elements remain the property of their respective rights holders. The images are original generated fan illustrations, not traced artwork. Public repository access does not grant rights to third-party franchise elements; redistribution or commercialization requires appropriate rights clearance.
+This non-commercial, localhost-only fan prototype has both original generated project art and the separately documented v2 crew derivatives below. It is not affiliated with or endorsed by Eiichiro Oda, Shueisha, Toei Animation, or any other One Piece rights holder. One Piece character names and recognizable character elements remain the property of their respective rights holders.
+
+On `2026-08-14`, the project owner explicitly attested in the project conversation that the 17 listed source sheets may be used, adapted, and distributed in this public collaboration repository. That owner attestation is the recorded permission basis for these imports; a Sprite Database URL is not treated as permission, and this repository does not independently establish chain of title or grant a downstream asset license. The MIT license applies to code only. Reuse, redistribution, or commercialization of franchise or imported art requires its own appropriate rights clearance.
+
+## Animation v2 source gate and PvE batch
+
+- Source matrix: `art/animation-v2/source-matrix.json`
+- Deterministic importer: `scripts/assets/build_v2_animation.mjs`
+- Headless batch wrapper: `scripts/build_v2_assets.ps1`
+- Rebuild commands: `npm run assets:v2` or `powershell -ExecutionPolicy Bypass -File scripts/build_v2_assets.ps1`
+- Runtime contract: 46 transparent `128×128` frames in an eight-column `1024×768` atlas; idle `0–5`, move `6–13`, attack `14–21`, cast `22–33`, hit `34–37`, defeat `38–45`; stable pivot `(64, 116)`
+- Processing contract: exact solid-corner background removal, nearest-neighbor resizing only, integer placement, deterministic holds and offsets, code-drawn hard pixel effects, no runtime network request, and no external service
+
+All 17 non-Luffy crew imports are built from the local, SHA-pinned sheets listed below. Contributor names were transcribed from each exact Sprite Database file page on `2026-08-14`. The matrix records the game/page, contributor and verification basis, local path, source SHA-256, owner attestation, pivot, processing recipe, and a stable `derivedFrameMap` pointer. Each generated runtime JSON contains all 46 selected source rectangles, source pivots, destinations, durations, and local supplements, so the reproducible frame map is reviewable without duplicating 782 rectangles in the matrix.
+
+The importer uses deterministic connected-component selection. An auto-selected source rectangle may not exceed a `2.5:1` width-to-height ratio, which prevents text bars and detached effect strips from entering runtime atlases. The short Tashigi and Garp sheets expose 29 and 34 character-like candidates respectively after QA filtering; their missing poses are completed with deterministic holds, integer offsets, nearest-neighbor defeat compression, and locally drawn pixel effects. Existing 64×64 v1 assets remain checked in as fallbacks and in the Animation Lab. If a source is absent, its SHA changes, its permission is not buildable, or its frame-map strategy is missing, the importer reports `source missing -> v1 fallback` and emits no replacement. Luffy-v2 remains governed by its existing dedicated provenance and importer below.
+
+Abbreviations: GB2 = *One Piece: Gigant Battle! 2 - New World*; GB1 = *One Piece: Gigant Battle!*; GPC = *One Piece: Great Pirate Colosseum*.
+
+| Runtime asset | Source page / contributor | Source SHA-256 | Atlas SHA-256 | Editable source |
+|---|---|---|---|---|
+| `nami-v2` | [GB2 file 14763](https://spritedatabase.net/file/14763) / Grim | `a872516365fe5ef5ed358aeb2e15af073072170d768ce743d814df6caab1ebad` | `23c48476a9a4f28916c07837ae2f140435f81b13481e10e2db6589642046ab9c` | `art/libresprite/nami-v2.aseprite` |
+| `usopp-v2` | [GB2 file 15108](https://spritedatabase.net/file/15108) / Maverick PK; Roger-Kun | `b44ebf20cc27c53478c0662441bbb54324f60438fcd9f7e701d1bc13cc006f95` | `434fcf58fb668f80460a3170e932263e0481905e9097cc38239cc67afd372259` | `art/libresprite/usopp-v2.aseprite` |
+| `chopper-v2` | [GB2 file 14952](https://spritedatabase.net/file/14952) / Maverick PK | `a7ee521e96ca87767f83b102a0edaa13f934f533635507335141c0911267b1d6` | `b1219b4020567b725615efc49a8cd3634288008f8703baeb7b86211610f03cde` | `art/libresprite/chopper-v2.aseprite` |
+| `sanji-v2` | [GB2 file 14802](https://spritedatabase.net/file/14802) / Grim | `241a47a601691a0d1ae43d55c9dc57b60021165dce9e18badc1e63f806273a30` | `0779f13402d7cac30a2442a1b3c1646b83aa2ba7fbdb8ecf9e147ea910ccd31f` | `art/libresprite/sanji-v2.aseprite` |
+| `robin-v2` | [GB2 file 14846](https://spritedatabase.net/file/14846) / Maverick PK | `7d133c5d9d9e5e83e30179b527d2cb6110b95f5e6834ea9742a907b12c23f8a6` | `aab4df26b8fbdfbd7ffaee28118fa3dfc2d73ea8c675d7fa8d88223c0595a501` | `art/libresprite/robin-v2.aseprite` |
+| `smoker-v2` | [GB2 file 14681](https://spritedatabase.net/file/14681) / Grim | `79eca65cb07d4b144561e6353bd8dcd75dd9fea86170d711fe243449e5d9020b` | `e1368ca22a017a82cd220fdd76698f56b7681a561dbd59996cec4485c6c60410` | `art/libresprite/smoker-v2.aseprite` |
+| `kid-v2` | [GB2 file 15084](https://spritedatabase.net/file/15084) / rayleigh92 | `054d42e9c149ec6ab662a1f1a98add20851261a5a9ca32abbd24ced19436326a` | `16218fcaa10ceafecddfd2a1223dcb18eca205b60b2995f1a3ade55bc5ac55b8` | `art/libresprite/kid-v2.aseprite` |
+| `zoro-v2` | [GB2 file 14764](https://spritedatabase.net/file/14764) / Heatpark; Maverick PK | `9c657fa9eaafd0b84d87185b30981723c22d58b5db4bfe263032b3ec772d3e76` | `6f5030dcc083cc0260b7e161ac9164cfa4118ce30eb603d79dafc6f5c39a99a2` | `art/libresprite/zoro-v2.aseprite` |
+| `law-v2` | [GB2 file 14898](https://spritedatabase.net/file/14898) / Maverick PK | `74c54260ce78933c72460a909515224da249ea1f3f6504d68e51ff7ad3031164` | `2803a8cf60b710cab7ed8faa30b90b49fcbf1149c6714a5ee2a3af66eb2bebfd` | `art/libresprite/law-v2.aseprite` |
+| `doflamingo-v2` | [GB2 file 14628](https://spritedatabase.net/file/14628) / Maverick PK | `9e96520fcd6db0020d5e6803467ee1e2d7b2fda3c30e65015c8794538f0069e9` | `393b164ea7ef689a36220741337f7ae9e0523e93c455d6ea5480ff3bd6f512d3` | `art/libresprite/doflamingo-v2.aseprite` |
+| `tashigi-v2` | [GB1 file 12109](https://spritedatabase.net/file/12109) / Grim | `0e75f55363b5e15cfb5485fe911d8731d7c012c5d031339ecf52e62d6df30490` | `4cbbd573401b65893caf2a4aa924659bcdba731c59861e84160b4f9578e68152` | `art/libresprite/tashigi-v2.aseprite` |
+| `crocodile-v2` | [GB1 file 12235](https://spritedatabase.net/file/12235) / Grim | `d6bad2cd20c653e2b73c75e07ade26010e79ab802848483cf758d5a29f4e359c` | `98ef4d4492401afc94add4f77f54b7b993b6f39422b62797c80c156721b6197b` | `art/libresprite/crocodile-v2.aseprite` |
+| `ace-v2` | [GB1 file 12602](https://spritedatabase.net/file/12602) / Grim | `bae710da3f36816d5468d472f583afc1391340e43a2bde17a0e91e94a27edb2a` | `fc3ace66909715beec9a93930b246efcbe90205b77416017f5954fdd6fc71624` | `art/libresprite/ace-v2.aseprite` |
+| `hancock-v2` | [GB1 file 12152](https://spritedatabase.net/file/12152) / Megadoomer | `dc20883d508bc1fc329ba3c7b0ee110786bf6c36b37f47019a15bc58a2ca2361` | `4ce428072da07a8ecf6a10b7da1b5c21aacc3adcf634bfe5c9978eb41ddc6e9e` | `art/libresprite/hancock-v2.aseprite` |
+| `garp-v2` | [GB1 file 12056](https://spritedatabase.net/file/12056) / Grim | `ef044a99225cc4a784ae03824c0421665736317bc565d7d973386f80f54de980` | `b4ab4a887b4fd0f318b776458fa7c7691e5782cb4e6710883a8be807d109337e` | `art/libresprite/garp-v2.aseprite` |
+| `mihawk-v2` | [GB1 file 12780](https://spritedatabase.net/file/12780) / Heatpark; Maverick PK | `204e5507fc8eb712b922a1a808bb418efe451eaba7f9f74358dba21aa9907a2b` | `7323b88e3211bc3abb360507e8d7d659d68710f822e956474f74683626103e37` | `art/libresprite/mihawk-v2.aseprite` |
+| `sabo-v2` | [GPC file 21103](https://spritedatabase.net/file/21103) / Omega | `4b94607b55371e078add120c002c6a37f6d6d9b10f2cdd7b4b36850198b33417` | `a72dd13e26655f70a9defa7a7695a2990c00902c32dd7d07840fdb0d9d9069da` | `art/libresprite/sabo-v2.aseprite` |
+
+The five PvE v2 atlases use only the already-provenanced original generated cutouts in `public/assets/enemies`. External PvE links in the matrix are catalog references with `usedInRuntime: false`; no pixels were downloaded or copied from them. Their additional motion is deliberately modest: integer bob/lunge/shake offsets, nearest-neighbor defeat compression, and local pixel-only attack/cast effects.
+
+| Runtime asset | Source SHA-256 | Atlas SHA-256 | Editable source |
+|---|---|---|---|
+| `marine-recruit-v2` | `98e34d4774dfb2b97a43fb550430a3c254e60a071c8e62493cb0055f14406f45` | `a76a88c4e6d844fe5437220d27b7680f39aa9b83fd07595fe7c58f62129554c4` | `art/libresprite/marine-recruit-v2.aseprite` |
+| `rifle-marine-v2` | `4d928c8a57d58c422756ef1f1d2346638fc14a527304a38749103442b9108d61` | `51f08916ad8e2771bc2cb889e611ac8a4ab06aef4e45986d8c41c6a27e8367f6` | `art/libresprite/rifle-marine-v2.aseprite` |
+| `pirate-raider-v2` | `a9c6b4819d6df63a03c6fd07539fe642ce45662511b8c27b1d9cab405ae4f4c9` | `d0dc3f6b3549700c1000799aa111e88b098971b55207354d717b1de5182de370` | `art/libresprite/pirate-raider-v2.aseprite` |
+| `pacifista-v2` | `25ae3cf6a9228f92d3acd6aa1e3de103392fb18c031c95164f57284eae450bd7` | `386d4fcde8fca0a8073716a96cc0bf9f224c2d62d11ddf020996e7f8e050d631` | `art/libresprite/pacifista-v2.aseprite` |
+| `sea-king-v2` | `786f303d0b1b8b7be1c90e518ce1af5a5d066ad87f95726e8462cb51b3b19804` | `77164492d65ab24e660c1cd56ed44794d86c13af50dd39b75310542b409fafd8` | `art/libresprite/sea-king-v2.aseprite` |
 
 ## Generation and processing
 
@@ -557,6 +604,27 @@ Composition/framing: extra-wide 1.91:1 social-preview composition; the tactical 
 Lighting/mood: warm antique-gold lantern light against cool deep-navy moonlit ocean, adventurous, dramatic, inviting, legible at thumbnail size.
 Color palette: deep navy and indigo ocean, near-black storm clouds, weathered warm brown wood, parchment cream, antique brass-gold trim, restrained crimson accents, tiny cool sea-foam highlights.
 Constraints: no words, letters, numbers, typography, title, logo, watermark, signature, skull-and-crossbones, recognizable flag, official insignia, brand mark, copyrighted character, recognizable costume, human portrait, card frame, UI panel, health bar, button, or modern object; exactly one cohesive landscape illustration; keep all board squares and tokens in plausible perspective; no duplicated ship parts or floating disconnected objects.
+```
+
+## OpenGraph 1200×630 framing refinement
+
+- Integration date: `2026-08-14`
+- Edit tool: OpenAI built-in `image_gen.imagegen`, precise object-preserving edit
+- Edit input: the previously generated original nautical social preview described above
+- Generated edit source: `art/generated/og-v2-source.png`
+- Generated source validation: RGB `1731×909`; SHA-256 `cff8ede88821a5860be88097705f91a3fe3814c4c2dafa3ce76de527917775a5`
+- Final asset: `public/og.png`
+- Deterministic processing: bundled `sharp` cover-resize/crop with nearest-neighbor sampling to the metadata-declared `1200×630`
+- Final validation: RGB `1200×630`; SHA-256 `c9283812301f6a006a7f8bf261d76d7b15ff3bea26204274d7d0e726ec1d3a93`
+- Scope: framing and safe-edge extension only; no title, logo, character, interface, or additional copyrighted element was requested or introduced.
+- Prompt:
+
+```text
+Use case: precise-object-edit
+Asset type: exact 1200:630 social-preview reframing of the supplied original nautical pixel-art image
+Primary request: Preserve the supplied illustration's board, abstract tokens, ship deck, ocean, palette, lighting, pixel-art treatment, and object designs. Change only the outer framing so the complete scene fills a 1200:630 landscape composition with important content inside a safe central area. Extend existing ocean, sky, rail, and deck pixels naturally at the edges where needed; do not repaint or redesign the focal content.
+Composition: 1.90476:1 landscape ratio, central tactical board fully visible, balanced negative space, no cropped focal objects.
+Constraints: no words, letters, numbers, typography, title, logo, watermark, signature, character, portrait, new prop, new token, UI, health bar, button, emblem, flag, or modern object; preserve crisp deliberate pixel clusters and the original color palette.
 ```
 
 ## Luffy headless animation pilot

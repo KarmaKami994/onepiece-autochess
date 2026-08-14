@@ -113,6 +113,7 @@ describe("shop, economy, pool, and upgrades", () => {
         playerBDamage: 0,
         durationTicks: 1,
         events: [],
+        initialUnits: [],
         finalUnits: [],
       },
     ];

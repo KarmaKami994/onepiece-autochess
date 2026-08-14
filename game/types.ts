@@ -238,6 +238,7 @@ export interface MatchBattleResult {
   playerBDamage: number;
   durationTicks: number;
   events: BattleEvent[];
+  initialUnits: BattleUnitSnapshot[];
   finalUnits: BattleUnitSnapshot[];
 }
 
@@ -378,8 +379,37 @@ export type BattleEvent =
       tick: number;
       sourceId: string;
       targetId: string;
+      /** Total damage dealt. Kept for backwards-compatible event consumers. */
       amount: number;
+      healthDamage: number;
+      shieldDamage: number;
       damageKind: "attack" | "ability" | "burn";
+    }
+  | {
+      type: "energy";
+      tick: number;
+      unitId: string;
+      /** Effective signed delta after applying the 0-100 energy cap. */
+      amount: number;
+      /** Energy after this event has been applied. */
+      value: number;
+      reason: "attack" | "damaged" | "cast-reset";
+    }
+  | {
+      type: "dodge";
+      tick: number;
+      sourceId: string;
+      targetId: string;
+    }
+  | {
+      type: "buff";
+      tick: number;
+      sourceId: string;
+      targetId: string;
+      stat: "attack";
+      amount: number;
+      value: number;
+      reason: "stacking-attack";
     }
   | {
       type: "heal";
@@ -428,6 +458,7 @@ export interface BattleResult {
   timedOut: boolean;
   durationTicks: number;
   events: BattleEvent[];
+  initialUnits: BattleUnitSnapshot[];
   finalUnits: BattleUnitSnapshot[];
 }
 

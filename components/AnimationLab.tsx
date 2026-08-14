@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import {
-  CREW_ANIMATION_MANIFEST,
+  ANIMATION_CONTENT_MANIFEST,
   getCrewAnimationDefinitions,
   type CrewAnimationDefinition,
   type CrewAnimationState,
@@ -65,7 +65,7 @@ function spriteStyle(
 
 export default function AnimationLab({ onBack }: { onBack: () => void }) {
   const rosterDefinitions = useMemo(
-    () => Object.values(CREW_ANIMATION_MANIFEST),
+    () => Object.values(ANIMATION_CONTENT_MANIFEST),
     [],
   );
   const [contentId, setContentId] = useState<string>(
@@ -129,6 +129,7 @@ export default function AnimationLab({ onBack }: { onBack: () => void }) {
             >
               {rosterDefinitions.map((candidate) => (
                 <option key={candidate.contentId} value={candidate.contentId}>
+                  {candidate.kind === "pve" ? "PVE · " : "CREW · "}
                   {candidate.contentId.toUpperCase()}
                 </option>
               ))}
@@ -234,7 +235,9 @@ export default function AnimationLab({ onBack }: { onBack: () => void }) {
                   </span>
                 </div>
                 <div className="animation-frame-readout" aria-live="polite">
-                  <span>{definition.contentId.toUpperCase()} · {definition.version.toUpperCase()}</span>
+                  <span>
+                    {definition.contentId.toUpperCase()} · {definition.kind.toUpperCase()} · {definition.version.toUpperCase()}
+                  </span>
                   <strong>{state.toUpperCase()}</strong>
                   <span>FRAME {frame} / {definition.frameCount - 1}</span>
                   <span>{clip.frameRate} FPS · {definition.frameWidth}²</span>

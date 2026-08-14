@@ -168,6 +168,10 @@ describe("local-only product boundary", () => {
       expect([...bytes.subarray(0, 8)], `${file} is not a PNG`).toEqual([
         137, 80, 78, 71, 13, 10, 26, 10,
       ]);
+      if (file.endsWith("public\\og.png") || file.endsWith("public/og.png")) {
+        expect(bytes.readUInt32BE(16)).toBe(1200);
+        expect(bytes.readUInt32BE(20)).toBe(630);
+      }
     }
   });
 

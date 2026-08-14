@@ -26,7 +26,7 @@ import type {
   UnitInstance,
 } from "./types";
 
-export const CURRENT_SAVE_SCHEMA_VERSION = 3;
+export const CURRENT_SAVE_SCHEMA_VERSION = 4;
 
 function cloneMatch(state: MatchState): MatchState {
   return JSON.parse(JSON.stringify(state)) as MatchState;
@@ -685,8 +685,15 @@ function simulatePvpRound(
   const pairingResult = createPairings(state);
   state.rngState = pairingResult.rngState;
   state.pairings = pairingResult.pairings;
+  simulateExistingPvpPairings(state, content);
+}
+
+function simulateExistingPvpPairings(
+  state: MatchState,
+  content: GameContent,
+): void {
   state.lastResults = [];
-  pairingResult.pairings.forEach((pairing, pairingIndex) => {
+  state.pairings.forEach((pairing, pairingIndex) => {
     const playerA = findPlayer(state, pairing.playerAId);
     const opponentId = pairing.playerBId ?? pairing.ghostOfPlayerId;
     const opponent = opponentId ? findPlayer(state, opponentId) : null;
@@ -730,6 +737,7 @@ function simulatePvpRound(
         result.winner === "a" && pairing.playerBId ? damage : 0,
       durationTicks: result.durationTicks,
       events: result.events,
+      initialUnits: result.initialUnits,
       finalUnits: result.finalUnits,
     });
   });
@@ -766,9 +774,32 @@ function simulatePveRound(
       playerBDamage: 0,
       durationTicks: result.durationTicks,
       events: result.events,
+      initialUnits: result.initialUnits,
       finalUnits: result.finalUnits,
     });
   }
+}
+
+/**
+ * Replays an already-paired battle without re-running planning or consuming
+ * pairing RNG. This is used when a v3 save contains combat results whose event
+ * schema predates the readable-combat contract.
+ */
+export function regenerateBattleResults(
+  state: MatchState,
+  content: GameContent = DEFAULT_CONTENT,
+): MatchState {
+  const next = cloneMatch(state);
+  if (next.phase !== "battle") {
+    return next;
+  }
+  const stage = getStageDefinition(next.round, content);
+  if (stage.kind === "pve") {
+    simulatePveRound(next, content);
+  } else {
+    simulateExistingPvpPairings(next, content);
+  }
+  return next;
 }
 
 function beginBattle(
@@ -1222,17 +1253,33 @@ function botUnitScore(
   const copies = Object.values(player.units).filter(
     (unit) => unit.definitionId === definitionId,
   );
-  const preferred = definition.traits.filter((traitId) =>
+  const preferred = definition.traits.some((traitId) =>
     personality.preferredTraits.includes(traitId),
-  ).length;
+  )
+    ? 1
+    : 0;
   const activeCounts = getActiveTraits(player, content);
-  const synergy = definition.traits.reduce((score, traitId) => {
-    const active = activeCounts.find(
-      (candidate) => candidate.traitId === traitId,
-    );
-    return score + (active?.count ?? 0) * 4;
-  }, 0);
-  return definition.cost * 25 + copies.length * 24 + preferred * 20 + synergy;
+  const synergy = definition.traits
+    .map((traitId) => {
+      const active = activeCounts.find(
+        (candidate) => candidate.traitId === traitId,
+      );
+      return (active?.count ?? 0) * 4;
+    })
+    .sort((left, right) => right - left)
+    .slice(0, 2)
+    .reduce((score, value) => score + value, 0);
+  // Base cost, copies, preference, and the two strongest live connections
+  // already reward flexible units. Normalize only exceptional tag breadth so
+  // a five-trait connector cannot dominate every otherwise distinct bot plan.
+  const connectorPenalty = Math.max(0, definition.traits.length - 3) * 12;
+  return (
+    definition.cost * 25 +
+    copies.length * 24 +
+    preferred * 20 +
+    synergy -
+    connectorPenalty
+  );
 }
 
 function botInstanceScore(
@@ -1298,15 +1345,15 @@ function botBuyPass(
         right.score - left.score || left.shopIndex - right.shopIndex,
     );
   for (const offer of offers) {
-    const currentPlayer = findPlayer(next, playerId);
+    let currentPlayer = findPlayer(next, playerId);
+    let stateBeforeReplacement: MatchState | null = null;
     const definition = offer.definitionId
       ? getUnitDefinition(offer.definitionId, content)
       : null;
     if (
       !currentPlayer ||
       !definition ||
-      currentPlayer.gold < definition.cost ||
-      !canReceiveUnit(currentPlayer, definition.id)
+      currentPlayer.gold < definition.cost
     ) {
       continue;
     }
@@ -1316,6 +1363,55 @@ function botBuyPass(
       state.round <= 3;
     if (!shouldBuy) {
       continue;
+    }
+    if (!canReceiveUnit(currentPlayer, definition.id)) {
+      // A full bench may turn over one stale one-star unit, but only for a
+      // clearly stronger, higher-cost offer. The later purchase is rolled back
+      // with this snapshot if command legality changes unexpectedly.
+      const replacement = currentPlayer.bench
+        .filter((unitId): unitId is string => Boolean(unitId))
+        .map((unitId) => currentPlayer!.units[unitId])
+        .filter((unit): unit is UnitInstance => Boolean(unit) && unit.star === 1)
+        .map((unit) => ({
+          unit,
+          definition: getUnitDefinition(unit.definitionId, content),
+          score: botInstanceScore(
+            unit,
+            currentPlayer!,
+            personality,
+            content,
+          ),
+        }))
+        .filter(
+          (candidate) =>
+            candidate.definition &&
+            candidate.definition.cost < definition.cost &&
+            offer.score >= candidate.score + 20,
+        )
+        .sort(
+          (left, right) =>
+            left.score - right.score ||
+            left.unit.acquiredOrder - right.unit.acquiredOrder ||
+            left.unit.id.localeCompare(right.unit.id),
+        )[0];
+      if (!replacement) {
+        continue;
+      }
+      stateBeforeReplacement = next;
+      const sale = applyCommand(
+        next,
+        { type: "SELL_UNIT", playerId, unitId: replacement.unit.id },
+        content,
+      );
+      if (!sale.ok) {
+        continue;
+      }
+      next = sale.state;
+      currentPlayer = findPlayer(next, playerId);
+      if (!currentPlayer || !canReceiveUnit(currentPlayer, definition.id)) {
+        next = stateBeforeReplacement;
+        continue;
+      }
     }
     const result = applyCommand(
       next,
@@ -1328,6 +1424,8 @@ function botBuyPass(
     );
     if (result.ok) {
       next = result.state;
+    } else if (stateBeforeReplacement) {
+      next = stateBeforeReplacement;
     }
   }
   return next;

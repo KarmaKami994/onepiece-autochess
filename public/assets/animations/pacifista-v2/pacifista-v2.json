@@ -1,0 +1,618 @@
+{
+  "schemaVersion": 2,
+  "pipeline": "procedural-static-cutout-v1",
+  "assetId": "pacifista",
+  "assetKey": "pacifista-v2",
+  "source": "public/assets/enemies/pacifista.png",
+  "sourceSha256": "25ae3cf6a9228f92d3acd6aa1e3de103392fb18c031c95164f57284eae450bd7",
+  "sourceDimensions": {
+    "width": 1024,
+    "height": 1536
+  },
+  "permission": {
+    "status": "project-owned",
+    "note": "The runtime source is the already-provenanced original generated enemy cutout, not the external reference candidate. See ASSET_PROVENANCE.md."
+  },
+  "frame": {
+    "width": 128,
+    "height": 128,
+    "columns": 8,
+    "destinationPivot": {
+      "x": 64,
+      "y": 116
+    }
+  },
+  "frameCount": 46,
+  "clips": {
+    "idle": {
+      "start": 0,
+      "end": 5,
+      "frameRate": 8,
+      "repeat": -1
+    },
+    "move": {
+      "start": 6,
+      "end": 13,
+      "frameRate": 16,
+      "repeat": 0
+    },
+    "attack": {
+      "start": 14,
+      "end": 21,
+      "frameRate": 14,
+      "repeat": 0
+    },
+    "cast": {
+      "start": 22,
+      "end": 33,
+      "frameRate": 12,
+      "repeat": 0
+    },
+    "hit": {
+      "start": 34,
+      "end": 37,
+      "frameRate": 12,
+      "repeat": 0
+    },
+    "defeat": {
+      "start": 38,
+      "end": 45,
+      "frameRate": 10,
+      "repeat": 0
+    }
+  },
+  "frames": [
+    {
+      "index": 0,
+      "state": "idle",
+      "durationMs": 125,
+      "transform": {
+        "x": 0,
+        "y": 0,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": null
+    },
+    {
+      "index": 1,
+      "state": "idle",
+      "durationMs": 125,
+      "transform": {
+        "x": 0,
+        "y": -1,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": null
+    },
+    {
+      "index": 2,
+      "state": "idle",
+      "durationMs": 125,
+      "transform": {
+        "x": 1,
+        "y": -2,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": null
+    },
+    {
+      "index": 3,
+      "state": "idle",
+      "durationMs": 125,
+      "transform": {
+        "x": 0,
+        "y": -1,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": null
+    },
+    {
+      "index": 4,
+      "state": "idle",
+      "durationMs": 125,
+      "transform": {
+        "x": -1,
+        "y": 0,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": null
+    },
+    {
+      "index": 5,
+      "state": "idle",
+      "durationMs": 125,
+      "transform": {
+        "x": 0,
+        "y": 1,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": null
+    },
+    {
+      "index": 6,
+      "state": "move",
+      "durationMs": 63,
+      "transform": {
+        "x": -4,
+        "y": 0,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": null
+    },
+    {
+      "index": 7,
+      "state": "move",
+      "durationMs": 63,
+      "transform": {
+        "x": -2,
+        "y": -2,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": null
+    },
+    {
+      "index": 8,
+      "state": "move",
+      "durationMs": 63,
+      "transform": {
+        "x": 0,
+        "y": -3,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": null
+    },
+    {
+      "index": 9,
+      "state": "move",
+      "durationMs": 63,
+      "transform": {
+        "x": 2,
+        "y": -1,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": null
+    },
+    {
+      "index": 10,
+      "state": "move",
+      "durationMs": 63,
+      "transform": {
+        "x": 4,
+        "y": 0,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": null
+    },
+    {
+      "index": 11,
+      "state": "move",
+      "durationMs": 63,
+      "transform": {
+        "x": 2,
+        "y": -2,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": null
+    },
+    {
+      "index": 12,
+      "state": "move",
+      "durationMs": 63,
+      "transform": {
+        "x": 0,
+        "y": -3,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": null
+    },
+    {
+      "index": 13,
+      "state": "move",
+      "durationMs": 63,
+      "transform": {
+        "x": -2,
+        "y": -1,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": null
+    },
+    {
+      "index": 14,
+      "state": "attack",
+      "durationMs": 71,
+      "transform": {
+        "x": 0,
+        "y": 0,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "beam"
+    },
+    {
+      "index": 15,
+      "state": "attack",
+      "durationMs": 71,
+      "transform": {
+        "x": 2,
+        "y": 0,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "beam"
+    },
+    {
+      "index": 16,
+      "state": "attack",
+      "durationMs": 71,
+      "transform": {
+        "x": 5,
+        "y": -1,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "beam"
+    },
+    {
+      "index": 17,
+      "state": "attack",
+      "durationMs": 71,
+      "transform": {
+        "x": 9,
+        "y": -2,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "beam"
+    },
+    {
+      "index": 18,
+      "state": "attack",
+      "durationMs": 71,
+      "transform": {
+        "x": 12,
+        "y": -2,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "beam"
+    },
+    {
+      "index": 19,
+      "state": "attack",
+      "durationMs": 71,
+      "transform": {
+        "x": 8,
+        "y": -1,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "beam"
+    },
+    {
+      "index": 20,
+      "state": "attack",
+      "durationMs": 71,
+      "transform": {
+        "x": 3,
+        "y": 0,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "beam"
+    },
+    {
+      "index": 21,
+      "state": "attack",
+      "durationMs": 71,
+      "transform": {
+        "x": 0,
+        "y": 0,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "beam"
+    },
+    {
+      "index": 22,
+      "state": "cast",
+      "durationMs": 83,
+      "transform": {
+        "x": 0,
+        "y": 0,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "beam"
+    },
+    {
+      "index": 23,
+      "state": "cast",
+      "durationMs": 83,
+      "transform": {
+        "x": -1,
+        "y": -1,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "beam"
+    },
+    {
+      "index": 24,
+      "state": "cast",
+      "durationMs": 83,
+      "transform": {
+        "x": 0,
+        "y": -2,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "beam"
+    },
+    {
+      "index": 25,
+      "state": "cast",
+      "durationMs": 83,
+      "transform": {
+        "x": 1,
+        "y": -3,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "beam"
+    },
+    {
+      "index": 26,
+      "state": "cast",
+      "durationMs": 83,
+      "transform": {
+        "x": 0,
+        "y": -2,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "beam"
+    },
+    {
+      "index": 27,
+      "state": "cast",
+      "durationMs": 83,
+      "transform": {
+        "x": -1,
+        "y": -1,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "beam"
+    },
+    {
+      "index": 28,
+      "state": "cast",
+      "durationMs": 83,
+      "transform": {
+        "x": 0,
+        "y": 0,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "beam"
+    },
+    {
+      "index": 29,
+      "state": "cast",
+      "durationMs": 83,
+      "transform": {
+        "x": 1,
+        "y": -1,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "beam"
+    },
+    {
+      "index": 30,
+      "state": "cast",
+      "durationMs": 83,
+      "transform": {
+        "x": 0,
+        "y": -2,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "beam"
+    },
+    {
+      "index": 31,
+      "state": "cast",
+      "durationMs": 83,
+      "transform": {
+        "x": -1,
+        "y": -1,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "beam"
+    },
+    {
+      "index": 32,
+      "state": "cast",
+      "durationMs": 83,
+      "transform": {
+        "x": 0,
+        "y": 0,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "beam"
+    },
+    {
+      "index": 33,
+      "state": "cast",
+      "durationMs": 83,
+      "transform": {
+        "x": 0,
+        "y": 0,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "beam"
+    },
+    {
+      "index": 34,
+      "state": "hit",
+      "durationMs": 83,
+      "transform": {
+        "x": -4,
+        "y": 0,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "impact-pixels"
+    },
+    {
+      "index": 35,
+      "state": "hit",
+      "durationMs": 83,
+      "transform": {
+        "x": 4,
+        "y": -1,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "impact-pixels"
+    },
+    {
+      "index": 36,
+      "state": "hit",
+      "durationMs": 83,
+      "transform": {
+        "x": -2,
+        "y": 0,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "impact-pixels"
+    },
+    {
+      "index": 37,
+      "state": "hit",
+      "durationMs": 83,
+      "transform": {
+        "x": 0,
+        "y": 0,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": "impact-pixels"
+    },
+    {
+      "index": 38,
+      "state": "defeat",
+      "durationMs": 100,
+      "transform": {
+        "x": 0,
+        "y": 0,
+        "scaleX": 1,
+        "scaleY": 1
+      },
+      "effect": null
+    },
+    {
+      "index": 39,
+      "state": "defeat",
+      "durationMs": 100,
+      "transform": {
+        "x": 2,
+        "y": 0,
+        "scaleX": 1.02,
+        "scaleY": 0.94
+      },
+      "effect": null
+    },
+    {
+      "index": 40,
+      "state": "defeat",
+      "durationMs": 100,
+      "transform": {
+        "x": 4,
+        "y": 0,
+        "scaleX": 1.05,
+        "scaleY": 0.86
+      },
+      "effect": null
+    },
+    {
+      "index": 41,
+      "state": "defeat",
+      "durationMs": 100,
+      "transform": {
+        "x": 6,
+        "y": 0,
+        "scaleX": 1.08,
+        "scaleY": 0.76
+      },
+      "effect": null
+    },
+    {
+      "index": 42,
+      "state": "defeat",
+      "durationMs": 100,
+      "transform": {
+        "x": 8,
+        "y": 0,
+        "scaleX": 1.12,
+        "scaleY": 0.64
+      },
+      "effect": null
+    },
+    {
+      "index": 43,
+      "state": "defeat",
+      "durationMs": 100,
+      "transform": {
+        "x": 10,
+        "y": 0,
+        "scaleX": 1.16,
+        "scaleY": 0.51
+      },
+      "effect": null
+    },
+    {
+      "index": 44,
+      "state": "defeat",
+      "durationMs": 100,
+      "transform": {
+        "x": 12,
+        "y": 0,
+        "scaleX": 1.2,
+        "scaleY": 0.38
+      },
+      "effect": null
+    },
+    {
+      "index": 45,
+      "state": "defeat",
+      "durationMs": 100,
+      "transform": {
+        "x": 14,
+        "y": 0,
+        "scaleX": 1.24,
+        "scaleY": 0.24
+      },
+      "effect": null
+    }
+  ]
+}

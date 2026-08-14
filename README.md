@@ -26,10 +26,25 @@ Useful checks:
 ```powershell
 npm test
 npm run test:soak
+npm run test:production-soak
+npm run test:e2e
 npm run typecheck
 npm run build
 npm run lint
 ```
+
+`test:production-soak` simulates 1,000 complete matches with the unchanged
+production configuration and writes its balance report to
+`tmp/production-soak-report.json`. On a fresh workstation, install the bundled
+E2E browser once with `npx playwright install chromium` before running
+`test:e2e`; the tests cover both supported desktop viewport sizes.
+
+The latest reviewed production metrics, definitions, limitations, and dated
+raw snapshot are documented in [BALANCE_REPORT.md](BALANCE_REPORT.md).
+
+The committed v2 animation assets can be rebuilt headlessly with
+`npm run assets:v2`. LibreSprite is only needed to recreate the editable
+`.aseprite` files; the game itself and normal build do not require it.
 
 ## Controls
 
@@ -71,6 +86,7 @@ opening a PR, run:
 npm run typecheck
 npm run lint
 npm test
+npm run test:e2e
 npm run build
 ```
 

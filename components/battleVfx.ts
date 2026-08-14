@@ -70,6 +70,14 @@ export type HealVfxOptions = CommonVfxOptions &
     radius?: number;
   }>;
 
+export type TelegraphVfxOptions = CommonVfxOptions &
+  Readonly<{
+    from: BattleVfxPoint;
+    targets: readonly BattleVfxPoint[];
+    shape: "target" | "line" | "area";
+    reducedMotion?: boolean;
+  }>;
+
 const TEAM_COLORS: Record<BattleVfxTeam, number> = {
   player: 0x55e8d1,
   enemy: 0xff6878,
@@ -522,6 +530,98 @@ export function playHealVfx(
   return scope.handle;
 }
 
+/** Deterministic targeting cue shown before a cast. It communicates the
+ * resolved targets but never feeds information back into combat. */
+export function playTelegraphVfx(
+  scene: Phaser.Scene,
+  options: TelegraphVfxOptions,
+): BattleVfxHandle {
+  const baseDuration = options.reducedMotion ? 220 : 470;
+  const durationMs = scaledDuration(baseDuration, options.speed);
+  const scope = createEffectScope(scene, durationMs);
+  const color = mixColor(effectColor(options), 0xc08cff, 0.56);
+  const highlight = mixColor(color, 0xffffff, 0.72);
+  const depth = options.depth ?? BATTLE_VFX_DEPTH.overlay - 2;
+  const targets = options.targets.length ? options.targets : [options.from];
+
+  if (options.shape === "line") {
+    const line = scope.add(scene.add.graphics()).setDepth(depth);
+    line.lineStyle(8, color, 0.2);
+    line.beginPath();
+    line.moveTo(options.from.x, options.from.y);
+    targets.forEach((target) => line.lineTo(target.x, target.y));
+    line.strokePath();
+    line.lineStyle(2, highlight, 0.9);
+    line.beginPath();
+    line.moveTo(options.from.x, options.from.y);
+    targets.forEach((target) => line.lineTo(target.x, target.y));
+    line.strokePath();
+    if (!options.reducedMotion) {
+      scene.tweens.add({
+        targets: line,
+        alpha: 0,
+        duration: durationMs,
+        ease: "Sine.In",
+      });
+    }
+  }
+
+  if (options.shape === "area") {
+    const total = targets.reduce(
+      (sum, target) => ({ x: sum.x + target.x, y: sum.y + target.y }),
+      { x: 0, y: 0 },
+    );
+    const center = {
+      x: total.x / targets.length,
+      y: total.y / targets.length,
+    };
+    const radius = Math.max(
+      22,
+      ...targets.map((target) => Math.hypot(target.x - center.x, target.y - center.y) + 18),
+    );
+    const area = scope
+      .add(scene.add.circle(center.x, center.y, radius, color, 0.12))
+      .setStrokeStyle(2, highlight, 0.86)
+      .setDepth(depth);
+    if (!options.reducedMotion) {
+      area.setScale(0.72);
+      scene.tweens.add({
+        targets: area,
+        scaleX: 1.08,
+        scaleY: 1.08,
+        alpha: 0,
+        duration: durationMs,
+        ease: "Cubic.Out",
+      });
+    }
+  }
+
+  targets.forEach((target, index) => {
+    const marker = scope
+      .add(scene.add.circle(target.x, target.y, 17, color, 0.1))
+      .setStrokeStyle(2, highlight, 0.95)
+      .setDepth(depth + 1);
+    const cross = scope.add(scene.add.graphics()).setDepth(depth + 2);
+    cross.lineStyle(2, highlight, 0.92);
+    cross.lineBetween(target.x - 7, target.y, target.x + 7, target.y);
+    cross.lineBetween(target.x, target.y - 7, target.x, target.y + 7);
+    if (!options.reducedMotion) {
+      marker.setScale(0.55);
+      scene.tweens.add({
+        targets: [marker, cross],
+        scaleX: 1.16,
+        scaleY: 1.16,
+        alpha: 0,
+        delay: scaledDuration(index * 24, options.speed),
+        duration: Math.max(1, durationMs - scaledDuration(index * 24, options.speed)),
+        ease: "Cubic.Out",
+      });
+    }
+  });
+
+  return scope.handle;
+}
+
 export const battleVfx = {
   slash: playSlashVfx,
   fireProjectile: playFireProjectileVfx,
@@ -530,4 +630,5 @@ export const battleVfx = {
   impact: playImpactVfx,
   shield: playShieldVfx,
   heal: playHealVfx,
+  telegraph: playTelegraphVfx,
 } as const;

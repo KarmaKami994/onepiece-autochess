@@ -32,10 +32,20 @@ Run these before opening a pull request:
 npm run typecheck
 npm run lint
 npm test
+npm run test:e2e
 npm run build
 ```
 
 Use `npm run test:soak` for engine, economy, bot, pairing, or match-flow changes.
+Before balance or release changes, also run `npm run test:production-soak`; its
+1,000-match report is written below `tmp/` and intentionally remains untracked.
+Run `npx playwright install chromium` once before the first local E2E check.
+
+Use `npm run assets:v2` to rebuild the standard 128×128 animation atlases.
+Licensed imports must have their local source, source-page metadata, SHA-256,
+frame map, pivot, processing steps, and explicit public-redistribution
+permission recorded in `art/animation-v2/source-matrix.json` before they may
+replace a v1 runtime fallback.
 
 ## Engine rules
 

@@ -1,0 +1,63 @@
+{
+  "generatedAt": "2026-08-14T08:44:20.758Z",
+  "seeds": 1000,
+  "completeMatches": 1000,
+  "crashes": 0,
+  "minRounds": 27,
+  "maxRounds": 51,
+  "averageRounds": 34.709,
+  "averageFullClockMinutes": 28.735645,
+  "averagePacedMinutes": 18.891728333333344,
+  "battleCount": 136737,
+  "timeoutRate": 0.0007093910207186058,
+  "drawRate": 0.00045342518850055217,
+  "characterPresence": {
+    "nami": { "finalBoards": 5308, "winningBoards": 509, "winRate": 0.09589299171062547 },
+    "usopp": { "finalBoards": 5305, "winningBoards": 577, "winRate": 0.10876531573986804 },
+    "chopper": { "finalBoards": 5269, "winningBoards": 640, "winRate": 0.12146517365724047 },
+    "tashigi": { "finalBoards": 4764, "winningBoards": 621, "winRate": 0.13035264483627204 },
+    "sanji": { "finalBoards": 3554, "winningBoards": 477, "winRate": 0.1342149690489589 },
+    "robin": { "finalBoards": 4219, "winningBoards": 371, "winRate": 0.0879355297463854 },
+    "smoker": { "finalBoards": 2575, "winningBoards": 427, "winRate": 0.1658252427184466 },
+    "sabo": { "finalBoards": 2336, "winningBoards": 538, "winRate": 0.2303082191780822 },
+    "luffy": { "finalBoards": 1245, "winningBoards": 413, "winRate": 0.3317269076305221 },
+    "zoro": { "finalBoards": 3173, "winningBoards": 499, "winRate": 0.15726441853135834 },
+    "kid": { "finalBoards": 1741, "winningBoards": 303, "winRate": 0.17403790924755888 },
+    "crocodile": { "finalBoards": 2866, "winningBoards": 368, "winRate": 0.1284019539427774 },
+    "law": { "finalBoards": 1281, "winningBoards": 293, "winRate": 0.22872755659640906 },
+    "ace": { "finalBoards": 1587, "winningBoards": 460, "winRate": 0.2898550724637681 },
+    "hancock": { "finalBoards": 1254, "winningBoards": 294, "winRate": 0.23444976076555024 },
+    "doflamingo": { "finalBoards": 1271, "winningBoards": 271, "winRate": 0.21321793863099922 },
+    "garp": { "finalBoards": 298, "winningBoards": 209, "winRate": 0.7013422818791947 },
+    "mihawk": { "finalBoards": 130, "winningBoards": 80, "winRate": 0.6153846153846154 }
+  },
+  "traitReachability": {
+    "straw-hat": { "activations": 195575, "maxTier": 3 },
+    "navy": { "activations": 45270, "maxTier": 2 },
+    "warlord": { "activations": 14509, "maxTier": 2 },
+    "supernova": { "activations": 21798, "maxTier": 2 },
+    "brotherhood": { "activations": 17768, "maxTier": 2 },
+    "revolutionary": { "activations": 123656, "maxTier": 2 },
+    "captain": { "activations": 7694, "maxTier": 2 },
+    "brawler": { "activations": 29067, "maxTier": 2 },
+    "swordsman": { "activations": 33537, "maxTier": 2 },
+    "marksman": { "activations": 36920, "maxTier": 2 },
+    "specialist": { "activations": 86348, "maxTier": 2 },
+    "guardian": { "activations": 41052, "maxTier": 2 }
+  },
+  "itemUsage": {
+    "black-blade": 14106,
+    "meat-platter": 2971,
+    "clima-tact": 19717,
+    "sniper-goggles": 12158,
+    "sea-prism-stone": 8024,
+    "armament-wraps": 4948,
+    "den-den-mushi": 4503,
+    "cola-engine": 5162
+  },
+  "targets": {
+    "matchLength20To30Minutes": true,
+    "noCharacterAbove65PercentOfWinningBoards": true,
+    "everyTraitReached": true
+  }
+}

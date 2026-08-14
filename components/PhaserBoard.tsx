@@ -21,6 +21,24 @@ import {
   mirroredOriginX,
   type BoardFacing,
 } from "./boardFacing";
+import {
+  ANIMATED_BENCH_HIT_AREA,
+  ANIMATED_BOARD_HIT_AREA,
+  BENCH_DESTINATIONS,
+  BOARD_GEOMETRY,
+  FALLBACK_TOKEN_HIT_AREA,
+  MAP_BACKDROP_ANCHOR,
+  PLAYER_BOARD_DESTINATIONS,
+  boardCellCenter,
+  boardDestinationAtPoint,
+  boardDestinationCenter,
+  boardDestinationTarget,
+  gameplayCameraFrame,
+  proportionalCoverSize,
+  safeScreenBoundsWithinStage,
+  symmetricBackdropTarget,
+  type BoardDestination,
+} from "./boardGeometry";
 
 export type BoardZone = "board" | "bench";
 
@@ -39,7 +57,11 @@ export type BoardUnit = {
   items: string[];
   hp: number;
   maxHp: number;
+  shield?: number;
+  energy?: number;
   finalHp?: number;
+  finalShield?: number;
+  finalEnergy?: number;
   portrait?: string;
 };
 
@@ -54,10 +76,35 @@ export type BoardMove = {
 export type CombatFxEvent = {
   id: string;
   tick: number;
-  kind: "move" | "attack" | "ability" | "damage" | "heal" | "defeat";
+  kind:
+    | "move"
+    | "attack"
+    | "cast"
+    | "damage"
+    | "heal"
+    | "shield"
+    | "energy"
+    | "status"
+    | "buff"
+    | "dodge"
+    | "defeat";
   sourceId?: string;
   targetId?: string;
+  targetIds?: string[];
   amount?: number;
+  healthDamage?: number;
+  shieldDamage?: number;
+  damageKind?: string;
+  critical?: boolean;
+  abilityId?: string;
+  abilityName?: string;
+  telegraph?: "target" | "line" | "area";
+  status?: string;
+  durationTicks?: number;
+  energyDelta?: number;
+  energyValue?: number;
+  reason?: string;
+  stat?: string;
   label?: string;
   toX?: number;
   toY?: number;
@@ -72,43 +119,49 @@ type BoardPayload = {
   boardSkin: BoardSkin;
 };
 
+export function preservesActiveBattleTimeline(
+  current: BoardPayload,
+  next: BoardPayload,
+): boolean {
+  return (
+    current.phase === "battle" &&
+    next.phase === "battle" &&
+    current.units === next.units &&
+    current.interactive === next.interactive &&
+    current.capacity === next.capacity &&
+    current.boardSkin === next.boardSkin
+  );
+}
+
 type PhaserBoardProps = BoardPayload & {
   phase: string;
   combatEvents: CombatFxEvent[];
   eventSequence: number;
   speed: number;
   particles: boolean;
+  combatNumbers: boolean;
+  reducedMotion: boolean;
   onMoveUnit: (move: BoardMove) => boolean;
   onSelectUnit: (unitId: string | null) => void;
 };
 
 type SceneBridge = {
-  sync: (payload: BoardPayload) => void;
+  sync: (payload: BoardPayload, forceRebuild?: boolean) => void;
   animateEvents: (
     events: CombatFxEvent[],
     speed: number,
     particles: boolean,
+    combatNumbers: boolean,
+    reducedMotion: boolean,
   ) => void;
 };
 
-type BoardDestination =
-  | {
-      zone: "board";
-      x: number;
-      y: number;
-    }
-  | {
-      zone: "bench";
-      slot: number;
-    };
-
-const CANVAS_WIDTH = 760;
-const CANVAS_HEIGHT = 420;
-const CELL_W = 78;
-const CELL_H = 48;
-const GRID_X = 68;
-const GRID_Y = 34;
-const BENCH_Y = 365;
+const CANVAS_WIDTH = BOARD_GEOMETRY.worldWidth;
+const CANVAS_HEIGHT = BOARD_GEOMETRY.worldHeight;
+const CELL_W = BOARD_GEOMETRY.cellWidth;
+const CELL_H = BOARD_GEOMETRY.cellHeight;
+const GRID_X = BOARD_GEOMETRY.gridX;
+const GRID_Y = BOARD_GEOMETRY.gridY;
 
 function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
@@ -147,13 +200,15 @@ export default function PhaserBoard({
   eventSequence,
   speed,
   particles,
+  combatNumbers,
+  reducedMotion,
   onMoveUnit,
   onSelectUnit,
 }: PhaserBoardProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<import("phaser").Game | null>(null);
   const bridgeRef = useRef<SceneBridge | null>(null);
-  const animatedSequenceRef = useRef<number | null>(null);
+  const animatedSequenceRef = useRef<string | null>(null);
   const latestRef = useRef<BoardPayload>({
     units,
     selectedId,
@@ -191,6 +246,7 @@ export default function PhaserBoard({
 
         class GrandLineBoard extends Phaser.Scene implements SceneBridge {
           private mapLayer?: Phaser.GameObjects.Container;
+          private mapBackdrop?: Phaser.GameObjects.Image;
           private ambientLayer?: Phaser.GameObjects.Container;
           private currentBoardSkin?: BoardSkin;
           private tokenLayer?: Phaser.GameObjects.Container;
@@ -223,6 +279,12 @@ export default function PhaserBoard({
             string,
             { current: number; max: number }
           >();
+          private shieldBars = new Map<string, Phaser.GameObjects.Rectangle>();
+          private shieldState = new Map<string, number>();
+          private energyBars = new Map<string, Phaser.GameObjects.Rectangle>();
+          private energyState = new Map<string, number>();
+          private statusLabels = new Map<string, Phaser.GameObjects.Text>();
+          private statusExpiries = new Map<string, Map<string, number>>();
           private animationGeneration = 0;
           private requestedTextures = new Set<string>();
           private failedTextures = new Set<string>();
@@ -231,6 +293,62 @@ export default function PhaserBoard({
           constructor() {
             super("grand-line-board");
           }
+
+          private boardColumnSafeScreenBounds(width: number, height: number) {
+            const stageElement = hostRef.current?.parentElement;
+            const boardColumn = stageElement?.parentElement?.querySelector(
+              ".board-column",
+            );
+            if (!(stageElement instanceof HTMLElement)) return undefined;
+            if (!(boardColumn instanceof HTMLElement)) return undefined;
+            const stageBounds = stageElement.getBoundingClientRect();
+            const boardColumnBounds = boardColumn.getBoundingClientRect();
+            return safeScreenBoundsWithinStage(
+              stageBounds,
+              boardColumnBounds,
+              width,
+              height,
+            );
+          }
+
+          private fitCameraToViewport(width: number, height: number) {
+            const safeScreenBounds = this.boardColumnSafeScreenBounds(
+              width,
+              height,
+            );
+            const frame = gameplayCameraFrame(
+              width,
+              height,
+              safeScreenBounds,
+            );
+            const camera = this.cameras.main;
+            camera
+              .setZoom(frame.zoom)
+              .centerOn(frame.centerX, frame.centerY);
+            if (this.mapBackdrop) {
+              const source = this.mapBackdrop.texture.getSourceImage() as {
+                width: number;
+                height: number;
+              };
+              const backdropTarget = symmetricBackdropTarget(frame);
+              const cover = proportionalCoverSize(
+                source.width,
+                source.height,
+                backdropTarget.width,
+                backdropTarget.height,
+              );
+              this.mapBackdrop
+                .setPosition(MAP_BACKDROP_ANCHOR.x, MAP_BACKDROP_ANCHOR.y)
+                .setDisplaySize(cover.width, cover.height);
+            }
+          }
+
+          private handleScaleResize = (gameSize: {
+            width: number;
+            height: number;
+          }) => {
+            this.fitCameraToViewport(gameSize.width, gameSize.height);
+          };
 
           preload() {
             BOARD_MAP_LIST.forEach((map) => {
@@ -249,6 +367,11 @@ export default function PhaserBoard({
           }
 
           create() {
+            this.fitCameraToViewport(this.scale.width, this.scale.height);
+            this.scale.on("resize", this.handleScaleResize);
+            this.events.once("shutdown", () => {
+              this.scale.off("resize", this.handleScaleResize);
+            });
             this.createCrewAnimations();
             this.drawMap(this.payload.boardSkin);
             this.createDestinationTargets();
@@ -387,8 +510,16 @@ export default function PhaserBoard({
               battleVfx.heal(this, { at: to, team, speed });
               return;
             }
+            if (event.kind === "shield" && to) {
+              battleVfx.shield(this, { at: to, team, speed });
+              return;
+            }
             if (event.kind === "damage" && to) {
-              battleVfx.impact(this, { at: to, team, speed });
+              if ((event.shieldDamage ?? 0) > 0 && (event.healthDamage ?? 0) <= 0) {
+                battleVfx.shield(this, { at: to, team, speed, radius: 20 });
+              } else {
+                battleVfx.impact(this, { at: to, team, speed });
+              }
               return;
             }
             if (event.kind === "defeat" && to) {
@@ -446,6 +577,7 @@ export default function PhaserBoard({
             this.mapLayer?.destroy(true);
             this.ambientLayer = undefined;
             this.mapLayer = undefined;
+            this.mapBackdrop = undefined;
           }
 
           private drawMap(boardSkin: BoardSkin) {
@@ -457,16 +589,19 @@ export default function PhaserBoard({
             const mapLayer = this.add.container(0, 0).setDepth(0);
             this.mapLayer = mapLayer;
             if (this.textures.exists(map.textureKey)) {
-              mapLayer.add(
-                this.add
-                  .image(0, 0, map.textureKey)
-                  .setOrigin(0)
-                  .setDisplaySize(CANVAS_WIDTH, CANVAS_HEIGHT),
-              );
+              this.mapBackdrop = this.add
+                .image(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, map.textureKey)
+                .setOrigin(0.5);
+              mapLayer.add(this.mapBackdrop);
             } else {
               const fallback = this.add.graphics();
               fallback.fillStyle(0x082a34, 1);
-              fallback.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+              fallback.fillRect(
+                -CANVAS_WIDTH,
+                -CANVAS_HEIGHT,
+                CANVAS_WIDTH * 3,
+                CANVAS_HEIGHT * 3,
+              );
               fallback.fillStyle(0x755033, 1);
               fallback.fillRoundedRect(
                 GRID_X - 14,
@@ -477,46 +612,25 @@ export default function PhaserBoard({
               );
               mapLayer.add(fallback);
             }
+            this.fitCameraToViewport(this.scale.width, this.scale.height);
 
-            const bench = this.add.graphics();
-            bench.fillStyle(0x041318, 0.45);
-            bench.fillRoundedRect(
-              GRID_X - 9,
-              BENCH_Y - 20,
-              CELL_W * 8 + 18,
-              50,
-              8,
-            );
-            bench.lineStyle(2, map.accentColor, 0.62);
-            bench.strokeRoundedRect(
-              GRID_X - 9,
-              BENCH_Y - 20,
-              CELL_W * 8 + 18,
-              50,
-              8,
-            );
-            for (let column = 1; column < 8; column += 1) {
-              bench.lineStyle(1, map.accentColor, 0.18);
-              bench.lineBetween(
-                GRID_X + column * CELL_W,
-                BENCH_Y - 15,
-                GRID_X + column * CELL_W,
-                BENCH_Y + 25,
-              );
-            }
-            mapLayer.add(bench);
-            mapLayer.add(
-              this.add
-                .text(GRID_X - 2, BENCH_Y - 18, "RESERVES", {
-                  fontFamily: '"Courier New", monospace',
-                  fontStyle: "bold",
-                  fontSize: "8px",
-                  color: `#${map.accentColor.toString(16).padStart(6, "0")}`,
-                  stroke: "#07131a",
-                  strokeThickness: 2,
-                })
-                .setAlpha(0.78),
-            );
+            const benchGuides = this.add.graphics();
+            benchGuides.lineStyle(1, map.accentColor, 0.14);
+            BENCH_DESTINATIONS.forEach((destination) => {
+              const target = boardDestinationTarget(destination);
+              const right = target.x + target.width;
+              const bottom = target.y + target.height;
+              const mark = 5;
+              benchGuides.lineBetween(target.x, target.y, target.x + mark, target.y);
+              benchGuides.lineBetween(target.x, target.y, target.x, target.y + mark);
+              benchGuides.lineBetween(right, target.y, right - mark, target.y);
+              benchGuides.lineBetween(right, target.y, right, target.y + mark);
+              benchGuides.lineBetween(target.x, bottom, target.x + mark, bottom);
+              benchGuides.lineBetween(target.x, bottom, target.x, bottom - mark);
+              benchGuides.lineBetween(right, bottom, right - mark, bottom);
+              benchGuides.lineBetween(right, bottom, right, bottom - mark);
+            });
+            mapLayer.add(benchGuides);
 
             const ambientLayer = this.add.container(0, 0).setDepth(2);
             this.ambientLayer = ambientLayer;
@@ -564,37 +678,21 @@ export default function PhaserBoard({
           }
 
           private createDestinationTargets() {
-            for (let row = 3; row < 6; row += 1) {
-              for (let col = 0; col < 8; col += 1) {
-                this.registerDestinationTarget(
-                  { zone: "board", x: col, y: row },
-                  GRID_X + col * CELL_W + CELL_W / 2,
-                  GRID_Y + row * CELL_H + CELL_H / 2,
-                  CELL_W - 7,
-                  CELL_H - 7,
-                );
-              }
-            }
-
-            for (let slot = 0; slot < 8; slot += 1) {
-              this.registerDestinationTarget(
-                { zone: "bench", slot },
-                GRID_X + slot * CELL_W + CELL_W / 2,
-                BENCH_Y + 5,
-                CELL_W - 7,
-                38,
-              );
-            }
+            PLAYER_BOARD_DESTINATIONS.forEach((destination) => {
+              this.registerDestinationTarget(destination);
+            });
+            BENCH_DESTINATIONS.forEach((destination) => {
+              this.registerDestinationTarget(destination);
+            });
           }
 
           private registerDestinationTarget(
             destination: BoardDestination,
-            x: number,
-            y: number,
-            width: number,
-            height: number,
           ) {
             const key = destinationKey(destination);
+            const target = boardDestinationTarget(destination);
+            const { x, y } = target.center;
+            const { width, height } = target;
             const surface = this.add
               .rectangle(x, y, width, height, 0x3b9f91, 0)
               .setStrokeStyle(2, 0x7fe4cc, 0)
@@ -717,56 +815,6 @@ export default function PhaserBoard({
             });
           }
 
-          private destinationAt(x: number, y: number) {
-            if (
-              y >= BENCH_Y - 18 &&
-              y <= BENCH_Y + 28 &&
-              x >= GRID_X &&
-              x < GRID_X + CELL_W * 8
-            ) {
-              return {
-                zone: "bench",
-                slot: clamp(Math.floor((x - GRID_X) / CELL_W), 0, 7),
-              } satisfies BoardDestination;
-            }
-
-            if (
-              x < GRID_X ||
-              x >= GRID_X + CELL_W * 8 ||
-              y < GRID_Y + CELL_H * 3 ||
-              y >= GRID_Y + CELL_H * 6
-            ) {
-              return undefined;
-            }
-
-            return {
-              zone: "board",
-              x: clamp(Math.floor((x - GRID_X) / CELL_W), 0, 7),
-              y: clamp(Math.floor((y - GRID_Y) / CELL_H), 3, 5),
-            } satisfies BoardDestination;
-          }
-
-          private destinationPosition(destination: BoardDestination) {
-            return destination.zone === "bench"
-              ? {
-                  x:
-                    GRID_X +
-                    clamp(destination.slot, 0, 7) * CELL_W +
-                    CELL_W / 2,
-                  y: BENCH_Y + 4,
-                }
-              : {
-                  x:
-                    GRID_X +
-                    clamp(destination.x, 0, 7) * CELL_W +
-                    CELL_W / 2,
-                  y:
-                    GRID_Y +
-                    clamp(destination.y, 3, 5) * CELL_H +
-                    CELL_H / 2,
-                };
-          }
-
           private returnDraggedToken(
             container: Phaser.GameObjects.Container,
             origin: { x: number; y: number },
@@ -854,7 +902,15 @@ export default function PhaserBoard({
             }
           }
 
-          sync(payload: BoardPayload) {
+          sync(payload: BoardPayload, forceRebuild = false) {
+            if (
+              !forceRebuild &&
+              this.tokenObjects.size > 0 &&
+              preservesActiveBattleTimeline(this.payload, payload)
+            ) {
+              this.payload = payload;
+              return;
+            }
             if (payload.phase !== this.payload.phase) {
               this.animationGeneration += 1;
               this.draggingUnitId = null;
@@ -872,6 +928,12 @@ export default function PhaserBoard({
             this.unitFacings.clear();
             this.hpBars.clear();
             this.hpState.clear();
+            this.shieldBars.clear();
+            this.shieldState.clear();
+            this.energyBars.clear();
+            this.energyState.clear();
+            this.statusLabels.clear();
+            this.statusExpiries.clear();
 
             payload.units.forEach((unit) => {
               const token = this.makeToken(unit, payload);
@@ -919,56 +981,34 @@ export default function PhaserBoard({
           }
 
           private makeToken(unit: BoardUnit, payload: BoardPayload) {
-            const position =
-              unit.zone === "bench"
-                ? {
-                    x: GRID_X + clamp(unit.slot, 0, 7) * CELL_W + CELL_W / 2,
-                    y: BENCH_Y + 4,
-                  }
-                : {
-                    x:
-                      GRID_X +
-                      clamp(unit.x, 0, 7) * CELL_W +
-                      CELL_W / 2,
-                    y:
-                      GRID_Y +
-                      clamp(unit.y, 0, 5) * CELL_H +
-                      CELL_H / 2,
-                  };
+            const position = boardDestinationCenter(unitDestination(unit));
 
             const container = this.add.container(position.x, position.y);
             const shadow = this.add.ellipse(2, 15, 43, 13, 0x07131a, 0.54);
-            const ring = this.add.circle(
-              0,
-              -2,
-              unit.zone === "bench" ? 17 : 20,
-              unit.team === "enemy" ? 0x6d2733 : 0x183e43,
-              1,
-            );
             const isSelected = payload.selectedId === unit.id;
-            const selectionHalo = this.add
-              .circle(
+            const fallbackCard = this.add
+              .rectangle(
                 0,
-                -2,
-                unit.zone === "bench" ? 22 : 26,
-                0xffe189,
-                0.08,
+                -3,
+                unit.zone === "bench" ? 34 : 40,
+                unit.zone === "bench" ? 38 : 44,
+                unit.team === "enemy" ? 0x321c24 : 0x102f37,
+                0.94,
               )
-              .setStrokeStyle(3, 0xffed9c, 0.95)
-              .setVisible(isSelected);
-            ring.setStrokeStyle(
-              isSelected ? 4 : 2,
-              isSelected
-                ? 0xffd768
-                : unit.team === "enemy"
-                  ? 0xe36b72
-                  : 0xe2bd66,
-              1,
-            );
-            const body = this.add.circle(
+              .setStrokeStyle(
+                isSelected ? 4 : 2,
+                isSelected
+                  ? 0xffd768
+                  : unit.team === "enemy"
+                    ? 0xe36b72
+                    : 0xe2bd66,
+                1,
+              );
+            const fallbackAccent = this.add.rectangle(
               0,
-              -3,
-              unit.zone === "bench" ? 14 : 17,
+              unit.zone === "bench" ? 14 : 16,
+              unit.zone === "bench" ? 28 : 34,
+              3,
               unit.color,
               1,
             );
@@ -980,19 +1020,27 @@ export default function PhaserBoard({
               .find((candidate) =>
                 this.textures.exists(crewSheetKey(candidate.assetKey)),
               );
-            const usesPilotAnimation =
-              Boolean(animationDefinition) &&
-              unit.zone === "board";
+            const usesAnimation = Boolean(animationDefinition);
             const hasPortrait =
               this.textures.exists(portraitKey) &&
               !this.failedTextures.has(portraitKey);
             const startingFacing = initialBoardFacing(unit.team);
             this.unitFacings.set(unit.id, startingFacing);
-            const animatedSprite = usesPilotAnimation
+            const spriteDisplaySize = animationDefinition
+              ? unit.zone === "bench"
+                ? Math.round(animationDefinition.displaySize * 0.72)
+                : animationDefinition.displaySize
+              : 46;
+            const spriteY = animationDefinition
+              ? unit.zone === "bench"
+                ? Math.round(animationDefinition.yOffset * 0.66)
+                : animationDefinition.yOffset
+              : -6;
+            const animatedSprite = usesAnimation
               ? this.add
                   .sprite(
                     0,
-                    animationDefinition?.yOffset ?? -6,
+                    spriteY,
                     crewSheetKey(animationDefinition?.assetKey ?? unit.contentId),
                     0,
                   )
@@ -1003,10 +1051,7 @@ export default function PhaserBoard({
                     ),
                     animationDefinition?.originY ?? 0.5,
                   )
-                  .setDisplaySize(
-                    animationDefinition?.displaySize ?? 46,
-                    animationDefinition?.displaySize ?? 46,
-                  )
+                  .setDisplaySize(spriteDisplaySize, spriteDisplaySize)
                   .setFlipX(startingFacing === "left")
                   .play(
                     crewAnimationKey(
@@ -1022,6 +1067,8 @@ export default function PhaserBoard({
                 sprite: animatedSprite,
               });
             }
+            fallbackCard.setVisible(!animatedSprite);
+            fallbackAccent.setVisible(!animatedSprite);
             const portrait = hasPortrait && !animatedSprite
               ? this.add
                   .image(0, unit.zone === "bench" ? -4 : -6, portraitKey)
@@ -1051,21 +1098,15 @@ export default function PhaserBoard({
                 strokeThickness: 2,
               })
               .setOrigin(0.5);
-            const hpBack = this.add.rectangle(
-              0,
-              unit.zone === "bench" ? -23 : -28,
-              38,
-              4,
-              0x170f12,
-              1,
-            );
+            const hpY = unit.zone === "bench" ? -23 : -31;
+            const hpBack = this.add.rectangle(0, hpY, 42, 5, 0x170f12, 1);
             const ratio = clamp(unit.hp / Math.max(1, unit.maxHp), 0, 1);
             const hp = this.add
               .rectangle(
-                -19,
-                unit.zone === "bench" ? -23 : -28,
-                38 * ratio,
-                3,
+                -21,
+                hpY,
+                42 * ratio,
+                4,
                 ratio > 0.45 ? 0x5ad27a : 0xe26052,
                 1,
               )
@@ -1075,8 +1116,48 @@ export default function PhaserBoard({
               current: unit.hp,
               max: Math.max(1, unit.maxHp),
             });
+            const shieldBack = this.add
+              .rectangle(0, hpY + 5, 42, 3, 0x102837, 0.96)
+              .setVisible(unit.zone === "board");
+            const initialShield = Math.max(0, unit.shield ?? 0);
+            const shield = this.add
+              .rectangle(
+                -21,
+                hpY + 5,
+                42 * clamp(initialShield / Math.max(1, unit.maxHp), 0, 1),
+                2,
+                0x75cfff,
+                1,
+              )
+              .setOrigin(0, 0.5)
+              .setVisible(unit.zone === "board" && initialShield > 0);
+            this.shieldBars.set(unit.id, shield);
+            this.shieldState.set(unit.id, initialShield);
+            const energyBack = this.add
+              .rectangle(0, hpY + 9, 42, 3, 0x17142b, 0.96)
+              .setVisible(unit.zone === "board");
+            const initialEnergy = clamp(unit.energy ?? 0, 0, 100);
+            const energy = this.add
+              .rectangle(-21, hpY + 9, 42 * (initialEnergy / 100), 2, 0xdca8ff, 1)
+              .setOrigin(0, 0.5)
+              .setVisible(unit.zone === "board" && initialEnergy > 0);
+            this.energyBars.set(unit.id, energy);
+            this.energyState.set(unit.id, initialEnergy);
+            const statusLabel = this.add
+              .text(0, hpY - 7, "", {
+                fontFamily: '"Courier New", monospace',
+                fontStyle: "bold",
+                fontSize: "9px",
+                color: "#fff1c6",
+                stroke: "#06131a",
+                strokeThickness: 3,
+              })
+              .setOrigin(0.5)
+              .setVisible(false);
+            this.statusLabels.set(unit.id, statusLabel);
+            this.statusExpiries.set(unit.id, new Map());
             const stars = this.add
-              .text(0, unit.zone === "bench" ? -15 : -20, "★".repeat(unit.star), {
+              .text(0, unit.zone === "bench" ? -15 : -18, "★".repeat(unit.star), {
                 fontFamily: "Arial",
                 fontSize: "8px",
                 color: "#ffd45a",
@@ -1108,7 +1189,7 @@ export default function PhaserBoard({
                 .setStrokeStyle(1, 0xf1d47d, 0.8),
             );
 
-            container.add([shadow, selectionHalo, ring, body]);
+            container.add([shadow, fallbackCard, fallbackAccent]);
             if (animatedSprite) container.add(animatedSprite);
             if (portrait) container.add(portrait);
             container.add([
@@ -1116,24 +1197,31 @@ export default function PhaserBoard({
               name,
               hpBack,
               hp,
+              shieldBack,
+              shield,
+              energyBack,
+              energy,
+              statusLabel,
               stars,
               selectionMarker,
               ...itemPips,
             ]);
-            if (isSelected) {
-              this.tweens.add({
-                targets: selectionHalo,
-                scale: 1.13,
-                alpha: 0.72,
-                duration: 460,
-                ease: "Sine.InOut",
-                yoyo: true,
-                repeat: -1,
-              });
-            }
-            container.setSize(50, 52);
             container.setDepth(unit.team === "enemy" ? unit.y + 1 : unit.y + 10);
-            container.setInteractive({ cursor: "pointer" });
+            const hitArea = animatedSprite
+              ? unit.zone === "bench"
+                ? ANIMATED_BENCH_HIT_AREA
+                : ANIMATED_BOARD_HIT_AREA
+              : FALLBACK_TOKEN_HIT_AREA;
+            container.setInteractive(
+              new Phaser.Geom.Rectangle(
+                hitArea.x,
+                hitArea.y,
+                hitArea.width,
+                hitArea.height,
+              ),
+              Phaser.Geom.Rectangle.Contains,
+            );
+            if (container.input) container.input.cursor = "pointer";
             let wasDragged = false;
             container.on("pointerup", () => {
               if (wasDragged) {
@@ -1161,9 +1249,12 @@ export default function PhaserBoard({
               });
               container.on(
                 "drag",
-                (_pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
+                (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
                   container.setPosition(dragX, dragY);
-                  const destination = this.destinationAt(dragX, dragY);
+                  const destination = boardDestinationAtPoint(
+                    pointer.worldX,
+                    pointer.worldY,
+                  );
                   const nextHover = destination
                     ? destinationKey(destination)
                     : null;
@@ -1173,17 +1264,17 @@ export default function PhaserBoard({
                   }
                 },
               );
-              container.on("dragend", () => {
+              container.on("dragend", (pointer: Phaser.Input.Pointer) => {
                 this.tweens.add({
                   targets: container,
                   scale: 1,
                   duration: 80,
                 });
-                const destination = this.destinationAt(
-                  container.x,
-                  container.y,
+                const destination = boardDestinationAtPoint(
+                  pointer.worldX,
+                  pointer.worldY,
                 );
-                const origin = this.destinationPosition(unitDestination(unit));
+                const origin = boardDestinationCenter(unitDestination(unit));
                 this.draggingUnitId = null;
                 this.hoverDestinationKey = null;
 
@@ -1193,8 +1284,7 @@ export default function PhaserBoard({
                     ...destination,
                   });
                   if (accepted) {
-                    const targetPosition =
-                      this.destinationPosition(destination);
+                    const targetPosition = boardDestinationCenter(destination);
                     container.setPosition(targetPosition.x, targetPosition.y);
                     selectRef.current(unit.id);
                     this.refreshDestinationCues();
@@ -1223,6 +1313,8 @@ export default function PhaserBoard({
             events: CombatFxEvent[],
             animationSpeed: number,
             showParticles: boolean,
+            showCombatNumbers: boolean,
+            reduceMotion: boolean,
           ) {
             const speed = Math.max(0.5, animationSpeed);
             const generation = ++this.animationGeneration;
@@ -1233,9 +1325,150 @@ export default function PhaserBoard({
               state.current = clamp(nextHealth, 0, state.max);
               const ratio = state.current / state.max;
               bar
-                .setDisplaySize(Math.max(0.1, 38 * ratio), 3)
+                .setDisplaySize(Math.max(0.1, 42 * ratio), 4)
                 .setFillStyle(ratio > 0.45 ? 0x5ad27a : 0xe26052, 1)
                 .setVisible(ratio > 0);
+            };
+            const setShield = (unitId: string, nextShield: number) => {
+              const bar = this.shieldBars.get(unitId);
+              const hp = this.hpState.get(unitId);
+              if (!bar || !hp) return;
+              const shield = Math.max(0, nextShield);
+              this.shieldState.set(unitId, shield);
+              bar
+                .setDisplaySize(
+                  Math.max(0.1, 42 * clamp(shield / hp.max, 0, 1)),
+                  2,
+                )
+                .setVisible(shield > 0);
+              if (shield <= 0) {
+                const statuses = this.statusExpiries.get(unitId);
+                statuses?.delete("emergency-shield");
+                const label = this.statusLabels.get(unitId);
+                if (statuses && label) {
+                  const symbols = [...statuses.keys()]
+                    .map((status) =>
+                      status === "burn"
+                        ? "🔥"
+                        : status === "stun"
+                          ? "✦"
+                          : "◆",
+                    )
+                    .join(" ");
+                  label.setText(symbols).setVisible(Boolean(symbols));
+                }
+              }
+            };
+            const setEnergy = (unitId: string, nextEnergy: number) => {
+              const bar = this.energyBars.get(unitId);
+              if (!bar) return;
+              const energy = clamp(nextEnergy, 0, 100);
+              this.energyState.set(unitId, energy);
+              bar
+                .setDisplaySize(Math.max(0.1, 42 * (energy / 100)), 2)
+                .setFillStyle(energy >= 100 ? 0xffd45a : 0xdca8ff, 1)
+                .setVisible(energy > 0);
+            };
+            const statusIcon = (status: string) => {
+              if (status === "burn") return "🔥";
+              if (status === "stun") return "✦";
+              if (status === "emergency-shield" || status.includes("protect")) {
+                return "⬡";
+              }
+              return "◆";
+            };
+            const refreshStatuses = (unitId: string, tick: number) => {
+              const statuses = this.statusExpiries.get(unitId);
+              const label = this.statusLabels.get(unitId);
+              if (!statuses || !label) return;
+              for (const [status, untilTick] of statuses) {
+                if (untilTick > 0 && untilTick <= tick) statuses.delete(status);
+              }
+              const text = [...statuses.keys()].map(statusIcon).join(" ");
+              label.setText(text).setVisible(Boolean(text));
+            };
+            const applyStatus = (
+              unitId: string,
+              status: string,
+              tick: number,
+              durationTicks: number,
+            ) => {
+              if (!status) return;
+              const statuses = this.statusExpiries.get(unitId);
+              if (!statuses) return;
+              statuses.set(status, durationTicks > 0 ? tick + durationTicks : 0);
+              refreshStatuses(unitId, tick);
+              if (durationTicks > 0) {
+                this.time.delayedCall(
+                  Math.max(1, Math.round((durationTicks * 100) / speed)),
+                  () => {
+                    if (generation !== this.animationGeneration) return;
+                    refreshStatuses(unitId, tick + durationTicks);
+                  },
+                );
+              }
+            };
+            const showFloater = (
+              target: Phaser.GameObjects.Container | undefined,
+              text: string,
+              color: string,
+              emphatic = false,
+              offset = 0,
+            ) => {
+              if (!showCombatNumbers || !target || !text) return;
+              const floater = this.add
+                .text(target.x, target.y - 29 - offset, text, {
+                  fontFamily: '"Courier New", monospace',
+                  fontStyle: "bold",
+                  fontSize: emphatic ? "15px" : "12px",
+                  color,
+                  stroke: "#07131a",
+                  strokeThickness: emphatic ? 4 : 3,
+                })
+                .setOrigin(0.5)
+                .setDepth(160);
+              if (reduceMotion) {
+                this.time.delayedCall(Math.round(430 / speed), () => floater.destroy());
+                return;
+              }
+              this.tweens.add({
+                targets: floater,
+                y: floater.y - 24,
+                alpha: 0,
+                duration: Math.round(560 / speed),
+                onComplete: () => floater.destroy(),
+              });
+            };
+            const showCastName = (
+              source: Phaser.GameObjects.Container | undefined,
+              name: string | undefined,
+            ) => {
+              if (!source || !name) return;
+              const banner = this.add
+                .text(source.x, source.y - 48, name.toUpperCase(), {
+                  fontFamily: '"Courier New", monospace',
+                  fontStyle: "bold",
+                  fontSize: "10px",
+                  color: "#f1d8ff",
+                  backgroundColor: "#251938dd",
+                  stroke: "#07131a",
+                  strokeThickness: 2,
+                  padding: { x: 5, y: 3 },
+                })
+                .setOrigin(0.5)
+                .setDepth(165);
+              if (reduceMotion) {
+                this.time.delayedCall(Math.round(500 / speed), () => banner.destroy());
+                return;
+              }
+              this.tweens.add({
+                targets: banner,
+                y: banner.y - 8,
+                alpha: 0,
+                delay: Math.round(260 / speed),
+                duration: Math.round(380 / speed),
+                onComplete: () => banner.destroy(),
+              });
             };
 
             events.forEach((event) => {
@@ -1248,6 +1481,18 @@ export default function PhaserBoard({
                 const target = event.targetId
                   ? this.tokenObjects.get(event.targetId)
                   : undefined;
+                const targets = (event.targetIds?.length
+                  ? event.targetIds
+                  : event.targetId
+                    ? [event.targetId]
+                    : [])
+                  .map((id) => this.tokenObjects.get(id))
+                  .filter(
+                    (candidate): candidate is Phaser.GameObjects.Container =>
+                      Boolean(candidate),
+                  );
+
+                this.payload.units.forEach((unit) => refreshStatuses(unit.id, event.tick));
 
                 if (
                   event.kind === "move" &&
@@ -1256,44 +1501,67 @@ export default function PhaserBoard({
                   event.toY !== undefined
                 ) {
                   this.playCrewAnimation(event.sourceId, "move", speed);
-                  const destinationX =
-                    GRID_X + clamp(event.toX, 0, 7) * CELL_W + CELL_W / 2;
+                  const destination = boardCellCenter(event.toX, event.toY);
+                  const destinationX = destination.x;
                   this.faceUnit(event.sourceId ?? "", destinationX);
-                  this.tweens.add({
-                    targets: source,
-                    x: destinationX,
-                    y: GRID_Y + clamp(event.toY, 0, 5) * CELL_H + CELL_H / 2,
-                    duration: Math.round(
-                      125 / Math.max(0.5, animationSpeed),
-                    ),
-                  });
+                  const destinationY = destination.y;
+                  if (reduceMotion) {
+                    source.setPosition(destinationX, destinationY);
+                  } else {
+                    this.tweens.add({
+                      targets: source,
+                      x: destinationX,
+                      y: destinationY,
+                      duration: Math.round(125 / speed),
+                    });
+                  }
                   return;
                 }
 
                 if (
                   source &&
                   target &&
-                  (event.kind === "attack" || event.kind === "ability")
+                  (event.kind === "attack" || event.kind === "cast")
                 ) {
                   this.playCrewAnimation(
                     event.sourceId,
-                    event.kind === "ability" ? "cast" : "attack",
+                    event.kind === "cast" ? "cast" : "attack",
                     speed,
                   );
                   this.faceUnit(event.sourceId ?? "", target.x);
                   this.faceUnit(event.targetId ?? "", source.x);
-                  if (showParticles) {
-                    this.playCombatVfx(event, source, target, speed);
+                  if (event.kind === "cast") {
+                    showCastName(source, event.abilityName);
+                    battleVfx.telegraph(this, {
+                      from: { x: source.x, y: source.y - 4 },
+                      targets: (targets.length ? targets : [target]).map((entry) => ({
+                        x: entry.x,
+                        y: entry.y - 4,
+                      })),
+                      shape: event.telegraph ?? "target",
+                      team:
+                        this.payload.units.find((unit) => unit.id === event.sourceId)
+                          ?.team ?? "neutral",
+                      speed,
+                      reducedMotion: reduceMotion,
+                    });
                   }
-                  const sourceX = source.x;
-                  const sourceY = source.y;
-                  this.tweens.add({
-                    targets: source,
-                    x: sourceX + (target.x - sourceX) * 0.12,
-                    y: sourceY + (target.y - sourceY) * 0.12,
-                    yoyo: true,
-                    duration: Math.round(90 / speed),
-                  });
+                  if (showParticles && !reduceMotion) {
+                    (targets.length ? targets : [target]).forEach((castTarget) =>
+                      this.playCombatVfx(event, source, castTarget, speed),
+                    );
+                  }
+                  if (!reduceMotion) {
+                    const sourceX = source.x;
+                    const sourceY = source.y;
+                    this.tweens.add({
+                      targets: source,
+                      x: sourceX + (target.x - sourceX) * 0.12,
+                      y: sourceY + (target.y - sourceY) * 0.12,
+                      yoyo: true,
+                      duration: Math.round(90 / speed),
+                    });
+                  }
                 }
 
                 if (target && event.kind === "damage") {
@@ -1301,10 +1569,33 @@ export default function PhaserBoard({
                   if (source) this.faceUnit(event.targetId ?? "", source.x);
                   const hp = this.hpState.get(event.targetId ?? "");
                   if (hp) {
+                    const splitDamageAvailable =
+                      (event.healthDamage ?? 0) > 0 ||
+                      (event.shieldDamage ?? 0) > 0;
+                    const healthDamage = splitDamageAvailable
+                      ? Math.max(0, event.healthDamage ?? 0)
+                      : Math.max(0, event.amount ?? 0);
+                    const shieldDamage = Math.max(0, event.shieldDamage ?? 0);
                     setHealth(
                       event.targetId ?? "",
-                      hp.current - Math.max(0, event.amount ?? 0),
+                      hp.current - healthDamage,
                     );
+                    setShield(
+                      event.targetId ?? "",
+                      (this.shieldState.get(event.targetId ?? "") ?? 0) -
+                        shieldDamage,
+                    );
+                    if (shieldDamage > 0) {
+                      showFloater(target, `−${shieldDamage} SHIELD`, "#75cfff", false, 12);
+                    }
+                    if (healthDamage > 0) {
+                      showFloater(
+                        target,
+                        `${event.critical ? "CRIT " : ""}−${healthDamage}`,
+                        event.critical ? "#ffd45a" : "#ff8b72",
+                        event.critical,
+                      );
+                    }
                   }
                 } else if (target && event.kind === "heal") {
                   const hp = this.hpState.get(event.targetId ?? "");
@@ -1314,15 +1605,54 @@ export default function PhaserBoard({
                       hp.current + Math.max(0, event.amount ?? 0),
                     );
                   }
+                  showFloater(target, `+${Math.max(0, event.amount ?? 0)}`, "#74ed99");
+                } else if (target && event.kind === "shield") {
+                  setShield(
+                    event.targetId ?? "",
+                    (this.shieldState.get(event.targetId ?? "") ?? 0) +
+                      Math.max(0, event.amount ?? 0),
+                  );
+                  showFloater(
+                    target,
+                    `+${Math.max(0, event.amount ?? 0)} SHIELD`,
+                    "#75cfff",
+                  );
+                } else if (event.kind === "energy") {
+                  const unitId = event.targetId || event.sourceId;
+                  if (unitId) {
+                    const fallback =
+                      (this.energyState.get(unitId) ?? 0) +
+                      (event.energyDelta ?? event.amount ?? 0);
+                    setEnergy(unitId, event.energyValue ?? fallback);
+                  }
+                } else if (target && event.kind === "status") {
+                  applyStatus(
+                    event.targetId ?? "",
+                    event.status ?? "status",
+                    event.tick,
+                    event.durationTicks ?? 0,
+                  );
+                } else if (target && event.kind === "dodge") {
+                  showFloater(target, "DODGE", "#fff0a2", true);
+                } else if (target && event.kind === "buff") {
+                  showFloater(
+                    target,
+                    event.label ?? `+${Math.max(0, event.amount ?? 0)} ATK`,
+                    "#f0ba62",
+                  );
                 } else if (target && event.kind === "defeat") {
                   setHealth(event.targetId ?? "", 0);
+                  setShield(event.targetId ?? "", 0);
+                  setEnergy(event.targetId ?? "", 0);
                   this.playCrewAnimation(event.targetId, "defeat", speed);
                 }
 
                 if (
                   showParticles &&
+                  !reduceMotion &&
                   (event.kind === "damage" ||
                     event.kind === "heal" ||
+                    event.kind === "shield" ||
                     event.kind === "defeat")
                 ) {
                   this.playCombatVfx(event, source, target, speed);
@@ -1332,9 +1662,11 @@ export default function PhaserBoard({
                   target &&
                   (event.kind === "damage" ||
                     event.kind === "heal" ||
-                    event.kind === "ability" ||
+                    event.kind === "shield" ||
+                    event.kind === "status" ||
+                    event.kind === "dodge" ||
                     event.kind === "defeat");
-                if (target && reacts) {
+                if (target && reacts && !reduceMotion) {
                   const delaysAnimatedDefeat =
                     event.kind === "defeat" &&
                     this.animatedUnitSprites.has(event.targetId ?? "");
@@ -1358,39 +1690,6 @@ export default function PhaserBoard({
                     ),
                   });
 
-                  if (
-                    event.kind !== "ability" &&
-                    (event.amount || event.label)
-                  ) {
-                    const floater = this.add
-                      .text(
-                        target.x,
-                        target.y - 25,
-                        event.label ??
-                          `${event.kind === "heal" ? "+" : "−"}${Math.abs(event.amount ?? 0)}`,
-                        {
-                          fontFamily: '"Courier New", monospace',
-                          fontStyle: "bold",
-                          fontSize: "13px",
-                          color:
-                            event.kind === "heal" ? "#74ed99" : "#ff8b72",
-                          stroke: "#07131a",
-                          strokeThickness: 3,
-                        },
-                      )
-                      .setOrigin(0.5)
-                      .setDepth(150);
-                    this.tweens.add({
-                      targets: floater,
-                      y: floater.y - 24,
-                      alpha: 0,
-                      duration: Math.round(
-                        520 / Math.max(0.5, animationSpeed),
-                      ),
-                      onComplete: () => floater.destroy(),
-                    });
-                  }
-
                 }
               });
             });
@@ -1406,6 +1705,8 @@ export default function PhaserBoard({
                 for (const unit of this.payload.units) {
                   if (unit.finalHp === undefined) continue;
                   setHealth(unit.id, unit.finalHp);
+                  setShield(unit.id, unit.finalShield ?? 0);
+                  setEnergy(unit.id, unit.finalEnergy ?? 0);
                   if (unit.finalHp <= 0) {
                     const token = this.tokenObjects.get(unit.id);
                     token?.setAlpha(0).setScale(0.86);
@@ -1431,8 +1732,7 @@ export default function PhaserBoard({
           scene: GrandLineBoard,
           audio: { noAudio: true },
           scale: {
-            mode: Phaser.Scale.FIT,
-            autoCenter: Phaser.Scale.CENTER_BOTH,
+            mode: Phaser.Scale.RESIZE,
           },
         });
         gameRef.current = game;
@@ -1464,17 +1764,35 @@ export default function PhaserBoard({
   }, [units, selectedId, interactive, phase, capacity, boardSkin]);
 
   useEffect(() => {
+    const animationKey = `${eventSequence}:${speed}:${Number(particles)}:${Number(combatNumbers)}:${Number(reducedMotion)}`;
     if (
       !isReady ||
       !eventSequence ||
       !combatEvents.length ||
-      animatedSequenceRef.current === eventSequence
+      animatedSequenceRef.current === animationKey
     ) {
       return;
     }
-    animatedSequenceRef.current = eventSequence;
-    bridgeRef.current?.animateEvents(combatEvents, speed, particles);
-  }, [combatEvents, eventSequence, isReady, speed, particles]);
+    animatedSequenceRef.current = animationKey;
+    // Rebuild from the canonical initial snapshot before replaying at a newly
+    // selected speed; scheduled tweens never become combat state.
+    bridgeRef.current?.sync(latestRef.current, true);
+    bridgeRef.current?.animateEvents(
+      combatEvents,
+      speed,
+      particles,
+      combatNumbers,
+      reducedMotion,
+    );
+  }, [
+    combatEvents,
+    eventSequence,
+    isReady,
+    speed,
+    particles,
+    combatNumbers,
+    reducedMotion,
+  ]);
 
   if (failed) {
     return (

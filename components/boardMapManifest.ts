@@ -38,10 +38,10 @@ export const BOARD_MAPS: Record<BoardSkin, BoardMapDefinition> = {
     playerColor: 0x4cc5b0,
     enemyColor: 0xe36b72,
     waveZones: [
-      { x: 0, y: 0, width: 760, height: 60 },
-      { x: 0, y: 55, width: 42, height: 330 },
-      { x: 718, y: 55, width: 42, height: 330 },
-      { x: 0, y: 385, width: 760, height: 35 },
+      { x: 0, y: 0, width: 1_000, height: 42 },
+      { x: 0, y: 35, width: 118, height: 350 },
+      { x: 882, y: 35, width: 118, height: 350 },
+      { x: 0, y: 388, width: 1_000, height: 32 },
     ],
   },
   "marine-harbor": {
@@ -57,10 +57,10 @@ export const BOARD_MAPS: Record<BoardSkin, BoardMapDefinition> = {
     playerColor: 0x4ebed1,
     enemyColor: 0xe36b72,
     waveZones: [
-      { x: 0, y: 0, width: 760, height: 45 },
-      { x: 0, y: 40, width: 62, height: 345 },
-      { x: 698, y: 40, width: 62, height: 345 },
-      { x: 0, y: 382, width: 760, height: 38 },
+      { x: 0, y: 0, width: 1_000, height: 38 },
+      { x: 0, y: 32, width: 132, height: 352 },
+      { x: 868, y: 32, width: 132, height: 352 },
+      { x: 0, y: 386, width: 1_000, height: 34 },
     ],
   },
 };
