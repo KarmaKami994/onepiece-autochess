@@ -50,7 +50,10 @@ The committed v2 animation assets can be rebuilt headlessly with
 
 - Click a crew member and then a highlighted deck/bench cell, or drag directly.
   Amber cells swap occupants; red cells explain illegal capacity moves.
-- `1`–`6`: buy the matching shop offer.
+- `1`–`6`: buy the matching shop offer. Hover or keyboard-focus a poster for
+  its ability, stats, merge progress, and projected bond impact.
+- `1`–`8` on treasure screens: choose the matching reward or carousel token;
+  the highlighted best fit uses the same deterministic scoring as auto-pick.
 - `R`: reroll the shop for one gold.
 - `L`: lock or unlock the shop.
 - `X`: buy four XP for four gold.
@@ -62,6 +65,10 @@ The first-voyage guide pauses preparation while teaching recruitment,
 deployment, battle, treasure choice, and equipping. It can be skipped or
 reopened from Settings. Starting a new voyage while a save exists requires
 explicit confirmation.
+
+After each combat, a compact outcome notice reports victory, defeat, or draw,
+Captain damage, and remaining team health. The final results screen preserves
+the crew's names, stars, held treasure, and active bonds.
 
 ## Architecture
 

@@ -26,6 +26,15 @@ import {
   resolvePurchaseSelection,
   retainValidBoardSelection,
 } from "@/components/boardSelection";
+import {
+  buildBattleOutcome,
+  type BattleOutcomeRecap,
+} from "@/components/battleOutcome";
+import {
+  rankItemDecisionPreviews,
+  type AvailableItemDecisionPreview,
+} from "@/components/decisionSupport";
+import type { GameContent, MatchState, PlayerState } from "@/game";
 import "./game.css";
 
 type UnknownRecord = Record<string, unknown>;
@@ -156,12 +165,14 @@ type ItemEffectView = {
 
 type ChoiceView = {
   id: string;
+  contentId: string;
   name: string;
   description: string;
   icon: string;
   portrait?: string;
   color: string;
   effects: ItemEffectView[];
+  decision?: AvailableItemDecisionPreview & { recommended: boolean };
 };
 
 type ToastView = {
@@ -207,6 +218,7 @@ type MatchView = {
   battleDurationSeconds: number;
   placement: number;
   winnerName: string;
+  battleOutcome: BattleOutcomeRecap | null;
 };
 
 type SaveEnvelope = {
@@ -417,6 +429,7 @@ function itemView(
   const effects = recordValues(definition.effects).map(formatItemEffect);
   return {
     id: definitionId,
+    contentId: definitionId,
     name: stringValue(definition.name, titleCase(definitionId)),
     description: stringValue(
       definition.description,
@@ -1112,6 +1125,7 @@ function normalizeChoices(
     );
     return {
       id: choiceId,
+      contentId: definitionId,
       name,
       description: stringValue(
         definition.description ?? rawRecord.description,
@@ -1384,6 +1398,10 @@ function normalizeMatch(stateValue: unknown): MatchView {
   });
   const deployed = Object.keys(asRecord(player.board)).length;
   const events = normalizeEvents(state, playerId);
+  const battleOutcome = buildBattleOutcome({
+    state: state as unknown as MatchState,
+    playerId,
+  });
   const humanStandingIndex = standings.findIndex(
     (standing) => standing.isHuman,
   );
@@ -1396,6 +1414,31 @@ function normalizeMatch(stateValue: unknown): MatchView {
     unitDefinitions,
     itemDefinitions,
   );
+  const rankedChoiceDecisions = rankItemDecisionPreviews(
+    choices.map((choice) => choice.contentId),
+    player as unknown as PlayerState,
+    content as GameContent,
+  );
+  const recommendedItemId = rankedChoiceDecisions.find(
+    (decision) => decision.available,
+  )?.itemId;
+  const choiceDecisionByItemId = new Map(
+    rankedChoiceDecisions.flatMap((decision) =>
+      decision.available ? [[decision.itemId, decision] as const] : [],
+    ),
+  );
+  const enrichedChoices = choices.map((choice) => {
+    const decision = choiceDecisionByItemId.get(choice.contentId);
+    return decision
+      ? {
+          ...choice,
+          decision: {
+            ...decision,
+            recommended: decision.itemId === recommendedItemId,
+          },
+        }
+      : choice;
+  });
   const itemsById = new Map(
     [...itemDefinitions.entries()].map(([id, definition]) => [
       id,
@@ -1499,7 +1542,7 @@ function normalizeMatch(stateValue: unknown): MatchView {
     traits: normalizedTraits,
     standings,
     opponent,
-    choices,
+    choices: enrichedChoices,
     selectedDefinitionByUnit: board.views,
     itemsById,
     economy: {
@@ -1521,6 +1564,7 @@ function normalizeMatch(stateValue: unknown): MatchView {
     winnerName:
       winner?.name ??
       (winnerId === playerId ? "Your Crew" : "A rival captain"),
+    battleOutcome,
   };
 }
 
@@ -1860,6 +1904,8 @@ export default function GameClient() {
     const stateRecord = asRecord(next);
     const currentPhase = phaseName(stateRecord.phase);
     const humanId = getPlayerId(stateRecord);
+    const resolvedOutcome =
+      currentPhase === "battle" ? view?.battleOutcome ?? null : null;
 
     try {
       if (currentPhase === "preparation" && engine.applyCommand) {
@@ -1885,13 +1931,30 @@ export default function GameClient() {
       }
 
       setEngineState(next);
-      showToast(
-        "info",
-        currentPhase === "preparation" ? "SET SAIL" : "ROUND RESOLVED",
-        currentPhase === "preparation"
-          ? "Cannons ready — battle begins!"
-          : "The tide turns. Prepare for the next encounter.",
-      );
+      if (currentPhase === "preparation") {
+        showToast("info", "SET SAIL", "Cannons ready — battle begins!");
+      } else if (resolvedOutcome) {
+        const remaining = resolvedOutcome.survivorHpPercent ?? 0;
+        showToast(
+          resolvedOutcome.outcome === "win"
+            ? "success"
+            : resolvedOutcome.outcome === "loss"
+              ? "error"
+              : "info",
+          resolvedOutcome.outcomeLabel,
+          resolvedOutcome.outcome === "win"
+            ? `${resolvedOutcome.opponentName} defeated · ${remaining}% crew health remained.`
+            : resolvedOutcome.outcome === "loss"
+              ? `${resolvedOutcome.opponentName} dealt ${resolvedOutcome.captainDamage} Captain damage · ${remaining}% enemy health remained.`
+              : `${resolvedOutcome.opponentName} held the line · no Captain damage.`,
+        );
+      } else {
+        showToast(
+          "info",
+          "ROUND RESOLVED",
+          "The tide turns. Prepare for the next encounter.",
+        );
+      }
       playSound(currentPhase === "preparation" ? "battle" : "click");
     } catch {
       showToast(
@@ -1903,7 +1966,7 @@ export default function GameClient() {
     } finally {
       setIsAdvancing(false);
     }
-  }, [isAdvancing, playSound, setEngineState, showToast]);
+  }, [isAdvancing, playSound, setEngineState, showToast, view]);
 
   const advanceRef = useRef(advancePhase);
   useEffect(() => {
@@ -2295,8 +2358,18 @@ export default function GameClient() {
         else if (screen === "match") openSettings("match");
         return;
       }
-      if (screen !== "match" || !view) return;
       const key = event.key.toLowerCase();
+      if ((screen === "carousel" || screen === "reward") && view) {
+        if (/^[1-8]$/.test(key)) {
+          const choice = view.choices[Number(key) - 1];
+          if (choice) {
+            event.preventDefault();
+            chooseReward(choice.id);
+          }
+        }
+        return;
+      }
+      if (screen !== "match" || !view) return;
       if (key === "enter") {
         const mayStartTutorialBattle =
           tutorialStep === "sail" && view.deployed >= 2;
@@ -2358,6 +2431,7 @@ export default function GameClient() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [
     buyUnit,
+    chooseReward,
     closeSettings,
     issueCommand,
     openSettings,
@@ -2839,6 +2913,16 @@ function TutorialCoach({
     },
   };
   const lesson = lessons[step];
+  const progressStep: Record<TutorialStep, number> = {
+    welcome: 0,
+    recruit: 1,
+    deploy: 2,
+    second: 3,
+    sail: 4,
+    "await-reward": 5,
+    treasure: 5,
+    equip: 6,
+  };
   const target =
     step === "recruit" || step === "second" || step === "sail"
       ? "shop"
@@ -2884,7 +2968,33 @@ function TutorialCoach({
         aria-live={step === "welcome" ? undefined : "polite"}
         onKeyDown={trapWelcomeFocus}
       >
-        <span className="tutorial-progress">{lesson.eyebrow}</span>
+        <span
+          className="tutorial-progress"
+          aria-label={
+            progressStep[step] === 0
+              ? "First voyage introduction"
+              : `First voyage step ${progressStep[step]} of 6`
+          }
+        >
+          <b>{lesson.eyebrow}</b>
+          <span className="tutorial-progress-track" aria-hidden="true">
+            {Array.from({ length: 6 }, (_, index) => {
+              const stepNumber = index + 1;
+              return (
+                <i
+                  key={stepNumber}
+                  className={
+                    stepNumber < progressStep[step]
+                      ? "complete"
+                      : stepNumber === progressStep[step]
+                        ? "active"
+                        : ""
+                  }
+                />
+              );
+            })}
+          </span>
+        </span>
         <h2 id="tutorial-title">{lesson.title}</h2>
         <p>{lesson.copy}</p>
         {lesson.legend && (
@@ -3149,6 +3259,7 @@ function MatchScreen({
   onAdvance: () => void;
   onSettings: () => void;
 }) {
+  const [previewShopIndex, setPreviewShopIndex] = useState<number | null>(null);
   const planning = view.phase === "preparation";
   const warning = timer <= 8;
   const playerCrewCount = view.boardUnits.filter(
@@ -3395,10 +3506,13 @@ function MatchScreen({
               : ""
           }`}
         >
+          {planning && previewShopIndex !== null && view.shop[previewShopIndex] && (
+            <ShopDecisionPreview unit={view.shop[previewShopIndex]} />
+          )}
           <div className="shop-heading">
             <span>RECRUITMENT DOCK</span>
             <small className="shop-help">
-              Click a poster or press 1–6 · Hover for ability details
+              Click or press 1–6 · Hover or focus for full details
             </small>
           </div>
           <div className="shop-row">
@@ -3413,6 +3527,8 @@ function MatchScreen({
                   Boolean(unit.disabledReason) ||
                   !tutorialAllowsShop
                 }
+                previewed={previewShopIndex === index}
+                onPreview={setPreviewShopIndex}
                 onBuy={() => onBuyUnit(index)}
               />
             ))}
@@ -3609,11 +3725,15 @@ function ShopCard({
   unit,
   index,
   disabled,
+  previewed,
+  onPreview,
   onBuy,
 }: {
   unit: ShopUnitView | null;
   index: number;
   disabled: boolean;
+  previewed: boolean;
+  onPreview: (index: number | null) => void;
   onBuy: () => void;
 }) {
   if (!unit) {
@@ -3642,47 +3762,125 @@ function ShopCard({
     .filter(Boolean)
     .join(" · ");
   return (
-    <button
-      type="button"
-      className={`shop-card rarity-${slugify(unit.rarity)} ${
-        unit.disabledReason ? "is-unaffordable" : ""
-      } ${activatingBond ? "activates-bond" : ""}`}
-      disabled={disabled}
-      onClick={onBuy}
-      aria-label={`Recruit ${unit.name} for ${unit.cost} gold. ${
-        unit.disabledReason ? `${titleCase(unit.disabledReason)}. ` : ""
-      }Shortcut ${index + 1}`}
-      title={tooltip}
+    <div
+      className="shop-card-shell"
+      role={disabled ? "group" : undefined}
+      tabIndex={disabled ? 0 : -1}
+      aria-label={
+        disabled
+          ? `${unit.name} recruitment details. ${unit.disabledReason ?? "Recruitment unavailable"}`
+          : undefined
+      }
+      onMouseEnter={() => onPreview(index)}
+      onMouseLeave={() => onPreview(null)}
+      onFocus={() => onPreview(index)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) onPreview(null);
+      }}
     >
-      <kbd>{index + 1}</kbd>
-      <CrewPortrait src={unit.portrait} name={unit.name} color={unit.color} />
-      <span className="shop-unit-copy">
-        <strong>{unit.name}</strong>
-        <small>
-          {unit.traitDetails
-            .map((trait) => trait.name)
-            .slice(0, 2)
-            .join(" · ") || unit.rarity}
-        </small>
-      </span>
-      <span className="shop-badge-row">
-        {unit.purchaseUpgrade && (
-          <b className="merge-badge">
-            BUY → {"★".repeat(unit.purchaseUpgrade)}
-          </b>
+      <button
+        type="button"
+        className={`shop-card rarity-${slugify(unit.rarity)} ${
+          unit.disabledReason ? "is-unaffordable" : ""
+        } ${activatingBond ? "activates-bond" : ""} ${
+          previewed ? "is-previewed" : ""
+        }`}
+        disabled={disabled}
+        onClick={() => {
+          onPreview(null);
+          onBuy();
+        }}
+        aria-label={`Recruit ${unit.name} for ${unit.cost} gold. ${
+          unit.disabledReason ? `${titleCase(unit.disabledReason)}. ` : ""
+        }Shortcut ${index + 1}`}
+        aria-describedby={`shop-card-detail-${index}`}
+      >
+        <span className="sr-only" id={`shop-card-detail-${index}`}>
+          {tooltip}
+        </span>
+        <kbd>{index + 1}</kbd>
+        <CrewPortrait src={unit.portrait} name={unit.name} color={unit.color} />
+        <span className="shop-unit-copy">
+          <strong>{unit.name}</strong>
+          <small>
+            {unit.traitDetails
+              .map((trait) => trait.name)
+              .slice(0, 2)
+              .join(" · ") || unit.rarity}
+          </small>
+        </span>
+        <span className="shop-badge-row">
+          {unit.purchaseUpgrade && (
+            <b className="merge-badge">
+              BUY → {"★".repeat(unit.purchaseUpgrade)}
+            </b>
+          )}
+          {!unit.purchaseUpgrade && unit.ownedCopies > 0 && (
+            <b className="merge-badge">{unit.mergeProgress}</b>
+          )}
+          {activatingBond && (
+            <b className="bond-badge">FIELD → {activatingBond.name}</b>
+          )}
+        </span>
+        {unit.disabledReason && (
+          <b className="cost-warning">{unit.disabledReason}</b>
         )}
-        {!unit.purchaseUpgrade && unit.ownedCopies > 0 && (
-          <b className="merge-badge">{unit.mergeProgress}</b>
-        )}
-        {activatingBond && (
-          <b className="bond-badge">FIELD → {activatingBond.name}</b>
-        )}
-      </span>
-      {unit.disabledReason && (
-        <b className="cost-warning">{unit.disabledReason}</b>
-      )}
-      <span className="shop-cost">{unit.cost}<i>●</i></span>
-    </button>
+        <span className="shop-cost">{unit.cost}<i>●</i></span>
+      </button>
+    </div>
+  );
+}
+
+function ShopDecisionPreview({ unit }: { unit: ShopUnitView }) {
+  const activatingBond = unit.traitPreview.find(
+    (trait) => trait.activatesIfFielded,
+  );
+  return (
+    <aside
+      className="shop-decision-preview"
+      aria-label={`${unit.name} recruitment details`}
+      aria-live="polite"
+    >
+      <div className="shop-preview-identity">
+        <CrewPortrait src={unit.portrait} name={unit.name} color={unit.color} />
+        <span>
+          <small>{unit.rarity} · {unit.cost} GOLD</small>
+          <strong>{unit.name}</strong>
+          <em>{unit.traitDetails.map((trait) => trait.name).join(" · ")}</em>
+        </span>
+      </div>
+      <div className="shop-preview-ability">
+        <small>ABILITY · {titleCase(unit.ability.effect)}</small>
+        <strong>{unit.ability.name}</strong>
+        <p>{unit.ability.description}</p>
+      </div>
+      <div className="shop-preview-impact">
+        <small>RECRUITMENT IMPACT</small>
+        <span className="shop-preview-stats">
+          HP {unit.stats.health} · ATK {unit.stats.attack} · DEF {unit.stats.defense} · RNG {unit.stats.range}
+        </span>
+        <ul className="shop-preview-bonds" aria-label="Projected bond counts after fielding">
+          {unit.traitPreview.slice(0, 3).map((trait) => (
+            <li key={trait.id} className={trait.activatesIfFielded ? "activates" : ""}>
+              {trait.name} {trait.current}→{trait.current + trait.deltaIfFielded}
+              {trait.next ? ` / ${trait.next}` : ""}
+            </li>
+          ))}
+          {unit.traitPreview.length > 3 && (
+            <li>+{unit.traitPreview.length - 3} MORE</li>
+          )}
+        </ul>
+        <strong className={unit.disabledReason ? "is-warning" : ""}>
+          {unit.disabledReason
+            ? unit.disabledReason
+            : unit.purchaseUpgrade
+              ? `IMMEDIATE MERGE → ${"★".repeat(unit.purchaseUpgrade)}`
+              : activatingBond
+                ? `FIELD TO ACTIVATE ${activatingBond.name.toUpperCase()}`
+                : `OWNED ${unit.mergeProgress}`}
+        </strong>
+      </div>
+    </aside>
   );
 }
 
@@ -3983,6 +4181,11 @@ function CarouselScreen({
   timer: number;
   onChoose: (id: string) => void;
 }) {
+  const [previewChoiceId, setPreviewChoiceId] = useState(
+    choices[0]?.id ?? "",
+  );
+  const previewChoice =
+    choices.find((choice) => choice.id === previewChoiceId) ?? choices[0];
   return (
     <section className="choice-screen carousel-screen">
       <header className="choice-heading">
@@ -4000,7 +4203,9 @@ function CarouselScreen({
           <button
             type="button"
             key={choice.id}
-            className="carousel-choice"
+            className={`carousel-choice ${
+              choice.decision?.recommended ? "is-recommended" : ""
+            }`}
             style={
               {
                 "--choice-index": index,
@@ -4009,19 +4214,45 @@ function CarouselScreen({
               } as CSSProperties
             }
             onClick={() => onChoose(choice.id)}
-            data-tooltip={choice.description}
+            onMouseEnter={() => setPreviewChoiceId(choice.id)}
+            onFocus={() => setPreviewChoiceId(choice.id)}
+            aria-describedby="carousel-choice-preview"
+            aria-label={`Choose ${choice.name}. Shortcut ${index + 1}${
+              choice.decision?.recommended ? ". Recommended for your crew" : ""
+            }`}
           >
+            <kbd>{index + 1}</kbd>
+            {choice.decision?.recommended && (
+              <b className="carousel-recommended">BEST FIT</b>
+            )}
             <span className="carousel-item-icon">{choice.icon}</span>
             <strong>{choice.name}</strong>
           </button>
         ))}
-        <div className="carousel-center">
-          <span>☠</span>
-          <strong>PICK ONE</strong>
-          <small>No going back</small>
+        <div
+          className="carousel-center"
+          id="carousel-choice-preview"
+          aria-live="polite"
+        >
+          <span>{previewChoice?.icon ?? "☠"}</span>
+          <strong>{previewChoice?.name ?? "PICK ONE"}</strong>
+          <small>{previewChoice?.description ?? "No going back"}</small>
+          {previewChoice && previewChoice.effects.length > 0 && (
+            <em>
+              {previewChoice.effects.map((effect) => effect.label).join(" · ")}
+            </em>
+          )}
+          {previewChoice?.decision && (
+            <b className="carousel-fit-copy">
+              {previewChoice.decision.recommended ? "AUTO-PICK FAVORITE" : "CREW FIT"}
+              {previewChoice.decision.bestFit
+                ? ` · ${previewChoice.decision.bestFit.unitName}`
+                : " · KEEP FOR LATER"}
+            </b>
+          )}
         </div>
       </div>
-      <p className="choice-hint">Select a treasure token · timeout picks the best fit</p>
+      <p className="choice-hint">Click or press 1–8 · timeout picks the best fit</p>
     </section>
   );
 }
@@ -4049,14 +4280,21 @@ function RewardScreen({
             key={choice.id}
             style={{ "--choice-color": choice.color } as CSSProperties}
             onClick={() => onChoose(choice.id)}
+            aria-label={`Take treasure: ${choice.name}. Shortcut ${index + 1}`}
           >
             <span className="reward-number">0{index + 1}</span>
+            <kbd>{index + 1}</kbd>
             <span className="treasure-icon">{choice.icon}</span>
             <strong>{choice.name}</strong>
             <p>{choice.description}</p>
             {choice.effects.length > 0 && (
               <small className="reward-effects">
                 {choice.effects.map((effect) => effect.label).join(" · ")}
+              </small>
+            )}
+            {choice.decision?.bestFit && (
+              <small className="reward-fit">
+                {choice.decision.recommended ? "BEST CREW FIT" : "BEST ON"} · {choice.decision.bestFit.unitName}
               </small>
             )}
             <span className="choose-label">TAKE TREASURE</span>
@@ -4077,6 +4315,7 @@ function ResultsScreen({
   onMenu: () => void;
 }) {
   const won = view.placement === 1;
+  const activeTraits = view.traits.filter((trait) => trait.tier > 0);
   return (
     <section className={`results-screen ${won ? "victory" : ""}`}>
       <div className="results-panel">
@@ -4102,18 +4341,47 @@ function ResultsScreen({
             </strong>
           </div>
         </div>
-        <div className="final-crew" aria-label="Final crew">
+        {activeTraits.length > 0 && (
+          <div className="results-traits" aria-label="Active final crew bonds">
+            <span>ACTIVE BONDS</span>
+            <ul>
+              {activeTraits.map((trait) => (
+                <li key={trait.id} style={{ "--trait-color": trait.color } as CSSProperties}>
+                  <i aria-hidden="true">{trait.icon}</i>
+                  <strong>{trait.name}</strong>
+                  <small>{trait.count}</small>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        <div className="final-crew" aria-label="Final crew composition">
           {view.resultCrew
             .slice(0, 8)
             .map((unit) => {
               const definition = view.selectedDefinitionByUnit.get(unit.id);
+              const itemNames = unit.items.map(
+                (itemId) => view.itemsById.get(itemId)?.name ?? titleCase(itemId),
+              );
               return (
-                <CrewPortrait
+                <article
                   key={unit.id}
-                  src={definition?.portrait}
-                  name={unit.name}
-                  color={definition?.color ?? cssColor(unit.contentId)}
-                />
+                  className="final-crew-card"
+                  aria-label={`${unit.name}, ${unit.star} star${unit.star === 1 ? "" : "s"}${
+                    itemNames.length ? `, items: ${itemNames.join(", ")}` : ", no items"
+                  }`}
+                >
+                  <CrewPortrait
+                    src={definition?.portrait}
+                    name={unit.name}
+                    color={definition?.color ?? cssColor(unit.contentId)}
+                  />
+                  <span>
+                    <strong>{unit.name}</strong>
+                    <b aria-label={`${unit.star} stars`}>{"★".repeat(unit.star)}</b>
+                    <small>{itemNames.join(" · ") || "NO TREASURE"}</small>
+                  </span>
+                </article>
               );
             })}
         </div>
