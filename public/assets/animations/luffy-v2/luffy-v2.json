@@ -18,7 +18,8 @@
     "destinationPivot": {
       "x": 40,
       "y": 116
-    }
+    },
+    "idleVisualTopPx": 56
   },
   "frameCount": 46,
   "clips": {

@@ -42,6 +42,30 @@ const rows = Math.ceil(mapping.frames.length / columns);
 const destinationPivot = mapping.frame.destinationPivot;
 const renderedFrames = [];
 
+async function deriveIdleVisualTopPx(frames) {
+  let visualTop = frameHeight;
+  for (const frame of frames.slice(mapping.clips.idle.start, mapping.clips.idle.end + 1)) {
+    const { data, info } = await sharp(frame.png)
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    for (let y = 0; y < info.height; y += 1) {
+      let visible = false;
+      for (let x = 0; x < info.width; x += 1) {
+        if (data[(y * info.width + x) * info.channels + 3] > 8) {
+          visible = true;
+          break;
+        }
+      }
+      if (visible) {
+        visualTop = Math.min(visualTop, y);
+        break;
+      }
+    }
+  }
+  return visualTop < frameHeight ? visualTop : Math.round(frameHeight * 0.25);
+}
+
 await mkdir(path.dirname(sheetPath), { recursive: true });
 await mkdir(path.dirname(metadataPath), { recursive: true });
 await mkdir(framesDirectory, { recursive: true });
@@ -154,7 +178,10 @@ const metadata = {
   sourceSha256,
   sourceDimensions: mapping.sourceDimensions,
   backgroundRgb: mapping.backgroundRgb,
-  frame: mapping.frame,
+  frame: {
+    ...mapping.frame,
+    idleVisualTopPx: await deriveIdleVisualTopPx(renderedFrames),
+  },
   frameCount: mapping.frames.length,
   clips: mapping.clips,
   frames: mapping.frames.map((frame, index) => ({

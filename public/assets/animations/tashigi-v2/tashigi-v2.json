@@ -33,7 +33,8 @@
     "destinationPivot": {
       "x": 64,
       "y": 116
-    }
+    },
+    "idleVisualTopPx": 52
   },
   "frameCount": 46,
   "clips": {

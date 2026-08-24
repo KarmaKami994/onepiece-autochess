@@ -24,10 +24,59 @@ export type CrewAnimationDefinition = {
   frameCount: number;
   displaySize: number;
   yOffset: number;
+  /** Top-most non-transparent idle pixel in source-frame coordinates. */
+  idleVisualTopPx: number;
   sheetColumns?: number;
   originX?: number;
   originY?: number;
   clips: Record<CrewAnimationState, CrewAnimationClip>;
+};
+
+const V1_IDLE_VISUAL_TOP_PX: Record<string, number> = {
+  luffy: 4,
+  zoro: 5,
+  nami: 5,
+  usopp: 9,
+  chopper: 0,
+  tashigi: 10,
+  sanji: 10,
+  robin: 8,
+  smoker: 6,
+  sabo: 0,
+  kid: 6,
+  crocodile: 8,
+  law: 6,
+  ace: 6,
+  hancock: 8,
+  doflamingo: 6,
+  garp: 8,
+  mihawk: 0,
+};
+
+const V2_IDLE_VISUAL_TOP_PX: Record<string, number> = {
+  luffy: 56,
+  nami: 42,
+  usopp: 49,
+  chopper: 74,
+  tashigi: 52,
+  sanji: 46,
+  robin: 45,
+  smoker: 39,
+  sabo: 6,
+  kid: 41,
+  crocodile: 41,
+  zoro: 47,
+  law: 41,
+  ace: 46,
+  hancock: 43,
+  doflamingo: 34,
+  garp: 36,
+  mihawk: 41,
+  "marine-recruit": 8,
+  "rifle-marine": 9,
+  "pirate-raider": 8,
+  pacifista: 4,
+  "sea-king": 15,
 };
 
 function standardDefinition(
@@ -46,6 +95,7 @@ function standardDefinition(
     frameCount: 17,
     displaySize,
     yOffset,
+    idleVisualTopPx: V1_IDLE_VISUAL_TOP_PX[contentId] ?? 8,
     clips: {
       idle: { start: 0, end: 3, frameRate: 6, repeat: -1 },
       move: { start: 0, end: 3, frameRate: 10, repeat: 0 },
@@ -90,6 +140,7 @@ export const LUFFY_V2_ANIMATION: CrewAnimationDefinition = {
   sheetColumns: 8,
   displaySize: 88,
   yOffset: 12,
+  idleVisualTopPx: V2_IDLE_VISUAL_TOP_PX.luffy,
   originX: 40 / 128,
   originY: 116 / 128,
   clips: {
@@ -129,6 +180,7 @@ function crewV2Definition(
     sheetColumns: 8,
     displaySize,
     yOffset,
+    idleVisualTopPx: V2_IDLE_VISUAL_TOP_PX[contentId] ?? 32,
     originX: 64 / 128,
     originY: 116 / 128,
     clips: V2_CLIPS,
@@ -173,6 +225,7 @@ function pveV2Definition(
     sheetColumns: 8,
     displaySize,
     yOffset,
+    idleVisualTopPx: V2_IDLE_VISUAL_TOP_PX[contentId] ?? 32,
     originX: 64 / 128,
     originY: 116 / 128,
     clips: V2_CLIPS,

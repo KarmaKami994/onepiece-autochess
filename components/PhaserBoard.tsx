@@ -22,6 +22,12 @@ import {
   type BoardFacing,
 } from "./boardFacing";
 import {
+  RESOURCE_BAR_COLORS,
+  RESOURCE_BAR_GEOMETRY,
+  resourceBarFill,
+  resourceBarLayout,
+} from "./unitResourceBar";
+import {
   ANIMATED_BENCH_HIT_AREA,
   ANIMATED_BOARD_HIT_AREA,
   BENCH_DESTINATIONS,
@@ -274,14 +280,21 @@ export default function PhaserBoard({
           private draggingUnitId: string | null = null;
           private hoverDestinationKey: string | null = null;
           private invalidDropNotice?: Phaser.GameObjects.Text;
-          private hpBars = new Map<string, Phaser.GameObjects.Rectangle>();
+          private resourceBars = new Map<
+            string,
+            {
+              graphics: Phaser.GameObjects.Graphics;
+              team: BoardUnit["team"];
+              maxHp: number;
+              display: { hp: number; shield: number; energy: number };
+              layout: ReturnType<typeof resourceBarLayout>;
+            }
+          >();
           private hpState = new Map<
             string,
             { current: number; max: number }
           >();
-          private shieldBars = new Map<string, Phaser.GameObjects.Rectangle>();
           private shieldState = new Map<string, number>();
-          private energyBars = new Map<string, Phaser.GameObjects.Rectangle>();
           private energyState = new Map<string, number>();
           private statusLabels = new Map<string, Phaser.GameObjects.Text>();
           private statusExpiries = new Map<string, Map<string, number>>();
@@ -922,15 +935,16 @@ export default function PhaserBoard({
             this.payload = payload;
             if (!this.tokenLayer) return;
             this.requestPortraitTextures(payload.units);
+            this.resourceBars.forEach((bar) => {
+              this.tweens.killTweensOf(bar.display);
+            });
             this.tokenLayer.removeAll(true);
             this.tokenObjects.clear();
             this.animatedUnitSprites.clear();
             this.unitFacings.clear();
-            this.hpBars.clear();
+            this.resourceBars.clear();
             this.hpState.clear();
-            this.shieldBars.clear();
             this.shieldState.clear();
-            this.energyBars.clear();
             this.energyState.clear();
             this.statusLabels.clear();
             this.statusExpiries.clear();
@@ -978,6 +992,133 @@ export default function PhaserBoard({
               this,
             );
             if (!this.load.isLoading()) this.load.start();
+          }
+
+          private drawResourceBar(unitId: string) {
+            const bar = this.resourceBars.get(unitId);
+            if (!bar) return;
+            const { graphics, layout } = bar;
+            graphics.clear().setVisible(layout.visible);
+            if (!layout.visible || !graphics.active) return;
+
+            const fill = resourceBarFill({
+              ...bar.display,
+              maxHp: bar.maxHp,
+              team: bar.team,
+            });
+            const width = RESOURCE_BAR_GEOMETRY.width;
+            const left = -width / 2;
+            const healthOuterTop =
+              layout.healthY - RESOURCE_BAR_GEOMETRY.healthOuterHeight / 2;
+            const healthInnerTop =
+              layout.healthY - RESOURCE_BAR_GEOMETRY.healthInnerHeight / 2;
+            const energyOuterTop =
+              layout.energyY - RESOURCE_BAR_GEOMETRY.energyOuterHeight / 2;
+            const energyInnerTop =
+              layout.energyY - RESOURCE_BAR_GEOMETRY.energyInnerHeight / 2;
+
+            graphics
+              .fillStyle(RESOURCE_BAR_COLORS.frame, 1)
+              .fillRect(
+                left - 1,
+                healthOuterTop,
+                width + 2,
+                RESOURCE_BAR_GEOMETRY.healthOuterHeight,
+              )
+              .fillStyle(RESOURCE_BAR_COLORS.empty, 1)
+              .fillRect(
+                left,
+                healthInnerTop,
+                width,
+                RESOURCE_BAR_GEOMETRY.healthInnerHeight,
+              );
+            if (fill.healthWidth > 0) {
+              graphics
+                .fillStyle(fill.healthColor, 1)
+                .fillRect(
+                  left,
+                  healthInnerTop,
+                  fill.healthWidth,
+                  RESOURCE_BAR_GEOMETRY.healthInnerHeight,
+                );
+            }
+            if (fill.shieldWidth > 0) {
+              graphics
+                .fillStyle(RESOURCE_BAR_COLORS.shield, 1)
+                .fillRect(
+                  left + fill.healthWidth,
+                  healthInnerTop,
+                  fill.shieldWidth,
+                  RESOURCE_BAR_GEOMETRY.healthInnerHeight,
+                );
+            }
+            graphics.lineStyle(1, RESOURCE_BAR_COLORS.frame, 0.78);
+            fill.segmentXs.forEach((x) => {
+              graphics.lineBetween(
+                x,
+                healthInnerTop,
+                x,
+                healthInnerTop + RESOURCE_BAR_GEOMETRY.healthInnerHeight,
+              );
+            });
+
+            graphics
+              .fillStyle(RESOURCE_BAR_COLORS.frame, 1)
+              .fillRect(
+                left - 1,
+                energyOuterTop,
+                width + 2,
+                RESOURCE_BAR_GEOMETRY.energyOuterHeight,
+              )
+              .fillStyle(0x17142b, 1)
+              .fillRect(
+                left,
+                energyInnerTop,
+                width,
+                RESOURCE_BAR_GEOMETRY.energyInnerHeight,
+              );
+            if (fill.energyWidth > 0) {
+              graphics
+                .fillStyle(fill.energyColor, 1)
+                .fillRect(
+                  left,
+                  energyInnerTop,
+                  fill.energyWidth,
+                  RESOURCE_BAR_GEOMETRY.energyInnerHeight,
+                );
+            }
+          }
+
+          private transitionResourceBar(
+            unitId: string,
+            animationSpeed: number,
+            immediate: boolean,
+          ) {
+            const bar = this.resourceBars.get(unitId);
+            const hp = this.hpState.get(unitId);
+            if (!bar || !hp) return;
+            const target = {
+              hp: hp.current,
+              shield: this.shieldState.get(unitId) ?? 0,
+              energy: this.energyState.get(unitId) ?? 0,
+            };
+            this.tweens.killTweensOf(bar.display);
+            if (immediate || !bar.layout.visible) {
+              Object.assign(bar.display, target);
+              this.drawResourceBar(unitId);
+              return;
+            }
+            this.tweens.add({
+              targets: bar.display,
+              ...target,
+              duration: Math.max(
+                1,
+                Math.round(150 / Math.max(0.5, animationSpeed)),
+              ),
+              ease: "Linear",
+              onUpdate: () => this.drawResourceBar(unitId),
+              onComplete: () => this.drawResourceBar(unitId),
+            });
           }
 
           private makeToken(unit: BoardUnit, payload: BoardPayload) {
@@ -1098,53 +1239,38 @@ export default function PhaserBoard({
                 strokeThickness: 2,
               })
               .setOrigin(0.5);
-            const hpY = unit.zone === "bench" ? -23 : -31;
-            const hpBack = this.add.rectangle(0, hpY, 42, 5, 0x170f12, 1);
-            const ratio = clamp(unit.hp / Math.max(1, unit.maxHp), 0, 1);
-            const hp = this.add
-              .rectangle(
-                -21,
-                hpY,
-                42 * ratio,
-                4,
-                ratio > 0.45 ? 0x5ad27a : 0xe26052,
-                1,
-              )
-              .setOrigin(0, 0.5);
-            this.hpBars.set(unit.id, hp);
+            const barLayout = resourceBarLayout({
+              phase: payload.phase,
+              zone: unit.zone,
+              spriteY,
+              frameHeight: animationDefinition?.frameHeight ?? 64,
+              displaySize: spriteDisplaySize,
+              originY: animationDefinition?.originY ?? 0.5,
+              idleVisualTopPx: animationDefinition?.idleVisualTopPx,
+            });
+            const initialShield = Math.max(0, unit.shield ?? 0);
+            const initialEnergy = clamp(unit.energy ?? 0, 0, 100);
+            const resourceBar = this.add.graphics();
+            this.resourceBars.set(unit.id, {
+              graphics: resourceBar,
+              team: unit.team,
+              maxHp: Math.max(1, unit.maxHp),
+              display: {
+                hp: clamp(unit.hp, 0, Math.max(1, unit.maxHp)),
+                shield: initialShield,
+                energy: initialEnergy,
+              },
+              layout: barLayout,
+            });
             this.hpState.set(unit.id, {
               current: unit.hp,
               max: Math.max(1, unit.maxHp),
             });
-            const shieldBack = this.add
-              .rectangle(0, hpY + 5, 42, 3, 0x102837, 0.96)
-              .setVisible(unit.zone === "board");
-            const initialShield = Math.max(0, unit.shield ?? 0);
-            const shield = this.add
-              .rectangle(
-                -21,
-                hpY + 5,
-                42 * clamp(initialShield / Math.max(1, unit.maxHp), 0, 1),
-                2,
-                0x75cfff,
-                1,
-              )
-              .setOrigin(0, 0.5)
-              .setVisible(unit.zone === "board" && initialShield > 0);
-            this.shieldBars.set(unit.id, shield);
             this.shieldState.set(unit.id, initialShield);
-            const energyBack = this.add
-              .rectangle(0, hpY + 9, 42, 3, 0x17142b, 0.96)
-              .setVisible(unit.zone === "board");
-            const initialEnergy = clamp(unit.energy ?? 0, 0, 100);
-            const energy = this.add
-              .rectangle(-21, hpY + 9, 42 * (initialEnergy / 100), 2, 0xdca8ff, 1)
-              .setOrigin(0, 0.5)
-              .setVisible(unit.zone === "board" && initialEnergy > 0);
-            this.energyBars.set(unit.id, energy);
             this.energyState.set(unit.id, initialEnergy);
+            this.drawResourceBar(unit.id);
             const statusLabel = this.add
-              .text(0, hpY - 7, "", {
+              .text(0, barLayout.statusY, "", {
                 fontFamily: '"Courier New", monospace',
                 fontStyle: "bold",
                 fontSize: "9px",
@@ -1157,7 +1283,7 @@ export default function PhaserBoard({
             this.statusLabels.set(unit.id, statusLabel);
             this.statusExpiries.set(unit.id, new Map());
             const stars = this.add
-              .text(0, unit.zone === "bench" ? -15 : -18, "★".repeat(unit.star), {
+              .text(0, unit.zone === "bench" ? 27 : 31, "★".repeat(unit.star), {
                 fontFamily: "Arial",
                 fontSize: "8px",
                 color: "#ffd45a",
@@ -1166,14 +1292,21 @@ export default function PhaserBoard({
               })
               .setOrigin(0.5);
             const selectionMarker = this.add
-              .text(0, unit.zone === "bench" ? -36 : -42, "▼", {
-                fontFamily: "Arial, sans-serif",
-                fontStyle: "bold",
-                fontSize: "13px",
-                color: "#fff0a2",
-                stroke: "#4a280d",
-                strokeThickness: 3,
-              })
+              .text(
+                0,
+                barLayout.visible
+                  ? barLayout.selectionY
+                  : Math.floor(barLayout.visualTopY - 9),
+                "▼",
+                {
+                  fontFamily: "Arial, sans-serif",
+                  fontStyle: "bold",
+                  fontSize: "13px",
+                  color: "#fff0a2",
+                  stroke: "#4a280d",
+                  strokeThickness: 3,
+                },
+              )
               .setOrigin(0.5)
               .setVisible(isSelected);
             const itemPips = unit.items.slice(0, 3).map((itemId, index) =>
@@ -1195,12 +1328,7 @@ export default function PhaserBoard({
             container.add([
               initial,
               name,
-              hpBack,
-              hp,
-              shieldBack,
-              shield,
-              energyBack,
-              energy,
+              resourceBar,
               statusLabel,
               stars,
               selectionMarker,
@@ -1318,29 +1446,34 @@ export default function PhaserBoard({
           ) {
             const speed = Math.max(0.5, animationSpeed);
             const generation = ++this.animationGeneration;
-            const setHealth = (unitId: string, nextHealth: number) => {
+            const setHealth = (
+              unitId: string,
+              nextHealth: number,
+              immediate = false,
+            ) => {
               const state = this.hpState.get(unitId);
-              const bar = this.hpBars.get(unitId);
-              if (!state || !bar) return;
+              if (!state) return;
               state.current = clamp(nextHealth, 0, state.max);
-              const ratio = state.current / state.max;
-              bar
-                .setDisplaySize(Math.max(0.1, 42 * ratio), 4)
-                .setFillStyle(ratio > 0.45 ? 0x5ad27a : 0xe26052, 1)
-                .setVisible(ratio > 0);
+              this.transitionResourceBar(
+                unitId,
+                speed,
+                immediate || reduceMotion,
+              );
             };
-            const setShield = (unitId: string, nextShield: number) => {
-              const bar = this.shieldBars.get(unitId);
+            const setShield = (
+              unitId: string,
+              nextShield: number,
+              immediate = false,
+            ) => {
               const hp = this.hpState.get(unitId);
-              if (!bar || !hp) return;
+              if (!hp) return;
               const shield = Math.max(0, nextShield);
               this.shieldState.set(unitId, shield);
-              bar
-                .setDisplaySize(
-                  Math.max(0.1, 42 * clamp(shield / hp.max, 0, 1)),
-                  2,
-                )
-                .setVisible(shield > 0);
+              this.transitionResourceBar(
+                unitId,
+                speed,
+                immediate || reduceMotion,
+              );
               if (shield <= 0) {
                 const statuses = this.statusExpiries.get(unitId);
                 statuses?.delete("emergency-shield");
@@ -1359,15 +1492,18 @@ export default function PhaserBoard({
                 }
               }
             };
-            const setEnergy = (unitId: string, nextEnergy: number) => {
-              const bar = this.energyBars.get(unitId);
-              if (!bar) return;
+            const setEnergy = (
+              unitId: string,
+              nextEnergy: number,
+              immediate = false,
+            ) => {
               const energy = clamp(nextEnergy, 0, 100);
               this.energyState.set(unitId, energy);
-              bar
-                .setDisplaySize(Math.max(0.1, 42 * (energy / 100)), 2)
-                .setFillStyle(energy >= 100 ? 0xffd45a : 0xdca8ff, 1)
-                .setVisible(energy > 0);
+              this.transitionResourceBar(
+                unitId,
+                speed,
+                immediate || reduceMotion,
+              );
             };
             const statusIcon = (status: string) => {
               if (status === "burn") return "🔥";
@@ -1704,9 +1840,9 @@ export default function PhaserBoard({
                 if (generation !== this.animationGeneration) return;
                 for (const unit of this.payload.units) {
                   if (unit.finalHp === undefined) continue;
-                  setHealth(unit.id, unit.finalHp);
-                  setShield(unit.id, unit.finalShield ?? 0);
-                  setEnergy(unit.id, unit.finalEnergy ?? 0);
+                  setHealth(unit.id, unit.finalHp, true);
+                  setShield(unit.id, unit.finalShield ?? 0, true);
+                  setEnergy(unit.id, unit.finalEnergy ?? 0, true);
                   if (unit.finalHp <= 0) {
                     const token = this.tokenObjects.get(unit.id);
                     token?.setAlpha(0).setScale(0.86);

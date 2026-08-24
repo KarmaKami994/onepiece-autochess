@@ -102,6 +102,31 @@ async function sha256(file) {
   return createHash("sha256").update(await readFile(file)).digest("hex");
 }
 
+async function deriveIdleVisualTopPx(frames, frameWidth = 128, frameHeight = 128) {
+  let visualTop = frameHeight;
+  const idleFrames = frames.slice(V2_CLIPS.idle.start, V2_CLIPS.idle.end + 1);
+  for (const frame of idleFrames) {
+    const { data, info } = await sharp(frame.png)
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    for (let y = 0; y < Math.min(frameHeight, info.height); y += 1) {
+      let visible = false;
+      for (let x = 0; x < Math.min(frameWidth, info.width); x += 1) {
+        if (data[(y * info.width + x) * info.channels + 3] > 8) {
+          visible = true;
+          break;
+        }
+      }
+      if (visible) {
+        visualTop = Math.min(visualTop, y);
+        break;
+      }
+    }
+  }
+  return visualTop < frameHeight ? visualTop : Math.round(frameHeight * 0.25);
+}
+
 async function inspectEntry(entry) {
   const sourcePath = resolveProjectPath(entry.source.localPath);
   let sourceExists = true;
@@ -456,7 +481,13 @@ async function renderAutoFrameMap(status, options) {
       characterCandidateCount: characterCandidates.length,
       baseCandidateIndex: baseIndex,
     },
-    frame: { width: 128, height: 128, columns: 8, destinationPivot: entry.pivot },
+    frame: {
+      width: 128,
+      height: 128,
+      columns: 8,
+      destinationPivot: entry.pivot,
+      idleVisualTopPx: await deriveIdleVisualTopPx(frames),
+    },
     frameCount: TOTAL_FRAMES,
     clips: V2_CLIPS,
     frames: serializableFrames(frames),
@@ -541,7 +572,13 @@ async function renderProceduralCutout(status, options) {
     sourceSha256: actualSha256,
     sourceDimensions: { width: sourceMetadata.width, height: sourceMetadata.height },
     permission: entry.permission,
-    frame: { width: 128, height: 128, columns: 8, destinationPivot: entry.pivot },
+    frame: {
+      width: 128,
+      height: 128,
+      columns: 8,
+      destinationPivot: entry.pivot,
+      idleVisualTopPx: await deriveIdleVisualTopPx(frames),
+    },
     frameCount: TOTAL_FRAMES,
     clips: V2_CLIPS,
     frames: serializableFrames(frames),
@@ -618,7 +655,13 @@ async function renderFrameMap(status, options) {
     sourceSha256: actualSha256,
     sourceDimensions: { width: sourceMetadata.width, height: sourceMetadata.height },
     permission: entry.permission,
-    frame: { width: 128, height: 128, columns: 8, destinationPivot: entry.pivot },
+    frame: {
+      width: 128,
+      height: 128,
+      columns: 8,
+      destinationPivot: entry.pivot,
+      idleVisualTopPx: await deriveIdleVisualTopPx(frames),
+    },
     frameCount: TOTAL_FRAMES,
     clips: V2_CLIPS,
     frames: serializableFrames(frames),
