@@ -785,3 +785,27 @@ Composition/framing: exactly one centered upright character in a compact wide-le
 Color palette: hot pink, deep magenta, pale cream, black, warm skin, blond gold, antique brass, restrained crimson; do not use #00FF66 or neon green anywhere in the subject.
 Constraints: one character only; opaque hard-edged sprite silhouette; all feathers must form solid attached clusters with no soft wisps; no visible strings, magic effects, glow, smoke, particles, transparency, cast shadow, contact shadow, reflection, aura, extra props, weapons, text, letters, numbers, logos, official emblems, skull marks, signature, watermark, UI, card frame, scenery, detached feathers, duplicated limbs, or background objects.
 ```
+
+## Original Bounty Regatta pixel-art set
+
+- Creation date: `2026-08-24`
+- Creation tools: local deterministic JavaScript pixel primitives and bundled `sharp 0.34.5`
+- External services, source images, and network requests: none
+- Original source and importer: `scripts/build_carousel_assets.mjs`
+- Rebuild command: `npm run assets:carousel`
+- Runtime manifest: `public/assets/carousel/carousel-manifest.json`
+- Integrity manifest: `public/assets/carousel/checksums.sha256.json`
+- Visual QA sheet: `public/assets/carousel/contact-sheet.png`
+- Processing contract: integer-coordinate clean-room geometry at half resolution, hard alpha edges, nearest-neighbor 2× enlargement, fixed palettes and fixed PRNG seed; no interpolation, GUI step, runtime generation, copied sprite, or external art input
+
+The set contains an original deep-navy ocean regatta arena with a central current and buoy course, an original top-down sailing boat animated in eight directions and four wake phases across eight sail palettes, and original animated bounty tokens for the eight finished items. Item symbols are locally drawn, simplified gameplay motifs rather than imported icons. The boat atlas is palette-major, direction-major, then animation-frame-minor; the bounty atlas is animation-frame-major then item-column-minor. Exact rectangles, pivots, frame formulas, palette colors, item IDs, dimensions, and timings are stored in the runtime manifest.
+
+| Asset | Runtime dimensions | SHA-256 |
+|---|---:|---|
+| `public/assets/carousel/ocean-arena.png` | `1520×840` | `41097c8919c5dd308bcef01dbf4981ff46eb2973c0c5fbf34a0109b6638fe381` |
+| `public/assets/carousel/boats.png` | `1536×1536` (256 frames at `96×96`) | `1c60ff65240917cca043d85eee7f2b857b481e3868f6b1eb4793199cfa32a9de` |
+| `public/assets/carousel/bounties.png` | `512×256` (32 frames at `64×64`) | `82618d906775375b810cab9b4234cefb65eff98d590de4d078dd3599dff7741d` |
+| `public/assets/carousel/carousel-manifest.json` | schema v1 | `a70007a69d809b7c7f57bcebf3a3f254b78f7f648dc28f294237938f09c3c511` |
+| `public/assets/carousel/contact-sheet.png` | `1400×800` | `5632adc7c3d26831bb3025d592fff5fbd00cabf8771b2b7d05504be931e2e4d3` |
+
+Visual QA on `2026-08-24` confirmed that all eight palette/direction combinations remain distinguishable on the arena, all 32 item frames stay inside their cells, all sprite edges are hard pixels, all atlas backgrounds are transparent, and the generated contact sheet contains no text, logo, watermark, recognizable external character, or copied interface.

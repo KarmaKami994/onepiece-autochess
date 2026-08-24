@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   DEFAULT_CONTENT,
+  CAROUSEL_TICK_MS,
   advanceMatchPhase,
   createMatch,
   getActiveTraits,
@@ -149,8 +150,11 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
             if (result.winnerId === null) draws += 1;
           }
         } else if (state.phase === "carousel") {
-          fullSeconds += 10;
-          paced += 3;
+          const carouselSeconds = state.carouselSession
+            ? (state.carouselSession.durationTicks * CAROUSEL_TICK_MS) / 1_000
+            : 0;
+          fullSeconds += carouselSeconds;
+          paced += carouselSeconds;
         }
 
         state = advanceMatchPhase(state, DEFAULT_CONTENT);

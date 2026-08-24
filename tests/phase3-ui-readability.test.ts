@@ -64,7 +64,7 @@ describe("Phase 3 combat presentation", () => {
     }
     expect(client).toContain("tutorial-combat-legend");
     expect(client).toContain(
-      "numberValue(engine.CURRENT_SAVE_SCHEMA_VERSION, 5)",
+      "numberValue(engine.CURRENT_SAVE_SCHEMA_VERSION, 6)",
     );
     expect(css).toContain(".game-shell.reduced-motion");
     expect(css).toContain(".combat-hud");

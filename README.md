@@ -45,6 +45,8 @@ raw snapshot are documented in [BALANCE_REPORT.md](BALANCE_REPORT.md).
 The committed v2 animation assets can be rebuilt headlessly with
 `npm run assets:v2`. LibreSprite is only needed to recreate the editable
 `.aseprite` files; the game itself and normal build do not require it.
+The original Bounty Regatta arena, boat palettes, and animated bounty tokens
+can be rebuilt reproducibly with `npm run assets:carousel`.
 
 ## Controls
 
@@ -52,8 +54,10 @@ The committed v2 animation assets can be rebuilt headlessly with
   Amber cells swap occupants; red cells explain illegal capacity moves.
 - `1`–`6`: buy the matching shop offer. Hover or keyboard-focus a poster for
   its ability, stats, merge progress, and projected bond impact.
-- `1`–`8` on treasure screens: choose the matching reward or carousel token;
-  the highlighted best fit uses the same deterministic scoring as auto-pick.
+- `1`–`3` on treasure reward screens: choose the matching reward.
+- During the Bounty Regatta, left-click the ocean to steer your boat. A bounty
+  is claimed only when the boat touches it; the gold marker shows the same
+  deterministic best-fit choice used by timeout auto-pick.
 - `R`: reroll the shop for one gold.
 - `L`: lock or unlock the shop.
 - `X`: buy four XP for four gold.
@@ -80,7 +84,8 @@ the crew's names, stars, held treasure, and active bonds.
   `applyCommand`, and battles are resolved from a seed before any animation.
 - The active match is stored in IndexedDB. Small accessibility and audio
   settings are stored in localStorage. Closing during battle resumes from the
-  stable pre-battle state and seed.
+  stable pre-battle state and seed; closing during a Bounty Regatta resumes the
+  last complete 50 ms simulation checkpoint.
 - All artwork is bundled under `public/assets`; Web Audio effects are generated
   locally. Gameplay makes no network requests.
 

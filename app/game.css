@@ -3996,6 +3996,275 @@ details.trait-building {
   text-align: center;
 }
 
+/* Phase 7C: player-controlled Bounty Regatta */
+
+.bounty-regatta-screen {
+  display: block;
+  height: 100vh;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #03141c;
+}
+
+.regatta-stage {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 50%, #147486 0 12%, transparent 40%),
+    #062c39;
+}
+
+.regatta-stage > .phaser-carousel,
+.regatta-stage > .phaser-carousel-host,
+.regatta-stage > div:first-child:not(.regatta-preview):not(.regatta-fallback) {
+  width: 100%;
+  height: 100%;
+}
+
+.regatta-stage canvas {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  image-rendering: pixelated;
+}
+
+.regatta-hud {
+  position: absolute;
+  z-index: 12;
+  top: 14px;
+  right: 18px;
+  left: 18px;
+  display: grid;
+  min-height: 86px;
+  padding: 11px 14px;
+  grid-template-columns: minmax(290px, 1fr) 190px 92px 92px;
+  align-items: center;
+  gap: 12px;
+  border: 2px solid #b78c43;
+  color: #e8d4a6;
+  background:
+    repeating-linear-gradient(0deg, #ffffff04 0 1px, transparent 1px 7px),
+    #071e28ed;
+  box-shadow: inset 0 0 0 2px #031017, 7px 8px 0 #020b11a3;
+  pointer-events: none;
+}
+
+.regatta-title {
+  min-width: 0;
+}
+
+.regatta-title h2 {
+  margin: 5px 0 2px;
+  color: #f6dda0;
+  font: 900 clamp(25px, 2.6vw, 39px)/0.9 Impact, "Arial Black", sans-serif;
+  letter-spacing: 0.08em;
+  text-shadow: 3px 4px 0 #031016;
+}
+
+.regatta-title p {
+  margin: 6px 0 0;
+  overflow: hidden;
+  color: #a9c4c0;
+  font: 700 10px/1.1 "Courier New", monospace;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.regatta-status {
+  display: grid;
+  min-height: 58px;
+  padding: 7px 9px;
+  align-content: center;
+  border: 1px solid #51757a;
+  background: #061922d9;
+  text-align: center;
+}
+
+.regatta-status span,
+.regatta-status small {
+  color: #8da9a7;
+  font: 800 8px/1.2 "Courier New", monospace;
+  letter-spacing: 0.07em;
+}
+
+.regatta-status strong {
+  margin: 4px 0;
+  color: #80ddb2;
+  font: 900 11px/1 "Courier New", monospace;
+}
+
+.regatta-status strong.is-locked {
+  color: #efca69;
+}
+
+.regatta-hud .carousel-timer {
+  position: static;
+  width: 92px;
+  height: 58px;
+  box-shadow: none;
+}
+
+.regatta-settings {
+  min-height: 42px;
+  border: 1px solid #a77f42;
+  color: #ead39b;
+  background: #103440;
+  cursor: pointer;
+  font: 900 9px/1 "Courier New", monospace;
+  pointer-events: auto;
+}
+
+.regatta-preview {
+  position: absolute;
+  z-index: 14;
+  right: 20px;
+  bottom: 53px;
+  display: grid;
+  width: 265px;
+  min-height: 116px;
+  padding: 12px 14px;
+  align-content: center;
+  border: 3px double #d2a54e;
+  color: #eedaa9;
+  background:
+    repeating-linear-gradient(0deg, #ffffff04 0 1px, transparent 1px 7px),
+    #071c25eb;
+  box-shadow: 6px 7px 0 #020c12a3;
+  pointer-events: none;
+}
+
+.regatta-preview > span {
+  font-size: 24px;
+}
+
+.regatta-preview > strong {
+  margin: 4px 0;
+  color: #f3dda4;
+  font: 900 12px/1 "Courier New", monospace;
+}
+
+.regatta-preview small,
+.regatta-preview em {
+  color: #a9c1bd;
+  font: 700 8px/1.25 "Courier New", monospace;
+}
+
+.regatta-preview em {
+  margin-top: 5px;
+  color: #e4bf67;
+  font-style: normal;
+}
+
+.regatta-preview .carousel-fit-copy {
+  justify-self: start;
+}
+
+.regatta-claimed {
+  margin-top: 7px;
+  color: #ef8d80;
+  font: 900 8px/1 "Courier New", monospace;
+}
+
+.regatta-help {
+  position: absolute;
+  z-index: 13;
+  right: 300px;
+  bottom: 15px;
+  left: 20px;
+  display: flex;
+  min-height: 28px;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(15px, 3vw, 42px);
+  border: 1px solid #537278;
+  color: #9eb9b5;
+  background: #041821df;
+  font: 800 8px/1 "Courier New", monospace;
+  letter-spacing: 0.05em;
+  pointer-events: none;
+}
+
+.regatta-help b {
+  color: #edc969;
+}
+
+.regatta-fallback {
+  position: absolute;
+  z-index: 20;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: min(430px, calc(100vw - 40px));
+  padding: 25px;
+  place-items: center;
+  border: 3px double #d3a74f;
+  color: #e9d5a3;
+  background: #08232df2;
+  box-shadow: 8px 10px 0 #020b10a8;
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+
+.regatta-fallback > span {
+  color: #e7ba55;
+  font-size: 38px;
+}
+
+.regatta-fallback strong {
+  margin-top: 8px;
+  font: 900 17px/1.1 Impact, "Arial Black", sans-serif;
+  letter-spacing: 0.05em;
+}
+
+.regatta-fallback p {
+  color: #abc1be;
+  font: 700 10px/1.4 "Courier New", monospace;
+}
+
+.regatta-fallback button {
+  min-height: 38px;
+  padding: 8px 13px;
+  border: 2px solid #d2a44d;
+  background: #87343a;
+  cursor: pointer;
+  font: 900 10px/1 "Courier New", monospace;
+}
+
+.high-contrast .regatta-hud,
+.high-contrast .regatta-preview,
+.high-contrast .regatta-help {
+  border-color: #ffe078;
+  background-color: #03141cf5;
+}
+
+@media (max-height: 760px) {
+  .regatta-hud {
+    top: 8px;
+    min-height: 72px;
+    padding-block: 7px;
+  }
+
+  .regatta-title h2 {
+    font-size: 27px;
+  }
+
+  .regatta-title p {
+    display: none;
+  }
+
+  .regatta-preview {
+    bottom: 43px;
+    min-height: 92px;
+  }
+
+  .regatta-help {
+    bottom: 8px;
+  }
+}
+
 @media (max-width: 1120px) {
   .match-body {
     grid-template-columns: 166px minmax(610px, 1fr) 188px;

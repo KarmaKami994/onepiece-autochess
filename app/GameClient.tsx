@@ -15,6 +15,12 @@ import PhaserBoard, {
   type BoardUnit,
   type CombatFxEvent,
 } from "@/components/PhaserBoard";
+import PhaserCarousel, {
+  type CarouselParticipantView,
+  type CarouselPresentationSnapshot,
+  type CarouselTokenView,
+} from "@/components/PhaserCarousel";
+import { DEFAULT_BOUNTY_ITEM_ORDER } from "@/components/carouselGeometry";
 import AnimationLab from "@/components/AnimationLab";
 import {
   BOARD_MAP_LIST,
@@ -47,7 +53,14 @@ type Screen =
   | "reward"
   | "results"
   | "confirm-new";
-type SoundName = "click" | "coin" | "error" | "battle" | "reward";
+type SoundName =
+  | "click"
+  | "coin"
+  | "error"
+  | "battle"
+  | "reward"
+  | "splash"
+  | "unlock";
 type TutorialStep =
   | "welcome"
   | "recruit"
@@ -86,6 +99,11 @@ type EngineContract = {
     content?: unknown,
   ) => unknown;
   advanceMatchPhase?: (state: unknown, content?: unknown) => unknown;
+  advanceCarousel?: (
+    state: unknown,
+    ticks?: number,
+    content?: unknown,
+  ) => unknown;
   getStageDefinition?: (round: number, content?: unknown) => unknown;
   migrateMatchState?: (state: unknown, content?: unknown) => unknown;
   CURRENT_SAVE_SCHEMA_VERSION?: number;
@@ -197,6 +215,31 @@ type ChoiceView = {
   color: string;
   effects: ItemEffectView[];
   decision?: AvailableItemDecisionPreview & { recommended: boolean };
+  takenByPlayerId?: string | null;
+  orbitIndex?: number;
+  claimedAtTick?: number | null;
+};
+
+type CarouselEventView = {
+  id: string;
+  tick: number;
+  type: string;
+  playerId?: string;
+  choiceId?: string;
+  itemId?: string;
+  playerAId?: string;
+  playerBId?: string;
+  playerIds?: string[];
+  from?: { x: number; y: number };
+  to?: { x: number; y: number };
+};
+
+type CarouselSessionView = {
+  tick: number;
+  durationTicks: number;
+  finishAtTick: number | null;
+  participants: CarouselParticipantView[];
+  events: CarouselEventView[];
 };
 
 type ToastView = {
@@ -229,6 +272,7 @@ type MatchView = {
   standings: StandingView[];
   opponent: StandingView | null;
   choices: ChoiceView[];
+  carouselSession: CarouselSessionView | null;
   selectedDefinitionByUnit: Map<string, ShopUnitView>;
   itemsById: Map<string, ChoiceView>;
   economy: {
@@ -263,6 +307,16 @@ const DB_VERSION = 1;
 const STORE_NAME = "voyages";
 const ACTIVE_SAVE = "active-voyage";
 const COMBAT_SPEEDS = [0.5, 1, 2, 4] as const;
+const CAROUSEL_COLORS = [
+  "#f4cf67",
+  "#df6259",
+  "#62b9d1",
+  "#73c68b",
+  "#b986d7",
+  "#e58e52",
+  "#d7e1e0",
+  "#4f78bb",
+] as const;
 
 const DEFAULT_SETTINGS: Settings = {
   muted: false,
@@ -1186,18 +1240,16 @@ function normalizeChoices(
       : choiceType === "carousel"
         ? state.carouselChoices ?? state.carousel ?? player.carouselChoices
         : state.carouselChoices ?? state.carousel ?? player.carouselChoices;
-  const choices = recordValues(stateChoices).filter((choice) => {
-    if (choiceType === "items") return true;
-    const takenBy = asRecord(choice).takenByPlayerId;
-    return takenBy === null || takenBy === undefined || takenBy === "";
-  });
+  const choices = recordValues(stateChoices);
   const definitions =
     choiceType === "units" ? unitDefinitions : itemDefinitions;
-  const choiceLimit = choiceType === "items" ? 3 : 8;
+  const choiceLimit =
+    choiceType === "items" ? 3 : choiceType === "carousel" ? 9 : 8;
   const fallback = [...definitions.entries()]
     .slice(0, choiceLimit)
     .map(([id, definition]) => ({ id, ...definition }));
-  const source = choices.length ? choices : fallback;
+  const source =
+    choices.length || choiceType === "carousel" ? choices : fallback;
 
   return source.slice(0, choiceLimit).map((raw, index) => {
     const rawRecord = asRecord(raw);
@@ -1251,6 +1303,16 @@ function normalizeChoices(
         choiceType === "units"
           ? []
           : recordValues(definition.effects).map(formatItemEffect),
+      takenByPlayerId:
+        rawRecord.takenByPlayerId === null
+          ? null
+          : stringValue(rawRecord.takenByPlayerId) || null,
+      orbitIndex: Math.max(0, numberValue(rawRecord.orbitIndex, index)),
+      claimedAtTick:
+        rawRecord.claimedAtTick === null ||
+        rawRecord.claimedAtTick === undefined
+          ? null
+          : Math.max(0, numberValue(rawRecord.claimedAtTick)),
     };
   });
 }
@@ -1580,7 +1642,9 @@ function normalizeMatch(stateValue: unknown): MatchView {
     itemDefinitions,
   );
   const rankedChoiceDecisions = rankItemDecisionPreviews(
-    choices.map((choice) => choice.contentId),
+    choices
+      .filter((choice) => !choice.takenByPlayerId)
+      .map((choice) => choice.contentId),
     player as unknown as PlayerState,
     content as GameContent,
   );
@@ -1592,6 +1656,12 @@ function normalizeMatch(stateValue: unknown): MatchView {
       decision.available ? [[decision.itemId, decision] as const] : [],
     ),
   );
+  const recommendedChoiceId = choices
+    .filter(
+      (choice) =>
+        !choice.takenByPlayerId && choice.contentId === recommendedItemId,
+    )
+    .sort((left, right) => left.id.localeCompare(right.id))[0]?.id;
   const enrichedChoices = choices.map((choice) => {
     const decision = choiceDecisionByItemId.get(choice.contentId);
     return decision
@@ -1599,11 +1669,93 @@ function normalizeMatch(stateValue: unknown): MatchView {
           ...choice,
           decision: {
             ...decision,
-            recommended: decision.itemId === recommendedItemId,
+            recommended: choice.id === recommendedChoiceId,
           },
         }
       : choice;
   });
+  const carouselSessionRecord = asRecord(state.carouselSession);
+  const normalizeCarouselPoint = (rawPoint: unknown) => {
+    const value = asRecord(rawPoint);
+    return {
+      x: numberValue(value.x),
+      y: numberValue(value.y),
+    };
+  };
+  const carouselParticipants = recordValues(
+    carouselSessionRecord.participants,
+  ).map((rawParticipant, index) => {
+    const participant = asRecord(rawParticipant);
+    const participantId = stringValue(participant.playerId);
+    const standing = standings.find(
+      (candidate) => candidate.id === participantId,
+    );
+    return {
+      playerId: participantId,
+      name: standing?.name ?? (participantId === playerId ? "Your Ship" : "Rival"),
+      rank: Math.max(1, numberValue(participant.rank, index + 1)),
+      paletteIndex: participantId === playerId ? 0 : (index % 7) + 1,
+      color:
+        CAROUSEL_COLORS[
+          participantId === playerId ? 0 : (index % 7) + 1
+        ],
+      spawnPosition: normalizeCarouselPoint(participant.spawnPosition),
+      position: normalizeCarouselPoint(participant.position),
+      targetPosition: normalizeCarouselPoint(participant.targetPosition),
+      releaseTick: Math.max(0, numberValue(participant.releaseTick)),
+      reactionDelayTicks: Math.max(
+        0,
+        numberValue(participant.reactionDelayTicks),
+      ),
+      moving: booleanValue(participant.moving),
+      claimedChoiceId: stringValue(participant.claimedChoiceId) || null,
+    } satisfies CarouselParticipantView;
+  });
+  const carouselSession: CarouselSessionView | null =
+    rawPhase === "carousel" && carouselParticipants.length > 0
+      ? {
+          tick: Math.max(0, numberValue(carouselSessionRecord.tick)),
+          durationTicks: Math.max(
+            1,
+            numberValue(carouselSessionRecord.durationTicks, 320),
+          ),
+          finishAtTick:
+            carouselSessionRecord.finishAtTick === null ||
+            carouselSessionRecord.finishAtTick === undefined
+              ? null
+              : Math.max(0, numberValue(carouselSessionRecord.finishAtTick)),
+          participants: carouselParticipants,
+          events: recordValues(carouselSessionRecord.events).map(
+            (rawEvent, index) => {
+              const event = asRecord(rawEvent);
+              return {
+                id: stringValue(
+                  event.id,
+                  `carousel-${round}-${numberValue(event.tick)}-${index}`,
+                ),
+                tick: Math.max(0, numberValue(event.tick)),
+                type: stringValue(event.type, "move"),
+                playerId: stringValue(event.playerId) || undefined,
+                choiceId: stringValue(event.choiceId) || undefined,
+                itemId: stringValue(event.itemId) || undefined,
+                playerAId: stringValue(event.playerAId) || undefined,
+                playerBId: stringValue(event.playerBId) || undefined,
+                playerIds: Array.isArray(event.playerIds)
+                  ? event.playerIds.map(String)
+                  : undefined,
+                from:
+                  event.from === undefined
+                    ? undefined
+                    : normalizeCarouselPoint(event.from),
+                to:
+                  event.to === undefined
+                    ? undefined
+                    : normalizeCarouselPoint(event.to),
+              };
+            },
+          ),
+        }
+      : null;
   const itemsById = new Map(
     [...itemDefinitions.entries()].map(([id, definition]) => [
       id,
@@ -1708,6 +1860,7 @@ function normalizeMatch(stateValue: unknown): MatchView {
     standings,
     opponent,
     choices: enrichedChoices,
+    carouselSession,
     selectedDefinitionByUnit: board.views,
     itemsById,
     economy: {
@@ -1805,6 +1958,8 @@ function useSynth(settings: Settings) {
         error: [130, 0.16, "sawtooth"],
         battle: [190, 0.2, "square"],
         reward: [760, 0.25, "triangle"],
+        splash: [210, 0.08, "triangle"],
+        unlock: [520, 0.16, "square"],
       };
       const [frequency, duration, type] = config[sound];
       oscillator.type = type;
@@ -1813,6 +1968,10 @@ function useSynth(settings: Settings) {
         oscillator.frequency.exponentialRampToValueAtTime(1120, now + duration);
       } else if (sound === "battle") {
         oscillator.frequency.exponentialRampToValueAtTime(90, now + duration);
+      } else if (sound === "splash") {
+        oscillator.frequency.exponentialRampToValueAtTime(120, now + duration);
+      } else if (sound === "unlock") {
+        oscillator.frequency.exponentialRampToValueAtTime(820, now + duration);
       }
       gain.gain.setValueAtTime(settings.volume * 0.09, now);
       gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
@@ -1843,7 +2002,6 @@ export default function GameClient() {
   const [scoutedPlayerId, setScoutedPlayerId] = useState<string | null>(null);
   const [timer, setTimer] = useState(30);
   const [phaseDuration, setPhaseDuration] = useState(30);
-  const [choiceTimer, setChoiceTimer] = useState(10);
   const [toast, setToast] = useState<ToastView | null>(null);
   const toastIdRef = useRef(0);
   const [tutorialStep, setTutorialStep] = useState<TutorialStep | null>(
@@ -1853,6 +2011,8 @@ export default function GameClient() {
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">(
     "idle",
   );
+  const saveWriteChainRef = useRef<Promise<void>>(Promise.resolve());
+  const lastCarouselCheckpointRef = useRef(0);
   const playSound = useSynth(settings);
   const view = useMemo(
     () => (engineState ? normalizeMatch(engineState) : null),
@@ -1913,10 +2073,14 @@ export default function GameClient() {
     } else if (nextPhase !== "battle") {
       preBattleStateRef.current = null;
     }
-    const nextUnits = normalizeMatch(next).boardUnits;
-    setSelectedUnitId((current) =>
-      retainValidBoardSelection(current, nextUnits),
-    );
+    if (nextPhase === "carousel") {
+      setSelectedUnitId(null);
+    } else {
+      const nextUnits = normalizeMatch(next).boardUnits;
+      setSelectedUnitId((current) =>
+        retainValidBoardSelection(current, nextUnits),
+      );
+    }
     setEngineStateReact(next);
   }, []);
 
@@ -1948,7 +2112,12 @@ export default function GameClient() {
 
   useEffect(() => {
     if (!engineState || !seed) return;
+    const isCarousel = phaseName(asRecord(engineState).phase) === "carousel";
+    const delay = isCarousel
+      ? Math.max(0, 250 - (Date.now() - lastCarouselCheckpointRef.current))
+      : 250;
     const saveTimer = window.setTimeout(() => {
+      if (isCarousel) lastCarouselCheckpointRef.current = Date.now();
       setSaveStatus("saving");
       const updatedAt = Date.now();
       const replayBattle =
@@ -1957,17 +2126,21 @@ export default function GameClient() {
       const stableState = replayBattle
         ? preBattleStateRef.current
         : engineState;
-      void writeVoyage({
+      const envelope: SaveEnvelope = {
         state: stableState,
         seed,
         updatedAt,
-        schemaVersion: numberValue(engine.CURRENT_SAVE_SCHEMA_VERSION, 5),
+        schemaVersion: numberValue(engine.CURRENT_SAVE_SCHEMA_VERSION, 6),
         contentVersion: stringValue(
           asRecord(stableState).contentVersion,
           "1.0.0",
         ),
         replayBattle,
-      })
+      };
+      saveWriteChainRef.current = saveWriteChainRef.current
+        .catch(() => undefined)
+        .then(() => writeVoyage(envelope));
+      void saveWriteChainRef.current
         .then(() => {
           setHasSave(true);
           setSaveDate(updatedAt);
@@ -1977,9 +2150,46 @@ export default function GameClient() {
         .catch(() => {
           setSaveStatus("idle");
         });
-    }, 250);
+    }, delay);
     return () => window.clearTimeout(saveTimer);
   }, [engineState, seed]);
+
+  useEffect(() => {
+    const checkpointCarousel = () => {
+      const current = engineStateRef.current;
+      if (
+        !current ||
+        !seed ||
+        phaseName(asRecord(current).phase) !== "carousel"
+      ) {
+        return;
+      }
+      const updatedAt = Date.now();
+      const envelope: SaveEnvelope = {
+        state: current,
+        seed,
+        updatedAt,
+        schemaVersion: numberValue(engine.CURRENT_SAVE_SCHEMA_VERSION, 6),
+        contentVersion: stringValue(
+          asRecord(current).contentVersion,
+          "1.0.0",
+        ),
+        replayBattle: false,
+      };
+      saveWriteChainRef.current = saveWriteChainRef.current
+        .catch(() => undefined)
+        .then(() => writeVoyage(envelope));
+    };
+    const onVisibilityChange = () => {
+      if (document.hidden) checkpointCarousel();
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("pagehide", checkpointCarousel);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("pagehide", checkpointCarousel);
+    };
+  }, [seed]);
 
   useEffect(() => {
     if (!view || screen === "settings" || screen === "animation-lab") return;
@@ -2029,7 +2239,6 @@ export default function GameClient() {
     const resetTimer = window.setTimeout(() => {
       setTimer(duration);
       setPhaseDuration(duration);
-      if (activePhase === "carousel") setChoiceTimer(10);
     }, 0);
     return () => window.clearTimeout(resetTimer);
   }, [
@@ -2042,8 +2251,8 @@ export default function GameClient() {
   const issueCommand = useCallback(
     (
       command: UnknownRecord,
-      successSound: SoundName = "click",
-      successMessage = "The crew carried out your order.",
+      successSound: SoundName | null = "click",
+      successMessage: string | null = "The crew carried out your order.",
     ) => {
       const current = engineStateRef.current;
       if (!current || !engine.applyCommand) {
@@ -2070,8 +2279,10 @@ export default function GameClient() {
           return false;
         }
         setEngineState(outcome.state);
-        showToast("success", "ORDER COMPLETE", successMessage);
-        playSound(successSound);
+        if (successMessage) {
+          showToast("success", "ORDER COMPLETE", successMessage);
+        }
+        if (successSound) playSound(successSound);
         return true;
       } catch {
         showToast(
@@ -2456,21 +2667,11 @@ export default function GameClient() {
 
   const chooseReward = useCallback(
     (choiceId: string) => {
-      if (!view) return;
-      const type =
-        view.phase === "carousel" ? "CAROUSEL_PICK" : "CHOOSE_ITEM";
-      const command =
-        type === "CAROUSEL_PICK"
-          ? {
-              type,
-              playerId: view.playerId,
-              choiceId,
-            }
-          : { type, playerId: view.playerId, choiceId };
+      if (!view || view.phase !== "item-choice") return;
       const choice = view.choices.find((candidate) => candidate.id === choiceId);
       if (
         issueCommand(
-          command,
+          { type: "CHOOSE_ITEM", playerId: view.playerId, choiceId },
           "reward",
           `Claimed ${choice?.name ?? "a Grand Line treasure"}.`,
         )
@@ -2492,32 +2693,104 @@ export default function GameClient() {
     [issueCommand, setEngineState, view],
   );
 
-  const chooseRewardRef = useRef(chooseReward);
-  useEffect(() => {
-    chooseRewardRef.current = chooseReward;
-  }, [chooseReward]);
+  const setCarouselTarget = useCallback(
+    (target: { x: number; y: number }) => {
+      if (!view || view.phase !== "carousel") return;
+      const participant = view.carouselSession?.participants.find(
+        (candidate) => candidate.playerId === view.playerId,
+      );
+      if (
+        !participant ||
+        (view.carouselSession?.tick ?? 0) < participant.releaseTick ||
+        participant.claimedChoiceId
+      ) {
+        return;
+      }
+      issueCommand(
+        {
+          type: "CAROUSEL_SET_TARGET",
+          playerId: view.playerId,
+          x: target.x,
+          y: target.y,
+        },
+        null,
+        null,
+      );
+    },
+    [issueCommand, view],
+  );
+
+  const autoResolveCarousel = useCallback(() => {
+    const current = engineStateRef.current;
+    if (!current || phaseName(asRecord(current).phase) !== "carousel") return;
+    issueCommand(
+      {
+        type: "TIMER_EXPIRED",
+        playerId: getPlayerId(asRecord(current)),
+      },
+      "reward",
+      "The Log Pose secured the best remaining bounty.",
+    );
+  }, [issueCommand]);
 
   useEffect(() => {
-    if (screen !== "carousel" || !view?.choices.length) return;
-    const interval = window.setInterval(() => {
-      setChoiceTimer((remaining) => {
-        if (remaining <= 1) {
-          window.clearInterval(interval);
-          const fallbackChoice = view.choices[0];
-          window.setTimeout(() => {
-            const accepted = issueCommand({
-              type: "TIMER_EXPIRED",
-              playerId: view.playerId,
-            });
-            if (!accepted) chooseRewardRef.current(fallbackChoice.id);
-          }, 0);
-          return 0;
+    if (
+      screen !== "carousel" ||
+      activePhase !== "carousel" ||
+      !engine.advanceCarousel
+    ) {
+      return;
+    }
+    let animationFrame = 0;
+    let previousTime = performance.now();
+    let accumulator = 0;
+    const runFrame = (time: number) => {
+      if (document.hidden) {
+        previousTime = time;
+        accumulator = 0;
+        animationFrame = window.requestAnimationFrame(runFrame);
+        return;
+      }
+      accumulator += Math.min(250, Math.max(0, time - previousTime));
+      previousTime = time;
+      const ticks = Math.min(5, Math.floor(accumulator / 50));
+      if (ticks > 0) {
+        accumulator -= ticks * 50;
+        const current = engineStateRef.current;
+        if (current && phaseName(asRecord(current).phase) === "carousel") {
+          try {
+            setEngineState(engine.advanceCarousel!(current, ticks, content));
+          } catch {
+            autoResolveCarousel();
+            return;
+          }
         }
-        return remaining - 1;
-      });
-    }, 1000);
-    return () => window.clearInterval(interval);
-  }, [issueCommand, screen, view?.round, view?.choices, view?.playerId]);
+      }
+      animationFrame = window.requestAnimationFrame(runFrame);
+    };
+    animationFrame = window.requestAnimationFrame(runFrame);
+    return () => window.cancelAnimationFrame(animationFrame);
+  }, [activePhase, autoResolveCarousel, screen, setEngineState]);
+
+  const playedCarouselEventsRef = useRef(new Set<string>());
+  useEffect(() => {
+    const session = view?.carouselSession;
+    if (!session || view.phase !== "carousel") {
+      playedCarouselEventsRef.current.clear();
+      return;
+    }
+    for (const event of session.events) {
+      if (playedCarouselEventsRef.current.has(event.id)) continue;
+      playedCarouselEventsRef.current.add(event.id);
+      if (event.type === "release" && event.playerId === view.playerId) {
+        playSound("unlock");
+      } else if (event.type === "claim") {
+        playSound(event.playerId === view.playerId ? "reward" : "splash");
+      } else if (event.type === "collision") {
+        playSound("splash");
+      }
+    }
+  }, [playSound, view]);
 
   const openSettings = useCallback(
     (from: Screen) => {
@@ -2599,10 +2872,12 @@ export default function GameClient() {
           returnFromScouting();
         }
         else if (screen === "match") openSettings("match");
+        else if (screen === "carousel") openSettings("carousel");
         return;
       }
       const key = event.key.toLowerCase();
-      if ((screen === "carousel" || screen === "reward") && view) {
+      if (screen === "carousel") return;
+      if (screen === "reward" && view) {
         if (/^[1-8]$/.test(key)) {
           const choice = view.choices[Number(key) - 1];
           if (choice) {
@@ -2902,9 +3177,13 @@ export default function GameClient() {
       {screen === "carousel" && view && (
         <CarouselScreen
           choices={view.choices}
+          session={view.carouselSession}
+          playerId={view.playerId}
           round={view.round}
-          timer={choiceTimer}
-          onChoose={chooseReward}
+          settings={settings}
+          onSetTarget={setCarouselTarget}
+          onAutoPick={autoResolveCarousel}
+          onSettings={() => openSettings("carousel")}
         />
       )}
       {screen === "reward" && view && (
@@ -4611,71 +4890,135 @@ function UnitInspector({
 
 function CarouselScreen({
   choices,
+  session,
+  playerId,
   round,
-  timer,
-  onChoose,
+  settings,
+  onSetTarget,
+  onAutoPick,
+  onSettings,
 }: {
   choices: ChoiceView[];
+  session: CarouselSessionView | null;
+  playerId: string;
   round: number;
-  timer: number;
-  onChoose: (id: string) => void;
+  settings: Settings;
+  onSetTarget: (target: { x: number; y: number }) => void;
+  onAutoPick: () => void;
+  onSettings: () => void;
 }) {
+  const [rendererFailed, setRendererFailed] = useState(false);
   const [previewChoiceId, setPreviewChoiceId] = useState(
-    choices[0]?.id ?? "",
+    choices.find((choice) => !choice.takenByPlayerId)?.id ?? "",
   );
   const previewChoice =
-    choices.find((choice) => choice.id === previewChoiceId) ?? choices[0];
+    choices.find((choice) => choice.id === previewChoiceId) ??
+    choices.find((choice) => !choice.takenByPlayerId) ??
+    choices[0];
+  const playerBoat = session?.participants.find(
+    (participant) => participant.playerId === playerId,
+  );
+  const remainingTicks = Math.max(
+    0,
+    (session?.durationTicks ?? 0) - (session?.tick ?? 0),
+  );
+  const remainingSeconds = Math.ceil(remainingTicks * 0.05);
+  const releaseSeconds = playerBoat
+    ? Math.max(0, Math.ceil((playerBoat.releaseTick - (session?.tick ?? 0)) * 0.05))
+    : 0;
+  const status = playerBoat?.claimedChoiceId
+    ? "BOUNTY SECURED"
+    : releaseSeconds > 0
+      ? `ANCHOR LOCKED · ${releaseSeconds}`
+      : "SAIL NOW";
+  const itemColumns: Map<string, number> = new Map(
+    DEFAULT_BOUNTY_ITEM_ORDER.map((itemId, index) => [
+      itemId,
+      index,
+    ]),
+  );
+  const tokens: CarouselTokenView[] = choices.map((choice, index) => ({
+    id: choice.id,
+    itemId: choice.contentId,
+    contentId: choice.contentId,
+    name: choice.name,
+    description: choice.description,
+    icon: choice.icon,
+    color: choice.color,
+    orbitIndex: choice.orbitIndex ?? index,
+    claimedAtTick: choice.claimedAtTick ?? null,
+    takenByPlayerId: choice.takenByPlayerId ?? null,
+    itemColumn: itemColumns.get(choice.contentId) ?? index % 8,
+  } satisfies CarouselTokenView));
+  const snapshot: CarouselPresentationSnapshot | null = session
+    ? {
+        tick: session.tick,
+        durationTicks: session.durationTicks,
+        finishAtTick: session.finishAtTick,
+        participants: session.participants,
+        choices: tokens,
+        events: session.events,
+      }
+    : null;
+  const recommendedChoiceId = choices.find(
+    (choice) => choice.decision?.recommended && !choice.takenByPlayerId,
+  )?.id;
   return (
-    <section className="choice-screen carousel-screen">
-      <header className="choice-heading">
-        <span className="eyebrow">ROUND {round} · LOWEST HEALTH DRAFTS FIRST</span>
-        <h2>GRAND LINE CAROUSEL</h2>
-        <p>Choose one rotating treasure before the rival captains take it.</p>
-        <div className={`carousel-timer ${timer <= 3 ? "is-warning" : ""}`}>
-          <span>AUTO PICK IN</span>
-          <strong>{timer}</strong>
+    <section className="choice-screen carousel-screen bounty-regatta-screen">
+      <header className="regatta-hud">
+        <div className="regatta-title">
+          <span className="eyebrow">ROUND {round} · LOWEST HEALTH SAILS FIRST</span>
+          <h2>BOUNTY REGATTA</h2>
+          <p>Click the sea to steer. Touch a floating bounty to claim it.</p>
         </div>
+        <div className="regatta-status" aria-live="polite">
+          <span>YOUR SHIP</span>
+          <strong className={releaseSeconds > 0 ? "is-locked" : ""}>{status}</strong>
+          <small>RANK #{playerBoat?.rank ?? "–"}</small>
+        </div>
+        <div className={`carousel-timer ${remainingSeconds <= 3 ? "is-warning" : ""}`}>
+          <span>AUTO PICK IN</span>
+          <strong>{remainingSeconds}</strong>
+        </div>
+        <button
+          type="button"
+          className="regatta-settings"
+          onClick={onSettings}
+          aria-label="Open settings and pause the Bounty Regatta"
+        >
+          SETTINGS
+        </button>
       </header>
-      <div className="carousel-ring" aria-label="Carousel treasures">
-        <div className="carousel-water" aria-hidden="true"><i /><i /><i /></div>
-        {choices.map((choice, index) => (
-          <button
-            type="button"
-            key={choice.id}
-            className={`carousel-choice ${
-              choice.decision?.recommended ? "is-recommended" : ""
-            }`}
-            style={
-              {
-                "--choice-index": index,
-                "--choice-count": Math.max(choices.length, 1),
-                "--choice-color": choice.color,
-              } as CSSProperties
-            }
-            onClick={() => onChoose(choice.id)}
-            onMouseEnter={() => setPreviewChoiceId(choice.id)}
-            onFocus={() => setPreviewChoiceId(choice.id)}
-            aria-describedby="carousel-choice-preview"
-            aria-label={`Choose ${choice.name}. Shortcut ${index + 1}${
-              choice.decision?.recommended ? ". Recommended for your crew" : ""
-            }`}
-          >
-            <kbd>{index + 1}</kbd>
-            {choice.decision?.recommended && (
-              <b className="carousel-recommended">BEST FIT</b>
-            )}
-            <span className="carousel-item-icon">{choice.icon}</span>
-            <strong>{choice.name}</strong>
-          </button>
-        ))}
+      <div className="regatta-stage" aria-label="Player-controlled boat arena">
+        {snapshot && !rendererFailed ? (
+          <PhaserCarousel
+            snapshot={snapshot}
+            playerId={playerId}
+            tickMs={50}
+            reducedMotion={settings.reducedMotion}
+            highContrast={settings.highContrast}
+            recommendedChoiceId={recommendedChoiceId}
+            onSetTarget={onSetTarget}
+            onHoverChoice={(choiceId) => setPreviewChoiceId(choiceId ?? "")}
+            onFailure={() => setRendererFailed(true)}
+            onFallbackAutoPick={onAutoPick}
+          />
+        ) : (
+          <div className="regatta-fallback" role="alert">
+            <span aria-hidden="true">⚓</span>
+            <strong>THE CURRENT CANNOT BE CHARTED</strong>
+            <p>Your Log Pose can still secure the best remaining bounty.</p>
+            <button type="button" onClick={onAutoPick}>AUTO-PICK BEST FIT</button>
+          </div>
+        )}
         <div
-          className="carousel-center"
+          className="regatta-preview"
           id="carousel-choice-preview"
           aria-live="polite"
         >
-          <span>{previewChoice?.icon ?? "☠"}</span>
-          <strong>{previewChoice?.name ?? "PICK ONE"}</strong>
-          <small>{previewChoice?.description ?? "No going back"}</small>
+          <span style={{ color: previewChoice?.color }}>{previewChoice?.icon ?? "☠"}</span>
+          <strong>{previewChoice?.name ?? "TRACK A BOUNTY"}</strong>
+          <small>{previewChoice?.description ?? "Hover a bounty for details."}</small>
           {previewChoice && previewChoice.effects.length > 0 && (
             <em>
               {previewChoice.effects.map((effect) => effect.label).join(" · ")}
@@ -4683,15 +5026,22 @@ function CarouselScreen({
           )}
           {previewChoice?.decision && (
             <b className="carousel-fit-copy">
-              {previewChoice.decision.recommended ? "AUTO-PICK FAVORITE" : "CREW FIT"}
+              {previewChoice.decision.recommended ? "LOG POSE FAVORITE" : "CREW FIT"}
               {previewChoice.decision.bestFit
                 ? ` · ${previewChoice.decision.bestFit.unitName}`
                 : " · KEEP FOR LATER"}
             </b>
           )}
+          {previewChoice?.takenByPlayerId && (
+            <b className="regatta-claimed">CLAIMED BY A RIVAL</b>
+          )}
         </div>
       </div>
-      <p className="choice-hint">Click or press 1–8 · timeout picks the best fit</p>
+      <footer className="regatta-help">
+        <span><b>LEFT CLICK</b> SET SAILING TARGET</span>
+        <span><b>TOUCH</b> CLAIM BOUNTY</span>
+        <span><b>TIMEOUT</b> BEST FIT</span>
+      </footer>
     </section>
   );
 }

@@ -5,7 +5,12 @@ import {
   getUnitDefinition,
 } from "./content";
 import { simulateBattle } from "./combat";
-import { hashSeed, shuffleDeterministic, weightedIndex } from "./rng";
+import {
+  hashSeed,
+  randomInt,
+  shuffleDeterministic,
+  weightedIndex,
+} from "./rng";
 import { getActiveTraits } from "./traits";
 import type {
   BattleSetupUnit,
@@ -13,6 +18,9 @@ import type {
   BotFormationPlacement,
   BotPersonality,
   CarouselChoice,
+  CarouselEvent,
+  CarouselParticipantState,
+  CarouselSessionState,
   CommandError,
   CommandResult,
   GameCommand,
@@ -29,7 +37,26 @@ import type {
   UnitInstance,
 } from "./types";
 
-export const CURRENT_SAVE_SCHEMA_VERSION = 5;
+export const CURRENT_SAVE_SCHEMA_VERSION = 6;
+
+export const CAROUSEL_TICK_MS = 50;
+export const CAROUSEL_ARENA_WIDTH = 1520;
+export const CAROUSEL_ARENA_HEIGHT = 840;
+export const CAROUSEL_BOAT_RADIUS = 34;
+export const CAROUSEL_BOUNTY_RADIUS = 30;
+
+const CAROUSEL_CENTER: Position = {
+  x: CAROUSEL_ARENA_WIDTH / 2,
+  y: CAROUSEL_ARENA_HEIGHT / 2,
+};
+export const CAROUSEL_ORBIT_RADIUS_X = 260;
+export const CAROUSEL_ORBIT_RADIUS_Y = 190;
+const CAROUSEL_SPAWN_RADIUS_X = 650;
+const CAROUSEL_SPAWN_RADIUS_Y = 330;
+export const CAROUSEL_ORBIT_RADIANS_PER_TICK = 0.02;
+const CAROUSEL_BOAT_SPEED_PER_TICK = 8;
+const CAROUSEL_PICKUP_HOLD_TICKS = 800 / CAROUSEL_TICK_MS;
+const CAROUSEL_EVENT_LOG_LIMIT = 256;
 
 function cloneMatch(state: MatchState): MatchState {
   return JSON.parse(JSON.stringify(state)) as MatchState;
@@ -362,6 +389,7 @@ export function createMatch(
     lastResults: [],
     pendingItemChoices: {},
     carouselChoices: [],
+    carouselSession: null,
     winnerId: null,
     nextUnitSerial: 1,
     nextChoiceSerial: 1,
@@ -1102,15 +1130,20 @@ function createCarouselChoices(
   state: MatchState,
   content: GameContent,
 ): CarouselChoice[] {
-  const itemShuffle = shuffleDeterministic(content.items, state.rngState);
+  const livingPlayers = state.players.filter((player) => player.alive).length;
+  const desiredCount = Math.min(9, Math.max(5, livingPlayers + 3));
+  const itemDeck = content.items.flatMap((item) => [item, item]);
+  const itemShuffle = shuffleDeterministic(itemDeck, state.rngState);
   state.rngState = itemShuffle.state;
   return itemShuffle.values
-    .slice(0, content.config.playerCount)
-    .map((item) => {
-      const choice = {
+    .slice(0, Math.min(desiredCount, itemDeck.length))
+    .map((item, orbitIndex) => {
+      const choice: CarouselChoice = {
         id: `choice-${state.nextChoiceSerial}`,
         itemId: item.id,
         takenByPlayerId: null,
+        orbitIndex,
+        claimedAtTick: null,
       };
       state.nextChoiceSerial += 1;
       return choice;
@@ -1120,7 +1153,12 @@ function createCarouselChoices(
 function carouselDraftOrder(state: MatchState): PlayerState[] {
   return state.players
     .filter((player) => player.alive)
-    .sort((left, right) => left.hp - right.hp || left.id.localeCompare(right.id));
+    .sort(
+      (left, right) =>
+        left.hp - right.hp ||
+        left.level - right.level ||
+        left.id.localeCompare(right.id),
+    );
 }
 
 function alreadyDrafted(state: MatchState, playerId: string): boolean {
@@ -1140,8 +1178,17 @@ function scoreCarouselChoice(
 function grantCarouselChoice(
   player: PlayerState,
   choice: CarouselChoice,
+  tick: number,
+  participant?: CarouselParticipantState,
 ): void {
+  if (choice.takenByPlayerId !== null) {
+    return;
+  }
   choice.takenByPlayerId = player.id;
+  choice.claimedAtTick = tick;
+  if (participant) {
+    participant.claimedChoiceId = choice.id;
+  }
   player.inventory.push(choice.itemId);
 }
 
@@ -1157,26 +1204,9 @@ function bestCarouselChoice(
     (left, right) =>
       scoreCarouselChoice(right, player, content) -
         scoreCarouselChoice(left, player, content) ||
+      left.itemId.localeCompare(right.itemId) ||
       left.id.localeCompare(right.id),
   )[0] ?? null;
-}
-
-function draftBotsUntilHuman(
-  state: MatchState,
-  content: GameContent,
-): void {
-  for (const player of carouselDraftOrder(state)) {
-    if (alreadyDrafted(state, player.id)) {
-      continue;
-    }
-    if (!player.isBot) {
-      return;
-    }
-    const choice = bestCarouselChoice(state, player, content);
-    if (choice) {
-      grantCarouselChoice(player, choice);
-    }
-  }
 }
 
 function returnUnusedCarouselChoices(
@@ -1187,8 +1217,116 @@ function returnUnusedCarouselChoices(
 
 function enterPreparationAfterCarousel(state: MatchState): MatchState {
   returnUnusedCarouselChoices(state);
+  state.carouselSession = null;
   state.phase = "preparation";
   return state;
+}
+
+function roundCarouselCoordinate(value: number): number {
+  return Math.round(value * 1_000) / 1_000;
+}
+
+function clampCarouselPosition(position: Position): Position {
+  return {
+    x: roundCarouselCoordinate(
+      Math.max(
+        CAROUSEL_BOAT_RADIUS,
+        Math.min(CAROUSEL_ARENA_WIDTH - CAROUSEL_BOAT_RADIUS, position.x),
+      ),
+    ),
+    y: roundCarouselCoordinate(
+      Math.max(
+        CAROUSEL_BOAT_RADIUS,
+        Math.min(CAROUSEL_ARENA_HEIGHT - CAROUSEL_BOAT_RADIUS, position.y),
+      ),
+    ),
+  };
+}
+
+function createCarouselSession(state: MatchState): CarouselSessionState {
+  const draftOrder = carouselDraftOrder(state);
+  const rankByPlayerId = new Map(
+    draftOrder.map((player, index) => [
+      player.id,
+      draftOrder.length - index,
+    ]),
+  );
+  const human = draftOrder.find((player) => !player.isBot) ?? null;
+  const orderedPlayers = [
+    ...(human ? [human] : []),
+    ...draftOrder
+      .filter((player) => player.id !== human?.id)
+      .sort((left, right) => left.id.localeCompare(right.id)),
+  ];
+  const arenaSeed = hashSeed(
+    `${state.seed}:carousel:${state.round}:${state.rngState}`,
+  );
+  const participants = orderedPlayers.map((player, index) => {
+    const angle =
+      index === 0 && !player.isBot
+        ? Math.PI / 2
+        : Math.PI / 2 + (index * Math.PI * 2) / orderedPlayers.length;
+    const spawnPosition = clampCarouselPosition({
+      x: CAROUSEL_CENTER.x + Math.cos(angle) * CAROUSEL_SPAWN_RADIUS_X,
+      y: CAROUSEL_CENTER.y + Math.sin(angle) * CAROUSEL_SPAWN_RADIUS_Y,
+    });
+    let reactionDelayTicks = 0;
+    if (player.isBot) {
+      const delay = randomInt(
+        state.rngState,
+        1_000 / CAROUSEL_TICK_MS,
+        6_000 / CAROUSEL_TICK_MS + 1,
+      );
+      state.rngState = delay.state;
+      reactionDelayTicks = delay.value;
+    }
+    const rank = rankByPlayerId.get(player.id) ?? 1;
+    const baseReleaseTick =
+      state.round === 4
+        ? 5_000 / CAROUSEL_TICK_MS
+        : 5_000 / CAROUSEL_TICK_MS +
+          (draftOrder.length - rank) * (2_000 / CAROUSEL_TICK_MS);
+    return {
+      playerId: player.id,
+      rank,
+      spawnPosition,
+      position: { ...spawnPosition },
+      targetPosition: { ...spawnPosition },
+      releaseTick: baseReleaseTick + reactionDelayTicks,
+      reactionDelayTicks,
+      moving: false,
+      claimedChoiceId: null,
+    } satisfies CarouselParticipantState;
+  });
+  const durationSeconds =
+    state.round === 4 ? 16 : 16 + draftOrder.length * 2;
+  return {
+    tick: 0,
+    durationTicks: durationSeconds * (1_000 / CAROUSEL_TICK_MS),
+    finishAtTick: null,
+    arenaSeed,
+    participants,
+    events: [],
+  };
+}
+
+export function getCarouselChoicePosition(
+  state: MatchState,
+  choice: CarouselChoice,
+  tick = state.carouselSession?.tick ?? 0,
+): Position {
+  const choiceCount = Math.max(1, state.carouselChoices.length);
+  const angle =
+    (choice.orbitIndex / choiceCount) * Math.PI * 2 +
+    tick * CAROUSEL_ORBIT_RADIANS_PER_TICK;
+  return {
+    x: roundCarouselCoordinate(
+      CAROUSEL_CENTER.x + Math.cos(angle) * CAROUSEL_ORBIT_RADIUS_X,
+    ),
+    y: roundCarouselCoordinate(
+      CAROUSEL_CENTER.y + Math.sin(angle) * CAROUSEL_ORBIT_RADIUS_Y,
+    ),
+  };
 }
 
 function prepareCarousel(
@@ -1198,22 +1336,318 @@ function prepareCarousel(
   state.phase = "carousel";
   state.stageId = getStageDefinition(state.round, content).id;
   state.carouselChoices = createCarouselChoices(state, content);
-  draftBotsUntilHuman(state, content);
-  if (
-    carouselDraftOrder(state).every((player) =>
-      alreadyDrafted(state, player.id),
-    )
-  ) {
+  state.carouselSession = createCarouselSession(state);
+  if (state.carouselSession.participants.length === 0) {
     return enterPreparationAfterCarousel(state);
   }
   return state;
 }
 
-function finishCarouselIfComplete(
+function allCarouselParticipantsClaimed(state: MatchState): boolean {
+  const session = state.carouselSession;
+  return Boolean(
+    session &&
+      session.participants.length > 0 &&
+      session.participants.every(
+        (participant) => participant.claimedChoiceId !== null,
+      ),
+  );
+}
+
+function moveCarouselParticipant(
+  participant: CarouselParticipantState,
+): { from: Position; to: Position } | null {
+  const from = { ...participant.position };
+  const deltaX = participant.targetPosition.x - participant.position.x;
+  const deltaY = participant.targetPosition.y - participant.position.y;
+  const distance = Math.hypot(deltaX, deltaY);
+  if (distance <= 0.001) {
+    participant.position = { ...participant.targetPosition };
+    participant.moving = false;
+    return null;
+  }
+  const distanceToTravel = Math.min(CAROUSEL_BOAT_SPEED_PER_TICK, distance);
+  participant.position = clampCarouselPosition({
+    x: participant.position.x + (deltaX / distance) * distanceToTravel,
+    y: participant.position.y + (deltaY / distance) * distanceToTravel,
+  });
+  participant.moving = distance > CAROUSEL_BOAT_SPEED_PER_TICK;
+  return { from, to: { ...participant.position } };
+}
+
+function updateCarouselBotTarget(
+  state: MatchState,
+  content: GameContent,
+  participant: CarouselParticipantState,
+): void {
+  const player = findPlayer(state, participant.playerId);
+  if (!player?.isBot) {
+    return;
+  }
+  if (participant.claimedChoiceId !== null) {
+    participant.targetPosition = { ...participant.spawnPosition };
+    return;
+  }
+  const choice = bestCarouselChoice(state, player, content);
+  if (choice) {
+    participant.targetPosition = getCarouselChoicePosition(
+      state,
+      choice,
+      state.carouselSession?.tick,
+    );
+  }
+}
+
+function resolveCarouselBoatCollisions(
+  session: CarouselSessionState,
+  events: CarouselEvent[],
+): void {
+  const collidable = [...session.participants]
+    .filter(
+      (participant) =>
+        session.tick >= participant.releaseTick &&
+        participant.claimedChoiceId === null,
+    )
+    .sort((left, right) => left.playerId.localeCompare(right.playerId));
+  const minimumDistance = CAROUSEL_BOAT_RADIUS * 2;
+  const reportedPairs = new Set<string>();
+  const maximumPasses = Math.max(1, collidable.length ** 2 * 2);
+  for (let pass = 0; pass < maximumPasses; pass += 1) {
+    let correctedOverlap = false;
+    for (let leftIndex = 0; leftIndex < collidable.length; leftIndex += 1) {
+      for (
+        let rightIndex = leftIndex + 1;
+        rightIndex < collidable.length;
+        rightIndex += 1
+      ) {
+        const left = collidable[leftIndex];
+        const right = collidable[rightIndex];
+        const deltaX = right.position.x - left.position.x;
+        const deltaY = right.position.y - left.position.y;
+        const distance = Math.hypot(deltaX, deltaY);
+        if (distance >= minimumDistance - 0.001) {
+          continue;
+        }
+        const normalX = distance <= 0.001 ? 1 : deltaX / distance;
+        const normalY = distance <= 0.001 ? 0 : deltaY / distance;
+        const displacement = (minimumDistance - distance) / 2;
+        left.position = clampCarouselPosition({
+          x: left.position.x - normalX * displacement,
+          y: left.position.y - normalY * displacement,
+        });
+        right.position = clampCarouselPosition({
+          x: right.position.x + normalX * displacement,
+          y: right.position.y + normalY * displacement,
+        });
+        correctedOverlap = true;
+        const pairKey = `${left.playerId}|${right.playerId}`;
+        if (!reportedPairs.has(pairKey)) {
+          reportedPairs.add(pairKey);
+          events.push({
+            id: `${session.tick}:collision:${left.playerId}:${right.playerId}`,
+            type: "collision",
+            tick: session.tick,
+            playerAId: left.playerId,
+            playerBId: right.playerId,
+          });
+        }
+      }
+    }
+    if (!correctedOverlap) {
+      break;
+    }
+  }
+}
+
+function resolveCarouselClaims(
+  state: MatchState,
+  content: GameContent,
+  events: CarouselEvent[],
+): void {
+  const session = state.carouselSession;
+  if (!session) {
+    return;
+  }
+  const claimDistance = CAROUSEL_BOAT_RADIUS + CAROUSEL_BOUNTY_RADIUS;
+  const candidates = session.participants
+    .filter(
+      (participant) =>
+        session.tick >= participant.releaseTick &&
+        participant.claimedChoiceId === null,
+    )
+    .flatMap((participant) =>
+      state.carouselChoices
+        .filter((choice) => choice.takenByPlayerId === null)
+        .map((choice) => ({
+          participant,
+          choice,
+          distance: Math.hypot(
+            participant.position.x -
+              getCarouselChoicePosition(state, choice).x,
+            participant.position.y -
+              getCarouselChoicePosition(state, choice).y,
+          ),
+        })),
+    )
+    .filter((candidate) => candidate.distance <= claimDistance)
+    .sort(
+      (left, right) =>
+        left.distance - right.distance ||
+        left.participant.playerId.localeCompare(right.participant.playerId) ||
+        left.choice.id.localeCompare(right.choice.id),
+    );
+  for (const candidate of candidates) {
+    if (
+      candidate.participant.claimedChoiceId !== null ||
+      candidate.choice.takenByPlayerId !== null
+    ) {
+      continue;
+    }
+    const player = findPlayer(state, candidate.participant.playerId);
+    if (!player?.alive) {
+      continue;
+    }
+    grantCarouselChoice(
+      player,
+      candidate.choice,
+      session.tick,
+      candidate.participant,
+    );
+    events.push({
+      id: `${session.tick}:claim:${player.id}:${candidate.choice.id}`,
+      type: "claim",
+      tick: session.tick,
+      playerId: player.id,
+      choiceId: candidate.choice.id,
+      itemId: candidate.choice.itemId,
+    });
+    if (player.isBot) {
+      candidate.participant.targetPosition = {
+        ...candidate.participant.spawnPosition,
+      };
+    }
+  }
+  if (allCarouselParticipantsClaimed(state) && session.finishAtTick === null) {
+    session.finishAtTick = session.tick + CAROUSEL_PICKUP_HOLD_TICKS;
+  }
+}
+
+function autoAssignRemainingCarouselChoices(
+  state: MatchState,
+  content: GameContent,
+  events?: CarouselEvent[],
+): void {
+  const session = state.carouselSession;
+  const tick = session?.tick ?? 0;
+  const assignedPlayerIds: string[] = [];
+  for (const player of carouselDraftOrder(state)) {
+    if (alreadyDrafted(state, player.id)) {
+      continue;
+    }
+    const choice = bestCarouselChoice(state, player, content);
+    if (!choice) {
+      continue;
+    }
+    const participant = session?.participants.find(
+      (candidate) => candidate.playerId === player.id,
+    );
+    grantCarouselChoice(player, choice, tick, participant);
+    assignedPlayerIds.push(player.id);
+    events?.push({
+      id: `${tick}:claim:${player.id}:${choice.id}`,
+      type: "claim",
+      tick,
+      playerId: player.id,
+      choiceId: choice.id,
+      itemId: choice.itemId,
+    });
+  }
+  if (assignedPlayerIds.length > 0) {
+    events?.push({
+      id: `${tick}:timeout`,
+      type: "timeout",
+      tick,
+      playerIds: assignedPlayerIds,
+    });
+  }
+}
+
+export function advanceCarousel(
+  state: MatchState,
+  ticks = 1,
+  content: GameContent = DEFAULT_CONTENT,
+): MatchState {
+  if (state.phase !== "carousel" || !state.carouselSession) {
+    return state;
+  }
+  const next = cloneMatch(state);
+  const session = next.carouselSession;
+  if (!session) {
+    return next;
+  }
+  const events: CarouselEvent[] = [...session.events];
+  const requestedTicks = Math.max(0, Math.floor(ticks));
+  for (let step = 0; step < requestedTicks; step += 1) {
+    session.tick += 1;
+    for (const participant of session.participants) {
+      if (participant.releaseTick === session.tick) {
+        events.push({
+          id: `${session.tick}:release:${participant.playerId}`,
+          type: "release",
+          tick: session.tick,
+          playerId: participant.playerId,
+        });
+      }
+      if (session.tick < participant.releaseTick) {
+        participant.moving = false;
+        continue;
+      }
+      updateCarouselBotTarget(next, content, participant);
+      const movement = moveCarouselParticipant(participant);
+      if (movement) {
+        events.push({
+          id: `${session.tick}:move:${participant.playerId}`,
+          type: "move",
+          tick: session.tick,
+          playerId: participant.playerId,
+          ...movement,
+        });
+      }
+    }
+    resolveCarouselBoatCollisions(session, events);
+    resolveCarouselClaims(next, content, events);
+
+    if (session.tick >= session.durationTicks && session.finishAtTick === null) {
+      autoAssignRemainingCarouselChoices(next, content, events);
+      session.finishAtTick = session.tick + CAROUSEL_PICKUP_HOLD_TICKS;
+    }
+    if (session.finishAtTick !== null && session.tick >= session.finishAtTick) {
+      events.push({
+        id: `${session.tick}:complete`,
+        type: "complete",
+        tick: session.tick,
+      });
+      return enterPreparationAfterCarousel(next);
+    }
+  }
+  session.events = events.slice(-CAROUSEL_EVENT_LOG_LIMIT);
+  return next;
+}
+
+export function resolveLegacyCarousel(
+  state: MatchState,
+  content: GameContent = DEFAULT_CONTENT,
+): MatchState {
+  const next = cloneMatch(state);
+  autoAssignRemainingCarouselChoices(next, content);
+  return enterPreparationAfterCarousel(next);
+}
+
+function finishCarouselImmediately(
   state: MatchState,
   content: GameContent,
 ): MatchState {
-  draftBotsUntilHuman(state, content);
+  autoAssignRemainingCarouselChoices(state, content);
   const complete = carouselDraftOrder(state).every((player) =>
     alreadyDrafted(state, player.id),
   );
@@ -1243,6 +1677,7 @@ function beginNextRound(
   state.lastResults = [];
   state.pendingItemChoices = {};
   state.carouselChoices = [];
+  state.carouselSession = null;
   const stage = getStageDefinition(state.round, content);
   state.stageId = stage.id;
   for (const player of state.players.filter((candidate) => candidate.alive)) {
@@ -2085,16 +2520,7 @@ function autoResolveCarousel(
   content: GameContent,
 ): MatchState {
   const next = cloneMatch(state);
-  for (const player of carouselDraftOrder(next)) {
-    if (alreadyDrafted(next, player.id)) {
-      continue;
-    }
-    const choice = bestCarouselChoice(next, player, content);
-    if (choice) {
-      grantCarouselChoice(player, choice);
-    }
-  }
-  return finishCarouselIfComplete(next, content);
+  return finishCarouselImmediately(next, content);
 }
 
 export function advanceMatchPhase(
@@ -2158,7 +2584,10 @@ export function applyCommand(
       "There is no item choice right now.",
     );
   }
-  if (command.type === "CAROUSEL_PICK" && state.phase !== "carousel") {
+  if (
+    command.type === "CAROUSEL_SET_TARGET" &&
+    state.phase !== "carousel"
+  ) {
     return commandFailure(
       state,
       "WRONG_PHASE",
@@ -2292,31 +2721,55 @@ export function applyCommand(
       }
       return { ok: true, state: next };
     }
-    case "CAROUSEL_PICK": {
-      const nextDrafter = carouselDraftOrder(next).find(
-        (candidate) => !alreadyDrafted(next, candidate.id),
+    case "CAROUSEL_SET_TARGET": {
+      const session = next.carouselSession;
+      const participant = session?.participants.find(
+        (candidate) => candidate.playerId === player.id,
       );
-      if (nextDrafter?.id !== player.id) {
+      if (!session || !participant) {
         return commandFailure(
           state,
-          "NOT_DRAFT_TURN",
-          "Another player drafts before you.",
+          "CAROUSEL_NOT_READY",
+          "The bounty regatta is not ready.",
         );
       }
-      const choice = next.carouselChoices.find(
-        (candidate) =>
-          candidate.id === command.choiceId &&
-          candidate.takenByPlayerId === null,
-      );
-      if (!choice) {
+      if (player.isBot) {
         return commandFailure(
           state,
-          "INVALID_CAROUSEL_CHOICE",
-          "That carousel choice is unavailable.",
+          "BOT_CONTROLLED",
+          "Bot boats steer themselves.",
         );
       }
-      grantCarouselChoice(player, choice);
-      next = finishCarouselIfComplete(next, content);
+      if (session.tick < participant.releaseTick) {
+        return commandFailure(
+          state,
+          "CAROUSEL_LOCKED",
+          "Your boat has not been released yet.",
+        );
+      }
+      if (participant.claimedChoiceId !== null) {
+        return commandFailure(
+          state,
+          "CAROUSEL_ALREADY_CLAIMED",
+          "Your boat already carries a bounty.",
+        );
+      }
+      if (!Number.isFinite(command.x) || !Number.isFinite(command.y)) {
+        return commandFailure(
+          state,
+          "INVALID_CAROUSEL_TARGET",
+          "The sailing target must use finite coordinates.",
+        );
+      }
+      participant.targetPosition = clampCarouselPosition({
+        x: command.x,
+        y: command.y,
+      });
+      participant.moving =
+        Math.hypot(
+          participant.targetPosition.x - participant.position.x,
+          participant.targetPosition.y - participant.position.y,
+        ) > 0.001;
       return { ok: true, state: next };
     }
   }

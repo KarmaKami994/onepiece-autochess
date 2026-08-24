@@ -6,6 +6,7 @@
     "node": ">=22.13.0"
   },
   "scripts": {
+    "assets:carousel": "node scripts/build_carousel_assets.mjs",
     "assets:maps": "node scripts/build_board_maps.mjs",
     "assets:luffy": "powershell -ExecutionPolicy Bypass -File scripts/build_luffy_pilot.ps1",
     "assets:luffy:v2": "powershell -ExecutionPolicy Bypass -File scripts/build_luffy_v2.ps1",

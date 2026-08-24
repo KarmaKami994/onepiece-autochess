@@ -221,10 +221,21 @@ describe("round and special-stage flow", () => {
     }
     expect(state.round).toBe(4);
     expect(state.phase).toBe("carousel");
-    expect(state.carouselChoices).toHaveLength(8);
+    expect(state.carouselChoices).toHaveLength(9);
+    expect(state.carouselSession?.participants).toHaveLength(8);
     expect(
-      new Set(state.carouselChoices.map((choice) => choice.itemId)).size,
-    ).toBe(8);
+      Math.max(
+        ...Object.values(
+          state.carouselChoices.reduce<Record<string, number>>(
+            (counts, choice) => {
+              counts[choice.itemId] = (counts[choice.itemId] ?? 0) + 1;
+              return counts;
+            },
+            {},
+          ),
+        ),
+      ),
+    ).toBeLessThanOrEqual(2);
     const inventoryBefore = state.players.reduce(
       (total, player) => total + player.inventory.length,
       0,

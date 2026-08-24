@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   CURRENT_SAVE_SCHEMA_VERSION,
+  DEFAULT_CONTENT,
+  advanceCarousel,
   applyCommand,
   createMatch,
   createMemoryStorage,
@@ -41,6 +43,7 @@ describe("versioned local persistence", () => {
       stageId: undefined,
       pendingItemChoices: undefined,
       carouselChoices: undefined,
+      carouselSession: undefined,
       nextChoiceSerial: undefined,
     };
     const migrated = migrateMatchState(legacy);
@@ -48,6 +51,7 @@ describe("versioned local persistence", () => {
     expect(migrated.stageId).toBe("east-blue-patrol");
     expect(migrated.pendingItemChoices).toEqual({});
     expect(migrated.carouselChoices).toEqual([]);
+    expect(migrated.carouselSession).toBeNull();
     expect(migrated.nextChoiceSerial).toBe(1);
     expect(
       migrated.players.every((player) => Array.isArray(player.finalCrew)),
@@ -134,6 +138,102 @@ describe("versioned local persistence", () => {
     ).toBe(true);
     expect(
       migrated.players.every((player) => player.recentBattles.length === 0),
+    ).toBe(true);
+  });
+
+  it("resolves a legacy schema-five carousel during the v6 migration", () => {
+    const state = createMatch("v5-carousel-migration");
+    state.round = 3;
+    state.phase = "item-choice";
+    state.pendingItemChoices = {};
+    const carousel = applyCommand(state, { type: "TIMER_EXPIRED" });
+    if (!carousel.ok) throw new Error(carousel.error.message);
+    expect(carousel.state.phase).toBe("carousel");
+    const legacy = structuredClone(carousel.state) as unknown as Record<
+      string,
+      unknown
+    >;
+    legacy.schemaVersion = 5;
+    delete legacy.carouselSession;
+    const bot = carousel.state.players.find((player) => player.id === "bot-1")!;
+    const firstItem = DEFAULT_CONTENT.items[0].id;
+    bot.inventory.push(firstItem);
+    legacy.players = structuredClone(carousel.state.players);
+    const inventoryBefore = carousel.state.players.reduce(
+      (total, player) => total + player.inventory.length,
+      0,
+    );
+    legacy.carouselChoices = DEFAULT_CONTENT.items.map((item, index) => ({
+      id: `legacy-choice-${index + 1}`,
+      itemId: item.id,
+      takenByPlayerId: index === 0 ? bot.id : null,
+    }));
+
+    const migrated = migrateMatchState(legacy);
+
+    expect(migrated.schemaVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
+    expect(migrated.phase).toBe("preparation");
+    expect(migrated.carouselSession).toBeNull();
+    expect(migrated.carouselChoices).toEqual([]);
+    expect(
+      migrated.players.reduce(
+        (total, player) => total + player.inventory.length,
+        0,
+      ) - inventoryBefore,
+    ).toBe(7);
+  });
+
+  it("round-trips an in-progress v6 carousel checkpoint", () => {
+    const state = createMatch("v6-carousel-checkpoint");
+    state.round = 3;
+    state.phase = "item-choice";
+    state.pendingItemChoices = {};
+    const carousel = applyCommand(state, { type: "TIMER_EXPIRED" });
+    if (!carousel.ok) throw new Error(carousel.error.message);
+    const releaseTick = carousel.state.carouselSession!.participants.find(
+      (participant) => participant.playerId === "player-1",
+    )!.releaseTick;
+    let checkpoint = advanceCarousel(carousel.state, releaseTick);
+    const target = applyCommand(checkpoint, {
+      type: "CAROUSEL_SET_TARGET",
+      playerId: "player-1",
+      x: 760,
+      y: 420,
+    });
+    if (!target.ok) throw new Error(target.error.message);
+    checkpoint = advanceCarousel(target.state, 17);
+    expect(checkpoint.carouselSession).not.toBeNull();
+
+    const restored = deserializeMatch(serializeMatch(checkpoint));
+    expect(restored).toEqual(checkpoint);
+    const continuedOriginal = advanceCarousel(checkpoint, 41);
+    const continuedRestored = advanceCarousel(restored, 41);
+    expect(continuedRestored).toEqual(continuedOriginal);
+    expect(applyCommand(continuedRestored, { type: "TIMER_EXPIRED" })).toEqual(
+      applyCommand(continuedOriginal, { type: "TIMER_EXPIRED" }),
+    );
+  });
+
+  it("safely resolves a malformed v6 carousel checkpoint", () => {
+    const state = createMatch("malformed-v6-carousel");
+    state.round = 3;
+    state.phase = "item-choice";
+    state.pendingItemChoices = {};
+    const carousel = applyCommand(state, { type: "TIMER_EXPIRED" });
+    if (!carousel.ok) throw new Error(carousel.error.message);
+    const malformed = structuredClone(carousel.state) as unknown as Record<
+      string,
+      unknown
+    >;
+    malformed.carouselSession = {};
+
+    const migrated = migrateMatchState(malformed);
+
+    expect(migrated.phase).toBe("preparation");
+    expect(migrated.carouselSession).toBeNull();
+    expect(migrated.carouselChoices).toEqual([]);
+    expect(
+      migrated.players.every((player) => player.inventory.length === 1),
     ).toBe(true);
   });
 

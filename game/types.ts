@@ -243,6 +243,57 @@ export interface CarouselChoice {
   id: string;
   itemId: string;
   takenByPlayerId: string | null;
+  orbitIndex: number;
+  claimedAtTick: number | null;
+}
+
+export interface CarouselParticipantState {
+  playerId: string;
+  rank: number;
+  spawnPosition: Position;
+  position: Position;
+  targetPosition: Position;
+  releaseTick: number;
+  reactionDelayTicks: number;
+  moving: boolean;
+  claimedChoiceId: string | null;
+}
+
+export type CarouselEvent =
+  | { id: string; type: "release"; tick: number; playerId: string }
+  | {
+      id: string;
+      type: "move";
+      tick: number;
+      playerId: string;
+      from: Position;
+      to: Position;
+    }
+  | {
+      id: string;
+      type: "collision";
+      tick: number;
+      playerAId: string;
+      playerBId: string;
+    }
+  | {
+      id: string;
+      type: "claim";
+      tick: number;
+      playerId: string;
+      choiceId: string;
+      itemId: string;
+    }
+  | { id: string; type: "timeout"; tick: number; playerIds: string[] }
+  | { id: string; type: "complete"; tick: number };
+
+export interface CarouselSessionState {
+  tick: number;
+  durationTicks: number;
+  finishAtTick: number | null;
+  arenaSeed: number;
+  participants: CarouselParticipantState[];
+  events: CarouselEvent[];
 }
 
 export interface MatchBattleResult {
@@ -273,6 +324,7 @@ export interface MatchState {
   lastResults: MatchBattleResult[];
   pendingItemChoices: Record<string, string[]>;
   carouselChoices: CarouselChoice[];
+  carouselSession: CarouselSessionState | null;
   winnerId: string | null;
   nextUnitSerial: number;
   nextChoiceSerial: number;
@@ -304,7 +356,12 @@ export type GameCommand =
     }
   | { type: "END_PREPARATION"; playerId: string }
   | { type: "CHOOSE_ITEM"; playerId: string; choiceId: string }
-  | { type: "CAROUSEL_PICK"; playerId: string; choiceId: string }
+  | {
+      type: "CAROUSEL_SET_TARGET";
+      playerId: string;
+      x: number;
+      y: number;
+    }
   | { type: "TIMER_EXPIRED" };
 
 export interface CommandError {

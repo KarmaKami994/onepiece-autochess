@@ -231,9 +231,17 @@ async function advanceVisiblePhase(page: Page): Promise<boolean> {
     await reward.click();
     return true;
   }
-  const carousel = page.locator("button.carousel-choice").first();
-  if (await carousel.isVisible()) {
-    await carousel.click();
+  const regatta = page.locator(".bounty-regatta-screen");
+  if (await regatta.isVisible()) {
+    const canvas = regatta.locator("canvas");
+    await expect(canvas).toBeVisible();
+    const bounds = await canvas.boundingBox();
+    if (bounds) {
+      await canvas.click({
+        position: { x: bounds.width / 2, y: bounds.height / 2 },
+      });
+    }
+    await expect(page.locator(".match-screen")).toBeVisible({ timeout: 40_000 });
     return true;
   }
 
@@ -455,17 +463,51 @@ test("complete voyage covers PvE reward, carousel, PvP, resume, and results", as
     await page.waitForTimeout(35);
   }
   expect(sawCarousel).toBe(true);
-  const recommendedCarouselChoice = page.locator(
-    "button.carousel-choice.is-recommended",
+  const regatta = page.locator(".bounty-regatta-screen");
+  await expect(
+    regatta.getByRole("heading", { name: "BOUNTY REGATTA" }),
+  ).toBeVisible();
+  const regattaApplication = regatta.getByRole("application", {
+    name: /Bounty Regatta/i,
+  });
+  await expect(regattaApplication).toBeVisible();
+  await expect(regatta.locator(".regatta-status")).toContainText(
+    /ANCHOR LOCKED|SAIL NOW/,
   );
-  await expect(recommendedCarouselChoice).toHaveCount(1);
-  await recommendedCarouselChoice.focus();
-  await expect(page.locator(".carousel-center")).toContainText(
-    "AUTO-PICK FAVORITE",
+  await expect(regatta.getByRole("list", { name: /Captains/i }).locator("li"))
+    .toHaveCount(8);
+  const regattaRenderer = regattaApplication.locator("..");
+  await expect(regattaRenderer).toHaveAttribute("data-carousel-ready", "true");
+  await expect(regatta.locator(".regatta-preview")).toBeVisible();
+
+  await expect(regatta.locator(".regatta-status")).toContainText("SAIL NOW", {
+    timeout: 8_000,
+  });
+  const canvas = regatta.locator("canvas");
+  const canvasBounds = await canvas.boundingBox();
+  expect(canvasBounds).not.toBeNull();
+  await canvas.click({
+    position: {
+      x: (canvasBounds?.width ?? 0) / 2,
+      y: (canvasBounds?.height ?? 0) / 2,
+    },
+  });
+  await expect
+    .poll(async () => Number(await regattaRenderer.getAttribute("data-target-y")))
+    .toBeLessThan(500);
+  const remainingBeforeReload = Number(
+    await regatta.locator(".carousel-timer strong").innerText(),
   );
-  const carouselShortcut = await recommendedCarouselChoice.locator("kbd").innerText();
-  await page.keyboard.press(`Digit${carouselShortcut}`);
-  await expect(page.locator(".match-screen")).toBeVisible();
+  await page.waitForTimeout(400);
+  await page.reload();
+  await expect(page.getByRole("button", { name: /CONTINUE/i })).toBeEnabled();
+  await page.getByRole("button", { name: /CONTINUE/i }).click();
+  await expect(regatta).toBeVisible();
+  const remainingAfterReload = Number(
+    await regatta.locator(".carousel-timer strong").innerText(),
+  );
+  expect(remainingAfterReload).toBeLessThanOrEqual(remainingBeforeReload);
+  await expect(page.locator(".match-screen")).toBeVisible({ timeout: 40_000 });
 
   await page.getByRole("button", { name: /START BATTLE|SET SAIL/i }).click();
   await expect(page.locator(".opponent-banner .tiny-label")).toHaveText(

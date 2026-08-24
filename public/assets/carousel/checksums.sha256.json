@@ -1,0 +1,11 @@
+{
+  "algorithm": "sha256",
+  "files": {
+    "scripts/build_carousel_assets.mjs": "f9a07ce29874039534ac5e8c699675e3a309c2c9b2789a53eda933cdcb45a96d",
+    "public/assets/carousel/ocean-arena.png": "41097c8919c5dd308bcef01dbf4981ff46eb2973c0c5fbf34a0109b6638fe381",
+    "public/assets/carousel/boats.png": "1c60ff65240917cca043d85eee7f2b857b481e3868f6b1eb4793199cfa32a9de",
+    "public/assets/carousel/bounties.png": "82618d906775375b810cab9b4234cefb65eff98d590de4d078dd3599dff7741d",
+    "public/assets/carousel/carousel-manifest.json": "a70007a69d809b7c7f57bcebf3a3f254b78f7f648dc28f294237938f09c3c511",
+    "public/assets/carousel/contact-sheet.png": "5632adc7c3d26831bb3025d592fff5fbd00cabf8771b2b7d05504be931e2e4d3"
+  }
+}
