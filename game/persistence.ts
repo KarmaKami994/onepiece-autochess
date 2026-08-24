@@ -66,6 +66,25 @@ export function migrateMatchState(
     }
   }
 
+  if (version <= 4 && Array.isArray(mutable.players)) {
+    for (const rawPlayer of mutable.players) {
+      if (isRecord(rawPlayer)) {
+        rawPlayer.recentBattles = [];
+      }
+    }
+  }
+
+  if (Array.isArray(mutable.players)) {
+    for (const rawPlayer of mutable.players) {
+      if (!isRecord(rawPlayer)) {
+        continue;
+      }
+      rawPlayer.recentBattles = Array.isArray(rawPlayer.recentBattles)
+        ? rawPlayer.recentBattles.slice(-5)
+        : [];
+    }
+  }
+
   const requiredArrays = ["players", "pairings", "lastResults"] as const;
   for (const field of requiredArrays) {
     if (!Array.isArray(mutable[field])) {

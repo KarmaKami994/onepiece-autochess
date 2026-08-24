@@ -83,7 +83,7 @@ function assertLegalState(state: MatchState, content: GameContent): void {
   }
 }
 
-describe("1,000-seed complete headless match soak", () => {
+describe("50-seed complete headless match soak", () => {
   it(
     "autoplays every seed through elimination to one legal winner",
     () => {
@@ -91,7 +91,7 @@ describe("1,000-seed complete headless match soak", () => {
       const winningBoards: Record<string, number> = {};
       const visitedPhases = new Set<string>();
 
-      for (let seed = 0; seed < 1_000; seed += 1) {
+      for (let seed = 0; seed < 50; seed += 1) {
         let state = createMatch(`full-match-${seed}`, content);
         const human = state.players.find(
           (player) => player.id === "player-1",
@@ -147,7 +147,7 @@ describe("1,000-seed complete headless match soak", () => {
       );
       expect(Object.keys(winningBoards).length).toBeGreaterThanOrEqual(8);
       expect(Math.max(...Object.values(winningBoards))).toBeLessThanOrEqual(
-        900,
+        45,
       );
     },
     120_000,

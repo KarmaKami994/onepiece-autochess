@@ -192,6 +192,22 @@ export interface UnitInstance {
   acquiredOrder: number;
 }
 
+export type RecentBattleOutcome = "win" | "loss" | "draw";
+
+export interface RecentBattleRecord {
+  round: number;
+  opponentId: string;
+  outcome: RecentBattleOutcome;
+  isGhost: boolean;
+  captainDamageDealt: number;
+  captainDamageTaken: number;
+}
+
+export interface BotFormationPlacement {
+  unitId: string;
+  position: Position;
+}
+
 export interface PlayerState {
   id: string;
   name: string;
@@ -213,6 +229,7 @@ export interface PlayerState {
   winStreak: number;
   lossStreak: number;
   lastOpponents: string[];
+  recentBattles: RecentBattleRecord[];
   placement: number | null;
 }
 

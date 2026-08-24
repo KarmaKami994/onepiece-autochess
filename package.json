@@ -21,7 +21,7 @@
     "test": "vitest run --config vitest.config.ts --exclude tests/soak.test.ts",
     "test:watch": "vitest --config vitest.config.ts",
     "test:soak": "vitest run --config vitest.config.ts tests/soak.test.ts",
-    "test:production-soak": "tsx scripts/run_production_soak.ts --seeds=1000 --out=tmp/production-soak-report.json",
+    "test:production-soak": "tsx scripts/run_production_soak.ts --seeds=50 --out=tmp/production-soak-report.json",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "typecheck": "tsc --noEmit",

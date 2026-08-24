@@ -65,7 +65,7 @@ describe("versioned local persistence", () => {
 
     const migrated = migrateMatchState(legacy);
 
-    expect(migrated.schemaVersion).toBe(4);
+    expect(migrated.schemaVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
     expect(migrated.phase).toBe("preparation");
     expect(migrated.lastResults).toEqual([]);
     expect(migrated.players).toEqual(state.players);
@@ -99,7 +99,7 @@ describe("versioned local persistence", () => {
     const second = migrateMatchState(legacy);
 
     expect(first).toEqual(second);
-    expect(first.schemaVersion).toBe(4);
+    expect(first.schemaVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
     expect(first.phase).toBe("battle");
     expect(first.players).toEqual(playersBefore);
     expect(first.pool).toEqual(poolBefore);
@@ -112,6 +112,28 @@ describe("versioned local persistence", () => {
           Array.isArray(result.initialUnits) &&
           !JSON.stringify(result.events).includes("legacy-combat-event"),
       ),
+    ).toBe(true);
+  });
+
+  it("migrates schema-four players with an empty recent battle history", () => {
+    const state = createMatch("v4-history-migration");
+    const legacy = structuredClone(state) as unknown as Record<string, unknown>;
+    legacy.schemaVersion = 4;
+    const players = legacy.players as Array<Record<string, unknown>>;
+    for (const player of players) {
+      delete player.recentBattles;
+    }
+
+    const migrated = migrateMatchState(legacy);
+
+    expect(migrated.schemaVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
+    expect(
+      migrated.players.every((player) =>
+        Array.isArray(player.recentBattles),
+      ),
+    ).toBe(true);
+    expect(
+      migrated.players.every((player) => player.recentBattles.length === 0),
     ).toBe(true);
   });
 

@@ -44,6 +44,7 @@ function player(overrides: Partial<PlayerState> = {}): PlayerState {
     winStreak: 0,
     lossStreak: 0,
     lastOpponents: [],
+    recentBattles: [],
     placement: null,
     ...overrides,
   };
@@ -307,4 +308,3 @@ describe("item and carousel decision support", () => {
     });
   });
 });
-

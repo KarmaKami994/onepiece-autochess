@@ -33,7 +33,7 @@ npm run build
 npm run lint
 ```
 
-`test:production-soak` simulates 1,000 complete matches with the unchanged
+`test:production-soak` simulates 50 complete matches with the unchanged
 production configuration and writes its balance report to
 `tmp/production-soak-report.json`. On a fresh workstation, install the bundled
 E2E browser once with `npx playwright install chromium` before running

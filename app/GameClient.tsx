@@ -102,14 +102,38 @@ type TraitView = {
   color: string;
 };
 
+type RecentBattleView = {
+  round: number;
+  opponentId: string;
+  opponentName: string;
+  outcome: "win" | "loss" | "draw";
+  isGhost: boolean;
+  captainDamageDealt: number;
+  captainDamageTaken: number;
+};
+
+type CrewPreviewView = {
+  id: string;
+  name: string;
+  star: number;
+  portrait: string;
+};
+
 type StandingView = {
   id: string;
   name: string;
   hp: number;
+  gold: number;
   level: number;
   streak: number;
   alive: boolean;
   isHuman: boolean;
+  traits: TraitView[];
+  inventory: ChoiceView[];
+  boardUnits: BoardUnit[];
+  crewPreview: CrewPreviewView[];
+  recentBattles: RecentBattleView[];
+  selectedDefinitionByUnit: Map<string, ShopUnitView>;
 };
 
 type ShopUnitView = {
@@ -238,6 +262,7 @@ const DB_NAME = "grand-line-auto-chess";
 const DB_VERSION = 1;
 const STORE_NAME = "voyages";
 const ACTIVE_SAVE = "active-voyage";
+const COMBAT_SPEEDS = [0.5, 1, 2, 4] as const;
 
 const DEFAULT_SETTINGS: Settings = {
   muted: false,
@@ -260,6 +285,11 @@ function loadStoredSettings(): Settings {
     return {
       ...DEFAULT_SETTINGS,
       ...parsed,
+      animationSpeed: COMBAT_SPEEDS.includes(
+        parsed.animationSpeed as (typeof COMBAT_SPEEDS)[number],
+      )
+        ? parsed.animationSpeed!
+        : DEFAULT_SETTINGS.animationSpeed,
       boardSkin: isBoardSkin(parsed.boardSkin)
         ? parsed.boardSkin
         : DEFAULT_BOARD_SKIN,
@@ -527,6 +557,43 @@ function unitView(
   };
 }
 
+function enrichUnitOwnership(
+  base: ShopUnitView,
+  owner: UnknownRecord,
+): ShopUnitView {
+  const owned = recordValues(owner.units)
+    .map(asRecord)
+    .filter(
+      (instance) =>
+        stringValue(instance.definitionId) === base.id,
+    );
+  const oneStarCount = owned.filter(
+    (instance) => numberValue(instance.star, 1) === 1,
+  ).length;
+  const twoStarCount = owned.filter(
+    (instance) => numberValue(instance.star, 1) === 2,
+  ).length;
+  const hasThreeStar = owned.some(
+    (instance) => numberValue(instance.star, 1) >= 3,
+  );
+  const ownedCopies = owned.reduce((total, instance) => {
+    const star = numberValue(instance.star, 1);
+    return total + (star >= 3 ? 9 : star === 2 ? 3 : 1);
+  }, 0);
+
+  return {
+    ...base,
+    ownedCopies,
+    mergeProgress: hasThreeStar
+      ? "MAX"
+      : ownedCopies < 3
+        ? `${ownedCopies} / 3 → ★★`
+        : `${ownedCopies} / 9 → ★★★`,
+    purchaseUpgrade:
+      oneStarCount >= 2 ? (twoStarCount >= 2 ? 3 : 2) : null,
+  };
+}
+
 function getPlayerId(state: UnknownRecord): string {
   const players = recordValues(state.players).map(asRecord);
   const human =
@@ -544,6 +611,41 @@ function getPlayer(state: UnknownRecord, playerId: string): UnknownRecord {
       .map(asRecord)
       .find((player) => stringValue(player.id) === playerId) ?? {}
   );
+}
+
+function normalizeRecentBattles(
+  player: UnknownRecord,
+  playerNames: Map<string, string>,
+): RecentBattleView[] {
+  return recordValues(player.recentBattles)
+    .slice(-5)
+    .reverse()
+    .map((rawBattle) => {
+      const battle = asRecord(rawBattle);
+      const opponentId = stringValue(battle.opponentId, "unknown");
+      const rawOutcome = stringValue(battle.outcome, "draw").toLowerCase();
+      const outcome: RecentBattleView["outcome"] =
+        rawOutcome === "win" || rawOutcome === "loss"
+          ? rawOutcome
+          : "draw";
+      return {
+        round: Math.max(1, numberValue(battle.round, 1)),
+        opponentId,
+        opponentName:
+          playerNames.get(opponentId) ??
+          (booleanValue(battle.isGhost) ? "Ghost Fleet" : "Unknown Captain"),
+        outcome,
+        isGhost: booleanValue(battle.isGhost),
+        captainDamageDealt: Math.max(
+          0,
+          numberValue(battle.captainDamageDealt, 0),
+        ),
+        captainDamageTaken: Math.max(
+          0,
+          numberValue(battle.captainDamageTaken, 0),
+        ),
+      };
+    });
 }
 
 function deriveTutorialStep(stateValue: unknown): TutorialStep | null {
@@ -1252,25 +1354,81 @@ function normalizeMatch(stateValue: unknown): MatchView {
     });
   }
   const allPlayers = recordValues(state.players).map(asRecord);
-  const standings = allPlayers
-    .map((rawPlayer) => ({
-      id: stringValue(rawPlayer.id),
-      name: stringValue(
+  const playerNames = new Map(
+    allPlayers.map((rawPlayer) => [
+      stringValue(rawPlayer.id),
+      stringValue(
         rawPlayer.name,
         booleanValue(rawPlayer.isBot) ? "Rival Captain" : "Your Crew",
       ),
-      hp: Math.max(0, numberValue(rawPlayer.hp ?? rawPlayer.health, 100)),
-      level: Math.max(1, numberValue(rawPlayer.level, 1)),
-      streak: numberValue(
-        rawPlayer.winStreak,
-        -numberValue(rawPlayer.lossStreak, 0),
-      ),
-      alive: booleanValue(
-        rawPlayer.alive,
-        numberValue(rawPlayer.hp ?? rawPlayer.health, 100) > 0,
-      ),
-      isHuman: stringValue(rawPlayer.id) === playerId,
-    }))
+    ]),
+  );
+  const scoutingState: UnknownRecord = {
+    ...state,
+    pairings: [],
+    lastResults: [],
+  };
+  const standings = allPlayers
+    .map((rawPlayer) => {
+      const scoutingBoard = buildBoardUnits(
+        scoutingState,
+        rawPlayer,
+        null,
+        unitDefinitions,
+        enemyDefinitions,
+        traitDefinitions,
+        itemDefinitions,
+      );
+      for (const [unitId, definitionView] of scoutingBoard.views) {
+        scoutingBoard.views.set(
+          unitId,
+          enrichUnitOwnership(definitionView, rawPlayer),
+        );
+      }
+      const scoutingInventory = (Array.isArray(rawPlayer.inventory)
+        ? rawPlayer.inventory
+        : []
+      ).map((rawItemId) => {
+        const itemId = String(rawItemId);
+        return itemView(itemId, itemDefinitions.get(itemId) ?? {});
+      });
+      const crewPreview = scoutingBoard.units
+        .filter((unit) => unit.zone === "board")
+        .sort((left, right) => right.star - left.star || left.id.localeCompare(right.id))
+        .slice(0, 5)
+        .map((unit) => ({
+          id: unit.id,
+          name: unit.name,
+          star: unit.star,
+          portrait:
+            scoutingBoard.views.get(unit.id)?.portrait ?? unit.portrait ?? "",
+        }));
+      return {
+        id: stringValue(rawPlayer.id),
+        name: stringValue(
+          rawPlayer.name,
+          booleanValue(rawPlayer.isBot) ? "Rival Captain" : "Your Crew",
+        ),
+        hp: Math.max(0, numberValue(rawPlayer.hp ?? rawPlayer.health, 100)),
+        gold: Math.max(0, numberValue(rawPlayer.gold, 0)),
+        level: Math.max(1, numberValue(rawPlayer.level, 1)),
+        streak: numberValue(
+          rawPlayer.winStreak,
+          -numberValue(rawPlayer.lossStreak, 0),
+        ),
+        alive: booleanValue(
+          rawPlayer.alive,
+          numberValue(rawPlayer.hp ?? rawPlayer.health, 100) > 0,
+        ),
+        isHuman: stringValue(rawPlayer.id) === playerId,
+        traits: normalizeTraits(rawPlayer, traitDefinitions),
+        inventory: scoutingInventory,
+        boardUnits: scoutingBoard.units,
+        crewPreview,
+        recentBattles: normalizeRecentBattles(rawPlayer, playerNames),
+        selectedDefinitionByUnit: scoutingBoard.views,
+      };
+    })
     .sort(
       (a, b) =>
         Number(b.alive) - Number(a.alive) ||
@@ -1283,10 +1441,17 @@ function normalizeMatch(stateValue: unknown): MatchView {
           id: stringValue(stage.id, "pve"),
           name: stringValue(stage.name, "Grand Line Raiders"),
           hp: 100,
+          gold: 0,
           level: round,
           streak: 0,
           alive: true,
           isHuman: false,
+          traits: [],
+          inventory: [],
+          boardUnits: [],
+          crewPreview: [],
+          recentBattles: [],
+          selectedDefinitionByUnit: new Map<string, ShopUnitView>(),
         }
       : null) ??
     standings.find((standing) => standing.id === opponentId) ??
@@ -1675,6 +1840,7 @@ export default function GameClient() {
   const [saveReady, setSaveReady] = useState(false);
   const [saveDate, setSaveDate] = useState<number | null>(null);
   const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
+  const [scoutedPlayerId, setScoutedPlayerId] = useState<string | null>(null);
   const [timer, setTimer] = useState(30);
   const [phaseDuration, setPhaseDuration] = useState(30);
   const [choiceTimer, setChoiceTimer] = useState(10);
@@ -1692,9 +1858,34 @@ export default function GameClient() {
     () => (engineState ? normalizeMatch(engineState) : null),
     [engineState],
   );
+  const scoutedStanding = useMemo(
+    () =>
+      scoutedPlayerId && view
+        ? view.standings.find(
+            (standing) =>
+              standing.id === scoutedPlayerId && !standing.isHuman,
+          ) ?? null
+        : null,
+    [scoutedPlayerId, view],
+  );
   const activePhase = view?.phase;
   const activeRound = view?.round;
   const activeBattleDuration = view?.battleDurationSeconds ?? 45;
+
+  const returnFromScouting = useCallback(() => {
+    setScoutedPlayerId(null);
+    setSelectedUnitId(null);
+  }, []);
+
+  useEffect(() => {
+    if (!scoutedPlayerId || !view) return;
+    const captain = view.standings.find(
+      (standing) => standing.id === scoutedPlayerId,
+    );
+    if (view.phase === "preparation" && captain?.alive) return;
+    const returnTimer = window.setTimeout(returnFromScouting, 0);
+    return () => window.clearTimeout(returnTimer);
+  }, [returnFromScouting, scoutedPlayerId, view]);
 
   const showToast = useCallback(
     (
@@ -1770,7 +1961,7 @@ export default function GameClient() {
         state: stableState,
         seed,
         updatedAt,
-        schemaVersion: numberValue(engine.CURRENT_SAVE_SCHEMA_VERSION, 4),
+        schemaVersion: numberValue(engine.CURRENT_SAVE_SCHEMA_VERSION, 5),
         contentVersion: stringValue(
           asRecord(stableState).contentVersion,
           "1.0.0",
@@ -1895,6 +2086,26 @@ export default function GameClient() {
     [playSound, setEngineState, showToast],
   );
 
+  const scoutPlayer = useCallback(
+    (playerId: string | null) => {
+      if (!view || view.phase !== "preparation" || tutorialStep !== null) {
+        return;
+      }
+      if (!playerId || playerId === view.playerId) {
+        returnFromScouting();
+        return;
+      }
+      const captain = view.standings.find(
+        (standing) => standing.id === playerId,
+      );
+      if (!captain?.alive || captain.isHuman) return;
+      setSelectedUnitId(null);
+      setScoutedPlayerId(captain.id);
+      playSound("click");
+    },
+    [playSound, returnFromScouting, tutorialStep, view],
+  );
+
   const advancePhase = useCallback(() => {
     if (isAdvancing || !engineStateRef.current || !engine.advanceMatchPhase) {
       return;
@@ -1906,6 +2117,10 @@ export default function GameClient() {
     const humanId = getPlayerId(stateRecord);
     const resolvedOutcome =
       currentPhase === "battle" ? view?.battleOutcome ?? null : null;
+
+    if (currentPhase === "preparation" && scoutedPlayerId) {
+      returnFromScouting();
+    }
 
     try {
       if (currentPhase === "preparation" && engine.applyCommand) {
@@ -1966,7 +2181,15 @@ export default function GameClient() {
     } finally {
       setIsAdvancing(false);
     }
-  }, [isAdvancing, playSound, setEngineState, showToast, view]);
+  }, [
+    isAdvancing,
+    playSound,
+    returnFromScouting,
+    scoutedPlayerId,
+    setEngineState,
+    showToast,
+    view,
+  ]);
 
   const advanceRef = useRef(advancePhase);
   useEffect(() => {
@@ -2021,6 +2244,7 @@ export default function GameClient() {
       setSeed(freshSeed);
       setEngineState(next);
       setSelectedUnitId(null);
+      setScoutedPlayerId(null);
       setScreen("match");
       setTutorialStep(
         hasCompletedFirstVoyage() ? null : "welcome",
@@ -2079,6 +2303,7 @@ export default function GameClient() {
         }
         setSeed(saved.seed);
         setEngineState(restored);
+        setScoutedPlayerId(null);
         if (hasCompletedFirstVoyage()) {
           setTutorialStep(null);
         } else {
@@ -2113,6 +2338,7 @@ export default function GameClient() {
     setSeed("");
     setScreen("menu");
     setSelectedUnitId(null);
+    setScoutedPlayerId(null);
     setTutorialStep(null);
   }, []);
 
@@ -2167,6 +2393,10 @@ export default function GameClient() {
 
   const moveUnit = useCallback(
     (move: BoardMove) => {
+      if (scoutedPlayerId) {
+        returnFromScouting();
+        return false;
+      }
       if (!view || view.phase !== "preparation") return false;
       const unit = view.boardUnits.find(
         (candidate) => candidate.id === move.unitId,
@@ -2191,10 +2421,14 @@ export default function GameClient() {
         }.`,
       );
     },
-    [issueCommand, view],
+    [issueCommand, returnFromScouting, scoutedPlayerId, view],
   );
 
   const sellSelected = useCallback(() => {
+    if (scoutedPlayerId) {
+      returnFromScouting();
+      return;
+    }
     if (!view || !selectedUnitId || view.phase !== "preparation") return;
     const selectedName =
       view.boardUnits.find((unit) => unit.id === selectedUnitId)?.name ??
@@ -2212,7 +2446,13 @@ export default function GameClient() {
     ) {
       setSelectedUnitId(null);
     }
-  }, [issueCommand, selectedUnitId, view]);
+  }, [
+    issueCommand,
+    returnFromScouting,
+    scoutedPlayerId,
+    selectedUnitId,
+    view,
+  ]);
 
   const chooseReward = useCallback(
     (choiceId: string) => {
@@ -2355,6 +2595,9 @@ export default function GameClient() {
         if (screen === "settings") closeSettings();
         else if (screen === "confirm-new") setScreen("menu");
         else if (screen === "animation-lab") setScreen("menu");
+        else if (screen === "match" && scoutedPlayerId) {
+          returnFromScouting();
+        }
         else if (screen === "match") openSettings("match");
         return;
       }
@@ -2435,18 +2678,25 @@ export default function GameClient() {
     closeSettings,
     issueCommand,
     openSettings,
+    returnFromScouting,
+    scoutedPlayerId,
     screen,
     showToast,
     tutorialStep,
     view,
   ]);
 
-  const selectedUnit = view?.boardUnits.find(
+  const displayedBoardUnits =
+    scoutedStanding?.boardUnits ?? view?.boardUnits ?? [];
+  const displayedDefinitions =
+    scoutedStanding?.selectedDefinitionByUnit ??
+    view?.selectedDefinitionByUnit;
+  const selectedUnit = displayedBoardUnits.find(
     (unit) => unit.id === selectedUnitId,
   );
   const selectedDefinition =
-    selectedUnitId && view
-      ? view.selectedDefinitionByUnit.get(selectedUnitId)
+    selectedUnitId && displayedDefinitions
+      ? displayedDefinitions.get(selectedUnitId)
       : undefined;
   const tutorialCrewCount =
     view?.boardUnits.filter((unit) => unit.team === "player").length ?? 0;
@@ -2585,10 +2835,13 @@ export default function GameClient() {
           settings={settings}
           selectedUnit={selectedUnit}
           selectedDefinition={selectedDefinition}
+          scoutedStanding={scoutedStanding}
           tutorialStep={tutorialStep}
           saveStatus={saveStatus}
           isAdvancing={isAdvancing}
           onSelectUnit={setSelectedUnitId}
+          onScoutPlayer={scoutPlayer}
+          onReturnFromScout={returnFromScouting}
           onMoveUnit={moveUnit}
           onBuyUnit={buyUnit}
           onReroll={() =>
@@ -2622,6 +2875,10 @@ export default function GameClient() {
           }
           onSellSelected={sellSelected}
           onEquipItem={(itemId) => {
+            if (scoutedPlayerId) {
+              returnFromScouting();
+              return;
+            }
             if (!selectedUnitId) return;
             const item = view.itemsById.get(itemId);
             issueCommand(
@@ -3092,10 +3349,10 @@ function SettingsScreen({
                 })
               }
             >
-              <option value={0.75}>Leisurely · 0.75×</option>
+              <option value={0.5}>Leisurely · 0.5×</option>
               <option value={1}>Normal · 1×</option>
-              <option value={1.5}>Swift · 1.5×</option>
-              <option value={2}>Storm speed · 2×</option>
+              <option value={2}>Swift · 2×</option>
+              <option value={4}>Storm speed · 4×</option>
             </select>
           </label>
           <fieldset className="map-skin-setting">
@@ -3223,10 +3480,13 @@ function MatchScreen({
   settings,
   selectedUnit,
   selectedDefinition,
+  scoutedStanding,
   tutorialStep,
   saveStatus,
   isAdvancing,
   onSelectUnit,
+  onScoutPlayer,
+  onReturnFromScout,
   onMoveUnit,
   onBuyUnit,
   onReroll,
@@ -3244,10 +3504,13 @@ function MatchScreen({
   settings: Settings;
   selectedUnit?: BoardUnit;
   selectedDefinition?: ShopUnitView;
+  scoutedStanding: StandingView | null;
   tutorialStep: TutorialStep | null;
   saveStatus: "idle" | "saving" | "saved";
   isAdvancing: boolean;
   onSelectUnit: (unitId: string | null) => void;
+  onScoutPlayer: (playerId: string | null) => void;
+  onReturnFromScout: () => void;
   onMoveUnit: (move: BoardMove) => boolean;
   onBuyUnit: (index: number) => void;
   onReroll: () => void;
@@ -3261,6 +3524,10 @@ function MatchScreen({
 }) {
   const [previewShopIndex, setPreviewShopIndex] = useState<number | null>(null);
   const planning = view.phase === "preparation";
+  const scouting = planning && Boolean(scoutedStanding);
+  const tacticalUnits = scoutedStanding?.boardUnits ?? view.boardUnits;
+  const tacticalTraits = scoutedStanding?.traits ?? view.traits;
+  const tacticalCapacity = scoutedStanding?.level ?? view.capacity;
   const warning = timer <= 8;
   const playerCrewCount = view.boardUnits.filter(
     (unit) => unit.team === "player",
@@ -3272,7 +3539,7 @@ function MatchScreen({
   const tutorialAllowsSailing =
     tutorialStep === null || tutorialStep === "sail";
   let quickMove: BoardMove | null = null;
-  if (selectedUnit?.team === "player") {
+  if (!scouting && selectedUnit?.team === "player") {
     if (selectedUnit.zone === "bench") {
       if (view.deployed < view.capacity) {
         const occupied = new Set(
@@ -3313,16 +3580,22 @@ function MatchScreen({
         </div>
         <div className="opponent-banner">
           <span className="tiny-label">
-            {view.opponent
+            {scoutedStanding
+              ? "SCOUTING CAPTAIN"
+              : view.opponent
               ? view.phase === "battle"
                 ? "ENGAGED WITH"
                 : "NEXT ENCOUNTER"
               : "PAIRING"}
           </span>
           <strong>
-            {view.opponent?.name ?? "Pairing after preparation"}
+            {scoutedStanding?.name ??
+              view.opponent?.name ??
+              "Pairing after preparation"}
           </strong>
-          {view.opponent && <span>Lv. {view.opponent.level}</span>}
+          {(scoutedStanding ?? view.opponent) && (
+            <span>Lv. {(scoutedStanding ?? view.opponent)?.level}</span>
+          )}
         </div>
         <div
           className={`phase-clock ${warning ? "is-warning" : ""}`}
@@ -3350,15 +3623,19 @@ function MatchScreen({
         </div>
       </header>
 
-      <div className="match-body" data-board-skin={settings.boardSkin}>
+      <div
+        className="match-body"
+        data-board-skin={settings.boardSkin}
+        data-scouting={scouting ? "true" : "false"}
+      >
         <PhaserBoard
-          units={view.boardUnits}
+          units={tacticalUnits}
           selectedId={selectedUnit?.id ?? null}
-          interactive={planning}
-          phase={view.phase}
-          capacity={view.capacity}
+          interactive={planning && !scouting}
+          phase={scouting ? "scouting" : view.phase}
+          capacity={tacticalCapacity}
           boardSkin={settings.boardSkin}
-          combatEvents={view.events}
+          combatEvents={scouting ? [] : view.events}
           eventSequence={view.eventSequence}
           speed={settings.animationSpeed}
           particles={settings.particles}
@@ -3368,30 +3645,34 @@ function MatchScreen({
           onSelectUnit={onSelectUnit}
         />
         <div className="left-rail">
-          <TraitsPanel traits={view.traits} />
-          <InventoryTray
-            items={view.inventory}
-            units={view.boardUnits.filter((unit) => unit.team === "player")}
-            selectedId={selectedUnit?.id ?? null}
-            selectedName={selectedDefinition?.name}
-            disabled={
-              !planning ||
-              !selectedUnit ||
-              selectedUnit.items.length >= 3
-            }
-            help={
-              !planning
-                ? "Treasure can be equipped during preparation."
-                : !selectedUnit
-                  ? "Select a crew member, then click an item."
-                  : selectedUnit.items.length >= 3
-                    ? `${selectedDefinition?.name ?? "This unit"} already carries 3 items.`
-                    : "Click an item to equip it. Max 3 per unit."
-            }
-            highlighted={tutorialStep === "equip"}
-            onSelect={onSelectUnit}
-            onEquip={onEquipItem}
-          />
+          <TraitsPanel traits={tacticalTraits} />
+          {scoutedStanding ? (
+            <ScoutIntelPanel standing={scoutedStanding} itemsById={view.itemsById} />
+          ) : (
+            <InventoryTray
+              items={view.inventory}
+              units={view.boardUnits.filter((unit) => unit.team === "player")}
+              selectedId={selectedUnit?.id ?? null}
+              selectedName={selectedDefinition?.name}
+              disabled={
+                !planning ||
+                !selectedUnit ||
+                selectedUnit.items.length >= 3
+              }
+              help={
+                !planning
+                  ? "Treasure can be equipped during preparation."
+                  : !selectedUnit
+                    ? "Select a crew member, then click an item."
+                    : selectedUnit.items.length >= 3
+                      ? `${selectedDefinition?.name ?? "This unit"} already carries 3 items.`
+                      : "Click an item to equip it. Max 3 per unit."
+              }
+              highlighted={tutorialStep === "equip"}
+              onSelect={onSelectUnit}
+              onEquip={onEquipItem}
+            />
+          )}
         </div>
         <div
           className={`board-column ${
@@ -3401,15 +3682,32 @@ function MatchScreen({
           }`}
         >
           <div className="board-ribbon">
-            <span className={planning ? "active" : ""}>FORMATION</span>
-            <i />
-            <strong>
-              {planning
-                ? "Select or drag crew onto highlighted deck tiles"
-                : "The crew fights on its own"}
-            </strong>
-            <i />
-            <span className={!planning ? "active" : ""}>COMBAT</span>
+            {scoutedStanding ? (
+              <>
+                <span className="active">SCOUTING</span>
+                <i />
+                <strong>{scoutedStanding.name}&apos;s formation</strong>
+                <button
+                  type="button"
+                  className="return-from-scout"
+                  onClick={onReturnFromScout}
+                >
+                  RETURN TO YOUR CREW
+                </button>
+              </>
+            ) : (
+              <>
+                <span className={planning ? "active" : ""}>FORMATION</span>
+                <i />
+                <strong>
+                  {planning
+                    ? "Select or drag crew onto highlighted deck tiles"
+                    : "The crew fights on its own"}
+                </strong>
+                <i />
+                <span className={!planning ? "active" : ""}>COMBAT</span>
+              </>
+            )}
           </div>
           {!planning && (
             <div className="combat-hud" aria-label="Combat presentation controls">
@@ -3428,10 +3726,10 @@ function MatchScreen({
                   }
                   aria-label="Battle animation speed"
                 >
-                  <option value={0.75}>0.75×</option>
+                  <option value={0.5}>0.5×</option>
                   <option value={1}>1×</option>
-                  <option value={1.5}>1.5×</option>
                   <option value={2}>2×</option>
+                  <option value={4}>4×</option>
                 </select>
               </label>
               <span className="combat-hud-key">
@@ -3446,15 +3744,22 @@ function MatchScreen({
               unit={selectedUnit}
               definition={selectedDefinition}
               itemsById={view.itemsById}
-              canSell={planning}
+              canSell={planning && !scouting}
               allowSell={tutorialStep === null}
-              quickMove={planning ? quickMove : null}
+              quickMove={planning && !scouting ? quickMove : null}
               onClose={() => onSelectUnit(null)}
               onSell={onSellSelected}
               onMove={() => quickMove && onMoveUnit(quickMove)}
             />
           )}
-          {!selectedUnit && <StandingsPanel standings={view.standings} />}
+          {!selectedUnit && (
+            <StandingsPanel
+              standings={view.standings}
+              planning={planning && tutorialStep === null}
+              scoutedPlayerId={scoutedStanding?.id ?? null}
+              onScoutPlayer={onScoutPlayer}
+            />
+          )}
         </div>
       </div>
 
@@ -3653,7 +3958,113 @@ function TraitsPanel({ traits }: { traits: TraitView[] }) {
   );
 }
 
-function StandingsPanel({ standings }: { standings: StandingView[] }) {
+function ScoutIntelPanel({
+  standing,
+  itemsById,
+}: {
+  standing: StandingView;
+  itemsById: Map<string, ChoiceView>;
+}) {
+  const equippedItemIds = standing.boardUnits.flatMap((unit) => unit.items);
+  const itemCounts = new Map<string, number>();
+  [...equippedItemIds, ...standing.inventory.map((item) => item.contentId)].forEach(
+    (itemId) => itemCounts.set(itemId, (itemCounts.get(itemId) ?? 0) + 1),
+  );
+  const itemRows = [...itemCounts.entries()].map(([itemId, count]) => ({
+    item: itemsById.get(itemId) ?? itemView(itemId, {}),
+    count,
+  }));
+
+  return (
+    <aside
+      className="side-panel scout-intel-panel"
+      aria-label={`${standing.name} captain intel`}
+    >
+      <div className="side-heading">
+        <span>CAPTAIN INTEL</span>
+        <small>READ ONLY</small>
+      </div>
+      <div className="scout-intel-scroll">
+        <div className="scout-summary">
+          <span>
+            <small>LEVEL</small>
+            <strong>{standing.level}</strong>
+          </span>
+          <span>
+            <small>GOLD</small>
+            <strong>{standing.gold}</strong>
+          </span>
+          <span>
+            <small>CREW</small>
+            <strong>
+              {standing.boardUnits.filter((unit) => unit.zone === "board").length}/
+              {standing.level}
+            </strong>
+          </span>
+        </div>
+
+        <section className="scout-intel-section" aria-label="Scouted treasure">
+          <strong>TREASURE</strong>
+          {itemRows.length ? (
+            <ul className="scout-item-list">
+              {itemRows.map(({ item, count }) => (
+                <li key={item.id} title={item.description}>
+                  <span aria-hidden="true">{item.icon}</span>
+                  <b>{item.name}</b>
+                  {count > 1 && <small>×{count}</small>}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No treasure revealed.</p>
+          )}
+        </section>
+
+        <section className="scout-intel-section" aria-label="Recent battles">
+          <strong>RECENT BATTLES</strong>
+          {standing.recentBattles.length ? (
+            <ol className="recent-battle-list">
+              {standing.recentBattles.map((battle) => (
+                <li
+                  key={`${battle.round}-${battle.opponentId}`}
+                  data-outcome={battle.outcome}
+                >
+                  <span>R{battle.round}</span>
+                  <b>
+                    {battle.opponentName}
+                    {battle.isGhost ? " · GHOST" : ""}
+                  </b>
+                  <small>
+                    {battle.outcome.toUpperCase()}
+                    {battle.captainDamageDealt > 0
+                      ? ` · +${battle.captainDamageDealt}`
+                      : battle.captainDamageTaken > 0
+                        ? ` · -${battle.captainDamageTaken}`
+                        : ""}
+                  </small>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p>No PvP encounters recorded yet.</p>
+          )}
+        </section>
+      </div>
+    </aside>
+  );
+}
+
+function StandingsPanel({
+  standings,
+  planning,
+  scoutedPlayerId,
+  onScoutPlayer,
+}: {
+  standings: StandingView[];
+  planning: boolean;
+  scoutedPlayerId: string | null;
+  onScoutPlayer: (playerId: string | null) => void;
+}) {
   return (
     <aside className="side-panel standings-panel" aria-label="Captain standings">
       <div className="side-heading">
@@ -3664,20 +4075,48 @@ function StandingsPanel({ standings }: { standings: StandingView[] }) {
         {standings.map((standing, index) => (
           <li
             key={standing.id}
-            className={`${standing.isHuman ? "is-player" : ""} ${!standing.alive ? "eliminated" : ""}`}
+            className={`${standing.isHuman ? "is-player" : ""} ${!standing.alive ? "eliminated" : ""} ${scoutedPlayerId === standing.id ? "is-scouted" : ""}`}
           >
-            <span className="rank">{index + 1}</span>
-            <span className="captain-avatar" aria-hidden="true">
-              {standing.name.slice(0, 1).toUpperCase()}
-            </span>
-            <span className="captain-copy">
-              <strong>{standing.isHuman ? "YOU" : standing.name}</strong>
-              <small>LV. {standing.level} {standing.streak > 1 ? `· 🔥${standing.streak}` : ""}</small>
-            </span>
-            <span className="captain-health">
-              <i style={{ width: `${standing.hp}%` }} />
-              <b>{standing.hp}</b>
-            </span>
+            <button
+              type="button"
+              disabled={
+                !planning ||
+                !standing.alive ||
+                (standing.isHuman && scoutedPlayerId === null)
+              }
+              aria-pressed={scoutedPlayerId === standing.id}
+              aria-label={
+                standing.isHuman
+                  ? `Return to your crew, level ${standing.level}, ${standing.hp} health`
+                  : `Scout ${standing.name}, level ${standing.level}, ${standing.hp} health`
+              }
+              title={
+                standing.crewPreview.length
+                  ? standing.crewPreview
+                      .map((unit) => `${unit.name} ${"★".repeat(unit.star)}`)
+                      .join(" · ")
+                  : "No deployed crew revealed"
+              }
+              onClick={() =>
+                onScoutPlayer(standing.isHuman ? null : standing.id)
+              }
+            >
+              <span className="rank">{index + 1}</span>
+              <span className="captain-avatar" aria-hidden="true">
+                {standing.name.slice(0, 1).toUpperCase()}
+              </span>
+              <span className="captain-copy">
+                <strong>{standing.isHuman ? "YOU" : standing.name}</strong>
+                <small>
+                  LV. {standing.level} · {standing.gold}G
+                  {standing.streak > 1 ? ` · 🔥${standing.streak}` : ""}
+                </small>
+              </span>
+              <span className="captain-health">
+                <i style={{ width: `${standing.hp}%` }} />
+                <b>{standing.hp}</b>
+              </span>
+            </button>
           </li>
         ))}
       </ol>

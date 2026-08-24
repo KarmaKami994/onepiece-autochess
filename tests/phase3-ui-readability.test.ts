@@ -34,8 +34,8 @@ describe("Phase 3 combat presentation", () => {
     expect(board).not.toMatch(/from ["'](?:@\/)?game/);
     expect(vfx).not.toMatch(/from ["'](?:@\/)?game/);
     for (const cue of [
-      "energyBars",
-      "shieldBars",
+      "resourceBars",
+      "transitionResourceBar",
       "statusLabels",
       "DODGE",
       "CRIT ",
@@ -59,9 +59,12 @@ describe("Phase 3 combat presentation", () => {
     expect(client).toContain("START BATTLE");
     expect(client).toContain("SKIP ANIMATION");
     expect(client).toContain("Battle animation speed");
+    for (const speed of ["0.5×", "1×", "2×", "4×"]) {
+      expect(client).toContain(speed);
+    }
     expect(client).toContain("tutorial-combat-legend");
     expect(client).toContain(
-      "numberValue(engine.CURRENT_SAVE_SCHEMA_VERSION, 4)",
+      "numberValue(engine.CURRENT_SAVE_SCHEMA_VERSION, 5)",
     );
     expect(css).toContain(".game-shell.reduced-motion");
     expect(css).toContain(".combat-hud");

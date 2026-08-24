@@ -10,6 +10,7 @@ import { getActiveTraits } from "./traits";
 import type {
   BattleSetupUnit,
   BattleTeam,
+  BotFormationPlacement,
   BotPersonality,
   CarouselChoice,
   CommandError,
@@ -20,13 +21,15 @@ import type {
   MatchState,
   PlayerState,
   Position,
+  RecentBattleOutcome,
+  RecentBattleRecord,
   StarLevel,
   UnitDefinition,
   UnitDestination,
   UnitInstance,
 } from "./types";
 
-export const CURRENT_SAVE_SCHEMA_VERSION = 4;
+export const CURRENT_SAVE_SCHEMA_VERSION = 5;
 
 function cloneMatch(state: MatchState): MatchState {
   return JSON.parse(JSON.stringify(state)) as MatchState;
@@ -327,6 +330,7 @@ function createPlayer(
     winStreak: 0,
     lossStreak: 0,
     lastOpponents: [],
+    recentBattles: [],
     placement: null,
   };
 }
@@ -854,6 +858,26 @@ function updateStreak(
   }
 }
 
+function battleOutcomeFor(
+  playerId: string,
+  winnerId: string | null,
+): RecentBattleOutcome {
+  if (winnerId === null) {
+    return "draw";
+  }
+  return winnerId === playerId ? "win" : "loss";
+}
+
+function appendRecentBattle(
+  player: PlayerState,
+  record: RecentBattleRecord,
+): void {
+  player.recentBattles = [
+    ...(player.recentBattles ?? []),
+    record,
+  ].slice(-5);
+}
+
 function resolveBattleResults(
   state: MatchState,
   content: GameContent,
@@ -898,11 +922,35 @@ function resolveBattleResults(
         ...playerB.lastOpponents.slice(-2),
         playerA.id,
       ];
+      appendRecentBattle(playerA, {
+        round: next.round,
+        opponentId: playerB.id,
+        outcome: battleOutcomeFor(playerA.id, result.winnerId),
+        isGhost: false,
+        captainDamageDealt: result.playerBDamage,
+        captainDamageTaken: result.playerADamage,
+      });
+      appendRecentBattle(playerB, {
+        round: next.round,
+        opponentId: playerA.id,
+        outcome: battleOutcomeFor(playerB.id, result.winnerId),
+        isGhost: false,
+        captainDamageDealt: result.playerADamage,
+        captainDamageTaken: result.playerBDamage,
+      });
     } else if (result.ghostOfPlayerId) {
       playerA.lastOpponents = [
         ...playerA.lastOpponents.slice(-2),
         result.ghostOfPlayerId,
       ];
+      appendRecentBattle(playerA, {
+        round: next.round,
+        opponentId: result.ghostOfPlayerId,
+        outcome: battleOutcomeFor(playerA.id, result.winnerId),
+        isGhost: true,
+        captainDamageDealt: 0,
+        captainDamageTaken: result.playerADamage,
+      });
     }
   }
 
@@ -1295,30 +1343,311 @@ function botInstanceScore(
   );
 }
 
-function botFormationCells(
+type BotFormationBand = "backline" | "frontline" | "flex" | "middle";
+
+interface BotThreatContext {
+  positions: Position[];
+  lineThreats: number;
+  adjacentThreats: number;
+}
+
+function desiredBotUnits(
+  player: PlayerState,
   personality: BotPersonality,
   content: GameContent,
-): Position[] {
+): UnitInstance[] {
+  return Object.values(player.units)
+    .filter((unit) => Boolean(getUnitDefinition(unit.definitionId, content)))
+    .sort(
+      (left, right) =>
+        botInstanceScore(right, player, personality, content) -
+          botInstanceScore(left, player, personality, content) ||
+        left.id.localeCompare(right.id) ||
+        left.acquiredOrder - right.acquiredOrder,
+    )
+    .slice(0, Math.max(0, player.level));
+}
+
+function botFormationBand(
+  unit: UnitInstance,
+  content: GameContent,
+): BotFormationBand {
+  const definition = getUnitDefinition(unit.definitionId, content);
+  if (!definition) {
+    return "middle";
+  }
+  const traits = new Set(definition.traits);
+  const isFrontliner = traits.has("guardian") || traits.has("brawler");
+  const isBackliner =
+    traits.has("marksman") ||
+    traits.has("specialist") ||
+    definition.stats.range >= 4;
+  if (isBackliner && !isFrontliner) {
+    return "backline";
+  }
+  if (isFrontliner) {
+    return "frontline";
+  }
+  if (traits.has("captain") || traits.has("swordsman")) {
+    return "flex";
+  }
+  return "middle";
+}
+
+function lastLivingOpponent(
+  state: MatchState,
+  player: PlayerState,
+): PlayerState | null {
+  for (const opponentId of [...(player.lastOpponents ?? [])].reverse()) {
+    const opponent = findPlayer(state, opponentId);
+    if (opponent?.alive && opponent.id !== player.id) {
+      return opponent;
+    }
+  }
+  return null;
+}
+
+function botThreatContext(
+  state: MatchState,
+  player: PlayerState,
+  content: GameContent,
+): BotThreatContext {
+  const opponent = lastLivingOpponent(state, player);
+  if (!opponent) {
+    return {
+      positions: [],
+      lineThreats: 0,
+      adjacentThreats: 0,
+    };
+  }
+  let lineThreats = 0;
+  let adjacentThreats = 0;
+  const positions = Object.entries(opponent.board)
+    .sort(([left], [right]) => left.localeCompare(right))
+    .flatMap(([key, unitId]) => {
+      const unit = opponent.units[unitId];
+      const definition = unit
+        ? getUnitDefinition(unit.definitionId, content)
+        : null;
+      if (!definition) {
+        return [];
+      }
+      if (definition.ability.pattern === "line") {
+        lineThreats += 1;
+      } else if (definition.ability.pattern === "adjacent") {
+        adjacentThreats += 1;
+      }
+      const position = parseCell(key);
+      return [
+        {
+          x: content.config.boardWidth - 1 - position.x,
+          y: content.config.boardHeight - 1 - position.y,
+        },
+      ];
+    });
+  return { positions, lineThreats, adjacentThreats };
+}
+
+function formationRowScore(
+  band: BotFormationBand,
+  position: Position,
+  content: GameContent,
+): number {
+  const frontRow =
+    content.config.boardHeight - content.config.deployRows;
+  const backRow = content.config.boardHeight - 1;
+  const middleRow = Math.round((frontRow + backRow) / 2);
+  switch (band) {
+    case "backline":
+      return 700 - Math.abs(position.y - backRow) * 320;
+    case "frontline":
+      return 700 - Math.abs(position.y - frontRow) * 320;
+    case "flex":
+      return (
+        650 -
+        Math.min(
+          Math.abs(position.y - frontRow),
+          Math.abs(position.y - middleRow),
+        ) *
+          300 +
+        (position.y === middleRow ? 20 : 0)
+      );
+    case "middle":
+      return 620 - Math.abs(position.y - middleRow) * 300;
+  }
+}
+
+function alignedForLine(left: Position, right: Position): boolean {
+  const deltaX = Math.abs(left.x - right.x);
+  const deltaY = Math.abs(left.y - right.y);
+  return (
+    left.x === right.x ||
+    left.y === right.y ||
+    (deltaX > 0 && deltaX === deltaY)
+  );
+}
+
+function botCellScore(
+  player: PlayerState,
+  personality: BotPersonality,
+  band: BotFormationBand,
+  position: Position,
+  placed: BotFormationPlacement[],
+  threat: BotThreatContext,
+  cornerX: number,
+  content: GameContent,
+): number {
+  const frontRow =
+    content.config.boardHeight - content.config.deployRows;
+  let score = formationRowScore(band, position, content);
+
+  if (personality.formation === "corner") {
+    score += 180 - Math.abs(position.x - cornerX) * 34;
+  } else if (personality.formation === "frontline") {
+    score += 100 - Math.abs(position.y - frontRow) * 38;
+  } else if (placed.length > 0) {
+    const nearestDistance = Math.min(
+      ...placed.map(
+        (placement) =>
+          Math.abs(placement.position.x - position.x) +
+          Math.abs(placement.position.y - position.y),
+      ),
+    );
+    score += nearestDistance * 24;
+  }
+
+  const adjacentWeight = Math.min(2, threat.adjacentThreats);
+  const lineWeight = Math.min(2, threat.lineThreats);
+  for (const placement of placed) {
+    const other = placement.position;
+    const chebyshevDistance = Math.max(
+      Math.abs(other.x - position.x),
+      Math.abs(other.y - position.y),
+    );
+    if (adjacentWeight > 0) {
+      if (chebyshevDistance <= 1) {
+        score -= 180 * adjacentWeight;
+      } else if (chebyshevDistance === 2) {
+        score -= 25 * adjacentWeight;
+      }
+    }
+    if (lineWeight > 0 && alignedForLine(other, position)) {
+      score -= 70 * lineWeight;
+    }
+  }
+
+  if (lineWeight > 0) {
+    for (const enemy of threat.positions) {
+      if (enemy.x === position.x) {
+        score -= 35 * lineWeight;
+      }
+    }
+  }
+
+  if (band === "frontline" || band === "flex") {
+    const protectedBackliners = placed.filter((placement) => {
+      const unit = player.units[placement.unitId];
+      return unit ? botFormationBand(unit, content) === "backline" : false;
+    });
+    const backlinerPositions =
+      protectedBackliners.length > 0
+        ? protectedBackliners.map((placement) => placement.position)
+        : placed.map((placement) => placement.position);
+    for (const backliner of backlinerPositions) {
+      score += Math.max(0, 72 - Math.abs(position.x - backliner.x) * 18);
+    }
+    for (const enemy of threat.positions) {
+      score += Math.max(0, 36 - Math.abs(position.x - enemy.x) * 9);
+    }
+  }
+
+  return score;
+}
+
+/**
+ * Produces a complete deterministic deployment plan without mutating state or
+ * consuming pairing/shop RNG. Only the bot's most recent still-living
+ * opponent is used as scouting context; current/future pairings are ignored.
+ */
+export function planBotFormation(
+  state: MatchState,
+  playerId: string,
+  content: GameContent = DEFAULT_CONTENT,
+): BotFormationPlacement[] {
+  const player = findPlayer(state, playerId);
+  if (!player?.isBot || !player.alive) {
+    return [];
+  }
+  const personality = botPersonality(player, content);
+  const desired = desiredBotUnits(player, personality, content)
+    .map((unit) => ({
+      unit,
+      band: botFormationBand(unit, content),
+      score: botInstanceScore(unit, player, personality, content),
+    }))
+    .sort((left, right) => {
+      const order: Record<BotFormationBand, number> = {
+        backline: 0,
+        frontline: 1,
+        flex: 2,
+        middle: 3,
+      };
+      return (
+        order[left.band] - order[right.band] ||
+        right.score - left.score ||
+        left.unit.id.localeCompare(right.unit.id)
+      );
+    });
   const firstDeployRow =
     content.config.boardHeight - content.config.deployRows;
-  const rows =
-    personality.formation === "frontline"
-      ? [firstDeployRow, firstDeployRow + 1, firstDeployRow + 2]
-      : personality.formation === "corner"
-        ? [firstDeployRow + 2, firstDeployRow + 1, firstDeployRow]
-        : [firstDeployRow + 1, firstDeployRow, firstDeployRow + 2];
-  const columns =
-    personality.formation === "corner"
-      ? Array.from({ length: content.config.boardWidth }, (_, index) => index)
-      : Array.from(
-          { length: content.config.boardWidth },
-          (_, index) =>
-            (Math.floor(content.config.boardWidth / 2) +
-              (index % 2 === 0 ? index / 2 : -(index + 1) / 2) +
-              content.config.boardWidth) %
-            content.config.boardWidth,
-        );
-  return rows.flatMap((y) => columns.map((x) => ({ x, y })));
+  const cells = Array.from(
+    { length: content.config.deployRows },
+    (_, rowOffset) => firstDeployRow + rowOffset,
+  ).flatMap((y) =>
+    Array.from({ length: content.config.boardWidth }, (_, x) => ({ x, y })),
+  );
+  const cornerX =
+    (hashSeed(`${state.seed}:${player.id}:r${state.round}:corner`) & 1) === 0
+      ? 0
+      : content.config.boardWidth - 1;
+  const threat = botThreatContext(state, player, content);
+  const placements: BotFormationPlacement[] = [];
+
+  for (const candidate of desired) {
+    const occupied = new Set(
+      placements.map((placement) =>
+        cellKey(placement.position.x, placement.position.y),
+      ),
+    );
+    const destination = cells
+      .filter((position) => !occupied.has(cellKey(position.x, position.y)))
+      .map((position) => ({
+        position,
+        score: botCellScore(
+          player,
+          personality,
+          candidate.band,
+          position,
+          placements,
+          threat,
+          cornerX,
+          content,
+        ),
+      }))
+      .sort(
+        (left, right) =>
+          right.score - left.score ||
+          left.position.y - right.position.y ||
+          left.position.x - right.position.x,
+      )[0]?.position;
+    if (destination) {
+      placements.push({
+        unitId: candidate.unit.id,
+        position: { ...destination },
+      });
+    }
+  }
+  return placements;
 }
 
 function botBuyPass(
@@ -1441,55 +1770,30 @@ function arrangeBotBoard(
   if (!player) {
     return next;
   }
-  const personality = botPersonality(player, content);
-  const desired = Object.values(player.units)
-    .sort(
-      (left, right) =>
-        botInstanceScore(right, player!, personality, content) -
-          botInstanceScore(left, player!, personality, content) ||
-        left.acquiredOrder - right.acquiredOrder,
-    )
-    .slice(0, player.level);
-  const desiredIds = new Set(desired.map((unit) => unit.id));
-  const formation = botFormationCells(personality, content);
+  const plan = planBotFormation(next, playerId, content);
+  const desiredIds = new Set(plan.map((placement) => placement.unitId));
 
-  for (const unit of desired) {
+  // First make the selected lineup legal. A benched desired unit swaps with a
+  // deployed non-selected unit when the board is capped, so every transition
+  // still travels through MOVE_UNIT rather than mutating board records.
+  for (const placement of plan) {
     player = findPlayer(next, playerId);
-    if (!player || locateUnit(player, unit.id)?.zone === "board") {
+    if (!player || locateUnit(player, placement.unitId)?.zone === "board") {
       continue;
     }
-    const emptyCell = formation.find(
-      (position) => !player!.board[cellKey(position.x, position.y)],
-    );
-    let destination = emptyCell;
-    if (!destination && boardUnitCount(player) >= player.level) {
-      const replaceable = Object.entries(player.board)
-        .map(([key, deployedId]) => ({
-          key,
-          deployedId,
-          instance: player!.units[deployedId],
-        }))
-        .filter(
-          (entry) => entry.instance && !desiredIds.has(entry.deployedId),
-        )
-        .sort(
-          (left, right) =>
-            botInstanceScore(
-              left.instance!,
-              player!,
-              personality,
-              content,
-            ) -
-              botInstanceScore(
-                right.instance!,
-                player!,
-                personality,
-                content,
-              ) ||
-            left.key.localeCompare(right.key),
-        )[0];
-      destination = replaceable ? parseCell(replaceable.key) : undefined;
-    }
+    const replaceable = Object.entries(player.board)
+      .filter(([, deployedId]) => !desiredIds.has(deployedId))
+      .sort(([left], [right]) => left.localeCompare(right))[0];
+    const emptyPlannedCell = plan
+      .map((candidate) => candidate.position)
+      .find(
+        (position) => !player!.board[cellKey(position.x, position.y)],
+      );
+    const destination = replaceable
+      ? parseCell(replaceable[0])
+      : boardUnitCount(player) < player.level
+        ? emptyPlannedCell
+        : undefined;
     if (!destination) {
       continue;
     }
@@ -1498,8 +1802,42 @@ function arrangeBotBoard(
       {
         type: "MOVE_UNIT",
         playerId,
-        unitId: unit.id,
+        unitId: placement.unitId,
         to: { zone: "board", x: destination.x, y: destination.y },
+      },
+      content,
+    );
+    if (result.ok) {
+      next = result.state;
+    }
+  }
+
+  // With the desired lineup deployed, MOVE_UNIT swaps resolve arbitrary
+  // position cycles while preserving the board cap and bench invariants.
+  for (const placement of plan) {
+    player = findPlayer(next, playerId);
+    const location = player
+      ? locateUnit(player, placement.unitId)
+      : null;
+    if (
+      !player ||
+      (location?.zone === "board" &&
+        location.x === placement.position.x &&
+        location.y === placement.position.y)
+    ) {
+      continue;
+    }
+    const result = applyCommand(
+      next,
+      {
+        type: "MOVE_UNIT",
+        playerId,
+        unitId: placement.unitId,
+        to: {
+          zone: "board",
+          x: placement.position.x,
+          y: placement.position.y,
+        },
       },
       content,
     );

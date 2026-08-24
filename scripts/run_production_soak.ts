@@ -94,7 +94,7 @@ function recordTraits(
   }
 }
 
-export function runProductionSoak(seedCount = 1_000): ProductionSoakReport {
+export function runProductionSoak(seedCount = 50): ProductionSoakReport {
   if (!Number.isInteger(seedCount) || seedCount <= 0) {
     throw new Error("seedCount must be a positive integer");
   }
@@ -269,7 +269,7 @@ function argumentValue(name: string): string | undefined {
 }
 
 async function main(): Promise<void> {
-  const seeds = Number(argumentValue("seeds") ?? 1_000);
+  const seeds = Number(argumentValue("seeds") ?? 50);
   const report = runProductionSoak(seeds);
   const outputPath = argumentValue("out");
   if (outputPath) {

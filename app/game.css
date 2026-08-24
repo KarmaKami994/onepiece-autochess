@@ -1240,6 +1240,35 @@ details.trait-building {
 .board-ribbon strong { color: #a9bcb8; font-weight: 700; }
 .board-ribbon i { width: 34px; height: 1px; background: #52696b; }
 
+.match-body[data-scouting="true"] .board-ribbon {
+  border-color: #69aeb4;
+  background: #082a34ed;
+  box-shadow:
+    inset 0 0 0 1px #173f47,
+    2px 3px 0 #020b1099;
+  pointer-events: auto;
+}
+
+.return-from-scout {
+  min-height: 22px;
+  padding: 3px 7px;
+  border: 1px solid #bd994f;
+  color: #f0d58d;
+  background: #3b3020;
+  cursor: pointer;
+  font: 900 9px/1 "Courier New", monospace;
+  letter-spacing: 0.04em;
+}
+
+.return-from-scout:hover,
+.return-from-scout:focus-visible {
+  border-color: #f0ca66;
+  color: #fff0bb;
+  background: #564322;
+  outline: 1px solid #102a31;
+  outline-offset: 1px;
+}
+
 .combat-hud {
   position: absolute;
   z-index: 14;
@@ -1786,6 +1815,132 @@ details.trait-building {
   font-size: 24px;
 }
 
+.scout-intel-panel {
+  position: relative;
+  z-index: 1;
+  min-height: 168px !important;
+  max-height: 220px;
+  border-color: #547f82;
+}
+
+.scout-intel-scroll {
+  display: grid;
+  max-height: calc(220px - 36px);
+  padding: 6px;
+  gap: 7px;
+  overflow-y: auto;
+  scrollbar-color: #648b8c #061820;
+  scrollbar-width: thin;
+}
+
+.scout-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.scout-summary > span {
+  display: grid;
+  min-width: 0;
+  min-height: 39px;
+  padding: 5px;
+  place-items: center;
+  border: 1px solid #42646a;
+  color: #e9d293;
+  background: #071c24;
+  font: 900 11px/1 "Courier New", monospace;
+}
+
+.scout-summary small {
+  color: #799695;
+  font-size: 8px;
+}
+
+.scout-intel-section {
+  display: grid;
+  gap: 4px;
+}
+
+.scout-intel-section > strong {
+  color: #94b3af;
+  font: 900 8px/1 "Courier New", monospace;
+  letter-spacing: 0.08em;
+}
+
+.scout-intel-section > p {
+  margin: 0;
+  padding: 5px;
+  border: 1px dashed #40585d;
+  color: #708d8d;
+  font: 700 8px/1.25 "Courier New", monospace;
+}
+
+.scout-item-list,
+.recent-battle-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  gap: 3px;
+  list-style: none;
+}
+
+.scout-item-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.scout-item-list li {
+  display: grid;
+  min-width: 0;
+  min-height: 26px;
+  padding: 3px 4px;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  gap: 3px;
+  align-items: center;
+  border: 1px solid #52655d;
+  color: #d8ca9d;
+  background: #0a2228;
+  font: 800 8px/1 "Courier New", monospace;
+}
+
+.scout-item-list b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scout-item-list small {
+  color: #e0bd68;
+}
+
+.recent-battle-list li {
+  display: grid;
+  min-height: 25px;
+  padding: 3px 4px;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  gap: 4px;
+  align-items: center;
+  border-left: 2px solid #798486;
+  color: #88a3a0;
+  background: #081d24;
+  font: 800 8px/1 "Courier New", monospace;
+}
+
+.recent-battle-list li[data-outcome="win"] { border-color: #59a66f; }
+.recent-battle-list li[data-outcome="loss"] { border-color: #c6615c; }
+.recent-battle-list li[data-outcome="draw"] { border-color: #b99a56; }
+
+.recent-battle-list b {
+  overflow: hidden;
+  color: #b7c8c1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recent-battle-list small {
+  color: #d7c07f;
+  white-space: nowrap;
+}
+
 .standings-list {
   display: grid;
   margin: 0;
@@ -1795,17 +1950,26 @@ details.trait-building {
 }
 
 .standings-list li {
+  display: block;
+  min-height: 46px;
+}
+
+.standings-list li > button {
   display: grid;
+  width: 100%;
   min-height: 46px;
   padding: 4px 5px;
   grid-template-columns: 20px 32px minmax(0, 1fr) 42px;
   gap: 4px;
   align-items: center;
   border: 1px solid #314f57;
+  color: inherit;
   background: #0a222b;
+  cursor: pointer;
+  text-align: left;
 }
 
-.standings-list li.is-player {
+.standings-list li.is-player > button {
   border-color: #a98240;
   background: linear-gradient(90deg, #3e3323, #0a222b);
 }
@@ -1813,6 +1977,27 @@ details.trait-building {
 .standings-list li.eliminated {
   opacity: 0.43;
   filter: grayscale(0.8);
+}
+
+.standings-list li.is-scouted > button {
+  border-color: #6db4ba;
+  background: linear-gradient(90deg, #17414a, #0a222b);
+  box-shadow: inset 3px 0 0 #7bc6c9;
+}
+
+.standings-list li > button:hover:not(:disabled) {
+  border-color: #c49a4b;
+  background: #12333b;
+}
+
+.standings-list li > button:focus-visible {
+  border-color: #f0ca66;
+  outline: 2px solid #07151c;
+  outline-offset: 1px;
+}
+
+.standings-list li > button:disabled {
+  cursor: default;
 }
 
 .rank {
