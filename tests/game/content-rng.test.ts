@@ -18,10 +18,14 @@ describe("canonical game content", () => {
       "usopp",
       "chopper",
       "tashigi",
+      "koby",
+      "koala",
       "sanji",
       "robin",
       "smoker",
       "sabo",
+      "franky",
+      "brook",
       "luffy",
       "zoro",
       "kid",
@@ -34,7 +38,7 @@ describe("canonical game content", () => {
       "mihawk",
     ]);
     expect(DEFAULT_CONTENT.units.map((unit) => unit.cost)).toEqual([
-      1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5,
+      1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5,
     ]);
     expect(DEFAULT_CONTENT.traits).toHaveLength(12);
     expect(DEFAULT_CONTENT.items).toHaveLength(8);
@@ -67,10 +71,14 @@ describe("canonical game content", () => {
       "Exploding Star",
       "Emergency Cure",
       "Flash Cut",
+      "Shave Strike",
+      "Fish-Man Karate",
       "Diable Jambe",
       "Clutch",
       "White Blow",
       "Dragon Claw",
+      "Coup de Vent",
+      "Soul Solid",
       "Gum-Gum Gatling",
       "Oni Giri",
       "Magnetic Crush",
