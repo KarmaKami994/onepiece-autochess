@@ -225,10 +225,11 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     ability: ability(
       "dragon-claw",
       "Dragon Claw",
-      "Crushes the target area with a powerful claw strike.",
+      "Crushes the target area with Dragon Claw, damaging and briefly stunning nearby enemies.",
       190,
       "nearest-enemy",
       "adjacent",
+      { stunMs: 600 },
     ),
     assetPath: "/assets/characters/sabo.png",
   },
@@ -254,11 +255,11 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     ability: ability(
       "gum-gum-gatling",
       "Gum-Gum Gatling",
-      "Unleashes a rapid barrage across the enemy formation.",
+      "Unleashes a rapid three-hit Gatling barrage across nearby enemies, blasting surviving targets backward.",
       75,
       "nearest-enemy",
       "adjacent",
-      { hits: 3 },
+      { hits: 3, signatureMechanics: [{ kind: "knockback" }] },
     ),
     assetPath: "/assets/characters/luffy.png",
   },
@@ -311,11 +312,11 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     ability: ability(
       "magnetic-crush",
       "Magnetic Crush",
-      "Compacts metal around a group of enemies.",
+      "Crushes nearby enemies with magnetism, stunning them and pulling surviving targets one step closer.",
       275,
       "nearest-enemy",
       "adjacent",
-      { stunMs: 800 },
+      { stunMs: 800, signatureMechanics: [{ kind: "pull" }] },
     ),
     assetPath: "/assets/characters/kid.png",
   },
@@ -335,10 +336,11 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     ability: ability(
       "desert-spada",
       "Desert Spada",
-      "Sends a cutting blade of sand through an enemy line.",
+      "Sends a cutting blade of dehydrating sand through an enemy line, damaging and draining 15 Energy from survivors.",
       300,
       "farthest-enemy",
       "line",
+      { energyDrain: 15 },
     ),
     assetPath: "/assets/characters/crocodile.png",
   },
@@ -1136,7 +1138,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.5.0",
+  version: "1.6.0",
   units: UNIT_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,
   items: ITEM_DEFINITIONS,
