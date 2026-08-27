@@ -40,7 +40,8 @@ npm run build
 Use `npm run test:soak` for engine, economy, bot, pairing, or match-flow changes.
 Normal CI runs the 50-match `test:production-smoke`. Run the 1,000-match
 `test:production-soak` only for a deliberate release/balance audit; reports are
-written below `tmp/` and intentionally remain untracked.
+written below `tmp/` and intentionally remain untracked. The same audit can be
+started through the manual GitHub Actions `Release Production Soak` workflow.
 Run `npx playwright install chromium` once before the first local E2E check.
 
 Use `npm run assets:v2` to rebuild the standard 128×128 animation atlases.
