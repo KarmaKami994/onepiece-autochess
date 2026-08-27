@@ -22,10 +22,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-Roster expansion 18 → 30 — Pack D.
+Roster expansion 18 → 30 — Pack E.
 
 ## Last Completed Work
 
+- 2026-08-28 — `feature/roster-expansion-pack-e`: added Ivankov, Jinbe, Kuma and Kizaru as content-driven base-shop units using only existing heal, conditional shield, line targeting, Defense Pierce and knockback mechanics. The roster is now 26 units with cost distribution 6/7/6/5/2. Content moved to `1.10.0`; save schema remains 6. No existing character, trait, pool, shop, economy, combat-engine, type, persistence or presentation values changed. Material files: `game/content.ts`, `tests/game/roster-expansion-pack-e.test.ts`, necessary roster/content-version assertions and `PROJECT_STATE.md`.
 - 2026-08-27 — `9419b8c`, PR #16 on `feature/roster-expansion-pack-d`: added Koby, Koala, Franky and Brook as content-driven base-shop units using only existing lunge, stun and knockback mechanics. The roster is now 22 units with cost distribution 6/6/4/4/2. Content moved to `1.9.0`; save schema remains 6. No existing character, trait, pool, shop or economy values changed. Material files: `game/content.ts`, `tests/game/roster-expansion-pack-d.test.ts`, necessary roster/content-version assertions and `PROJECT_STATE.md`.
 - 2026-08-27 — `46849a8`, PR #15 on `analysis/full-roster-balance-readability`: completed the first post-identity-pass 1,000-seed full-roster assessment. Added cost-band, placement, top-four, Wilson-interval, combat-expression and PvP readability diagnostics plus the exact generated snapshot and decision report. No gameplay, content, presentation or save values changed; content remains `1.8.0` and save schema remains 6. Material files: `scripts/run_production_soak.ts`, `tests/production-audit.test.ts`, `docs/analysis/full-roster-balance-1000.json`, `docs/FULL_ROSTER_BALANCE_ASSESSMENT.md`, `PROJECT_STATE.md`.
 - 2026-08-27 — `6e012d3`, PR #14 on `feature/final-high-cost-identity-pack`: replaced Garp's global stun with post-damage global knockback and added transient per-ability Defense Pierce for Mihawk. Content moved to version `1.8.0`; save schema remains version 6. Material files: `game/combat.ts`, `game/content.ts`, `game/types.ts`, the new high-cost identity test and prior content-version regression tests.
@@ -40,6 +41,18 @@ Roster expansion 18 → 30 — Pack D.
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+Roster Expansion Pack E:
+
+- PASS — `npm run typecheck` (run through the installed npm CLI).
+- PASS — `npm run lint` (run through the installed npm CLI).
+- PASS — focused Pack E test: 1 file, 12 tests.
+- PASS — affected Pack E/content/production-audit tests: 11 files, 120 tests.
+- PASS — `npm test`: 34 files, 274 tests.
+- PASS — `npm run test:production-smoke`: 50/50 complete matches, zero crashes.
+- PASS — `npm run build`.
+- NOT RUN — `npm run test:e2e`; presentation source did not change and existing missing-character fallbacks are used.
+- NOT RUN — `npm run test:production-soak`; the next 1,000-seed assessment is reserved for the completed 30-unit roster after Pack F.
 
 Roster Expansion Pack D:
 
@@ -154,6 +167,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- The base shop roster now also includes Ivankov (2-cost Revolutionary/Specialist targeted heal with an inclusive 50%-HP pre-heal shield condition), Jinbe (3-cost Straw Hat/Guardian adjacent knockback), Kuma (3-cost Revolutionary/Guardian all-enemy knockback) and Kizaru (4-cost Navy/Marksman farthest line damage with transient 40% Defense Pierce). Content is `1.10.0`; save schema remains 6.
 - The base shop roster now includes Koby (1-cost Navy/Brawler lunge), Koala (1-cost Revolutionary/Brawler adjacent 300ms stun), Franky (2-cost Straw Hat/Guardian adjacent knockback) and Brook (2-cost Straw Hat/Swordsman line 400ms stun). Content is `1.9.0`; save schema remains 6.
 - The prior assessment changed no gameplay or presentation behavior. Production-soak output is additively richer and now reports same-cost placement/performance uncertainty plus PvP combat-expression/readability density.
 - Galaxy Impact now replaces Garp's previous global 1000ms stun with deterministic one-cell knockback after its unchanged global damage; Black Blade Wave now ignores 50% of each target's current non-negative Defense for that ability's mitigation only.
@@ -167,6 +181,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- None for Pack E. No new primitive, combat-engine, type, persistence, presentation or fabricated-asset change was needed; intended character paths rely on existing portrait/token fallbacks.
 - None for Pack D. No new primitive, combat/type/persistence/presentation change or fabricated asset was needed; intended character paths rely on existing portrait/token fallbacks.
 - None for the full-roster assessment; the 1,000-seed production soak was run exactly once after all required pre-soak verification passed.
 - The final high-cost identity pack stayed within scope; Defense Pierce required only a small central mitigation parameter and no persistent status or presentation change, so E2E was not run.
@@ -182,6 +197,8 @@ Final current-roster high-cost identity pack:
 ## Problems / Risks Found
 
 - PAC/Tashigi gameplay changes need separate product/balance review.
+- The Pack E 50-seed smoke completed without structural failure. Ivankov, Jinbe, Kuma and Kizaru had respectively 95/5.3%, 113/21.2%, 96/24.0% and 57/33.3% final-board observations/conditional win rates; these small-sample observations are not tuning evidence.
+- Ivankov, Jinbe, Kuma and Kizaru currently use the repository's neutral missing-character presentation fallbacks at their intended future asset paths; dedicated artwork remains a later art task.
 - The Pack D 50-seed smoke completed without structural failure. Koby, Koala, Franky and Brook had respectively 87/14.9%, 88/14.8%, 137/15.3% and 121/6.6% final-board observations/conditional win rates; these small-sample observations are not tuning evidence.
 - Koby, Koala, Franky and Brook currently use the repository's neutral missing-character presentation fallbacks at their intended future asset paths; dedicated artwork remains a later art task.
 - The 1,000-seed assessment shows high-confidence same-cost positive outliers for Sabo and Luffy and negative outliers for Robin and Nami; unit presence remains associative and composition-confounded, so tuning must stay isolated.
@@ -210,7 +227,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-Implement only Roster Expansion Pack E (Ivankov, Jinbe, Kuma and Kizaru) in its own bounded specification/PR; do not start it automatically. Preserve the completed 18-unit assessment as historical evidence and defer broad tuning until the 30-unit post-Pack-F assessment.
+Implement only Roster Expansion Pack F (Kuzan, Akainu, Shanks and Blackbeard) in its own bounded specification/PR, targeting the locked 30-unit distribution 6/7/6/7/4; do not start it automatically. Preserve the completed assessment history and defer broad tuning until the 30-unit post-Pack-F assessment.
 
 ## Codex Update Contract
 
