@@ -359,6 +359,19 @@ function validFinalHitBonus(
     : null;
 }
 
+function validConditionalShield(
+  definition: AbilityDefinition["conditionalShield"],
+): NonNullable<AbilityDefinition["conditionalShield"]> | null {
+  return definition &&
+    Number.isSafeInteger(definition.healthThresholdPercent) &&
+    definition.healthThresholdPercent >= 0 &&
+    definition.healthThresholdPercent <= 100 &&
+    Number.isSafeInteger(definition.power) &&
+    definition.power > 0
+    ? definition
+    : null;
+}
+
 function abilityTargets(
   source: MutableBattleUnit,
   units: MutableBattleUnit[],
@@ -1120,7 +1133,26 @@ export function simulateBattle(
           continue;
         }
         if (abilityDefinition.effect === "heal") {
+          const conditionalShield = validConditionalShield(
+            abilityDefinition.conditionalShield,
+          );
+          const shouldApplyConditionalShield =
+            conditionalShield !== null &&
+            target.hp * 100 <=
+              target.maxHp * conditionalShield.healthThresholdPercent;
           applyHeal(tick, source, target, scaledPower);
+          if (shouldApplyConditionalShield && conditionalShield) {
+            const shieldPower = Math.max(
+              1,
+              Math.floor(
+                (conditionalShield.power *
+                  abilityMultiplier *
+                  (100 + source.abilityPowerPercent)) /
+                  1_000_000,
+              ),
+            );
+            applyShield(tick, source, target, shieldPower);
+          }
         } else if (abilityDefinition.effect === "shield") {
           applyShield(tick, source, target, scaledPower);
         } else {

@@ -49,6 +49,11 @@ export interface SequentialStrikeDefinition {
   };
 }
 
+export interface ConditionalShieldDefinition {
+  healthThresholdPercent: number;
+  power: number;
+}
+
 export interface AbilityDefinition {
   id: string;
   name: string;
@@ -63,6 +68,7 @@ export interface AbilityDefinition {
   requiresTarget?: boolean;
   signatureMechanics?: SignatureMechanic[];
   sequentialStrike?: SequentialStrikeDefinition;
+  conditionalShield?: ConditionalShieldDefinition;
   energyDrain?: number;
   hits?: number;
   stunMs?: number;
