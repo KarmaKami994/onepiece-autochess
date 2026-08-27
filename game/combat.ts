@@ -721,7 +721,7 @@ export function simulateBattle(
     tick: number,
     unit: MutableBattleUnit,
     requestedAmount: number,
-    reason: "attack" | "damaged" | "cast-reset",
+    reason: "attack" | "damaged" | "cast-reset" | "ability-drain",
   ): void => {
     const previous = unit.energy;
     unit.energy = Math.max(0, Math.min(100, unit.energy + requestedAmount));
@@ -1192,6 +1192,24 @@ export function simulateBattle(
               status: "burn",
               durationTicks,
             });
+          }
+        }
+      }
+      const energyDrain = abilityDefinition.energyDrain;
+      if (
+        typeof energyDrain === "number" &&
+        Number.isSafeInteger(energyDrain) &&
+        energyDrain > 0
+      ) {
+        for (const targetId of intent.targetIds) {
+          const target = units.find(
+            (unit) =>
+              unit.id === targetId &&
+              unit.teamId !== source.teamId &&
+              alive(unit),
+          );
+          if (target && target.energy > 0) {
+            changeEnergy(tick, target, -energyDrain, "ability-drain");
           }
         }
       }

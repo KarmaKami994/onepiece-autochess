@@ -46,10 +46,11 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     ability: ability(
       "thunderbolt-tempo",
       "Thunderbolt Tempo",
-      "Calls lightning onto the target and nearby enemies.",
+      "Calls lightning onto an enemy and nearby foes, dealing damage and draining 15 Energy from survivors.",
       145,
       "nearest-enemy",
       "adjacent",
+      { energyDrain: 15 },
     ),
     assetPath: "/assets/characters/nami.png",
   },
@@ -1129,7 +1130,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.3.0",
+  version: "1.4.0",
   units: UNIT_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,
   items: ITEM_DEFINITIONS,
