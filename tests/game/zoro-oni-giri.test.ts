@@ -348,6 +348,20 @@ describe("Zoro Oni Giri sequential strikes", () => {
     expect(abilityDamage(result).map((event) => event.amount)).toEqual([355]);
   });
 
+  it("falls back when valid weights would allocate a zero-power strike", () => {
+    const content = clonedContent();
+    configureUnit(content, "zoro", 10_000, 1);
+    configureUnit(content, "chopper", 1_000);
+    definition(content, "zoro").ability.power = 2;
+
+    const result = runZoroBattle(content, [
+      setupUnit("target", "chopper", 2, 1),
+    ]);
+
+    expect(abilityHits(result)).toHaveLength(0);
+    expect(abilityDamage(result).map((event) => event.amount)).toEqual([2]);
+  });
+
   it("replays identically and keeps every battle event JSON serializable", () => {
     const content = clonedContent();
     configureUnit(content, "zoro", 10_000, 1);

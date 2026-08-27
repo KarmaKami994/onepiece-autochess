@@ -333,7 +333,7 @@ function sequentialStrikePowers(
     return null;
   }
   let allocated = 0;
-  return weights.map((weight, index) => {
+  const strikePowers = weights.map((weight, index) => {
     const damage =
       index === weights.length - 1
         ? scaledPower - allocated
@@ -341,6 +341,7 @@ function sequentialStrikePowers(
     allocated += damage;
     return damage;
   });
+  return strikePowers.some((power) => power <= 0) ? null : strikePowers;
 }
 
 function validFinalHitBonus(
