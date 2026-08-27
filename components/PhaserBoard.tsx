@@ -51,7 +51,10 @@ import {
   isSameDestination,
   unitDestination,
 } from "./boardTokens";
-import { combatPresentationStyle } from "./boardCombatPresentation";
+import {
+  combatPresentationStyle,
+  sequentialAbilityHitDelayMs,
+} from "./boardCombatPresentation";
 import { BOARD_SCENE_KEY, createBoardGameConfig } from "./BoardScene";
 
 export type BoardZone = "board" | "bench";
@@ -90,11 +93,13 @@ export type BoardMove = {
 export type CombatFxEvent = {
   id: string;
   tick: number;
+  presentationOffsetMs?: number;
   kind:
     | "move"
     | "displace"
     | "attack"
     | "cast"
+    | "ability-hit"
     | "damage"
     | "heal"
     | "shield"
@@ -114,6 +119,10 @@ export type CombatFxEvent = {
   abilityId?: string;
   abilityName?: string;
   telegraph?: "target" | "line" | "area";
+  deferImpactToAbilityHits?: boolean;
+  hitIndex?: number;
+  hitCount?: number;
+  finisher?: boolean;
   status?: string;
   durationTicks?: number;
   energyDelta?: number;
@@ -590,7 +599,13 @@ export default function PhaserBoard({
               battleVfx.heal(this, { at: to, team, speed, radius: 25 });
               battleVfx.shield(this, { at: to, team, speed, radius: 24 });
             } else if (presentation === "slash") {
-              battleVfx.slash(this, { from, to, team, speed, width: 6 });
+              battleVfx.slash(this, {
+                from,
+                to,
+                team,
+                speed,
+                width: event.finisher ? 8 : 6,
+              });
             } else {
               battleVfx.impact(this, { at: to, team, speed, radius: 17 });
             }
@@ -1732,7 +1747,15 @@ export default function PhaserBoard({
             };
 
             events.forEach((event) => {
-              const delay = Math.max(0, Math.round((event.tick * 100) / speed));
+              const presentationOffset =
+                event.presentationOffsetMs ??
+                (event.kind === "ability-hit"
+                  ? sequentialAbilityHitDelayMs(event.hitIndex ?? 1)
+                  : 0);
+              const delay = Math.max(
+                0,
+                Math.round((event.tick * 100 + presentationOffset) / speed),
+              );
               this.time.delayedCall(delay, () => {
                 if (generation !== this.animationGeneration) return;
                 const source = event.sourceId
@@ -1823,13 +1846,17 @@ export default function PhaserBoard({
                 if (
                   source &&
                   target &&
-                  (event.kind === "attack" || event.kind === "cast")
+                  (event.kind === "attack" ||
+                    event.kind === "cast" ||
+                    event.kind === "ability-hit")
                 ) {
-                  this.playCrewAnimation(
-                    event.sourceId,
-                    event.kind === "cast" ? "cast" : "attack",
-                    speed,
-                  );
+                  if (event.kind !== "ability-hit") {
+                    this.playCrewAnimation(
+                      event.sourceId,
+                      event.kind === "cast" ? "cast" : "attack",
+                      speed,
+                    );
+                  }
                   this.faceUnit(event.sourceId ?? "", target.x);
                   this.faceUnit(event.targetId ?? "", source.x);
                   if (event.kind === "cast") {
@@ -1848,12 +1875,16 @@ export default function PhaserBoard({
                       reducedMotion: reduceMotion,
                     });
                   }
-                  if (showParticles && !reduceMotion) {
+                  if (
+                    showParticles &&
+                    !reduceMotion &&
+                    !event.deferImpactToAbilityHits
+                  ) {
                     (targets.length ? targets : [target]).forEach((castTarget) =>
                       this.playCombatVfx(event, source, castTarget, speed),
                     );
                   }
-                  if (!reduceMotion) {
+                  if (!reduceMotion && event.kind !== "ability-hit") {
                     const sourceX = source.x;
                     const sourceY = source.y;
                     this.tweens.add({
@@ -1996,12 +2027,16 @@ export default function PhaserBoard({
               });
             });
 
-            const maxTick = events.reduce(
-              (highest, event) => Math.max(highest, event.tick),
+            const maxPresentationTimeMs = events.reduce(
+              (highest, event) =>
+                Math.max(
+                  highest,
+                  event.tick * 100 + (event.presentationOffsetMs ?? 0),
+                ),
               0,
             );
             this.time.delayedCall(
-              Math.round((maxTick * 100) / speed) + Math.round(720 / speed),
+              Math.round(maxPresentationTimeMs / speed) + Math.round(720 / speed),
               () => {
                 if (generation !== this.animationGeneration) return;
                 for (const unit of this.payload.units) {

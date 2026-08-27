@@ -16,6 +16,7 @@ describe("Phase 3 combat presentation", () => {
       "status",
       "buff",
       "cast",
+      "ability-hit",
       "displace",
     ]) {
       const domainKind = eventKind === "displace" ? "unit-displace" : eventKind;
@@ -27,6 +28,8 @@ describe("Phase 3 combat presentation", () => {
     expect(selector).toContain("movementKind: event.movementKind");
     expect(selector).toContain("from: point(event.from)");
     expect(selector).toContain("to: point(event.to)");
+    expect(selector).toContain("hitIndex: event.hitIndex");
+    expect(selector).toContain("finisher: event.finisher");
     expect(selector).not.toContain('? "ability"');
   });
 
@@ -47,6 +50,8 @@ describe("Phase 3 combat presentation", () => {
       "SHIELD",
       "abilityName",
       "playLungeTrail",
+      "sequentialAbilityHitDelayMs",
+      'event.kind === "ability-hit"',
       'event.kind === "displace"',
       'event.movementKind === "lunge"',
     ]) {

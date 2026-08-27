@@ -19,6 +19,7 @@ import type {
   BoardUnit,
   CombatFxEvent,
 } from "@/components/PhaserBoard";
+import { sequentialAbilityHitDelayMs } from "@/components/boardCombatPresentation";
 import type { CarouselParticipantView } from "@/components/PhaserCarousel";
 import {
   buildBattleOutcome,
@@ -682,6 +683,71 @@ function combatEvents(
         : [],
     ),
   );
+  const presentationOffsetByEventIndex = new Map<number, number>();
+  const lastDamageOffsetByTarget = new Map<
+    string,
+    { tick: number; offsetMs: number }
+  >();
+  let activeSequentialHit: {
+    tick: number;
+    sourceId: string;
+    targetId: string;
+    offsetMs: number;
+  } | null = null;
+  result.events.forEach((event, index) => {
+    if (event.type === "ability-hit") {
+      const offsetMs = sequentialAbilityHitDelayMs(event.hitIndex);
+      activeSequentialHit = {
+        tick: event.tick,
+        sourceId: event.sourceId,
+        targetId: event.targetId,
+        offsetMs,
+      };
+      presentationOffsetByEventIndex.set(index, offsetMs);
+      return;
+    }
+    if (
+      activeSequentialHit &&
+      event.tick === activeSequentialHit.tick &&
+      event.type === "damage" &&
+      event.damageKind === "ability" &&
+      event.sourceId === activeSequentialHit.sourceId &&
+      event.targetId === activeSequentialHit.targetId
+    ) {
+      presentationOffsetByEventIndex.set(index, activeSequentialHit.offsetMs);
+      lastDamageOffsetByTarget.set(event.targetId, {
+        tick: event.tick,
+        offsetMs: activeSequentialHit.offsetMs,
+      });
+      return;
+    }
+    if (
+      activeSequentialHit &&
+      event.tick === activeSequentialHit.tick &&
+      (event.type === "energy" ||
+        event.type === "heal" ||
+        event.type === "shield" ||
+        event.type === "status")
+    ) {
+      presentationOffsetByEventIndex.set(index, activeSequentialHit.offsetMs);
+      return;
+    }
+    if (event.type === "death") {
+      const damageTiming = lastDamageOffsetByTarget.get(event.unitId);
+      if (damageTiming?.tick === event.tick) {
+        presentationOffsetByEventIndex.set(index, damageTiming.offsetMs);
+      }
+      return;
+    }
+    if (
+      event.type === "cast" ||
+      event.type === "attack" ||
+      event.type === "unit-move" ||
+      event.type === "unit-displace"
+    ) {
+      activeSequentialHit = null;
+    }
+  });
   const point = (value: { x: number; y: number }) =>
     mirror
       ? {
@@ -692,6 +758,9 @@ function combatEvents(
   const events = result.events.flatMap((event, index): CombatFxEvent[] => {
     if (event.type === "battle-start" || event.type === "battle-end") return [];
     const id = `${state.round}-${index}`;
+    const offsetMs = presentationOffsetByEventIndex.get(index);
+    const presentationTiming =
+      offsetMs === undefined ? {} : { presentationOffsetMs: offsetMs };
     if (event.type === "unit-move") {
       const to = point(event.to);
       return [{
@@ -752,12 +821,30 @@ function combatEvents(
         abilityName:
           ability?.name ?? sourceAbility?.name ?? titleCase(event.abilityId),
         telegraph,
+        deferImpactToAbilityHits: Boolean(
+          ability?.sequentialStrike ?? sourceAbility?.sequentialStrike,
+        ),
+      }];
+    }
+    if (event.type === "ability-hit") {
+      return [{
+        id,
+        tick: event.tick,
+        ...presentationTiming,
+        kind: "ability-hit",
+        sourceId: event.sourceId,
+        targetId: event.targetId,
+        abilityId: event.abilityId,
+        hitIndex: event.hitIndex,
+        hitCount: event.hitCount,
+        finisher: event.finisher,
       }];
     }
     if (event.type === "damage") {
       return [{
         id,
         tick: event.tick,
+        ...presentationTiming,
         kind: "damage",
         sourceId: event.sourceId,
         targetId: event.targetId,
@@ -774,6 +861,7 @@ function combatEvents(
       return [{
         id,
         tick: event.tick,
+        ...presentationTiming,
         kind: "energy",
         sourceId: event.unitId,
         targetId: event.unitId,
@@ -807,6 +895,7 @@ function combatEvents(
       return [{
         id,
         tick: event.tick,
+        ...presentationTiming,
         kind: event.type,
         sourceId: event.sourceId,
         targetId: event.targetId,
@@ -817,6 +906,7 @@ function combatEvents(
       return [{
         id,
         tick: event.tick,
+        ...presentationTiming,
         kind: "status",
         sourceId: event.sourceId,
         targetId: event.targetId,
@@ -828,6 +918,7 @@ function combatEvents(
       return [{
         id,
         tick: event.tick,
+        ...presentationTiming,
         kind: "defeat",
         sourceId: event.sourceId ?? undefined,
         targetId: event.unitId,

@@ -22,17 +22,18 @@ Harden and stabilize the local prototype while preserving a portable determinist
 
 ## Current Phase
 
-Post-hardening stabilization and architectural review.
+Gameplay expansion — Zoro Oni Giri vertical slice.
 
 ## Last Completed Work
 
-- 2026-08-27 — `b33d49b`, PR #7 on `chore/stabilize-project-state`: added the current handoff and bounded Codex execution contract, a manual 1,000-match release-soak workflow, and minimal release-documentation synchronization. No runtime or gameplay files changed; stale pre-hardening PR #1 was closed as superseded.
+- 2026-08-27 — Zoro Oni Giri vertical slice on `feature/zoro-oni-giri-sequence` (commit/PR pending): added a reusable serializable sequential-strike primitive, deterministic in-range retargeting, a conditional final-hit bonus, one-based `ability-hit` events, and presentation-only rapid-slash playback. Zoro content moved to version `1.2.0`; save schema remains version 6.
+- 2026-08-27 — `6c7d66d`, PR #7: added the current handoff and bounded Codex execution contract, a manual 1,000-match release-soak workflow, and minimal release-documentation synchronization. No runtime or gameplay files changed; stale pre-hardening PR #1 was closed as superseded.
 - 2026-08-27 — `d2a4c7b` (`refactor(game): harden deterministic architecture and PAC combat`): introduced the typed command/context boundary; decomposed `GameClient`; extracted cohesive domain modules; split persistence format from browser persistence; added deterministic hashing and replay coverage; centralized scoring; added carousel structural sharing; improved Phaser asset loading; added CI, coverage, asset validation, production smoke/soak tooling, and architecture/future-multiplayer/release documentation. PAC combat cadence and Tashigi lunge gameplay changes were included in the same commit.
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
 
-Current `main` baseline (`d2a4c7b`) was reported green in CI before this task:
+Current `main` baseline (`6c7d66d`) was reported green in CI before this task:
 
 - PASS — `npm run typecheck`
 - PASS — `npm run lint`
@@ -43,21 +44,25 @@ Current `main` baseline (`d2a4c7b`) was reported green in CI before this task:
 - PASS — `npm run build`
 - PASS — `npm run test:e2e`
 
-This stabilization task:
+This Zoro vertical slice:
 
 - PASS — `npm run typecheck` (run through the installed npm CLI).
 - PASS — `npm run lint` (run through the installed npm CLI).
-- PASS — `git diff --check`.
-- PASS — static inspection confirmed that `test:production-soak` runs 1,000 seeds and the manual workflow uses the required command and artifact path.
+- PASS — focused combat/presentation tests: 4 files, 26 tests.
+- PASS — `npm test`: 26 files, 174 tests.
+- PASS — `npm run test:production-smoke`: 50/50 complete matches, zero crashes.
+- PASS — `npm run build`.
+- PASS — `npm run test:e2e`: 13 passed, 3 skipped.
 - NOT RUN — `npm run test:production-soak`; it remains a deliberate manual release action.
-- NOT RUN — unit, production-smoke and E2E suites; this task changes documentation and GitHub Actions configuration only.
 
 ## Behavioral Changes
 
-The previous large hardening commit also changed combat behavior through PAC-inspired action cadence and Tashigi lunge mechanics. This stabilization task does not modify those changes.
+- Zoro's Oni Giri now resolves as 30% / 30% / remainder strikes, redirects remaining strikes after a KO to the nearest living enemy in range, and grants the third strike 25% raw bonus damage when its current target is at or below 35% HP.
+- The previous large hardening commit also changed combat behavior through PAC-inspired action cadence and Tashigi lunge mechanics; those behaviors were not modified here.
 
 ## Deviations From Plan
 
+- The Zoro vertical slice stayed within its requested scope with no gameplay implementation deviations.
 - The previous execution exceeded the intended bounded scope and combined architecture refactoring, tooling changes and gameplay changes in one commit.
 - `PROJECT_STATE.md` was not present on `main` during that execution.
 
@@ -69,6 +74,8 @@ The previous large hardening commit also changed combat behavior through PAC-ins
 - `engine.ts`, `GameScreens.tsx`, `selectors.ts` and `PhaserBoard` still contain substantial responsibilities.
 - `game/index.ts` still exposes a broad internal API.
 - The host's default `npm` shim resolves to a missing roaming npm CLI; verification passed through the installed npm CLI without repository changes.
+- The 50-match smoke showed no obvious Zoro dominance (10.7% conditional win rate), but average full-clock length was 32.78 minutes and Garp remained above the report's 65% conditional-win target; these broader balance signals were not changed in this slice.
+- On Windows, the first E2E process hung while tearing down its owned Vinext server after all assertions passed; a clean rerun reused that server and exited successfully.
 
 ## Important Decisions
 
@@ -81,7 +88,7 @@ The previous large hardening commit also changed combat behavior through PAC-ins
 
 ## Next Recommended Task
 
-Review the PAC/Tashigi gameplay changes and current 1,000-match balance results before starting another structural refactor.
+Review the Zoro vertical slice and choose the next combat-expression unit.
 
 ## Codex Update Contract
 

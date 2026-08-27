@@ -15,6 +15,7 @@ import type {
   BattleUnitState,
   GameContent,
   Position,
+  SequentialStrikeDefinition,
   TraitEffect,
   UnitStats,
 } from "./types";
@@ -314,6 +315,46 @@ function chooseTarget(
     );
   });
   return ordered[0] ?? null;
+}
+
+const BASIS_POINTS = 10_000;
+
+function sequentialStrikePowers(
+  scaledPower: number,
+  definition: SequentialStrikeDefinition | undefined,
+): number[] | null {
+  const weights = definition?.hitWeightsBasisPoints;
+  if (
+    !weights ||
+    weights.length === 0 ||
+    weights.some((weight) => !Number.isSafeInteger(weight) || weight <= 0) ||
+    weights.reduce((sum, weight) => sum + weight, 0) !== BASIS_POINTS
+  ) {
+    return null;
+  }
+  let allocated = 0;
+  return weights.map((weight, index) => {
+    const damage =
+      index === weights.length - 1
+        ? scaledPower - allocated
+        : Math.floor((scaledPower * weight) / BASIS_POINTS);
+    allocated += damage;
+    return damage;
+  });
+}
+
+function validFinalHitBonus(
+  definition: SequentialStrikeDefinition,
+): SequentialStrikeDefinition["finalHitBonus"] | null {
+  const bonus = definition.finalHitBonus;
+  return bonus &&
+    Number.isSafeInteger(bonus.healthThresholdPercent) &&
+    bonus.healthThresholdPercent >= 0 &&
+    bonus.healthThresholdPercent <= 100 &&
+    Number.isSafeInteger(bonus.damageBonusPercent) &&
+    bonus.damageBonusPercent >= 0
+    ? bonus
+    : null;
 }
 
 function abilityTargets(
@@ -775,6 +816,69 @@ export function simulateBattle(
     return healthDamage;
   };
 
+  // keldaanCommunity/pokemonAutoChess commit
+  // a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee informed separating shared cast
+  // semantics from specialized multi-hit resolution; this stays plain data.
+  const applySequentialStrikes = (
+    tick: number,
+    source: MutableBattleUnit,
+    initialTarget: MutableBattleUnit,
+    ability: AbilityDefinition,
+    scaledPower: number,
+  ): boolean => {
+    const definition = ability.sequentialStrike;
+    const strikePowers = sequentialStrikePowers(scaledPower, definition);
+    if (!definition || !strikePowers) {
+      return false;
+    }
+    let target: MutableBattleUnit | null = alive(initialTarget)
+      ? initialTarget
+      : null;
+    const finalHitBonus = validFinalHitBonus(definition);
+    for (let index = 0; index < strikePowers.length && target; index += 1) {
+      const isFinalHit = index === strikePowers.length - 1;
+      const finisher = Boolean(
+        isFinalHit &&
+          finalHitBonus &&
+          target.hp * 100 <=
+            target.maxHp * finalHitBonus.healthThresholdPercent,
+      );
+      const rawDamage = finisher
+        ? Math.floor(
+            (strikePowers[index] *
+              (100 + (finalHitBonus?.damageBonusPercent ?? 0))) /
+              100,
+          )
+        : strikePowers[index];
+      emit({
+        type: "ability-hit",
+        tick,
+        sourceId: source.id,
+        targetId: target.id,
+        abilityId: ability.id,
+        hitIndex: index + 1,
+        hitCount: strikePowers.length,
+        finisher,
+      });
+      applyDamage(tick, source, target, rawDamage, "ability");
+      if (target.hp <= 0 && index < strikePowers.length - 1) {
+        target =
+          definition.retargetOnKill === "nearest-in-range"
+            ? chooseTarget(
+                source,
+                units.filter(
+                  (candidate) =>
+                    alive(candidate) &&
+                    candidate.teamId !== source.teamId &&
+                    distance(source, candidate) <= source.range,
+                ),
+              )
+            : null;
+      }
+    }
+    return true;
+  };
+
   const processDeaths = (tick: number): void => {
     for (const unit of units) {
       if (unit.state === "dead" || unit.hp > 0) {
@@ -978,9 +1082,18 @@ export function simulateBattle(
         } else if (abilityDefinition.effect === "shield") {
           applyShield(tick, source, target, scaledPower);
         } else {
-          const hits = Math.max(1, abilityDefinition.hits ?? 1);
-          for (let hit = 0; hit < hits; hit += 1) {
-            applyDamage(tick, source, target, scaledPower, "ability");
+          const sequentialApplied = applySequentialStrikes(
+            tick,
+            source,
+            target,
+            abilityDefinition,
+            scaledPower,
+          );
+          if (!sequentialApplied) {
+            const hits = Math.max(1, abilityDefinition.hits ?? 1);
+            for (let hit = 0; hit < hits; hit += 1) {
+              applyDamage(tick, source, target, scaledPower, "ability");
+            }
           }
           if (target.hp > 0 && abilityDefinition.stunMs) {
             const durationTicks = Math.max(

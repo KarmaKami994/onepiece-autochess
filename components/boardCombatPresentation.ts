@@ -6,6 +6,12 @@ export type CombatPresentationStyle =
   | "slash"
   | "impact";
 
+const SEQUENTIAL_HIT_GAP_MS = 120;
+
+export function sequentialAbilityHitDelayMs(hitIndex: number): number {
+  return Math.max(0, Math.floor(hitIndex) - 1) * SEQUENTIAL_HIT_GAP_MS;
+}
+
 export function combatPresentationStyle(
   contentId: string,
   eventKind: "attack" | "cast",
