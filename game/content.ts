@@ -360,10 +360,11 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     ability: ability(
       "room-shambles",
       "ROOM/Shambles",
-      "Manipulates a wide ROOM and strikes every enemy inside.",
+      "Manipulates a wide ROOM, damaging every enemy and pulling surviving foes one step toward Law.",
       195,
       "nearest-enemy",
       "all-enemies",
+      { signatureMechanics: [{ kind: "pull" }] },
     ),
     assetPath: "/assets/characters/law.png",
   },
@@ -383,11 +384,15 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     ability: ability(
       "fire-fist",
       "Fire Fist",
-      "Engulfs a cluster of enemies in a blazing fist.",
+      "Engulfs a cluster in a blazing fist, burning enemies and blasting survivors backward.",
       390,
       "farthest-enemy",
       "adjacent",
-      { burnPower: 28, burnDurationMs: 4_000 },
+      {
+        burnPower: 28,
+        burnDurationMs: 4_000,
+        signatureMechanics: [{ kind: "knockback" }],
+      },
     ),
     assetPath: "/assets/characters/ace.png",
   },
@@ -407,11 +412,11 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     ability: ability(
       "mero-mero",
       "Mero Mero",
-      "Petrifies and damages enemies across the battlefield.",
+      "Petrifies enemies across the battlefield, damaging and stunning them while draining 10 Energy from survivors.",
       235,
       "nearest-enemy",
       "all-enemies",
-      { stunMs: 1_000 },
+      { stunMs: 1_000, energyDrain: 10 },
     ),
     assetPath: "/assets/characters/hancock.png",
   },
@@ -431,11 +436,11 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     ability: ability(
       "string-bind",
       "String Bind",
-      "Binds a cluster in razor wire and leaves them stunned.",
+      "Binds a vulnerable enemy cluster in razor strings, damaging and stunning them before pulling survivors closer.",
       315,
       "lowest-health-enemy",
       "adjacent",
-      { stunMs: 1_400 },
+      { stunMs: 1_400, signatureMechanics: [{ kind: "pull" }] },
     ),
     assetPath: "/assets/characters/doflamingo.png",
   },
@@ -1138,7 +1143,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.6.0",
+  version: "1.7.0",
   units: UNIT_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,
   items: ITEM_DEFINITIONS,
