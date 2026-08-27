@@ -6,6 +6,7 @@ import {
   initialBoardFacing,
   mirroredOriginX,
 } from "../components/boardFacing";
+import { sequentialAbilityHitDelayMs } from "../components/boardCombatPresentation";
 import {
   BOARD_MAP_LIST,
   DEFAULT_BOARD_SKIN,
@@ -16,6 +17,10 @@ import {
 const projectRoot = path.resolve(import.meta.dirname, "..");
 
 describe("board presentation", () => {
+  it("spaces one-based sequential ability hits at a presentation-only cadence", () => {
+    expect([1, 2, 3].map(sequentialAbilityHitDelayMs)).toEqual([0, 120, 240]);
+  });
+
   it("keeps direction changes stable across vertical movement", () => {
     expect(initialBoardFacing("player")).toBe("right");
     expect(initialBoardFacing("enemy")).toBe("left");

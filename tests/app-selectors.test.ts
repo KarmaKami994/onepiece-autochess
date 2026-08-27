@@ -1,6 +1,29 @@
 import { describe, expect, it } from "vitest";
-import { createMatch } from "../game";
+import { createMatch, type BattleUnitSnapshot } from "../game";
 import { selectCarouselView, selectMatchView } from "../app/selectors";
+
+function snapshot(
+  id: string,
+  definitionId: string,
+  teamId: string,
+): BattleUnitSnapshot {
+  return {
+    id,
+    definitionId,
+    teamId,
+    star: 1,
+    x: 1,
+    y: 1,
+    hp: 500,
+    maxHp: 500,
+    shield: 0,
+    energy: 0,
+    attack: 50,
+    defense: 10,
+    range: 1,
+    state: "seek",
+  };
+}
 
 describe("typed application selectors", () => {
   it("builds the complete local UI view from canonical match state", () => {
@@ -89,5 +112,92 @@ describe("typed application selectors", () => {
       contentId: "meat-platter",
       orbitIndex: 0,
     });
+  });
+
+  it("maps sequential ability hits for presentation without replaying cast impact", () => {
+    const state = createMatch("selector-ability-hit");
+    state.phase = "battle";
+    const initialUnits = [
+      snapshot("zoro-source", "zoro", "player-1"),
+      snapshot("actual-target", "chopper", "bot-1"),
+    ];
+    state.lastResults = [{
+      playerAId: "player-1",
+      playerBId: "bot-1",
+      ghostOfPlayerId: null,
+      winnerId: null,
+      timedOut: false,
+      playerADamage: 0,
+      playerBDamage: 0,
+      durationTicks: 1,
+      events: [
+        {
+          type: "cast",
+          tick: 1,
+          sourceId: "zoro-source",
+          abilityId: "oni-giri",
+          targetIds: ["actual-target"],
+        },
+        {
+          type: "ability-hit",
+          tick: 1,
+          sourceId: "zoro-source",
+          targetId: "actual-target",
+          abilityId: "oni-giri",
+          hitIndex: 2,
+          hitCount: 3,
+          finisher: false,
+        },
+        {
+          type: "damage",
+          tick: 1,
+          sourceId: "zoro-source",
+          targetId: "actual-target",
+          amount: 143,
+          healthDamage: 143,
+          shieldDamage: 0,
+          damageKind: "ability",
+        },
+        {
+          type: "death",
+          tick: 1,
+          unitId: "actual-target",
+          sourceId: "zoro-source",
+        },
+      ],
+      initialUnits,
+      finalUnits: initialUnits,
+    }];
+
+    const view = selectMatchView(state);
+
+    expect(view.events).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: "cast",
+          abilityId: "oni-giri",
+          deferImpactToAbilityHits: true,
+        }),
+        expect.objectContaining({
+          kind: "ability-hit",
+          sourceId: "zoro-source",
+          targetId: "actual-target",
+          hitIndex: 2,
+          hitCount: 3,
+          finisher: false,
+          presentationOffsetMs: 120,
+        }),
+        expect.objectContaining({
+          kind: "damage",
+          targetId: "actual-target",
+          presentationOffsetMs: 120,
+        }),
+        expect.objectContaining({
+          kind: "defeat",
+          targetId: "actual-target",
+          presentationOffsetMs: 120,
+        }),
+      ]),
+    );
   });
 });

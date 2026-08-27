@@ -270,10 +270,20 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     ability: ability(
       "oni-giri",
       "Oni Giri",
-      "A devastating three-sword strike against one enemy.",
+      "Strikes three times. Remaining strikes redirect after a KO, and the final strike deals more damage to low-health enemies.",
       355,
       "lowest-health-enemy",
       "single",
+      {
+        sequentialStrike: {
+          hitWeightsBasisPoints: [3_000, 3_000, 4_000],
+          retargetOnKill: "nearest-in-range",
+          finalHitBonus: {
+            healthThresholdPercent: 35,
+            damageBonusPercent: 25,
+          },
+        },
+      },
     ),
     assetPath: "/assets/characters/zoro.png",
   },
@@ -1118,7 +1128,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.1.0",
+  version: "1.2.0",
   units: UNIT_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,
   items: ITEM_DEFINITIONS,

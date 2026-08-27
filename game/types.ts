@@ -38,6 +38,15 @@ export type AbilityEffectKind = "damage" | "heal" | "shield";
 
 export type SignatureMechanic = { kind: "lunge" };
 
+export interface SequentialStrikeDefinition {
+  hitWeightsBasisPoints: number[];
+  retargetOnKill?: "nearest-in-range";
+  finalHitBonus?: {
+    healthThresholdPercent: number;
+    damageBonusPercent: number;
+  };
+}
+
 export interface AbilityDefinition {
   id: string;
   name: string;
@@ -51,6 +60,7 @@ export interface AbilityDefinition {
   /** Targetless abilities may cast from a movement action window. */
   requiresTarget?: boolean;
   signatureMechanics?: SignatureMechanic[];
+  sequentialStrike?: SequentialStrikeDefinition;
   hits?: number;
   stunMs?: number;
   burnPower?: number;
@@ -487,6 +497,18 @@ export type BattleEvent =
       sourceId: string;
       abilityId: string;
       targetIds: string[];
+    }
+  | {
+      type: "ability-hit";
+      tick: number;
+      sourceId: string;
+      targetId: string;
+      abilityId: string;
+      /** One-based strike index for presentation and event consumers. */
+      hitIndex: number;
+      hitCount: number;
+      /** True only when the conditional final-hit damage bonus was applied. */
+      finisher: boolean;
     }
   | {
       type: "damage";
