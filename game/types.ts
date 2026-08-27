@@ -63,6 +63,7 @@ export interface AbilityDefinition {
   requiresTarget?: boolean;
   signatureMechanics?: SignatureMechanic[];
   sequentialStrike?: SequentialStrikeDefinition;
+  energyDrain?: number;
   hits?: number;
   stunMs?: number;
   burnPower?: number;
@@ -531,7 +532,7 @@ export type BattleEvent =
       amount: number;
       /** Energy after this event has been applied. */
       value: number;
-      reason: "attack" | "damaged" | "cast-reset";
+      reason: "attack" | "damaged" | "cast-reset" | "ability-drain";
     }
   | {
       type: "dodge";
