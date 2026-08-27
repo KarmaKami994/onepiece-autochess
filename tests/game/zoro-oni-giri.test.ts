@@ -133,7 +133,7 @@ describe("Zoro Oni Giri sequential strikes", () => {
       },
     });
     expect(zoro.ability.description).toContain("Strikes three times");
-    expect(DEFAULT_CONTENT.version).toBe("1.6.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.7.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(JSON.parse(JSON.stringify(zoro.ability))).toEqual(zoro.ability);
   });

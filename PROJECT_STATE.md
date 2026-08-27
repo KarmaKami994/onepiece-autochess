@@ -22,10 +22,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-Gameplay expansion — Combat Identity Pack B (Sabo / Luffy / Kid / Crocodile).
+Gameplay expansion — Combat Identity Pack C (Law / Ace / Hancock / Doflamingo).
 
 ## Last Completed Work
 
+- 2026-08-27 — `3489ef4`, PR #13 on `feature/combat-identity-pack-c`: composed existing pull, knockback, Energy Drain, stun and burn mechanics for Law, Ace, Hancock and Doflamingo without engine changes. Content moved to version `1.7.0`; save schema remains version 6. Material files: `game/content.ts`, the new Pack C combat test and prior content-version regression tests.
 - 2026-08-27 — `767733f`, PR #12 on `feature/combat-identity-pack-b`: added Sabo's brief AoE stun, Luffy's post-Gatling knockback, Kid's deterministic one-cell pull and Crocodile's 15-Energy Drain. Content moved to version `1.6.0`; save schema remains version 6. Material files: `game/combat.ts`, `game/content.ts`, `game/types.ts`, the new Pack B combat test and prior content-version regression tests.
 - 2026-08-27 — `08d4ccd`, PR #11 on `feature/combat-identity-pack-a`: added Chopper's conditional post-heal shield and composed existing knockback, Energy Drain, burn and stun primitives for Sanji, Robin and Smoker. Content moved to version `1.5.0`; save schema remains version 6.
 - 2026-08-27 — `e904305`, merged PR #10: added a validated serializable 15-Energy Drain after Thunderbolt Tempo's existing AoE damage, reusing the clamped Energy mutation/event pipeline for Nami.
@@ -37,7 +38,7 @@ Gameplay expansion — Combat Identity Pack B (Sabo / Luffy / Kid / Crocodile).
 
 ## Verification
 
-Current `main` baseline (`872a290`, merged PR #11) includes the verified Combat Identity Pack A:
+Current `main` baseline (`f0a2d3b`, merged PR #12) includes the verified Combat Identity Pack B:
 
 - PASS — `npm run typecheck`
 - PASS — `npm run lint`
@@ -103,8 +104,20 @@ Combat Identity Pack B:
 - NOT RUN — `npm run test:e2e`; no app, selector, Phaser or presentation source changed.
 - NOT RUN — `npm run test:production-soak`; it remains a deliberate manual release action.
 
+Combat Identity Pack C:
+
+- PASS — `npm run typecheck` (run through the installed npm CLI).
+- PASS — `npm run lint` (run through the installed npm CLI).
+- PASS — focused combat regressions: 7 files, 85 tests.
+- PASS — `npm test`: 31 files, 239 tests.
+- PASS — `npm run test:production-smoke`: 50/50 complete matches, zero crashes.
+- PASS — `npm run build`.
+- NOT RUN — `npm run test:e2e`; no app, selector, Phaser or presentation source changed.
+- NOT RUN — `npm run test:production-soak`; it remains a deliberate manual release action.
+
 ## Behavioral Changes
 
+- Combat Identity Pack C adds Law's global post-damage pull, Ace's post-burn knockback, Hancock's global 10-Energy Drain after stun, and Doflamingo's post-stun cluster pull using only existing primitives.
 - Combat Identity Pack B adds Sabo's 600ms AoE stun, Luffy's post-three-hit knockback, Kid's deterministic one-cell pull toward himself, and Crocodile's 15-Energy Drain after line damage.
 - Combat Identity Pack A adds Chopper's post-heal emergency shield at or below 35% pre-heal HP, Sanji's post-burn knockback, Robin's post-stun 15-Energy Drain, and deterministic line knockback for Smoker.
 - Nami's Thunderbolt Tempo now resolves its existing damage and damaged-Energy gains before draining up to 15 Energy from each surviving original affected target. Invalid drain configuration and zero-Energy targets produce no drain event.
@@ -114,6 +127,7 @@ Combat Identity Pack B:
 
 ## Deviations From Plan
 
+- Combat Identity Pack C stayed within scope with zero new primitives and no combat-engine, type or presentation changes, so E2E was not run.
 - Combat Identity Pack B stayed within scope; existing generic displacement, status and Energy presentation required no source changes, so E2E was not run.
 - Combat Identity Pack A stayed within scope; existing generic heal, shield, Energy, status and displacement presentation required no source changes, so E2E was not run.
 - The Nami vertical slice stayed within scope; existing generic Energy presentation required no source changes, so E2E was not run.
@@ -132,6 +146,7 @@ Combat Identity Pack B:
 - The host's default `npm` shim resolves to a missing roaming npm CLI; verification passed through the installed npm CLI without repository changes.
 - The Pack A 50-match smoke showed no obvious dominance among Chopper (9.4%), Sanji (14.5%), Robin (3.8%) or Smoker (11.7% conditional win rates). Average full-clock length remained above target at 31.26 minutes; no balance values were changed in response.
 - The Pack B 50-match smoke showed Luffy (32.5%) and Sabo (27.4%) above Kid (12.6%) and Crocodile (13.3%) in conditional win rate. The sample is small, Garp remained marginally above the report's 65% target at 65.4%, and average full-clock length remained above target at 31.34 minutes; no values were tuned.
+- The Pack C 50-match smoke showed no obvious dominance among Law (21.7%), Ace (26.0%), Hancock (17.7%) or Doflamingo (19.4%). Luffy (35.4%) and Sabo (27.6%) remained elevated in the small sample, and average full-clock length remained above target at 31.54 minutes; no values were tuned.
 - On Windows, the first E2E process hung while tearing down its owned Vinext server after all assertions passed; a clean rerun reused that server and exited successfully.
 
 ## Important Decisions
@@ -145,7 +160,7 @@ Combat Identity Pack B:
 
 ## Next Recommended Task
 
-Review Combat Identity Pack B and choose the next grouped character pack.
+Review Combat Identity Pack C and choose the final high-cost character pack.
 
 ## Codex Update Contract
 
