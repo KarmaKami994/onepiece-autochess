@@ -16,6 +16,7 @@ import type {
   GameContent,
   Position,
   SequentialStrikeDefinition,
+  SignatureMechanic,
   TraitEffect,
   UnitStats,
 } from "./types";
@@ -581,9 +582,49 @@ function chooseStep(
 
 function hasSignatureMechanic(
   ability: AbilityDefinition,
-  kind: "lunge",
+  kind: SignatureMechanic["kind"],
 ): boolean {
   return ability.signatureMechanics?.some((mechanic) => mechanic.kind === kind) ?? false;
+}
+
+function chooseKnockbackDestination(
+  source: MutableBattleUnit,
+  target: MutableBattleUnit,
+  units: MutableBattleUnit[],
+  content: GameContent,
+): Position | null {
+  const dx = target.x - source.x;
+  const dy = target.y - source.y;
+  const horizontal = dx === 0
+    ? null
+    : { x: target.x + Math.sign(dx), y: target.y };
+  const vertical = dy === 0
+    ? null
+    : { x: target.x, y: target.y + Math.sign(dy) };
+  const candidates = dx === 0
+    ? [vertical]
+    : dy === 0
+      ? [horizontal]
+      : Math.abs(dx) >= Math.abs(dy)
+        ? [horizontal, vertical]
+        : [vertical, horizontal];
+
+  for (const candidate of candidates) {
+    if (
+      candidate &&
+      candidate.x >= 0 &&
+      candidate.x < content.config.boardWidth &&
+      candidate.y >= 0 &&
+      candidate.y < content.config.boardHeight &&
+      !units.some(
+        (unit) =>
+          alive(unit) && unit.x === candidate.x && unit.y === candidate.y,
+      )
+    ) {
+      return candidate;
+    }
+  }
+  return null;
 }
 
 function firstLungeDestination(
@@ -1152,6 +1193,40 @@ export function simulateBattle(
               durationTicks,
             });
           }
+        }
+      }
+      if (hasSignatureMechanic(abilityDefinition, "knockback")) {
+        for (const targetId of [...intent.targetIds].sort((left, right) =>
+          left.localeCompare(right),
+        )) {
+          const target = units.find(
+            (unit) => unit.id === targetId && alive(unit),
+          );
+          if (!target) {
+            continue;
+          }
+          const destination = chooseKnockbackDestination(
+            source,
+            target,
+            units,
+            content,
+          );
+          if (!destination) {
+            continue;
+          }
+          const from = { x: target.x, y: target.y };
+          target.x = destination.x;
+          target.y = destination.y;
+          emit({
+            type: "unit-displace",
+            tick,
+            sourceId: source.id,
+            unitId: target.id,
+            abilityId: abilityDefinition.id,
+            movementKind: "knockback",
+            from,
+            to: destination,
+          });
         }
       }
     }

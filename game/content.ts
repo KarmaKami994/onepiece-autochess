@@ -69,10 +69,11 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     ability: ability(
       "exploding-star",
       "Exploding Star",
-      "Fires an explosive projectile that damages a cluster.",
+      "Fires an explosive shot at the farthest enemy, damaging nearby enemies and blasting surviving targets backward.",
       160,
       "farthest-enemy",
       "adjacent",
+      { signatureMechanics: [{ kind: "knockback" }] },
     ),
     assetPath: "/assets/characters/usopp.png",
   },
@@ -1128,7 +1129,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.2.0",
+  version: "1.3.0",
   units: UNIT_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,
   items: ITEM_DEFINITIONS,

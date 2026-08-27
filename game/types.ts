@@ -36,7 +36,9 @@ export type AbilityPattern =
   | "single-ally";
 export type AbilityEffectKind = "damage" | "heal" | "shield";
 
-export type SignatureMechanic = { kind: "lunge" };
+export type SignatureMechanic =
+  | { kind: "lunge" }
+  | { kind: "knockback" };
 
 export interface SequentialStrikeDefinition {
   hitWeightsBasisPoints: number[];
@@ -480,7 +482,7 @@ export type BattleEvent =
       sourceId: string;
       unitId: string;
       abilityId: string;
-      movementKind: "lunge";
+      movementKind: "lunge" | "knockback";
       from: Position;
       to: Position;
     }
