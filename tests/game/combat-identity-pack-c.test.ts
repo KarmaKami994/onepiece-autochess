@@ -235,7 +235,7 @@ describe("Combat Identity Pack C content", () => {
         signatureMechanics: [{ kind: "pull" }],
       },
     });
-    expect(DEFAULT_CONTENT.version).toBe("1.7.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.8.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 });

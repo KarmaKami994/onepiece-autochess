@@ -460,11 +460,14 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     ability: ability(
       "galaxy-impact",
       "Galaxy Impact",
-      "Shatters the battlefield with a colossal shock wave.",
+      "Shatters the battlefield with a colossal shock wave, damaging every enemy and blasting survivors backward.",
       360,
       "nearest-enemy",
       "all-enemies",
-      { stunMs: 1_000, castAnimationMs: 700 },
+      {
+        castAnimationMs: 700,
+        signatureMechanics: [{ kind: "knockback" }],
+      },
     ),
     assetPath: "/assets/characters/garp.png",
   },
@@ -484,11 +487,11 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     ability: ability(
       "black-blade-wave",
       "Black Blade Wave",
-      "Launches an overwhelming slash through an enemy line.",
+      "Launches an overwhelming slash through an enemy line, ignoring 50% of their Defense.",
       660,
       "farthest-enemy",
       "line",
-      { castAnimationMs: 700 },
+      { castAnimationMs: 700, defensePiercePercent: 50 },
     ),
     assetPath: "/assets/characters/mihawk.png",
   },
@@ -1143,7 +1146,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.7.0",
+  version: "1.8.0",
   units: UNIT_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,
   items: ITEM_DEFINITIONS,
