@@ -22,10 +22,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-Gameplay expansion — Combat Identity Pack C (Law / Ace / Hancock / Doflamingo).
+Gameplay expansion — Final current-roster high-cost identity pack (Garp / Mihawk).
 
 ## Last Completed Work
 
+- 2026-08-27 — `6e012d3`, PR #14 on `feature/final-high-cost-identity-pack`: replaced Garp's global stun with post-damage global knockback and added transient per-ability Defense Pierce for Mihawk. Content moved to version `1.8.0`; save schema remains version 6. Material files: `game/combat.ts`, `game/content.ts`, `game/types.ts`, the new high-cost identity test and prior content-version regression tests.
 - 2026-08-27 — `3489ef4`, PR #13 on `feature/combat-identity-pack-c`: composed existing pull, knockback, Energy Drain, stun and burn mechanics for Law, Ace, Hancock and Doflamingo without engine changes. Content moved to version `1.7.0`; save schema remains version 6. Material files: `game/content.ts`, the new Pack C combat test and prior content-version regression tests.
 - 2026-08-27 — `767733f`, PR #12 on `feature/combat-identity-pack-b`: added Sabo's brief AoE stun, Luffy's post-Gatling knockback, Kid's deterministic one-cell pull and Crocodile's 15-Energy Drain. Content moved to version `1.6.0`; save schema remains version 6. Material files: `game/combat.ts`, `game/content.ts`, `game/types.ts`, the new Pack B combat test and prior content-version regression tests.
 - 2026-08-27 — `08d4ccd`, PR #11 on `feature/combat-identity-pack-a`: added Chopper's conditional post-heal shield and composed existing knockback, Energy Drain, burn and stun primitives for Sanji, Robin and Smoker. Content moved to version `1.5.0`; save schema remains version 6.
@@ -38,7 +39,7 @@ Gameplay expansion — Combat Identity Pack C (Law / Ace / Hancock / Doflamingo)
 
 ## Verification
 
-Current `main` baseline (`f0a2d3b`, merged PR #12) includes the verified Combat Identity Pack B:
+Current `main` baseline (`c6a7e5b`, merged PR #13) includes the verified Combat Identity Pack C:
 
 - PASS — `npm run typecheck`
 - PASS — `npm run lint`
@@ -115,8 +116,20 @@ Combat Identity Pack C:
 - NOT RUN — `npm run test:e2e`; no app, selector, Phaser or presentation source changed.
 - NOT RUN — `npm run test:production-soak`; it remains a deliberate manual release action.
 
+Final current-roster high-cost identity pack:
+
+- PASS — `npm run typecheck` (run through the installed npm CLI).
+- PASS — `npm run lint` (run through the installed npm CLI).
+- PASS — focused combat regressions: 9 files, 104 tests.
+- PASS — `npm test`: 32 files, 254 tests.
+- PASS — `npm run test:production-smoke`: 50/50 complete matches, zero crashes.
+- PASS — `npm run build`.
+- NOT RUN — `npm run test:e2e`; no app, selector, Phaser or presentation source changed.
+- NOT RUN — `npm run test:production-soak`; it remains a deliberate manual release action.
+
 ## Behavioral Changes
 
+- Galaxy Impact now replaces Garp's previous global 1000ms stun with deterministic one-cell knockback after its unchanged global damage; Black Blade Wave now ignores 50% of each target's current non-negative Defense for that ability's mitigation only.
 - Combat Identity Pack C adds Law's global post-damage pull, Ace's post-burn knockback, Hancock's global 10-Energy Drain after stun, and Doflamingo's post-stun cluster pull using only existing primitives.
 - Combat Identity Pack B adds Sabo's 600ms AoE stun, Luffy's post-three-hit knockback, Kid's deterministic one-cell pull toward himself, and Crocodile's 15-Energy Drain after line damage.
 - Combat Identity Pack A adds Chopper's post-heal emergency shield at or below 35% pre-heal HP, Sanji's post-burn knockback, Robin's post-stun 15-Energy Drain, and deterministic line knockback for Smoker.
@@ -127,6 +140,7 @@ Combat Identity Pack C:
 
 ## Deviations From Plan
 
+- The final high-cost identity pack stayed within scope; Defense Pierce required only a small central mitigation parameter and no persistent status or presentation change, so E2E was not run.
 - Combat Identity Pack C stayed within scope with zero new primitives and no combat-engine, type or presentation changes, so E2E was not run.
 - Combat Identity Pack B stayed within scope; existing generic displacement, status and Energy presentation required no source changes, so E2E was not run.
 - Combat Identity Pack A stayed within scope; existing generic heal, shield, Energy, status and displacement presentation required no source changes, so E2E was not run.
@@ -147,6 +161,7 @@ Combat Identity Pack C:
 - The Pack A 50-match smoke showed no obvious dominance among Chopper (9.4%), Sanji (14.5%), Robin (3.8%) or Smoker (11.7% conditional win rates). Average full-clock length remained above target at 31.26 minutes; no balance values were changed in response.
 - The Pack B 50-match smoke showed Luffy (32.5%) and Sabo (27.4%) above Kid (12.6%) and Crocodile (13.3%) in conditional win rate. The sample is small, Garp remained marginally above the report's 65% target at 65.4%, and average full-clock length remained above target at 31.34 minutes; no values were tuned.
 - The Pack C 50-match smoke showed no obvious dominance among Law (21.7%), Ace (26.0%), Hancock (17.7%) or Doflamingo (19.4%). Luffy (35.4%) and Sabo (27.6%) remained elevated in the small sample, and average full-clock length remained above target at 31.54 minutes; no values were tuned.
+- The final high-cost 50-match smoke showed Garp at 56.0% and Mihawk at 43.8% conditional win rate from only 25 and 16 final-board appearances respectively. Luffy (35.4%) and Sabo (27.8%) remained elevated, and average full-clock length remained above target at 31.49 minutes; no values were tuned.
 - On Windows, the first E2E process hung while tearing down its owned Vinext server after all assertions passed; a clean rerun reused that server and exited successfully.
 
 ## Important Decisions
@@ -155,12 +170,13 @@ Combat Identity Pack C:
 - Future multiplayer is server authoritative.
 - Add no multiplayer infrastructure yet.
 - Keep a shared deterministic game domain.
+- Defense Pierce is transient per-ability mitigation behavior, not a persistent Defense mutation, status or debuff.
 - All future Codex work must be bounded and branch/PR based.
 - ChatGPT decides architecture and prioritization; Codex executes requested tasks.
 
 ## Next Recommended Task
 
-Review Combat Identity Pack C and choose the final high-cost character pack.
+Review the completed current-roster combat-identity pass and run a larger full-roster balance / combat-readability assessment before expanding the roster further.
 
 ## Codex Update Contract
 
