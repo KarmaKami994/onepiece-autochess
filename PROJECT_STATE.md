@@ -22,10 +22,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-Gameplay expansion — Final current-roster high-cost identity pack (Garp / Mihawk).
+Full-roster balance and combat-readability assessment.
 
 ## Last Completed Work
 
+- 2026-08-27 — `46849a8`, PR #15 on `analysis/full-roster-balance-readability`: completed the first post-identity-pass 1,000-seed full-roster assessment. Added cost-band, placement, top-four, Wilson-interval, combat-expression and PvP readability diagnostics plus the exact generated snapshot and decision report. No gameplay, content, presentation or save values changed; content remains `1.8.0` and save schema remains 6. Material files: `scripts/run_production_soak.ts`, `tests/production-audit.test.ts`, `docs/analysis/full-roster-balance-1000.json`, `docs/FULL_ROSTER_BALANCE_ASSESSMENT.md`, `PROJECT_STATE.md`.
 - 2026-08-27 — `6e012d3`, PR #14 on `feature/final-high-cost-identity-pack`: replaced Garp's global stun with post-damage global knockback and added transient per-ability Defense Pierce for Mihawk. Content moved to version `1.8.0`; save schema remains version 6. Material files: `game/combat.ts`, `game/content.ts`, `game/types.ts`, the new high-cost identity test and prior content-version regression tests.
 - 2026-08-27 — `3489ef4`, PR #13 on `feature/combat-identity-pack-c`: composed existing pull, knockback, Energy Drain, stun and burn mechanics for Law, Ace, Hancock and Doflamingo without engine changes. Content moved to version `1.7.0`; save schema remains version 6. Material files: `game/content.ts`, the new Pack C combat test and prior content-version regression tests.
 - 2026-08-27 — `767733f`, PR #12 on `feature/combat-identity-pack-b`: added Sabo's brief AoE stun, Luffy's post-Gatling knockback, Kid's deterministic one-cell pull and Crocodile's 15-Energy Drain. Content moved to version `1.6.0`; save schema remains version 6. Material files: `game/combat.ts`, `game/content.ts`, `game/types.ts`, the new Pack B combat test and prior content-version regression tests.
@@ -38,6 +39,17 @@ Gameplay expansion — Final current-roster high-cost identity pack (Garp / Miha
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+Full-roster balance and combat-readability assessment:
+
+- PASS — `npm run typecheck` (run through the installed npm CLI).
+- PASS — `npm run lint` (run through the installed npm CLI).
+- PASS — focused production-audit test: 1 file, 1 test.
+- PASS — `npm test`: 32 files, 254 tests.
+- PASS — `npm run test:production-smoke`: 50/50 complete matches, zero crashes.
+- PASS — `npm run build`.
+- PASS — `npm run test:production-soak`: exactly one run, 1,000/1,000 complete matches, zero crashes.
+- NOT RUN — `npm run test:e2e`; no app, selector, Phaser or presentation source changed.
 
 Current `main` baseline (`c6a7e5b`, merged PR #13) includes the verified Combat Identity Pack C:
 
@@ -129,6 +141,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- No gameplay or presentation behavior changed. Production-soak output is additively richer and now reports same-cost placement/performance uncertainty plus PvP combat-expression/readability density.
 - Galaxy Impact now replaces Garp's previous global 1000ms stun with deterministic one-cell knockback after its unchanged global damage; Black Blade Wave now ignores 50% of each target's current non-negative Defense for that ability's mitigation only.
 - Combat Identity Pack C adds Law's global post-damage pull, Ace's post-burn knockback, Hancock's global 10-Energy Drain after stun, and Doflamingo's post-stun cluster pull using only existing primitives.
 - Combat Identity Pack B adds Sabo's 600ms AoE stun, Luffy's post-three-hit knockback, Kid's deterministic one-cell pull toward himself, and Crocodile's 15-Energy Drain after line damage.
@@ -140,6 +153,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- None for the full-roster assessment; the 1,000-seed production soak was run exactly once after all required pre-soak verification passed.
 - The final high-cost identity pack stayed within scope; Defense Pierce required only a small central mitigation parameter and no persistent status or presentation change, so E2E was not run.
 - Combat Identity Pack C stayed within scope with zero new primitives and no combat-engine, type or presentation changes, so E2E was not run.
 - Combat Identity Pack B stayed within scope; existing generic displacement, status and Energy presentation required no source changes, so E2E was not run.
@@ -153,15 +167,15 @@ Final current-roster high-cost identity pack:
 ## Problems / Risks Found
 
 - PAC/Tashigi gameplay changes need separate product/balance review.
-- The current historical 1,000-match `BALANCE_REPORT` predates the newest combat behavior.
+- The 1,000-seed assessment shows high-confidence same-cost positive outliers for Sabo and Luffy and negative outliers for Robin and Nami; unit presence remains associative and composition-confounded, so tuning must stay isolated.
+- Ace appears on 68.1% of winning boards and exceeds the existing 65% presence guardrail; this is a watch signal, not causal proof.
+- Garp outperforms Mihawk within the two-unit 5-cost band, but their 616 and 395 final-board observations are the roster's smallest samples and are strongly affected by 5-cost availability.
+- Average full-clock match length is 32.22 minutes, above the existing 20–30 minute target; paced length is 22.31 minutes.
+- Pull and knockback share generic movement presentation, Energy Drain lacks caster attribution, and Defense Pierce has no dedicated cue. Their readability risk is amplified by 19.87 defined control events per PvP battle.
 - The `GameClient`/session boundary is improved, but some direct domain calls remain.
 - `engine.ts`, `GameScreens.tsx`, `selectors.ts` and `PhaserBoard` still contain substantial responsibilities.
 - `game/index.ts` still exposes a broad internal API.
 - The host's default `npm` shim resolves to a missing roaming npm CLI; verification passed through the installed npm CLI without repository changes.
-- The Pack A 50-match smoke showed no obvious dominance among Chopper (9.4%), Sanji (14.5%), Robin (3.8%) or Smoker (11.7% conditional win rates). Average full-clock length remained above target at 31.26 minutes; no balance values were changed in response.
-- The Pack B 50-match smoke showed Luffy (32.5%) and Sabo (27.4%) above Kid (12.6%) and Crocodile (13.3%) in conditional win rate. The sample is small, Garp remained marginally above the report's 65% target at 65.4%, and average full-clock length remained above target at 31.34 minutes; no values were tuned.
-- The Pack C 50-match smoke showed no obvious dominance among Law (21.7%), Ace (26.0%), Hancock (17.7%) or Doflamingo (19.4%). Luffy (35.4%) and Sabo (27.6%) remained elevated in the small sample, and average full-clock length remained above target at 31.54 minutes; no values were tuned.
-- The final high-cost 50-match smoke showed Garp at 56.0% and Mihawk at 43.8% conditional win rate from only 25 and 16 final-board appearances respectively. Luffy (35.4%) and Sabo (27.8%) remained elevated, and average full-clock length remained above target at 31.49 minutes; no values were tuned.
 - On Windows, the first E2E process hung while tearing down its owned Vinext server after all assertions passed; a clean rerun reused that server and exited successfully.
 
 ## Important Decisions
@@ -176,7 +190,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-Review the completed current-roster combat-identity pass and run a larger full-roster balance / combat-readability assessment before expanding the roster further.
+Use the 1,000-seed assessment for one bounded evidence-backed patch: first test a small single-lever Sabo ability-impact reduction. The top later readability target is distinct pull-versus-knockback presentation using the existing `movementKind` signal.
 
 ## Codex Update Contract
 
