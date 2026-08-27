@@ -21,9 +21,10 @@ local assets, failed requests, or required external gameplay traffic.
 
 ## Deliberate release/balance audit
 
-Run `npm run test:production-soak` once when preparing a dated balance release.
-It simulates 1,000 production seeds. Both production reports include the git
-SHA, seed count/range, save schema, content/config hashes, Node version, and
+Run `npm run test:production-soak` once when preparing a dated balance release,
+or start the manual GitHub Actions `Release Production Soak` workflow. It
+simulates 1,000 production seeds. Both production reports include the git SHA,
+seed count/range, save schema, content/config hashes, Node version, and
 generation timestamp. Review crashes, completion, match duration, timeout/draw
 rates, character presence, trait reachability, and item usage before committing
 a dated report.

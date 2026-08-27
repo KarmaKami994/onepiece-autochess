@@ -37,9 +37,11 @@ npm run lint
 ```
 
 `test:production-smoke` simulates 50 complete matches for normal CI and local
-verification. `test:production-soak` is the manual 1,000-seed release audit.
-Both use production rules and write versioned reports below `tmp/`, including
-the git SHA, Node and schema versions, seed range, and content/config hashes.
+verification. `test:production-soak` is the manual 1,000-seed release audit and
+can also be started through the GitHub Actions `Release Production Soak`
+workflow. Both use production rules and write versioned reports below `tmp/`,
+including the git SHA, Node and schema versions, seed range, and content/config
+hashes.
 On a fresh workstation, install the bundled
 E2E browser once with `npx playwright install chromium` before running
 `test:e2e`; the tests cover both supported desktop viewport sizes.
