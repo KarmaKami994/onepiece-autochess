@@ -640,6 +640,48 @@ function chooseKnockbackDestination(
   return null;
 }
 
+// Adapted concept reference: Pokemon Auto Chess Anchor Shot at
+// keldaanCommunity/pokemonAutoChess commit a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee.
+function choosePullDestination(
+  source: MutableBattleUnit,
+  target: MutableBattleUnit,
+  units: MutableBattleUnit[],
+  content: GameContent,
+): Position | null {
+  const dx = source.x - target.x;
+  const dy = source.y - target.y;
+  const horizontal = dx === 0
+    ? null
+    : { x: target.x + Math.sign(dx), y: target.y };
+  const vertical = dy === 0
+    ? null
+    : { x: target.x, y: target.y + Math.sign(dy) };
+  const candidates = dx === 0
+    ? [vertical]
+    : dy === 0
+      ? [horizontal]
+      : Math.abs(dx) >= Math.abs(dy)
+        ? [horizontal, vertical]
+        : [vertical, horizontal];
+
+  for (const candidate of candidates) {
+    if (
+      candidate &&
+      candidate.x >= 0 &&
+      candidate.x < content.config.boardWidth &&
+      candidate.y >= 0 &&
+      candidate.y < content.config.boardHeight &&
+      !units.some(
+        (unit) =>
+          alive(unit) && unit.x === candidate.x && unit.y === candidate.y,
+      )
+    ) {
+      return candidate;
+    }
+  }
+  return null;
+}
+
 function firstLungeDestination(
   source: MutableBattleUnit,
   target: MutableBattleUnit,
@@ -1274,6 +1316,40 @@ export function simulateBattle(
             unitId: target.id,
             abilityId: abilityDefinition.id,
             movementKind: "knockback",
+            from,
+            to: destination,
+          });
+        }
+      }
+      if (hasSignatureMechanic(abilityDefinition, "pull")) {
+        for (const targetId of [...intent.targetIds].sort((left, right) =>
+          left.localeCompare(right),
+        )) {
+          const target = units.find(
+            (unit) => unit.id === targetId && alive(unit),
+          );
+          if (!target) {
+            continue;
+          }
+          const destination = choosePullDestination(
+            source,
+            target,
+            units,
+            content,
+          );
+          if (!destination) {
+            continue;
+          }
+          const from = { x: target.x, y: target.y };
+          target.x = destination.x;
+          target.y = destination.y;
+          emit({
+            type: "unit-displace",
+            tick,
+            sourceId: source.id,
+            unitId: target.id,
+            abilityId: abilityDefinition.id,
+            movementKind: "pull",
             from,
             to: destination,
           });
