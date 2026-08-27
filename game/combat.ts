@@ -850,13 +850,27 @@ export function simulateBattle(
     target: MutableBattleUnit,
     rawAmount: number,
     damageKind: "attack" | "ability" | "burn",
+    defensePiercePercent = 0,
   ): number => {
     if (!alive(target)) {
       return 0;
     }
+    const defense = Math.max(0, target.defense);
+    const validDefensePiercePercent =
+      Number.isSafeInteger(defensePiercePercent) &&
+      defensePiercePercent >= 1 &&
+      defensePiercePercent <= 100
+        ? defensePiercePercent
+        : 0;
+    // Adapted from Pokemon Auto Chess Screech at pinned commit
+    // a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee without mutating Defense.
+    const ignoredDefense = Math.floor(
+      (defense * validDefensePiercePercent) / 100,
+    );
+    const effectiveDefense = Math.max(0, defense - ignoredDefense);
     const mitigated = Math.max(
       1,
-      Math.floor((rawAmount * 100) / (100 + Math.max(0, target.defense))),
+      Math.floor((rawAmount * 100) / (100 + effectiveDefense)),
     );
     const shieldDamage = Math.min(target.shield, mitigated);
     target.shield -= shieldDamage;
@@ -957,7 +971,14 @@ export function simulateBattle(
         hitCount: strikePowers.length,
         finisher,
       });
-      applyDamage(tick, source, target, rawDamage, "ability");
+      applyDamage(
+        tick,
+        source,
+        target,
+        rawDamage,
+        "ability",
+        ability.defensePiercePercent,
+      );
       if (target.hp <= 0 && index < strikePowers.length - 1) {
         target =
           definition.retargetOnKill === "nearest-in-range"
@@ -1208,7 +1229,14 @@ export function simulateBattle(
           if (!sequentialApplied) {
             const hits = Math.max(1, abilityDefinition.hits ?? 1);
             for (let hit = 0; hit < hits; hit += 1) {
-              applyDamage(tick, source, target, scaledPower, "ability");
+              applyDamage(
+                tick,
+                source,
+                target,
+                scaledPower,
+                "ability",
+                abilityDefinition.defensePiercePercent,
+              );
             }
           }
           if (target.hp > 0 && abilityDefinition.stunMs) {

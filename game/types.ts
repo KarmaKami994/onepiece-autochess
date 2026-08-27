@@ -70,6 +70,7 @@ export interface AbilityDefinition {
   signatureMechanics?: SignatureMechanic[];
   sequentialStrike?: SequentialStrikeDefinition;
   conditionalShield?: ConditionalShieldDefinition;
+  defensePiercePercent?: number;
   energyDrain?: number;
   hits?: number;
   stunMs?: number;
