@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
-  ALL_CREW_ANIMATION_DEFINITIONS,
   crewAnimationKey,
   crewSheetKey,
   getCrewAnimationDefinitions,
@@ -11,7 +10,6 @@ import {
 } from "./crewAnimationManifest";
 import { battleVfx } from "./battleVfx";
 import {
-  BOARD_MAP_LIST,
   getBoardMapDefinition,
   type BoardSkin,
 } from "./boardMapManifest";
@@ -33,18 +31,28 @@ import {
   BENCH_DESTINATIONS,
   BOARD_GEOMETRY,
   FALLBACK_TOKEN_HIT_AREA,
-  MAP_BACKDROP_ANCHOR,
   PLAYER_BOARD_DESTINATIONS,
   boardCellCenter,
   boardDestinationAtPoint,
   boardDestinationCenter,
   boardDestinationTarget,
-  gameplayCameraFrame,
-  proportionalCoverSize,
   safeScreenBoundsWithinStage,
-  symmetricBackdropTarget,
   type BoardDestination,
 } from "./boardGeometry";
+import {
+  resolveInitialBoardAssets,
+  resolveMissingAnimationDefinitions,
+} from "./boardAssets";
+import { resolveBoardBackdrop, resolveBoardCameraFrame } from "./boardCamera";
+import {
+  clampResourceValue as clamp,
+  destinationKey,
+  hashItemColor,
+  isSameDestination,
+  unitDestination,
+} from "./boardTokens";
+import { combatPresentationStyle } from "./boardCombatPresentation";
+import { BOARD_SCENE_KEY, createBoardGameConfig } from "./BoardScene";
 
 export type BoardZone = "board" | "bench";
 
@@ -84,6 +92,7 @@ export type CombatFxEvent = {
   tick: number;
   kind:
     | "move"
+    | "displace"
     | "attack"
     | "cast"
     | "damage"
@@ -112,6 +121,10 @@ export type CombatFxEvent = {
   reason?: string;
   stat?: string;
   label?: string;
+  unitId?: string;
+  movementKind?: string;
+  from?: Readonly<{ x: number; y: number }>;
+  to?: Readonly<{ x: number; y: number }>;
   toX?: number;
   toY?: number;
 };
@@ -153,6 +166,7 @@ type PhaserBoardProps = BoardPayload & {
 
 type SceneBridge = {
   sync: (payload: BoardPayload, forceRebuild?: boolean) => void;
+  refreshLayout: (width: number, height: number) => void;
   animateEvents: (
     events: CombatFxEvent[],
     speed: number,
@@ -168,32 +182,6 @@ const CELL_W = BOARD_GEOMETRY.cellWidth;
 const CELL_H = BOARD_GEOMETRY.cellHeight;
 const GRID_X = BOARD_GEOMETRY.gridX;
 const GRID_Y = BOARD_GEOMETRY.gridY;
-
-function clamp(value: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, value));
-}
-
-function destinationKey(destination: BoardDestination) {
-  return destination.zone === "bench"
-    ? `bench:${destination.slot}`
-    : `board:${destination.x}:${destination.y}`;
-}
-
-function unitDestination(unit: BoardUnit): BoardDestination {
-  return unit.zone === "bench"
-    ? { zone: "bench", slot: unit.slot }
-    : { zone: "board", x: unit.x, y: unit.y };
-}
-
-function isSameDestination(
-  unit: BoardUnit,
-  destination: BoardDestination,
-) {
-  if (unit.zone !== destination.zone) return false;
-  return destination.zone === "bench"
-    ? unit.slot === destination.slot
-    : unit.x === destination.x && unit.y === destination.y;
-}
 
 export default function PhaserBoard({
   units,
@@ -249,6 +237,10 @@ export default function PhaserBoard({
         const PhaserModule = await import("phaser");
         if (cancelled || !hostRef.current) return;
         const Phaser = PhaserModule.default;
+        const initialAssets = resolveInitialBoardAssets(
+          latestRef.current.units,
+          latestRef.current.boardSkin,
+        );
 
         class GrandLineBoard extends Phaser.Scene implements SceneBridge {
           private mapLayer?: Phaser.GameObjects.Container;
@@ -304,7 +296,7 @@ export default function PhaserBoard({
           private payload: BoardPayload = latestRef.current;
 
           constructor() {
-            super("grand-line-board");
+            super(BOARD_SCENE_KEY);
           }
 
           private boardColumnSafeScreenBounds(width: number, height: number) {
@@ -329,11 +321,17 @@ export default function PhaserBoard({
               width,
               height,
             );
-            const frame = gameplayCameraFrame(
+            const frame = resolveBoardCameraFrame(
               width,
               height,
               safeScreenBounds,
             );
+            const stageElement = hostRef.current?.parentElement;
+            if (stageElement instanceof HTMLElement) {
+              stageElement.dataset.cameraZoom = frame.zoom.toFixed(6);
+              stageElement.dataset.canvasWidth = String(Math.round(width));
+              stageElement.dataset.canvasHeight = String(Math.round(height));
+            }
             const camera = this.cameras.main;
             camera
               .setZoom(frame.zoom)
@@ -343,15 +341,9 @@ export default function PhaserBoard({
                 width: number;
                 height: number;
               };
-              const backdropTarget = symmetricBackdropTarget(frame);
-              const cover = proportionalCoverSize(
-                source.width,
-                source.height,
-                backdropTarget.width,
-                backdropTarget.height,
-              );
+              const cover = resolveBoardBackdrop(frame, source);
               this.mapBackdrop
-                .setPosition(MAP_BACKDROP_ANCHOR.x, MAP_BACKDROP_ANCHOR.y)
+                .setPosition(cover.x, cover.y)
                 .setDisplaySize(cover.width, cover.height);
             }
           }
@@ -363,11 +355,32 @@ export default function PhaserBoard({
             this.fitCameraToViewport(gameSize.width, gameSize.height);
           };
 
+          refreshLayout(width: number, height: number) {
+            const nextWidth = Math.max(1, Math.round(width));
+            const nextHeight = Math.max(1, Math.round(height));
+            if (
+              this.scale.width !== nextWidth ||
+              this.scale.height !== nextHeight
+            ) {
+              this.scale.resize(nextWidth, nextHeight);
+            }
+            // Phaser's canvas pool can recycle the previous FIT canvas from
+            // the Regatta. Clear its 1520:840 presentation before the RESIZE
+            // board is painted inside the tactical stage.
+            const canvasStyle = this.game.canvas.style;
+            canvasStyle.width = "100%";
+            canvasStyle.height = "100%";
+            canvasStyle.marginLeft = "0px";
+            canvasStyle.marginTop = "0px";
+            this.fitCameraToViewport(nextWidth, nextHeight);
+          }
+
           preload() {
-            BOARD_MAP_LIST.forEach((map) => {
-              this.load.image(map.textureKey, map.assetPath);
-            });
-            ALL_CREW_ANIMATION_DEFINITIONS.forEach((definition) => {
+            this.load.image(
+              initialAssets.map.textureKey,
+              initialAssets.map.assetPath,
+            );
+            initialAssets.animations.forEach((definition) => {
               this.load.spritesheet(
                 crewSheetKey(definition.assetKey),
                 definition.sheetPath,
@@ -385,7 +398,9 @@ export default function PhaserBoard({
             this.events.once("shutdown", () => {
               this.scale.off("resize", this.handleScaleResize);
             });
-            this.createCrewAnimations();
+            initialAssets.animations.forEach((definition) =>
+              this.createCrewAnimations(definition),
+            );
             this.drawMap(this.payload.boardSkin);
             this.createDestinationTargets();
             this.tokenLayer = this.add.container(0, 0).setDepth(20);
@@ -394,24 +409,23 @@ export default function PhaserBoard({
             if (!cancelled) setIsReady(true);
           }
 
-          private createCrewAnimations() {
-            ALL_CREW_ANIMATION_DEFINITIONS.forEach((definition) => {
-              const sheetKey = crewSheetKey(definition.assetKey);
-              Object.entries(definition.clips).forEach(([state, clip]) => {
-                const key = crewAnimationKey(
-                  definition.assetKey,
-                  state as CrewAnimationState,
-                );
-                if (this.anims.exists(key)) return;
-                this.anims.create({
-                  key,
-                  frameRate: clip.frameRate,
-                  repeat: clip.repeat,
-                  frames: this.anims.generateFrameNumbers(sheetKey, {
-                    start: clip.start,
-                    end: clip.end,
-                  }),
-                });
+          private createCrewAnimations(definition: CrewAnimationDefinition) {
+            const sheetKey = crewSheetKey(definition.assetKey);
+            if (!this.textures.exists(sheetKey)) return;
+            Object.entries(definition.clips).forEach(([state, clip]) => {
+              const key = crewAnimationKey(
+                definition.assetKey,
+                state as CrewAnimationState,
+              );
+              if (this.anims.exists(key)) return;
+              this.anims.create({
+                key,
+                frameRate: clip.frameRate,
+                repeat: clip.repeat,
+                frames: this.anims.generateFrameNumbers(sheetKey, {
+                  start: clip.start,
+                  end: clip.end,
+                }),
               });
             });
           }
@@ -547,8 +561,12 @@ export default function PhaserBoard({
             if (!from || !to || !sourceUnit) return;
 
             const contentId = sourceUnit.contentId;
+            const presentation = combatPresentationStyle(
+              contentId,
+              event.kind === "attack" ? "attack" : "cast",
+            );
             if (event.kind === "attack") {
-              if (["ace", "sabo", "usopp"].includes(contentId)) {
+              if (presentation === "fire") {
                 battleVfx.fireProjectile(this, {
                   from,
                   to,
@@ -562,24 +580,64 @@ export default function PhaserBoard({
               return;
             }
 
-            if (contentId === "nami") {
+            if (presentation === "lightning") {
               battleVfx.lightningStrike(this, { at: to, team, speed });
-            } else if (["ace", "sabo", "sanji"].includes(contentId)) {
+            } else if (presentation === "fire") {
               battleVfx.fireProjectile(this, { from, to, team, speed });
-            } else if (["smoker", "crocodile"].includes(contentId)) {
+            } else if (presentation === "smoke") {
               battleVfx.smokeBurst(this, { at: to, team, speed, radius: 28 });
-            } else if (contentId === "chopper") {
+            } else if (presentation === "heal") {
               battleVfx.heal(this, { at: to, team, speed, radius: 25 });
               battleVfx.shield(this, { at: to, team, speed, radius: 24 });
-            } else if (
-              ["zoro", "tashigi", "mihawk", "law", "doflamingo"].includes(
-                contentId,
-              )
-            ) {
+            } else if (presentation === "slash") {
               battleVfx.slash(this, { from, to, team, speed, width: 6 });
             } else {
               battleVfx.impact(this, { at: to, team, speed, radius: 17 });
             }
+          }
+
+          private playLungeTrail(
+            unitId: string,
+            from: Readonly<{ x: number; y: number }>,
+            to: Readonly<{ x: number; y: number }>,
+            speed: number,
+          ) {
+            const unit = this.payload.units.find(
+              (candidate) => candidate.id === unitId,
+            );
+            battleVfx.slash(this, {
+              from: { x: from.x, y: from.y - 4 },
+              to: { x: to.x, y: to.y - 4 },
+              team: unit?.team ?? "neutral",
+              speed,
+              width: 5,
+            });
+
+            const animated = this.animatedUnitSprites.get(unitId);
+            if (!animated?.sprite.active) return;
+            const sprite = animated.sprite;
+            [0.22, 0.52].forEach((progress, index) => {
+              const afterimage = this.add
+                .sprite(
+                  from.x + (to.x - from.x) * progress,
+                  from.y + (to.y - from.y) * progress + sprite.y,
+                  sprite.texture.key,
+                  sprite.frame.name,
+                )
+                .setOrigin(sprite.originX, sprite.originY)
+                .setDisplaySize(sprite.displayWidth, sprite.displayHeight)
+                .setFlipX(sprite.flipX)
+                .setTint(index === 0 ? 0xbdf7ff : 0xf8e49a)
+                .setAlpha(index === 0 ? 0.38 : 0.25)
+                .setDepth(119 - index);
+              this.tweens.add({
+                targets: afterimage,
+                alpha: 0,
+                duration: Math.max(1, Math.round((150 + index * 35) / speed)),
+                ease: "Quad.Out",
+                onComplete: () => afterimage.destroy(),
+              });
+            });
           }
 
           private clearMapLayers() {
@@ -930,10 +988,16 @@ export default function PhaserBoard({
               this.hoverDestinationKey = null;
             }
             if (payload.boardSkin !== this.currentBoardSkin) {
-              this.drawMap(payload.boardSkin);
+              const map = getBoardMapDefinition(payload.boardSkin);
+              if (this.textures.exists(map.textureKey)) {
+                this.drawMap(payload.boardSkin);
+              } else {
+                this.requestMapTexture(payload.boardSkin);
+              }
             }
             this.payload = payload;
             if (!this.tokenLayer) return;
+            this.requestAnimationTextures(payload.units);
             this.requestPortraitTextures(payload.units);
             this.resourceBars.forEach((bar) => {
               this.tweens.killTweensOf(bar.display);
@@ -960,6 +1024,66 @@ export default function PhaserBoard({
 
           private portraitKey(unit: BoardUnit) {
             return `crew-${unit.contentId.replace(/[^a-z0-9_-]/gi, "-")}`;
+          }
+
+          private requestMapTexture(boardSkin: BoardSkin) {
+            const map = getBoardMapDefinition(boardSkin);
+            if (
+              this.textures.exists(map.textureKey) ||
+              this.requestedTextures.has(map.textureKey) ||
+              this.failedTextures.has(map.textureKey)
+            ) {
+              return;
+            }
+            this.requestedTextures.add(map.textureKey);
+            this.load.image(map.textureKey, map.assetPath);
+            this.load.once("loaderror", (file: Phaser.Loader.File) => {
+              this.failedTextures.add(file.key);
+            });
+            this.load.once("complete", () => {
+              if (
+                this.payload.boardSkin === boardSkin &&
+                this.textures.exists(map.textureKey)
+              ) {
+                this.drawMap(boardSkin);
+                this.fitCameraToViewport(this.scale.width, this.scale.height);
+              }
+            });
+            if (!this.load.isLoading()) this.load.start();
+          }
+
+          private requestAnimationTextures(unitsToLoad: BoardUnit[]) {
+            const pending = resolveMissingAnimationDefinitions(unitsToLoad, {
+              textureExists: (key) => this.textures.exists(key),
+              requestedKeys: this.requestedTextures,
+              failedKeys: this.failedTextures,
+            });
+            if (!pending.length) return;
+
+            pending.forEach((definition) => {
+              const key = crewSheetKey(definition.assetKey);
+              this.requestedTextures.add(key);
+              this.load.spritesheet(key, definition.sheetPath, {
+                frameWidth: definition.frameWidth,
+                frameHeight: definition.frameHeight,
+              });
+            });
+            const markFailure = (file: Phaser.Loader.File) => {
+              this.failedTextures.add(file.key);
+            };
+            this.load.on("loaderror", markFailure, this);
+            this.load.once(
+              "complete",
+              () => {
+                this.load.off("loaderror", markFailure, this);
+                pending.forEach((definition) =>
+                  this.createCrewAnimations(definition),
+                );
+                this.sync(this.payload, true);
+              },
+              this,
+            );
+            if (!this.load.isLoading()) this.load.start();
           }
 
           private requestPortraitTextures(unitsToLoad: BoardUnit[]) {
@@ -1655,6 +1779,48 @@ export default function PhaserBoard({
                 }
 
                 if (
+                  event.kind === "displace" &&
+                  event.to &&
+                  (event.unitId || event.sourceId)
+                ) {
+                  const displacedUnitId = event.unitId || event.sourceId || "";
+                  const displaced = this.tokenObjects.get(displacedUnitId);
+                  if (!displaced) return;
+                  const destination = boardCellCenter(event.to.x, event.to.y);
+                  const origin = event.from
+                    ? boardCellCenter(event.from.x, event.from.y)
+                    : { x: displaced.x, y: displaced.y };
+                  this.tweens.killTweensOf(displaced);
+                  this.faceUnit(displacedUnitId, destination.x);
+
+                  if (
+                    event.movementKind === "lunge" &&
+                    showParticles &&
+                    !reduceMotion
+                  ) {
+                    this.playLungeTrail(
+                      displacedUnitId,
+                      origin,
+                      destination,
+                      speed,
+                    );
+                  }
+
+                  if (reduceMotion) {
+                    displaced.setPosition(destination.x, destination.y);
+                  } else {
+                    this.tweens.add({
+                      targets: displaced,
+                      x: destination.x,
+                      y: destination.y,
+                      duration: Math.max(1, Math.round(80 / speed)),
+                      ease: "Cubic.Out",
+                    });
+                  }
+                  return;
+                }
+
+                if (
                   source &&
                   target &&
                   (event.kind === "attack" || event.kind === "cast")
@@ -1853,24 +2019,15 @@ export default function PhaserBoard({
           }
         }
 
-        const game = new Phaser.Game({
-          type: Phaser.CANVAS,
-          width: CANVAS_WIDTH,
-          height: CANVAS_HEIGHT,
-          parent: hostRef.current,
-          backgroundColor: "#061d2a",
-          transparent: false,
-          render: {
-            antialias: false,
-            pixelArt: true,
-            roundPixels: true,
-          },
-          scene: GrandLineBoard,
-          audio: { noAudio: true },
-          scale: {
-            mode: Phaser.Scale.RESIZE,
-          },
-        });
+        const game = new Phaser.Game(
+          createBoardGameConfig(
+            Phaser,
+            hostRef.current,
+            GrandLineBoard,
+            CANVAS_WIDTH,
+            CANVAS_HEIGHT,
+          ),
+        );
         gameRef.current = game;
       } catch (error) {
         console.error("Unable to start the local board renderer", error);
@@ -1887,6 +2044,37 @@ export default function PhaserBoard({
       gameRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    if (!isReady) return;
+    const stageElement = hostRef.current?.parentElement;
+    if (!(stageElement instanceof HTMLElement)) return;
+
+    let animationFrame = 0;
+    const refreshLayout = () => {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = requestAnimationFrame(() => {
+        const bounds = stageElement.getBoundingClientRect();
+        if (bounds.width <= 0 || bounds.height <= 0) return;
+        bridgeRef.current?.refreshLayout(bounds.width, bounds.height);
+      });
+    };
+
+    const resizeObserver = new ResizeObserver(refreshLayout);
+    resizeObserver.observe(stageElement);
+    const boardColumn = stageElement.parentElement?.querySelector(
+      ".board-column",
+    );
+    if (boardColumn instanceof HTMLElement) {
+      resizeObserver.observe(boardColumn);
+    }
+    refreshLayout();
+
+    return () => {
+      cancelAnimationFrame(animationFrame);
+      resizeObserver.disconnect();
+    };
+  }, [isReady]);
 
   useEffect(() => {
     bridgeRef.current?.sync({
@@ -1975,14 +2163,6 @@ export default function PhaserBoard({
       </ul>
     </div>
   );
-}
-
-function hashItemColor(value: string): number {
-  let hash = 0;
-  for (let index = 0; index < value.length; index += 1) {
-    hash = (hash * 33 + value.charCodeAt(index)) >>> 0;
-  }
-  return [0x77b9d1, 0xd77a62, 0xe6c35b, 0x8bc477, 0xa986c8][hash % 5];
 }
 
 function CssBoardFallback({

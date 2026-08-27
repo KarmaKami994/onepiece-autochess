@@ -2,12 +2,17 @@ import { describe, expect, it } from "vitest";
 import {
   DEFAULT_CONTENT,
   advanceMatchPhase,
-  applyCommand,
+  applyCommand as applyDomainCommand,
   createMatch,
   getActiveTraits,
+  type GameCommand,
   type MatchState,
   type PlayerState,
 } from "../../game";
+
+function applyCommand(state: MatchState, command: GameCommand) {
+  return applyDomainCommand(state, command, { actorPlayerId: "player-1" });
+}
 
 function player(state: MatchState): PlayerState {
   const found = state.players.find((candidate) => candidate.id === "player-1");
@@ -37,7 +42,6 @@ function buyForced(
   forceOffer(state, definitionId);
   const result = applyCommand(state, {
     type: "BUY_UNIT",
-    playerId: "player-1",
     shopIndex: 0,
   });
   if (!result.ok) {
@@ -77,7 +81,6 @@ describe("shop, economy, pool, and upgrades", () => {
     );
     const result = applyCommand(state, {
       type: "REROLL_SHOP",
-      playerId: "player-1",
     });
     expect(result.ok).toBe(true);
     if (!result.ok) {
@@ -149,7 +152,6 @@ describe("shop, economy, pool, and upgrades", () => {
     const goldBeforeSale = player(state).gold;
     const sale = applyCommand(state, {
       type: "SELL_UNIT",
-      playerId: "player-1",
       unitId: nami[0].id,
     });
     expect(sale.ok).toBe(true);
@@ -180,7 +182,6 @@ describe("shop, economy, pool, and upgrades", () => {
     const beforeRejectedPurchase = structuredClone(state);
     const rejectedPurchase = applyCommand(state, {
       type: "BUY_UNIT",
-      playerId: "player-1",
       shopIndex: 0,
     });
     expect(rejectedPurchase.ok).toBe(false);
@@ -190,7 +191,6 @@ describe("shop, economy, pool, and upgrades", () => {
       forceOffer(state, "nami");
       return applyCommand(state, {
         type: "BUY_UNIT",
-        playerId: "player-1",
         shopIndex: 0,
       });
     })();
@@ -219,7 +219,6 @@ describe("board, item, and trait rules", () => {
 
     const invalid = applyCommand(state, {
       type: "MOVE_UNIT",
-      playerId: "player-1",
       unitId: first,
       to: { zone: "board", x: 0, y: 0 },
     });
@@ -228,7 +227,6 @@ describe("board, item, and trait rules", () => {
     for (const [index, unitId] of [first, second].entries()) {
       const move = applyCommand(state, {
         type: "MOVE_UNIT",
-        playerId: "player-1",
         unitId,
         to: { zone: "board", x: index, y: 5 },
       });
@@ -239,7 +237,6 @@ describe("board, item, and trait rules", () => {
     }
     const overCap = applyCommand(state, {
       type: "MOVE_UNIT",
-      playerId: "player-1",
       unitId: third,
       to: { zone: "board", x: 2, y: 5 },
     });
@@ -247,7 +244,6 @@ describe("board, item, and trait rules", () => {
 
     const swap = applyCommand(state, {
       type: "MOVE_UNIT",
-      playerId: "player-1",
       unitId: third,
       to: { zone: "board", x: 0, y: 5 },
     });
@@ -278,7 +274,6 @@ describe("board, item, and trait rules", () => {
     ]) {
       const equip = applyCommand(state, {
         type: "EQUIP_ITEM",
-        playerId: "player-1",
         unitId,
         itemId,
       });
@@ -291,7 +286,6 @@ describe("board, item, and trait rules", () => {
     expect(
       applyCommand(state, {
         type: "EQUIP_ITEM",
-        playerId: "player-1",
         unitId,
         itemId: "sniper-goggles",
       }).ok,
@@ -299,7 +293,6 @@ describe("board, item, and trait rules", () => {
 
     const sale = applyCommand(state, {
       type: "SELL_UNIT",
-      playerId: "player-1",
       unitId,
     });
     expect(sale.ok).toBe(true);
@@ -328,7 +321,6 @@ describe("board, item, and trait rules", () => {
     ids.forEach((unitId, index) => {
       const result = applyCommand(state, {
         type: "MOVE_UNIT",
-        playerId: "player-1",
         unitId,
         to: { zone: "board", x: index, y: 5 },
       });

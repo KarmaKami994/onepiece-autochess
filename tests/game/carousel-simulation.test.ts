@@ -10,7 +10,12 @@ import {
   createMatch,
   getCarouselChoicePosition,
   type MatchState,
+  deserializeMatch,
+  hashMatchState,
+  serializeMatch,
 } from "../../game";
+
+const PLAYER_CONTEXT = { actorPlayerId: "player-1" };
 
 function enterCarousel(round = 4, seed = "carousel-simulation"): MatchState {
   const state = createMatch(seed);
@@ -25,6 +30,45 @@ function enterCarousel(round = 4, seed = "carousel-simulation"): MatchState {
 }
 
 describe("deterministic bounty regatta", () => {
+  it("uses structural sharing for movement-only ticks", () => {
+    const state = enterCarousel(4, "carousel-sharing");
+    const next = advanceCarousel(state, 1);
+
+    expect(next).not.toBe(state);
+    expect(next.players).toBe(state.players);
+    expect(next.pool).toBe(state.pool);
+    expect(next.pairings).toBe(state.pairings);
+    expect(next.lastResults).toBe(state.lastResults);
+    expect(state.carouselSession?.tick).toBe(0);
+    expect(next.carouselSession?.tick).toBe(1);
+  });
+
+  it("replays steering and fixed ticks across a carousel checkpoint", () => {
+    const runToCheckpoint = () => {
+      let state = enterCarousel(4, "carousel-replay");
+      const releaseTick = state.carouselSession!.participants.find(
+        (participant) => participant.playerId === "player-1",
+      )!.releaseTick;
+      state = advanceCarousel(state, releaseTick);
+      const target = applyCommand(
+        state,
+        { type: "CAROUSEL_SET_TARGET", x: 760, y: 420 },
+        PLAYER_CONTEXT,
+      );
+      if (!target.ok) throw new Error(target.error.message);
+      return advanceCarousel(target.state, 13);
+    };
+
+    const first = advanceCarousel(runToCheckpoint(), 21);
+    const second = advanceCarousel(runToCheckpoint(), 21);
+    expect(hashMatchState(second)).toBe(hashMatchState(first));
+
+    const restored = deserializeMatch(serializeMatch(runToCheckpoint()));
+    expect(hashMatchState(advanceCarousel(restored, 21))).toBe(
+      hashMatchState(first),
+    );
+  });
+
   it("creates five to nine seeded offers with no more than two duplicates", () => {
     const full = enterCarousel(4, "full-regatta");
     expect(full.carouselChoices).toHaveLength(9);
@@ -96,10 +140,9 @@ describe("deterministic bounty regatta", () => {
     let state = enterCarousel(4, "human-steering");
     const locked = applyCommand(state, {
       type: "CAROUSEL_SET_TARGET",
-      playerId: "player-1",
       x: 0,
       y: 0,
-    });
+    }, PLAYER_CONTEXT);
     expect(locked).toMatchObject({
       ok: false,
       error: { code: "CAROUSEL_LOCKED" },
@@ -114,10 +157,9 @@ describe("deterministic bounty regatta", () => {
     )!;
     const command = applyCommand(state, {
       type: "CAROUSEL_SET_TARGET",
-      playerId: "player-1",
       x: CAROUSEL_ARENA_WIDTH * 2,
       y: -CAROUSEL_ARENA_HEIGHT,
-    });
+    }, PLAYER_CONTEXT);
     if (!command.ok) throw new Error(command.error.message);
     const targeted = command.state.carouselSession!.participants.find(
       (participant) => participant.playerId === "player-1",
@@ -248,8 +290,15 @@ describe("deterministic bounty regatta", () => {
 
   it("uses best-fit timeout rewards and completes after the pickup hold", () => {
     const state = enterCarousel(4, "timeout-best-fit");
+    const originalInventories = state.players.map((player) => player.inventory);
     const headless = advanceMatchPhase(state);
     const expectedHumanItem = headless.players[0].inventory.at(-1);
+
+    expect(headless.players).not.toBe(state.players);
+    expect(headless.pool).toBe(state.pool);
+    expect(state.players.map((player) => player.inventory)).toEqual(
+      originalInventories,
+    );
 
     state.carouselSession!.tick = state.carouselSession!.durationTicks - 1;
     const timedOut = advanceCarousel(state);

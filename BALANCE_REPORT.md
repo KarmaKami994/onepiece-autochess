@@ -1,4 +1,8 @@
-# Production balance audit — 2026-08-14
+# Production balance audit — 2026-08-14 (historical release baseline)
+
+This report is the last committed 1,000-seed balance baseline. Routine
+hardening uses the 50-seed production smoke; a new dated 1,000-seed snapshot is
+only committed for an intentional balance/release audit.
 
 ## Technical summary
 
@@ -122,6 +126,7 @@ except the timestamp.
 
 ```powershell
 npm run test:production-soak
+npm run test:production-smoke
 npm test
 npm run test:soak
 ```

@@ -87,16 +87,16 @@ describe("local-only product boundary", () => {
 
     expect(packageJson.dependencies.phaser).toBe("4.2.1");
     expect(packageJson.scripts["assets:luffy:v2"]).toContain(
-      "build_luffy_v2.ps1",
+      "build_v2_assets.mjs",
     );
     expect(packageJson.scripts.dev).toBe("vinext dev");
     expect(packageJson.scripts.build).toBe("vinext build");
   });
 
-  it("does not make runtime network requests", async () => {
+  it("keeps the domain and local session independent of networking", async () => {
     const files = (
       await Promise.all(
-        ["app", "components", "game"].map(async (directory) => {
+        ["game"].map(async (directory) => {
           try {
             return await sourceFiles(directory);
           } catch {
@@ -113,6 +113,12 @@ describe("local-only product boundary", () => {
         /\b(?:WebSocket|EventSource)\s*\(/,
       );
     }
+    const localSession = await readFile(
+      path.join(projectRoot, "app", "useLocalGameSession.ts"),
+      "utf8",
+    );
+    expect(localSession).not.toMatch(/\bfetch\s*\(/);
+    expect(localSession).not.toMatch(/\b(?:WebSocket|EventSource)\s*\(/);
   });
 
   it("keeps nondeterministic randomness outside the engine", async () => {

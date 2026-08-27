@@ -8,7 +8,7 @@ const source = (file: string) => readFile(path.join(projectRoot, file), "utf8");
 
 describe("Phase 3 combat presentation", () => {
   it("preserves readable engine events instead of flattening them to abilities", async () => {
-    const client = await source("app/GameClient.tsx");
+    const selector = await source("app/selectors.ts");
     for (const eventKind of [
       "shield",
       "energy",
@@ -16,13 +16,18 @@ describe("Phase 3 combat presentation", () => {
       "status",
       "buff",
       "cast",
+      "displace",
     ]) {
-      expect(client).toContain(`? \"${eventKind}\"`);
+      const domainKind = eventKind === "displace" ? "unit-displace" : eventKind;
+      expect(selector).toContain(`event.type === "${domainKind}"`);
     }
-    expect(client).toContain("targetIds,");
-    expect(client).toContain("healthDamage:");
-    expect(client).toContain("shieldDamage:");
-    expect(client).not.toContain('? "ability"');
+    expect(selector).toContain("targetIds: [...event.targetIds]");
+    expect(selector).toContain("healthDamage: event.healthDamage");
+    expect(selector).toContain("shieldDamage: event.shieldDamage");
+    expect(selector).toContain("movementKind: event.movementKind");
+    expect(selector).toContain("from: point(event.from)");
+    expect(selector).toContain("to: point(event.to)");
+    expect(selector).not.toContain('? "ability"');
   });
 
   it("keeps combat feedback renderer-only and exposes all readability cues", async () => {
@@ -41,6 +46,9 @@ describe("Phase 3 combat presentation", () => {
       "CRIT ",
       "SHIELD",
       "abilityName",
+      "playLungeTrail",
+      'event.kind === "displace"',
+      'event.movementKind === "lunge"',
     ]) {
       expect(board).toContain(cue);
     }
@@ -49,23 +57,22 @@ describe("Phase 3 combat presentation", () => {
   });
 
   it("offers persistent presentation controls and clear battle actions", async () => {
-    const [client, css] = await Promise.all([
+    const [client, screens, css] = await Promise.all([
       source("app/GameClient.tsx"),
+      source("app/screens/GameScreens.tsx"),
       source("app/game.css"),
     ]);
 
     expect(client).toContain("combatNumbers: true");
     expect(client).toContain("reducedMotion: false");
-    expect(client).toContain("START BATTLE");
-    expect(client).toContain("SKIP ANIMATION");
-    expect(client).toContain("Battle animation speed");
+    expect(screens).toContain("START BATTLE");
+    expect(screens).toContain("SKIP ANIMATION");
+    expect(screens).toContain("Battle animation speed");
     for (const speed of ["0.5×", "1×", "2×", "4×"]) {
-      expect(client).toContain(speed);
+      expect(screens).toContain(speed);
     }
-    expect(client).toContain("tutorial-combat-legend");
-    expect(client).toContain(
-      "numberValue(engine.CURRENT_SAVE_SCHEMA_VERSION, 6)",
-    );
+    expect(screens).toContain("tutorial-combat-legend");
+    expect(client).toContain("schemaVersion: engine.CURRENT_SAVE_SCHEMA_VERSION");
     expect(css).toContain(".game-shell.reduced-motion");
     expect(css).toContain(".combat-hud");
   });
@@ -99,5 +106,18 @@ describe("Phase 3 combat presentation", () => {
         phase: "preparation",
       }),
     ).toBe(false);
+  });
+
+  it("refits the tactical camera when returning from a differently sized scene", async () => {
+    const board = await source("components/PhaserBoard.tsx");
+
+    expect(board).toContain("new ResizeObserver(refreshLayout)");
+    expect(board).toContain("resizeObserver.observe(stageElement)");
+    expect(board).toContain("resizeObserver.observe(boardColumn)");
+    expect(board).toContain(
+      "bridgeRef.current?.refreshLayout(bounds.width, bounds.height)",
+    );
+    expect(board).toContain('canvasStyle.width = "100%"');
+    expect(board).toContain('canvasStyle.height = "100%"');
   });
 });

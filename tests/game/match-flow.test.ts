@@ -10,8 +10,10 @@ import {
   type MatchState,
 } from "../../game";
 
+const PLAYER_CONTEXT = { actorPlayerId: "player-1" };
+
 function timeout(state: MatchState): MatchState {
-  const result = applyCommand(state, { type: "TIMER_EXPIRED" });
+  const result = applyCommand(state, { type: "TIMER_EXPIRED" }, PLAYER_CONTEXT);
   if (!result.ok) {
     throw new Error(result.error.message);
   }
@@ -136,8 +138,7 @@ describe("round and special-stage flow", () => {
     const state = createMatch("pve-start");
     const result = applyCommand(state, {
       type: "END_PREPARATION",
-      playerId: "player-1",
-    });
+    }, PLAYER_CONTEXT);
     expect(result.ok).toBe(true);
     if (!result.ok) {
       return;
@@ -192,9 +193,8 @@ describe("round and special-stage flow", () => {
     expect(choices).toHaveLength(3);
     const choice = applyCommand(resolved, {
       type: "CHOOSE_ITEM",
-      playerId: "player-1",
       choiceId: choices[0],
-    });
+    }, PLAYER_CONTEXT);
     expect(choice.ok).toBe(true);
     if (choice.ok) {
       expect(choice.state.round).toBe(2);
@@ -314,8 +314,7 @@ describe("elimination and phase guards", () => {
     expect(
       applyCommand(state, {
         type: "REROLL_SHOP",
-        playerId: "player-1",
-      }),
+      }, PLAYER_CONTEXT),
     ).toMatchObject({
       ok: false,
       error: { code: "WRONG_PHASE" },

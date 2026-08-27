@@ -26,25 +26,32 @@ Useful checks:
 ```powershell
 npm test
 npm run test:soak
+npm run test:production-smoke
 npm run test:production-soak
+npm run test:coverage
+npm run assets:validate
 npm run test:e2e
 npm run typecheck
 npm run build
 npm run lint
 ```
 
-`test:production-soak` simulates 50 complete matches with the unchanged
-production configuration and writes its balance report to
-`tmp/production-soak-report.json`. On a fresh workstation, install the bundled
+`test:production-smoke` simulates 50 complete matches for normal CI and local
+verification. `test:production-soak` is the manual 1,000-seed release audit.
+Both use production rules and write versioned reports below `tmp/`, including
+the git SHA, Node and schema versions, seed range, and content/config hashes.
+On a fresh workstation, install the bundled
 E2E browser once with `npx playwright install chromium` before running
 `test:e2e`; the tests cover both supported desktop viewport sizes.
 
 The latest reviewed production metrics, definitions, limitations, and dated
 raw snapshot are documented in [BALANCE_REPORT.md](BALANCE_REPORT.md).
 
-The committed v2 animation assets can be rebuilt headlessly with
-`npm run assets:v2`. LibreSprite is only needed to recreate the editable
-`.aseprite` files; the game itself and normal build do not require it.
+The committed v2 runtime assets can be rebuilt cross-platform with
+`npm run assets:v2`. Use `npm run assets:v2:editable` to also recreate editable
+files. External tools resolve from `LIBRESPRITE_PATH`/`PYTHON_PATH`, the
+documented project-local directories, and then `PATH`; the game and normal
+build require neither tool.
 The original Bounty Regatta arena, boat palettes, and animated bounty tokens
 can be rebuilt reproducibly with `npm run assets:carousel`.
 
@@ -80,8 +87,13 @@ the crew's names, stars, held treasure, and active bonds.
   results.
 - Phaser renders the board, bench, draggable units, combat interpolation, and
   hit effects.
-- The `game/` package is UI-independent. Serializable state is changed through
-  `applyCommand`, and battles are resolved from a seed before any animation.
+- The `game/` package is UI-independent. Serializable commands carry intent;
+  trusted actor identity is supplied separately through `CommandContext`.
+  Battles and the Regatta are resolved from explicit seeds/ticks before any
+  animation.
+- `useLocalGameSession` is the local application seam. Typed selectors build UI
+  views, while IndexedDB access, clocks, tutorials, audio, and diagnostics stay
+  outside the domain.
 - The active match is stored in IndexedDB. Small accessibility and audio
   settings are stored in localStorage. Closing during battle resumes from the
   stable pre-battle state and seed; closing during a Bounty Regatta resumes the
@@ -105,6 +117,8 @@ npm run build
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the branch, review, asset-provenance,
 and deterministic-engine rules. The repository is public for source
 collaboration; the game itself is not deployed or hosted as a public service.
+Product, architecture, future multiplayer, and release notes live under
+[`docs/`](docs/).
 
 ## Rights and fan-project notice
 

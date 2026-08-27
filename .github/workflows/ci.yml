@@ -35,6 +35,15 @@ jobs:
       - name: Test
         run: npm test
 
+      - name: Coverage
+        run: npm run test:coverage
+
+      - name: Validate local assets
+        run: npm run assets:validate
+
+      - name: Production smoke
+        run: npm run test:production-smoke
+
       - name: Build
         run: npm run build
 
@@ -43,3 +52,15 @@ jobs:
 
       - name: Browser end-to-end
         run: npm run test:e2e
+
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Review dependency changes
+        uses: actions/dependency-review-action@v4

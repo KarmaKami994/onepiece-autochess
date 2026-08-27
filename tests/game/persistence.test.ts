@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import {
   CURRENT_SAVE_SCHEMA_VERSION,
   DEFAULT_CONTENT,
@@ -14,6 +16,8 @@ import {
   saveMatch,
   serializeMatch,
 } from "../../game";
+
+const PLAYER_CONTEXT = { actorPlayerId: "player-1" };
 
 describe("versioned local persistence", () => {
   it("round-trips a match through pure JSON", () => {
@@ -34,6 +38,38 @@ describe("versioned local persistence", () => {
     removeSavedMatch(storage);
     expect(loadMatch(storage)).toBeNull();
   });
+
+  it.each([1, 2, 3, 4, 5, 6])(
+    "loads the committed schema-v%d migration fixture",
+    (version) => {
+      const serialized = readFileSync(
+        path.join(process.cwd(), "tests", "fixtures", "saves", `v${version}.json`),
+        "utf8",
+      );
+      const migrated = deserializeMatch(serialized);
+
+      expect(migrated.schemaVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
+      expect(migrated.contentVersion).toBe(DEFAULT_CONTENT.version);
+      expect(migrated.seed).toBe(`fixture-v${version}`);
+      expect(migrated.carouselSession).toBeNull();
+      expect(migrated.players[0]?.finalCrew).toEqual([]);
+      expect(migrated.players[0]?.recentBattles).toHaveLength(
+        version === 5 ? 5 : 0,
+      );
+      if (version === 1) {
+        expect(migrated.stageId).toBe("east-blue-patrol");
+        expect(migrated.pendingItemChoices).toEqual({});
+        expect(migrated.nextChoiceSerial).toBe(1);
+      }
+      if (version === 3) expect(migrated.lastResults).toEqual([]);
+      if (version === 5) {
+        expect(migrated.players[0]?.recentBattles[0]?.round).toBe(2);
+      }
+      const roundTripped = deserializeMatch(serializeMatch(migrated));
+      expect(roundTripped).toEqual(migrated);
+      expect(migrateMatchState(roundTripped)).toEqual(migrated);
+    },
+  );
 
   it("migrates a schema-one match", () => {
     const state = createMatch("migration");
@@ -83,8 +119,7 @@ describe("versioned local persistence", () => {
     state.stageId = getStageDefinition(state.round).id;
     const started = applyCommand(state, {
       type: "END_PREPARATION",
-      playerId: "player-1",
-    });
+    }, PLAYER_CONTEXT);
     if (!started.ok) throw new Error(started.error.message);
     expect(started.state.phase).toBe("battle");
 
@@ -146,7 +181,7 @@ describe("versioned local persistence", () => {
     state.round = 3;
     state.phase = "item-choice";
     state.pendingItemChoices = {};
-    const carousel = applyCommand(state, { type: "TIMER_EXPIRED" });
+    const carousel = applyCommand(state, { type: "TIMER_EXPIRED" }, PLAYER_CONTEXT);
     if (!carousel.ok) throw new Error(carousel.error.message);
     expect(carousel.state.phase).toBe("carousel");
     const legacy = structuredClone(carousel.state) as unknown as Record<
@@ -188,7 +223,7 @@ describe("versioned local persistence", () => {
     state.round = 3;
     state.phase = "item-choice";
     state.pendingItemChoices = {};
-    const carousel = applyCommand(state, { type: "TIMER_EXPIRED" });
+    const carousel = applyCommand(state, { type: "TIMER_EXPIRED" }, PLAYER_CONTEXT);
     if (!carousel.ok) throw new Error(carousel.error.message);
     const releaseTick = carousel.state.carouselSession!.participants.find(
       (participant) => participant.playerId === "player-1",
@@ -196,10 +231,9 @@ describe("versioned local persistence", () => {
     let checkpoint = advanceCarousel(carousel.state, releaseTick);
     const target = applyCommand(checkpoint, {
       type: "CAROUSEL_SET_TARGET",
-      playerId: "player-1",
       x: 760,
       y: 420,
-    });
+    }, PLAYER_CONTEXT);
     if (!target.ok) throw new Error(target.error.message);
     checkpoint = advanceCarousel(target.state, 17);
     expect(checkpoint.carouselSession).not.toBeNull();
@@ -209,8 +243,8 @@ describe("versioned local persistence", () => {
     const continuedOriginal = advanceCarousel(checkpoint, 41);
     const continuedRestored = advanceCarousel(restored, 41);
     expect(continuedRestored).toEqual(continuedOriginal);
-    expect(applyCommand(continuedRestored, { type: "TIMER_EXPIRED" })).toEqual(
-      applyCommand(continuedOriginal, { type: "TIMER_EXPIRED" }),
+    expect(applyCommand(continuedRestored, { type: "TIMER_EXPIRED" }, PLAYER_CONTEXT)).toEqual(
+      applyCommand(continuedOriginal, { type: "TIMER_EXPIRED" }, PLAYER_CONTEXT),
     );
   });
 
@@ -219,7 +253,7 @@ describe("versioned local persistence", () => {
     state.round = 3;
     state.phase = "item-choice";
     state.pendingItemChoices = {};
-    const carousel = applyCommand(state, { type: "TIMER_EXPIRED" });
+    const carousel = applyCommand(state, { type: "TIMER_EXPIRED" }, PLAYER_CONTEXT);
     if (!carousel.ok) throw new Error(carousel.error.message);
     const malformed = structuredClone(carousel.state) as unknown as Record<
       string,

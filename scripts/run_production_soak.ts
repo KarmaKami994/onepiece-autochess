@@ -1,13 +1,17 @@
 import { mkdir, writeFile } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   DEFAULT_CONTENT,
+  CURRENT_SAVE_SCHEMA_VERSION,
   CAROUSEL_TICK_MS,
   advanceMatchPhase,
   createMatch,
   getActiveTraits,
   getStageDefinition,
+  hashCanonicalValue,
+  hashGameContent,
   type MatchState,
   type PlayerState,
   type UnitInstance,
@@ -15,6 +19,12 @@ import {
 
 export type ProductionSoakReport = {
   generatedAt: string;
+  gitSha: string;
+  nodeVersion: string;
+  schemaVersion: number;
+  contentHash: string;
+  configHash: string;
+  seedRange: { first: string; last: string };
   seeds: number;
   completeMatches: number;
   crashes: number;
@@ -38,6 +48,17 @@ export type ProductionSoakReport = {
     everyTraitReached: boolean;
   };
 };
+
+function currentGitSha(): string {
+  try {
+    return execFileSync("git", ["rev-parse", "HEAD"], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+  } catch {
+    return "unknown";
+  }
+}
 
 type MutableCounter = Record<string, number>;
 
@@ -237,6 +258,15 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
 
   return {
     generatedAt: new Date().toISOString(),
+    gitSha: currentGitSha(),
+    nodeVersion: process.version,
+    schemaVersion: CURRENT_SAVE_SCHEMA_VERSION,
+    contentHash: hashGameContent(DEFAULT_CONTENT),
+    configHash: hashCanonicalValue(DEFAULT_CONTENT.config),
+    seedRange: {
+      first: "production-0",
+      last: `production-${seedCount - 1}`,
+    },
     seeds: seedCount,
     completeMatches,
     crashes,

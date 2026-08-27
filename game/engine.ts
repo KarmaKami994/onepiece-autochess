@@ -5,13 +5,60 @@ import {
   getUnitDefinition,
 } from "./content";
 import { simulateBattle } from "./combat";
-import {
-  hashSeed,
-  randomInt,
-  shuffleDeterministic,
-  weightedIndex,
-} from "./rng";
+import { hashSeed, randomInt, shuffleDeterministic } from "./rng";
 import { getActiveTraits } from "./traits";
+import { CURRENT_SAVE_SCHEMA_VERSION } from "./schema";
+import { createPairings } from "./pairing";
+import { cellKey, cloneMatch, copiesForStar, findPlayer, parseCell } from "./state";
+import { gainXp, returnShopToPool, rollShop, streakIncome } from "./economy";
+import {
+  addUnitToPlayer,
+  boardUnitCount,
+  canReceiveUnit,
+  locateUnit,
+  removeFromLocation,
+} from "./roster";
+import {
+  CAROUSEL_ARENA_HEIGHT,
+  CAROUSEL_ARENA_WIDTH,
+  CAROUSEL_BOAT_RADIUS,
+  CAROUSEL_BOUNTY_RADIUS,
+  CAROUSEL_TICK_MS,
+  clampCarouselPosition,
+  createCarouselSteeringState,
+  createCarouselTickState,
+  getCarouselChoicePosition,
+  mutableCarouselPlayer,
+} from "./carousel";
+import {
+  appendRecentBattle,
+  battleOutcomeFor,
+  calculateLossDamage,
+  updateStreak,
+} from "./matchFlow";
+import {
+  getBotFormationBand as botFormationBand,
+  getBotPersonality as botPersonality,
+  selectDesiredBotUnits as desiredBotUnits,
+  type BotFormationBand,
+} from "./bots";
+
+export {
+  CAROUSEL_ARENA_HEIGHT,
+  CAROUSEL_ARENA_WIDTH,
+  CAROUSEL_BOAT_RADIUS,
+  CAROUSEL_BOUNTY_RADIUS,
+  CAROUSEL_ORBIT_RADIANS_PER_TICK,
+  CAROUSEL_ORBIT_RADIUS_X,
+  CAROUSEL_ORBIT_RADIUS_Y,
+  CAROUSEL_TICK_MS,
+} from "./carousel";
+import {
+  scoreBotInstance as botInstanceScore,
+  scoreBotUnit as botUnitScore,
+  scoreItemForPlayer as itemScore,
+  scoreItemForUnit,
+} from "./scoring";
 import type {
   BattleSetupUnit,
   BattleTeam,
@@ -21,312 +68,36 @@ import type {
   CarouselEvent,
   CarouselParticipantState,
   CarouselSessionState,
+  CommandContext,
   CommandError,
+  CommandErrorCode,
   CommandResult,
   GameCommand,
   GameContent,
-  MatchPairing,
   MatchState,
   PlayerState,
   Position,
-  RecentBattleOutcome,
-  RecentBattleRecord,
-  StarLevel,
-  UnitDefinition,
   UnitDestination,
   UnitInstance,
 } from "./types";
-
-export const CURRENT_SAVE_SCHEMA_VERSION = 6;
-
-export const CAROUSEL_TICK_MS = 50;
-export const CAROUSEL_ARENA_WIDTH = 1520;
-export const CAROUSEL_ARENA_HEIGHT = 840;
-export const CAROUSEL_BOAT_RADIUS = 34;
-export const CAROUSEL_BOUNTY_RADIUS = 30;
 
 const CAROUSEL_CENTER: Position = {
   x: CAROUSEL_ARENA_WIDTH / 2,
   y: CAROUSEL_ARENA_HEIGHT / 2,
 };
-export const CAROUSEL_ORBIT_RADIUS_X = 260;
-export const CAROUSEL_ORBIT_RADIUS_Y = 190;
 const CAROUSEL_SPAWN_RADIUS_X = 650;
 const CAROUSEL_SPAWN_RADIUS_Y = 330;
-export const CAROUSEL_ORBIT_RADIANS_PER_TICK = 0.02;
 const CAROUSEL_BOAT_SPEED_PER_TICK = 8;
 const CAROUSEL_PICKUP_HOLD_TICKS = 800 / CAROUSEL_TICK_MS;
 const CAROUSEL_EVENT_LOG_LIMIT = 256;
 
-function cloneMatch(state: MatchState): MatchState {
-  return JSON.parse(JSON.stringify(state)) as MatchState;
-}
-
 function commandFailure(
   state: MatchState,
-  code: string,
+  code: CommandErrorCode,
   message: string,
 ): CommandResult {
   const error: CommandError = { code, message };
   return { ok: false, state, error };
-}
-
-function cellKey(x: number, y: number): string {
-  return `${x},${y}`;
-}
-
-function parseCell(key: string): Position {
-  const [x, y] = key.split(",").map(Number);
-  return { x, y };
-}
-
-function findPlayer(
-  state: MatchState,
-  playerId: string,
-): PlayerState | null {
-  return state.players.find((player) => player.id === playerId) ?? null;
-}
-
-function copiesForStar(star: StarLevel): number {
-  return star === 1 ? 1 : star === 2 ? 3 : 9;
-}
-
-function firstEmptyBench(player: PlayerState): number {
-  return player.bench.findIndex((unitId) => unitId === null);
-}
-
-function boardUnitCount(player: PlayerState): number {
-  return Object.keys(player.board).length;
-}
-
-type UnitLocation =
-  | { zone: "board"; key: string; x: number; y: number }
-  | { zone: "bench"; slot: number }
-  | null;
-
-function locateUnit(player: PlayerState, unitId: string): UnitLocation {
-  const boardEntry = Object.entries(player.board).find(
-    ([, candidateId]) => candidateId === unitId,
-  );
-  if (boardEntry) {
-    const position = parseCell(boardEntry[0]);
-    return {
-      zone: "board",
-      key: boardEntry[0],
-      x: position.x,
-      y: position.y,
-    };
-  }
-  const slot = player.bench.indexOf(unitId);
-  return slot >= 0 ? { zone: "bench", slot } : null;
-}
-
-function removeFromLocation(player: PlayerState, unitId: string): void {
-  const location = locateUnit(player, unitId);
-  if (!location) {
-    return;
-  }
-  if (location.zone === "board") {
-    delete player.board[location.key];
-  } else {
-    player.bench[location.slot] = null;
-  }
-}
-
-function unitMergePriority(
-  player: PlayerState,
-  unit: UnitInstance,
-): [number, number, number] {
-  const location = locateUnit(player, unit.id);
-  if (location?.zone === "board") {
-    return [0, location.y * 100 + location.x, unit.acquiredOrder];
-  }
-  if (location?.zone === "bench") {
-    return [1, location.slot, unit.acquiredOrder];
-  }
-  return [2, 0, unit.acquiredOrder];
-}
-
-function mergeUnits(
-  player: PlayerState,
-  definitionId: string,
-  content: GameContent,
-): void {
-  for (const star of [1, 2] as const) {
-    while (true) {
-      const candidates = Object.values(player.units)
-        .filter(
-          (unit) =>
-            unit.definitionId === definitionId && unit.star === star,
-        )
-        .sort((left, right) => {
-          const leftPriority = unitMergePriority(player, left);
-          const rightPriority = unitMergePriority(player, right);
-          return (
-            leftPriority[0] - rightPriority[0] ||
-            leftPriority[1] - rightPriority[1] ||
-            leftPriority[2] - rightPriority[2]
-          );
-        });
-      if (candidates.length < 3) {
-        break;
-      }
-      const consumed = candidates.slice(0, 3);
-      const anchor = consumed[0];
-      const anchorLocation =
-        locateUnit(player, anchor.id) ??
-        ({
-          zone: "bench",
-          slot: firstEmptyBench(player),
-        } as const);
-      const combinedItems = consumed.flatMap((unit) => unit.items);
-      for (const unit of consumed) {
-        removeFromLocation(player, unit.id);
-        if (unit.id !== anchor.id) {
-          delete player.units[unit.id];
-        }
-      }
-      anchor.star = (star + 1) as StarLevel;
-      anchor.items = combinedItems.slice(0, content.config.itemCap);
-      player.inventory.push(...combinedItems.slice(content.config.itemCap));
-      const safeLocation =
-        anchorLocation.zone === "bench" && anchorLocation.slot < 0
-          ? ({
-              zone: "bench",
-              slot: firstEmptyBench(player),
-            } as const)
-          : anchorLocation;
-      if (safeLocation.zone === "bench" && safeLocation.slot >= 0) {
-        player.bench[safeLocation.slot] = anchor.id;
-      } else if (safeLocation.zone === "board") {
-        player.board[safeLocation.key] = anchor.id;
-      }
-    }
-  }
-}
-
-function canReceiveUnit(
-  player: PlayerState,
-  definitionId: string,
-): boolean {
-  return (
-    firstEmptyBench(player) >= 0 ||
-    Object.values(player.units).filter(
-      (unit) => unit.definitionId === definitionId && unit.star === 1,
-    ).length >= 2
-  );
-}
-
-function addUnitToPlayer(
-  state: MatchState,
-  player: PlayerState,
-  definitionId: string,
-  content: GameContent,
-  itemId: string | null = null,
-): UnitInstance | null {
-  if (!canReceiveUnit(player, definitionId)) {
-    return null;
-  }
-  const unit: UnitInstance = {
-    id: `unit-${state.nextUnitSerial}`,
-    definitionId,
-    star: 1,
-    items: itemId ? [itemId] : [],
-    acquiredOrder: state.nextUnitSerial,
-  };
-  state.nextUnitSerial += 1;
-  player.units[unit.id] = unit;
-  const slot = firstEmptyBench(player);
-  if (slot >= 0) {
-    player.bench[slot] = unit.id;
-  }
-  mergeUnits(player, definitionId, content);
-  return unit;
-}
-
-function returnShopToPool(state: MatchState, player: PlayerState): void {
-  for (const definitionId of player.shop) {
-    if (definitionId) {
-      state.pool[definitionId] = (state.pool[definitionId] ?? 0) + 1;
-    }
-  }
-  player.shop = player.shop.map(() => null);
-}
-
-function rollOneShopUnit(
-  state: MatchState,
-  player: PlayerState,
-  content: GameContent,
-): string | null {
-  const odds =
-    content.config.shopOddsByLevel[String(player.level)] ??
-    content.config.shopOddsByLevel[String(content.config.maxLevel)];
-  const availableByCost = [1, 2, 3, 4, 5].map((cost) =>
-    content.units.some(
-      (unit) => unit.cost === cost && (state.pool[unit.id] ?? 0) > 0,
-    ),
-  );
-  const costRoll = weightedIndex(
-    odds.map((weight, index) =>
-      availableByCost[index] ? weight : 0,
-    ),
-    state.rngState,
-  );
-  state.rngState = costRoll.state;
-  if (costRoll.index < 0) {
-    return null;
-  }
-  const cost = costRoll.index + 1;
-  const candidates = content.units
-    .filter((unit) => unit.cost === cost)
-    .sort((left, right) => left.id.localeCompare(right.id));
-  const unitRoll = weightedIndex(
-    candidates.map((unit) => state.pool[unit.id] ?? 0),
-    state.rngState,
-  );
-  state.rngState = unitRoll.state;
-  const selected = candidates[unitRoll.index];
-  if (!selected || (state.pool[selected.id] ?? 0) <= 0) {
-    return null;
-  }
-  state.pool[selected.id] -= 1;
-  return selected.id;
-}
-
-function rollShop(
-  state: MatchState,
-  player: PlayerState,
-  content: GameContent,
-): void {
-  player.shop = Array.from(
-    { length: content.config.shopSize },
-    () => rollOneShopUnit(state, player, content),
-  );
-}
-
-function gainXp(
-  player: PlayerState,
-  amount: number,
-  content: GameContent,
-): void {
-  if (player.level >= content.config.maxLevel) {
-    player.xp = 0;
-    return;
-  }
-  player.xp += amount;
-  while (player.level < content.config.maxLevel) {
-    const required =
-      content.config.xpToNextByLevel[String(player.level)] ??
-      Number.POSITIVE_INFINITY;
-    if (player.xp < required) {
-      break;
-    }
-    player.xp -= required;
-    player.level += 1;
-  }
-  if (player.level >= content.config.maxLevel) {
-    player.xp = 0;
-  }
 }
 
 function createPlayer(
@@ -559,72 +330,6 @@ function sellUnit(
   return null;
 }
 
-function recentOpponentPenalty(
-  player: PlayerState,
-  candidateId: string,
-): number {
-  const reversed = [...player.lastOpponents].reverse();
-  const index = reversed.indexOf(candidateId);
-  return index < 0 ? -1 : reversed.length - index;
-}
-
-export function createPairings(
-  state: MatchState,
-): { pairings: MatchPairing[]; rngState: number } {
-  const alivePlayers = state.players
-    .filter((player) => player.alive)
-    .sort((left, right) => left.id.localeCompare(right.id));
-  const shuffled = shuffleDeterministic(alivePlayers, state.rngState);
-  const remaining = [...shuffled.values];
-  const pairings: MatchPairing[] = [];
-  while (remaining.length >= 2) {
-    const playerA = remaining.shift();
-    if (!playerA) {
-      break;
-    }
-    const candidates = remaining
-      .map((player, index) => ({
-        player,
-        index,
-        penalty: recentOpponentPenalty(playerA, player.id),
-      }))
-      .sort(
-        (left, right) =>
-          left.penalty - right.penalty ||
-          left.index - right.index ||
-          left.player.id.localeCompare(right.player.id),
-      );
-    const selected = candidates[0];
-    if (!selected) {
-      break;
-    }
-    remaining.splice(selected.index, 1);
-    pairings.push({
-      playerAId: playerA.id,
-      playerBId: selected.player.id,
-      ghostOfPlayerId: null,
-    });
-  }
-  if (remaining.length === 1) {
-    const playerA = remaining[0];
-    const ghostCandidates = alivePlayers
-      .filter((player) => player.id !== playerA.id)
-      .sort(
-        (left, right) =>
-          recentOpponentPenalty(playerA, left.id) -
-            recentOpponentPenalty(playerA, right.id) ||
-          left.id.localeCompare(right.id),
-      );
-    const ghost = ghostCandidates[0] ?? null;
-    pairings.push({
-      playerAId: playerA.id,
-      playerBId: null,
-      ghostOfPlayerId: ghost?.id ?? null,
-    });
-  }
-  return { pairings, rngState: shuffled.state };
-}
-
 function playerBattleTeam(
   player: PlayerState,
   side: "a" | "b",
@@ -689,25 +394,6 @@ function pveBattleTeam(
     units,
     activeTraits: [],
   };
-}
-
-function calculateLossDamage(
-  winnerTeamId: string | null,
-  finalUnits: ReturnType<typeof simulateBattle>["finalUnits"],
-): number {
-  if (!winnerTeamId) {
-    return 0;
-  }
-  const survivors = finalUnits.filter(
-    (unit) =>
-      unit.teamId === winnerTeamId &&
-      unit.state !== "dead" &&
-      unit.hp > 0,
-  );
-  return Math.max(
-    1,
-    1 + survivors.reduce((sum, unit) => sum + unit.star, 0),
-  );
 }
 
 function simulatePvpRound(
@@ -870,42 +556,6 @@ function returnEliminatedPlayerPieces(
   player.units = {};
 }
 
-function updateStreak(
-  player: PlayerState,
-  result: "win" | "loss" | "draw",
-): void {
-  if (result === "win") {
-    player.winStreak += 1;
-    player.lossStreak = 0;
-  } else if (result === "loss") {
-    player.lossStreak += 1;
-    player.winStreak = 0;
-  } else {
-    player.winStreak = 0;
-    player.lossStreak = 0;
-  }
-}
-
-function battleOutcomeFor(
-  playerId: string,
-  winnerId: string | null,
-): RecentBattleOutcome {
-  if (winnerId === null) {
-    return "draw";
-  }
-  return winnerId === playerId ? "win" : "loss";
-}
-
-function appendRecentBattle(
-  player: PlayerState,
-  record: RecentBattleRecord,
-): void {
-  player.recentBattles = [
-    ...(player.recentBattles ?? []),
-    record,
-  ].slice(-5);
-}
-
 function resolveBattleResults(
   state: MatchState,
   content: GameContent,
@@ -1016,65 +666,6 @@ function resolveBattleResults(
     }
   }
   return beginNextRound(next, content);
-}
-
-function itemScore(
-  itemId: string,
-  player: PlayerState,
-  content: GameContent,
-): number {
-  const item = getItemDefinition(itemId, content);
-  if (!item) {
-    return -1;
-  }
-  const definitions = Object.values(player.units)
-    .map((instance) => getUnitDefinition(instance.definitionId, content))
-    .filter((definition): definition is UnitDefinition => Boolean(definition));
-  const hasTrait = (traitId: string) =>
-    definitions.some((definition) => definition.traits.includes(traitId));
-  const hasRanged = definitions.some(
-    (definition) => definition.stats.range >= 4,
-  );
-  const duplicatePenalty =
-    player.inventory.includes(itemId) ||
-    Object.values(player.units).some((unit) => unit.items.includes(itemId))
-      ? 8
-      : 0;
-
-  return item.effects.reduce((score, effect) => {
-    switch (effect.kind) {
-      case "health-flat":
-        return (
-          score +
-          (effect.value / 20) *
-            (hasTrait("guardian") || hasTrait("brawler") ? 1.5 : 1)
-        );
-      case "defense-flat":
-        return score + effect.value * (hasTrait("guardian") ? 1.6 : 1);
-      case "attack-flat":
-        return (
-          score +
-          effect.value *
-            (hasTrait("swordsman") || hasTrait("brawler") ? 1.45 : 1)
-        );
-      case "attack-speed-percent":
-        return score + effect.value * (hasTrait("marksman") ? 1.55 : 1);
-      case "critical-chance-percent":
-        return (
-          score +
-          effect.value *
-            (hasTrait("marksman") || hasTrait("swordsman") ? 1.6 : 1)
-        );
-      case "ability-power-percent":
-        return score + effect.value * (hasTrait("specialist") ? 1.65 : 1);
-      case "starting-energy":
-        return score + effect.value * (hasTrait("specialist") ? 1.45 : 1);
-      case "range-flat":
-        return score + effect.value * (hasRanged ? 28 : 4);
-      case "omnivamp-percent":
-        return score + effect.value * (hasTrait("brawler") ? 1.6 : 1);
-    }
-  }, -duplicatePenalty);
 }
 
 function prepareItemChoices(
@@ -1222,27 +813,6 @@ function enterPreparationAfterCarousel(state: MatchState): MatchState {
   return state;
 }
 
-function roundCarouselCoordinate(value: number): number {
-  return Math.round(value * 1_000) / 1_000;
-}
-
-function clampCarouselPosition(position: Position): Position {
-  return {
-    x: roundCarouselCoordinate(
-      Math.max(
-        CAROUSEL_BOAT_RADIUS,
-        Math.min(CAROUSEL_ARENA_WIDTH - CAROUSEL_BOAT_RADIUS, position.x),
-      ),
-    ),
-    y: roundCarouselCoordinate(
-      Math.max(
-        CAROUSEL_BOAT_RADIUS,
-        Math.min(CAROUSEL_ARENA_HEIGHT - CAROUSEL_BOAT_RADIUS, position.y),
-      ),
-    ),
-  };
-}
-
 function createCarouselSession(state: MatchState): CarouselSessionState {
   const draftOrder = carouselDraftOrder(state);
   const rankByPlayerId = new Map(
@@ -1307,25 +877,6 @@ function createCarouselSession(state: MatchState): CarouselSessionState {
     arenaSeed,
     participants,
     events: [],
-  };
-}
-
-export function getCarouselChoicePosition(
-  state: MatchState,
-  choice: CarouselChoice,
-  tick = state.carouselSession?.tick ?? 0,
-): Position {
-  const choiceCount = Math.max(1, state.carouselChoices.length);
-  const angle =
-    (choice.orbitIndex / choiceCount) * Math.PI * 2 +
-    tick * CAROUSEL_ORBIT_RADIANS_PER_TICK;
-  return {
-    x: roundCarouselCoordinate(
-      CAROUSEL_CENTER.x + Math.cos(angle) * CAROUSEL_ORBIT_RADIUS_X,
-    ),
-    y: roundCarouselCoordinate(
-      CAROUSEL_CENTER.y + Math.sin(angle) * CAROUSEL_ORBIT_RADIUS_Y,
-    ),
   };
 }
 
@@ -1463,6 +1014,7 @@ function resolveCarouselClaims(
   state: MatchState,
   content: GameContent,
   events: CarouselEvent[],
+  sharedPlayers?: PlayerState[],
 ): void {
   const session = state.carouselSession;
   if (!session) {
@@ -1503,10 +1055,16 @@ function resolveCarouselClaims(
     ) {
       continue;
     }
-    const player = findPlayer(state, candidate.participant.playerId);
-    if (!player?.alive) {
+    const existingPlayer = findPlayer(state, candidate.participant.playerId);
+    if (!existingPlayer?.alive) {
       continue;
     }
+    const player = mutableCarouselPlayer(
+      state,
+      candidate.participant.playerId,
+      sharedPlayers,
+    );
+    if (!player) continue;
     grantCarouselChoice(
       player,
       candidate.choice,
@@ -1536,18 +1094,25 @@ function autoAssignRemainingCarouselChoices(
   state: MatchState,
   content: GameContent,
   events?: CarouselEvent[],
+  sharedPlayers?: PlayerState[],
 ): void {
   const session = state.carouselSession;
   const tick = session?.tick ?? 0;
   const assignedPlayerIds: string[] = [];
-  for (const player of carouselDraftOrder(state)) {
-    if (alreadyDrafted(state, player.id)) {
+  for (const draftPlayer of carouselDraftOrder(state)) {
+    if (alreadyDrafted(state, draftPlayer.id)) {
       continue;
     }
-    const choice = bestCarouselChoice(state, player, content);
+    const choice = bestCarouselChoice(state, draftPlayer, content);
     if (!choice) {
       continue;
     }
+    const player = mutableCarouselPlayer(
+      state,
+      draftPlayer.id,
+      sharedPlayers,
+    );
+    if (!player) continue;
     const participant = session?.participants.find(
       (candidate) => candidate.playerId === player.id,
     );
@@ -1580,7 +1145,8 @@ export function advanceCarousel(
   if (state.phase !== "carousel" || !state.carouselSession) {
     return state;
   }
-  const next = cloneMatch(state);
+  const sharedPlayers = state.players;
+  const next = createCarouselTickState(state);
   const session = next.carouselSession;
   if (!session) {
     return next;
@@ -1615,10 +1181,10 @@ export function advanceCarousel(
       }
     }
     resolveCarouselBoatCollisions(session, events);
-    resolveCarouselClaims(next, content, events);
+    resolveCarouselClaims(next, content, events, sharedPlayers);
 
     if (session.tick >= session.durationTicks && session.finishAtTick === null) {
-      autoAssignRemainingCarouselChoices(next, content, events);
+      autoAssignRemainingCarouselChoices(next, content, events, sharedPlayers);
       session.finishAtTick = session.tick + CAROUSEL_PICKUP_HOLD_TICKS;
     }
     if (session.finishAtTick !== null && session.tick >= session.finishAtTick) {
@@ -1646,8 +1212,9 @@ export function resolveLegacyCarousel(
 function finishCarouselImmediately(
   state: MatchState,
   content: GameContent,
+  sharedPlayers?: PlayerState[],
 ): MatchState {
-  autoAssignRemainingCarouselChoices(state, content);
+  autoAssignRemainingCarouselChoices(state, content, undefined, sharedPlayers);
   const complete = carouselDraftOrder(state).every((player) =>
     alreadyDrafted(state, player.id),
   );
@@ -1655,17 +1222,6 @@ function finishCarouselImmediately(
     return state;
   }
   return enterPreparationAfterCarousel(state);
-}
-
-function streakIncome(
-  player: PlayerState,
-  content: GameContent,
-): number {
-  const streak = Math.max(player.winStreak, player.lossStreak);
-  return Math.min(
-    content.config.maxStreakBonus,
-    Math.max(0, streak - 1),
-  );
 }
 
 function beginNextRound(
@@ -1703,130 +1259,10 @@ function beginNextRound(
   return state;
 }
 
-function botPersonality(
-  player: PlayerState,
-  content: GameContent,
-): BotPersonality {
-  return (
-    content.botPersonalities.find(
-      (personality) => personality.id === player.personalityId,
-    ) ??
-    content.botPersonalities[0] ?? {
-      id: "fallback",
-      name: "Fallback",
-      economyReserve: 10,
-      levelAggression: 0.5,
-      rerollAggression: 0.5,
-      preferredTraits: [],
-      formation: "spread",
-    }
-  );
-}
-
-function botUnitScore(
-  definitionId: string,
-  player: PlayerState,
-  personality: BotPersonality,
-  content: GameContent,
-): number {
-  const definition = getUnitDefinition(definitionId, content);
-  if (!definition) {
-    return -1_000;
-  }
-  const copies = Object.values(player.units).filter(
-    (unit) => unit.definitionId === definitionId,
-  );
-  const preferred = definition.traits.some((traitId) =>
-    personality.preferredTraits.includes(traitId),
-  )
-    ? 1
-    : 0;
-  const activeCounts = getActiveTraits(player, content);
-  const synergy = definition.traits
-    .map((traitId) => {
-      const active = activeCounts.find(
-        (candidate) => candidate.traitId === traitId,
-      );
-      return (active?.count ?? 0) * 4;
-    })
-    .sort((left, right) => right - left)
-    .slice(0, 2)
-    .reduce((score, value) => score + value, 0);
-  // Base cost, copies, preference, and the two strongest live connections
-  // already reward flexible units. Normalize only exceptional tag breadth so
-  // a five-trait connector cannot dominate every otherwise distinct bot plan.
-  const connectorPenalty = Math.max(0, definition.traits.length - 3) * 12;
-  return (
-    definition.cost * 25 +
-    copies.length * 24 +
-    preferred * 20 +
-    synergy -
-    connectorPenalty
-  );
-}
-
-function botInstanceScore(
-  unit: UnitInstance,
-  player: PlayerState,
-  personality: BotPersonality,
-  content: GameContent,
-): number {
-  return (
-    botUnitScore(unit.definitionId, player, personality, content) +
-    (unit.star === 3 ? 260 : unit.star === 2 ? 100 : 0) +
-    unit.items.length * 18
-  );
-}
-
-type BotFormationBand = "backline" | "frontline" | "flex" | "middle";
-
 interface BotThreatContext {
   positions: Position[];
   lineThreats: number;
   adjacentThreats: number;
-}
-
-function desiredBotUnits(
-  player: PlayerState,
-  personality: BotPersonality,
-  content: GameContent,
-): UnitInstance[] {
-  return Object.values(player.units)
-    .filter((unit) => Boolean(getUnitDefinition(unit.definitionId, content)))
-    .sort(
-      (left, right) =>
-        botInstanceScore(right, player, personality, content) -
-          botInstanceScore(left, player, personality, content) ||
-        left.id.localeCompare(right.id) ||
-        left.acquiredOrder - right.acquiredOrder,
-    )
-    .slice(0, Math.max(0, player.level));
-}
-
-function botFormationBand(
-  unit: UnitInstance,
-  content: GameContent,
-): BotFormationBand {
-  const definition = getUnitDefinition(unit.definitionId, content);
-  if (!definition) {
-    return "middle";
-  }
-  const traits = new Set(definition.traits);
-  const isFrontliner = traits.has("guardian") || traits.has("brawler");
-  const isBackliner =
-    traits.has("marksman") ||
-    traits.has("specialist") ||
-    definition.stats.range >= 4;
-  if (isBackliner && !isFrontliner) {
-    return "backline";
-  }
-  if (isFrontliner) {
-    return "frontline";
-  }
-  if (traits.has("captain") || traits.has("swordsman")) {
-    return "flex";
-  }
-  return "middle";
 }
 
 function lastLivingOpponent(
@@ -2164,7 +1600,8 @@ function botBuyPass(
       stateBeforeReplacement = next;
       const sale = applyCommand(
         next,
-        { type: "SELL_UNIT", playerId, unitId: replacement.unit.id },
+        { type: "SELL_UNIT", unitId: replacement.unit.id },
+        { actorPlayerId: playerId },
         content,
       );
       if (!sale.ok) {
@@ -2181,9 +1618,9 @@ function botBuyPass(
       next,
       {
         type: "BUY_UNIT",
-        playerId,
         shopIndex: offer.shopIndex,
       },
+      { actorPlayerId: playerId },
       content,
     );
     if (result.ok) {
@@ -2236,10 +1673,10 @@ function arrangeBotBoard(
       next,
       {
         type: "MOVE_UNIT",
-        playerId,
         unitId: placement.unitId,
         to: { zone: "board", x: destination.x, y: destination.y },
       },
+      { actorPlayerId: playerId },
       content,
     );
     if (result.ok) {
@@ -2266,7 +1703,6 @@ function arrangeBotBoard(
       next,
       {
         type: "MOVE_UNIT",
-        playerId,
         unitId: placement.unitId,
         to: {
           zone: "board",
@@ -2274,6 +1710,7 @@ function arrangeBotBoard(
           y: placement.position.y,
         },
       },
+      { actorPlayerId: playerId },
       content,
     );
     if (result.ok) {
@@ -2295,41 +1732,12 @@ function botItemCompatibilityScore(
   if (!item || !definition || unit.items.length >= content.config.itemCap) {
     return Number.NEGATIVE_INFINITY;
   }
-  const hasTrait = (traitId: string) => definition.traits.includes(traitId);
-  const compatibility = item.effects.reduce((score, effect) => {
-    switch (effect.kind) {
-      case "health-flat":
-        return (
-          score +
-          (effect.value / 20) *
-            (hasTrait("guardian") || hasTrait("brawler") ? 1.5 : 1)
-        );
-      case "defense-flat":
-        return score + effect.value * (hasTrait("guardian") ? 1.6 : 1);
-      case "attack-flat":
-        return (
-          score +
-          effect.value *
-            (hasTrait("swordsman") || hasTrait("brawler") ? 1.45 : 1)
-        );
-      case "attack-speed-percent":
-        return score + effect.value * (hasTrait("marksman") ? 1.55 : 1);
-      case "critical-chance-percent":
-        return (
-          score +
-          effect.value *
-            (hasTrait("marksman") || hasTrait("swordsman") ? 1.6 : 1)
-        );
-      case "ability-power-percent":
-        return score + effect.value * (hasTrait("specialist") ? 1.65 : 1);
-      case "starting-energy":
-        return score + effect.value * (hasTrait("specialist") ? 1.45 : 1);
-      case "range-flat":
-        return score + effect.value * (definition.stats.range >= 4 ? 28 : 4);
-      case "omnivamp-percent":
-        return score + effect.value * (hasTrait("brawler") ? 1.6 : 1);
-    }
-  }, 0);
+  const compatibility = scoreItemForUnit(
+    itemId,
+    unit,
+    definition,
+    content,
+  );
   const deployedBonus = locateUnit(player, unit.id)?.zone === "board" ? 40 : 0;
   const duplicatePenalty = unit.items.includes(itemId) ? 20 : 0;
   return (
@@ -2386,10 +1794,10 @@ function equipBotInventory(
       next,
       {
         type: "EQUIP_ITEM",
-        playerId,
         unitId: selected.unitId,
         itemId: selected.itemId,
       },
+      { actorPlayerId: playerId },
       content,
     );
     if (!result.ok) {
@@ -2436,7 +1844,8 @@ export function runBotTurn(
     }
     const result = applyCommand(
       next,
-      { type: "BUY_XP", playerId },
+      { type: "BUY_XP" },
+      { actorPlayerId: playerId },
       content,
     );
     if (result.ok) {
@@ -2458,7 +1867,8 @@ export function runBotTurn(
     }
     const rerollResult = applyCommand(
       next,
-      { type: "REROLL_SHOP", playerId },
+      { type: "REROLL_SHOP" },
+      { actorPlayerId: playerId },
       content,
     );
     if (!rerollResult.ok) {
@@ -2471,7 +1881,8 @@ export function runBotTurn(
   next = equipBotInventory(next, playerId, content);
   const readyResult = applyCommand(
     next,
-    { type: "END_PREPARATION", playerId },
+    { type: "END_PREPARATION" },
+    { actorPlayerId: playerId },
     content,
   );
   return readyResult.ok ? readyResult.state : next;
@@ -2519,8 +1930,9 @@ function autoResolveCarousel(
   state: MatchState,
   content: GameContent,
 ): MatchState {
-  const next = cloneMatch(state);
-  return finishCarouselImmediately(next, content);
+  const sharedPlayers = state.players;
+  const next = createCarouselTickState(state);
+  return finishCarouselImmediately(next, content, sharedPlayers);
 }
 
 export function advanceMatchPhase(
@@ -2543,14 +1955,15 @@ export function advanceMatchPhase(
 
 function validatePlanningPlayer(
   state: MatchState,
-  command: Exclude<GameCommand, { type: "TIMER_EXPIRED" }>,
+  context: CommandContext,
 ): PlayerState | null {
-  return findPlayer(state, command.playerId);
+  return findPlayer(state, context.actorPlayerId);
 }
 
 export function applyCommand(
   state: MatchState,
   command: GameCommand,
+  context: CommandContext,
   content: GameContent = DEFAULT_CONTENT,
 ): CommandResult {
   if (command.type === "TIMER_EXPIRED") {
@@ -2595,7 +2008,7 @@ export function applyCommand(
     );
   }
 
-  const currentPlayer = validatePlanningPlayer(state, command);
+  const currentPlayer = validatePlanningPlayer(state, context);
   if (!currentPlayer) {
     return commandFailure(
       state,
@@ -2611,8 +2024,11 @@ export function applyCommand(
     );
   }
 
-  let next = cloneMatch(state);
-  const player = findPlayer(next, command.playerId);
+  let next =
+    command.type === "CAROUSEL_SET_TARGET" && state.carouselSession
+      ? createCarouselSteeringState(state, context.actorPlayerId)
+      : cloneMatch(state);
+  const player = findPlayer(next, context.actorPlayerId);
   if (!player) {
     return commandFailure(state, "PLAYER_NOT_FOUND", "Player disappeared.");
   }

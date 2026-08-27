@@ -10,8 +10,8 @@ On `2026-08-14`, the project owner explicitly attested in the project conversati
 
 - Source matrix: `art/animation-v2/source-matrix.json`
 - Deterministic importer: `scripts/assets/build_v2_animation.mjs`
-- Headless batch wrapper: `scripts/build_v2_assets.ps1`
-- Rebuild commands: `npm run assets:v2` or `powershell -ExecutionPolicy Bypass -File scripts/build_v2_assets.ps1`
+- Cross-platform headless batch wrapper: `scripts/build_v2_assets.mjs`
+- Rebuild commands: `npm run assets:v2` for runtime PNG/JSON output or `npm run assets:v2:editable` when LibreSprite is available
 - Runtime contract: 46 transparent `128×128` frames in an eight-column `1024×768` atlas; idle `0–5`, move `6–13`, attack `14–21`, cast `22–33`, hit `34–37`, defeat `38–45`; stable pivot `(64, 116)`
 - Processing contract: exact solid-corner background removal, nearest-neighbor resizing only, integer placement, deterministic holds and offsets, code-drawn hard pixel effects, no runtime network request, and no external service
 
@@ -733,7 +733,7 @@ Both generated sources and final derived assets were visually inspected. No refe
 - External services: none
 - Shared original source: `scripts/libresprite/create_roster_pilot.py`
 - Shared pixel primitives: `scripts/libresprite/pixel_svg.py`
-- Batch build source: `scripts/build_roster_animations.ps1`
+- Batch build source: `scripts/build_character_animation.mjs --roster`
 - Editable sources: `art/libresprite/<character>-pilot.aseprite`
 - Runtime sheets: `public/assets/animations/<character>/<character>.png`
 - Runtime metadata: `public/assets/animations/<character>/<character>.json`

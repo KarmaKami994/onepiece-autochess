@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 3,
+  "seed": "fixture-v3",
+  "round": 3,
+  "stageId": "raider-ambush",
+  "rngState": 103,
+  "phase": "preparation",
+  "players": [{ "id": "player-1", "finalCrew": [] }],
+  "pairings": [],
+  "lastResults": [{ "events": [{ "type": "legacy-event" }] }],
+  "pool": {},
+  "pendingItemChoices": {},
+  "carouselChoices": [],
+  "nextChoiceSerial": 1
+}

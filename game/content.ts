@@ -25,7 +25,7 @@ const ability = (
   pattern,
   effect: "damage",
   power,
-  castTimeMs: 500,
+  castAnimationMs: 500,
   ...extras,
 });
 
@@ -99,6 +99,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
         "single-ally",
       ),
       effect: "heal",
+      requiresTarget: false,
     },
     assetPath: "/assets/characters/chopper.png",
   },
@@ -118,10 +119,14 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     ability: ability(
       "flash-cut",
       "Flash Cut",
-      "Cuts through the nearest enemy with a precise strike.",
+      "Lunges beside the nearest enemy and lands a precise strike.",
       190,
       "nearest-enemy",
       "single",
+      {
+        requiresTarget: false,
+        signatureMechanics: [{ kind: "lunge" }],
+      },
     ),
     assetPath: "/assets/characters/tashigi.png",
   },
@@ -434,7 +439,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
       360,
       "nearest-enemy",
       "all-enemies",
-      { stunMs: 1_000, castTimeMs: 700 },
+      { stunMs: 1_000, castAnimationMs: 700 },
     ),
     assetPath: "/assets/characters/garp.png",
   },
@@ -458,7 +463,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
       660,
       "farthest-enemy",
       "line",
-      { castTimeMs: 700 },
+      { castAnimationMs: 700 },
     ),
     assetPath: "/assets/characters/mihawk.png",
   },
@@ -1113,7 +1118,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.0.0",
+  version: "1.1.0",
   units: UNIT_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,
   items: ITEM_DEFINITIONS,
@@ -1127,21 +1132,21 @@ export const CONTENT = DEFAULT_CONTENT;
 
 export function getUnitDefinition(
   id: string,
-  content: GameContent = DEFAULT_CONTENT,
+  content: Pick<GameContent, "units"> = DEFAULT_CONTENT,
 ): UnitDefinition | null {
   return content.units.find((unit) => unit.id === id) ?? null;
 }
 
 export function getTraitDefinition(
   id: string,
-  content: GameContent = DEFAULT_CONTENT,
+  content: Pick<GameContent, "traits"> = DEFAULT_CONTENT,
 ): TraitDefinition | null {
   return content.traits.find((trait) => trait.id === id) ?? null;
 }
 
 export function getItemDefinition(
   id: string,
-  content: GameContent = DEFAULT_CONTENT,
+  content: Pick<GameContent, "items"> = DEFAULT_CONTENT,
 ): ItemDefinition | null {
   return content.items.find((item) => item.id === id) ?? null;
 }

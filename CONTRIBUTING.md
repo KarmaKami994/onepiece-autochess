@@ -9,12 +9,11 @@ collaboration, while the playable prototype remains a localhost-only project.
 2. Run `npm ci`.
 3. Start the game with `npm run dev`.
 
-The normal game build uses only the committed runtime assets. Regenerating
-sprite sheets additionally requires Python 3.11 or newer and LibreSprite
-`1.1-dev`. Place the portable LibreSprite installation at
-`.codex-local/tools/LibreSprite-v1.1/`; that directory is intentionally ignored
-and must never be committed. The PowerShell asset scripts call LibreSprite in
-headless batch mode.
+The normal game build uses only committed runtime assets. Asset generation is
+orchestrated by cross-platform Node scripts. Python and LibreSprite resolve via
+`PYTHON_PATH` / `LIBRESPRITE_PATH`, the project-local `.venv` and
+`.codex-local/tools/LibreSprite-v1.1/` locations, then `PATH`. Local tool
+directories are ignored and must never be committed.
 
 ## Workflow
 
@@ -32,13 +31,16 @@ Run these before opening a pull request:
 npm run typecheck
 npm run lint
 npm test
+npm run test:coverage
+npm run assets:validate
 npm run test:e2e
 npm run build
 ```
 
 Use `npm run test:soak` for engine, economy, bot, pairing, or match-flow changes.
-Before balance or release changes, also run `npm run test:production-soak`; its
-1,000-match report is written below `tmp/` and intentionally remains untracked.
+Normal CI runs the 50-match `test:production-smoke`. Run the 1,000-match
+`test:production-soak` only for a deliberate release/balance audit; reports are
+written below `tmp/` and intentionally remain untracked.
 Run `npx playwright install chromium` once before the first local E2E check.
 
 Use `npm run assets:v2` to rebuild the standard 128×128 animation atlases.

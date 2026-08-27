@@ -24,7 +24,7 @@ Scope of this license
 ---------------------
 
 For this repository, "Software" means the source-code files under `app/`,
-`build/`, `components/`, `game/`, `scripts/`, `tests/`, and `worker/`, together
+`components/`, `game/`, `scripts/`, and `tests/`, together
 with the root package, TypeScript, Vite, Vitest, ESLint, PostCSS, and Next.js
 configuration files.
 

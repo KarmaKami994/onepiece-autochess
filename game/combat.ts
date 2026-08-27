@@ -41,8 +41,7 @@ interface MutableBattleUnit {
   range: number;
   attackIntervalTicks: number;
   moveIntervalTicks: number;
-  nextAttackTick: number;
-  nextMoveTick: number;
+  nextActionTick: number;
   abilityPowerPercent: number;
   criticalChancePercent: number;
   dodgePercent: number;
@@ -205,8 +204,7 @@ function createMutableUnits(
         1,
         Math.round(definition.stats.moveIntervalMs / tickMs),
       ),
-      nextAttackTick: 0,
-      nextMoveTick: 0,
+      nextActionTick: 0,
       abilityPowerPercent: 0,
       criticalChancePercent: 10,
       dodgePercent: 0,
@@ -338,7 +336,13 @@ function abilityTargets(
   }
   const candidateGroup =
     ability.targeting === "lowest-health-ally" ? allies : enemies;
-  const primary = chooseTarget(source, candidateGroup, ability.targeting);
+  const primaryCandidates =
+    ability.requiresTarget === false
+      ? candidateGroup
+      : candidateGroup.filter(
+          (candidate) => distance(source, candidate) <= source.range,
+        );
+  const primary = chooseTarget(source, primaryCandidates, ability.targeting);
   if (!primary) {
     return [];
   }
@@ -531,6 +535,44 @@ function chooseStep(
         left.firstStep!.x - right.firstStep!.x,
     )[0]?.firstStep ?? null
   );
+}
+
+function hasSignatureMechanic(
+  ability: AbilityDefinition,
+  kind: "lunge",
+): boolean {
+  return ability.signatureMechanics?.some((mechanic) => mechanic.kind === kind) ?? false;
+}
+
+function firstLungeDestination(
+  source: MutableBattleUnit,
+  target: MutableBattleUnit,
+  units: MutableBattleUnit[],
+  content: GameContent,
+): Position | null {
+  const occupied = new Set(
+    units
+      .filter((unit) => alive(unit))
+      .map((unit) => positionKey(unit.x, unit.y)),
+  );
+  for (let y = target.y - 1; y <= target.y + 1; y += 1) {
+    for (let x = target.x - 1; x <= target.x + 1; x += 1) {
+      if (x === target.x && y === target.y) {
+        continue;
+      }
+      if (
+        x < 0 ||
+        x >= content.config.boardWidth ||
+        y < 0 ||
+        y >= content.config.boardHeight ||
+        occupied.has(positionKey(x, y))
+      ) {
+        continue;
+      }
+      return { x, y };
+    }
+  }
+  return null;
 }
 
 export function remainingTeamHealthPercentage(
@@ -817,6 +859,9 @@ export function simulateBattle(
         source.state = "stunned";
         continue;
       }
+      if (tick < source.nextActionTick) {
+        continue;
+      }
       source.state = "seek";
       if (source.ability && source.energy >= 100) {
         const targets = abilityTargets(source, units, content);
@@ -840,7 +885,7 @@ export function simulateBattle(
       if (!target) {
         continue;
       }
-      if (distance(source, target) <= source.range && tick >= source.nextAttackTick) {
+      if (distance(source, target) <= source.range) {
         source.state = "attack-windup";
         intents.push({
           kind: "attack",
@@ -849,17 +894,15 @@ export function simulateBattle(
         });
         continue;
       }
-      if (tick >= source.nextMoveTick) {
-        const step = chooseStep(source, target, units, content);
-        if (step) {
-          source.state = "move";
-          intents.push({
-            kind: "move",
-            sourceId: source.id,
-            targetId: target.id,
-            to: step,
-          });
-        }
+      const step = chooseStep(source, target, units, content);
+      if (step) {
+        source.state = "move";
+        intents.push({
+          kind: "move",
+          sourceId: source.id,
+          targetId: target.id,
+          to: step,
+        });
       }
     }
 
@@ -871,12 +914,11 @@ export function simulateBattle(
         continue;
       }
       const abilityDefinition = source.ability;
-      source.nextAttackTick =
+      source.nextActionTick =
         tick +
-        Math.max(
-          1,
-          Math.round(abilityDefinition.castTimeMs / content.config.combatTickMs),
-        );
+        (abilityDefinition.requiresTarget === false
+          ? source.moveIntervalTicks
+          : source.attackIntervalTicks);
       emit({
         type: "cast",
         tick,
@@ -885,6 +927,36 @@ export function simulateBattle(
         targetIds: intent.targetIds,
       });
       changeEnergy(tick, source, -source.energy, "cast-reset");
+      let shouldApplyEffect = true;
+      if (hasSignatureMechanic(abilityDefinition, "lunge")) {
+        const primaryTarget = units.find(
+          (unit) => unit.id === intent.targetIds[0] && alive(unit),
+        );
+        const destination = primaryTarget
+          ? firstLungeDestination(source, primaryTarget, units, content)
+          : null;
+        if (!destination) {
+          shouldApplyEffect = false;
+        } else {
+          const from = { x: source.x, y: source.y };
+          source.x = destination.x;
+          source.y = destination.y;
+          source.nextActionTick = tick + 1;
+          emit({
+            type: "unit-displace",
+            tick,
+            sourceId: source.id,
+            unitId: source.id,
+            abilityId: abilityDefinition.id,
+            movementKind: "lunge",
+            from,
+            to: destination,
+          });
+        }
+      }
+      if (!shouldApplyEffect) {
+        continue;
+      }
       const abilityMultiplier =
         content.config.starAbilityBasisPoints[source.star - 1] ?? 10_000;
       const scaledPower = Math.max(
@@ -978,7 +1050,7 @@ export function simulateBattle(
       if (!source || !target) {
         continue;
       }
-      source.nextAttackTick = tick + source.attackIntervalTicks;
+      source.nextActionTick = tick + source.attackIntervalTicks;
       source.state = "attack-recovery";
       const dodged = roll(target.dodgePercent);
       const critical = dodged ? false : roll(source.criticalChancePercent);
@@ -1029,7 +1101,7 @@ export function simulateBattle(
       reserved.add(destinationKey);
       source.x = intent.to.x;
       source.y = intent.to.y;
-      source.nextMoveTick = tick + source.moveIntervalTicks;
+      source.nextActionTick = tick + source.moveIntervalTicks;
       emit({
         type: "unit-move",
         tick,

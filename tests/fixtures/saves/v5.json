@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 5,
+  "seed": "fixture-v5",
+  "round": 5,
+  "stageId": "pvp-5",
+  "rngState": 105,
+  "phase": "preparation",
+  "players": [{
+    "id": "player-1",
+    "finalCrew": [],
+    "recentBattles": [
+      { "round": 1 },
+      { "round": 2 },
+      { "round": 3 },
+      { "round": 4 },
+      { "round": 5 },
+      { "round": 6 }
+    ]
+  }],
+  "pairings": [],
+  "lastResults": [],
+  "pool": {},
+  "pendingItemChoices": {},
+  "carouselChoices": [],
+  "carouselSession": null,
+  "nextChoiceSerial": 1
+}

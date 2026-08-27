@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 2,
+  "seed": "fixture-v2",
+  "round": 2,
+  "stageId": "rifle-line",
+  "rngState": 102,
+  "phase": "preparation",
+  "players": [{ "id": "player-1" }],
+  "pairings": [],
+  "lastResults": [],
+  "pool": {},
+  "pendingItemChoices": {},
+  "carouselChoices": [],
+  "nextChoiceSerial": 1
+}

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "seed": "fixture-v1",
+  "round": 1,
+  "rngState": 101,
+  "phase": "preparation",
+  "players": [{ "id": "player-1" }],
+  "pairings": [],
+  "lastResults": [],
+  "pool": {}
+}

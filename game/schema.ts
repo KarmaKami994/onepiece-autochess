@@ -1,0 +1,1 @@
+export const CURRENT_SAVE_SCHEMA_VERSION = 6;

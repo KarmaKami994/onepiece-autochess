@@ -36,6 +36,8 @@ export type AbilityPattern =
   | "single-ally";
 export type AbilityEffectKind = "damage" | "heal" | "shield";
 
+export type SignatureMechanic = { kind: "lunge" };
+
 export interface AbilityDefinition {
   id: string;
   name: string;
@@ -44,7 +46,11 @@ export interface AbilityDefinition {
   pattern: AbilityPattern;
   effect: AbilityEffectKind;
   power: number;
-  castTimeMs: number;
+  /** Presentation timing only. Combat effects resolve in the action tick. */
+  castAnimationMs: number;
+  /** Targetless abilities may cast from a movement action window. */
+  requiresTarget?: boolean;
+  signatureMechanics?: SignatureMechanic[];
   hits?: number;
   stunMs?: number;
   burnPower?: number;
@@ -337,35 +343,59 @@ export type UnitDestination =
   | { kind: "bench"; index: number };
 
 export type GameCommand =
-  | { type: "BUY_UNIT"; playerId: string; shopIndex: number }
-  | { type: "REROLL_SHOP"; playerId: string }
-  | { type: "TOGGLE_SHOP_LOCK"; playerId: string }
-  | { type: "BUY_XP"; playerId: string }
+  | { type: "BUY_UNIT"; shopIndex: number }
+  | { type: "REROLL_SHOP" }
+  | { type: "TOGGLE_SHOP_LOCK" }
+  | { type: "BUY_XP" }
   | {
       type: "MOVE_UNIT";
-      playerId: string;
       unitId: string;
       to: UnitDestination;
     }
-  | { type: "SELL_UNIT"; playerId: string; unitId: string }
+  | { type: "SELL_UNIT"; unitId: string }
   | {
       type: "EQUIP_ITEM";
-      playerId: string;
       unitId: string;
       itemId: string;
     }
-  | { type: "END_PREPARATION"; playerId: string }
-  | { type: "CHOOSE_ITEM"; playerId: string; choiceId: string }
+  | { type: "END_PREPARATION" }
+  | { type: "CHOOSE_ITEM"; choiceId: string }
   | {
       type: "CAROUSEL_SET_TARGET";
-      playerId: string;
       x: number;
       y: number;
     }
   | { type: "TIMER_EXPIRED" };
 
+export interface CommandContext {
+  actorPlayerId: string;
+}
+
+export type CommandErrorCode =
+  | "BENCH_FULL"
+  | "BOARD_FULL"
+  | "BOT_CONTROLLED"
+  | "CAROUSEL_ALREADY_CLAIMED"
+  | "CAROUSEL_LOCKED"
+  | "CAROUSEL_NOT_READY"
+  | "EMPTY_SHOP_SLOT"
+  | "INVALID_BENCH_SLOT"
+  | "INVALID_BOARD_CELL"
+  | "INVALID_CAROUSEL_TARGET"
+  | "INVALID_ITEM_CHOICE"
+  | "INVALID_SHOP_SLOT"
+  | "ITEM_CAP"
+  | "ITEM_NOT_FOUND"
+  | "MAX_LEVEL"
+  | "NOT_ENOUGH_GOLD"
+  | "PLAYER_ELIMINATED"
+  | "PLAYER_NOT_FOUND"
+  | "UNIT_NOT_FOUND"
+  | "UNIT_NOT_PLACED"
+  | "WRONG_PHASE";
+
 export interface CommandError {
-  code: string;
+  code: CommandErrorCode;
   message: string;
 }
 
@@ -431,6 +461,16 @@ export type BattleEvent =
       type: "unit-move";
       tick: number;
       unitId: string;
+      from: Position;
+      to: Position;
+    }
+  | {
+      type: "unit-displace";
+      tick: number;
+      sourceId: string;
+      unitId: string;
+      abilityId: string;
+      movementKind: "lunge";
       from: Position;
       to: Position;
     }

@@ -11,6 +11,11 @@ import type {
   UnitInstance,
   UnitStats,
 } from "../game/types";
+import {
+  playerOwnsItem,
+  scoreItemEffect,
+  scoreItemForPlayer,
+} from "../game/scoring";
 
 export type DecisionSupportContent = Pick<
   GameContent,
@@ -352,77 +357,6 @@ export function buildShopDecisionPreview(
   };
 }
 
-type EffectAffinityContext = Readonly<{
-  hasTrait: (traitId: string) => boolean;
-  hasRanged: boolean;
-}>;
-
-function scoreEffect(
-  effect: ItemEffect,
-  context: EffectAffinityContext,
-): Readonly<{ score: number; affinities: string[] }> {
-  switch (effect.kind) {
-    case "health-flat": {
-      const affinities = ["guardian", "brawler"].filter(context.hasTrait);
-      return {
-        score: (effect.value / 20) * (affinities.length ? 1.5 : 1),
-        affinities,
-      };
-    }
-    case "defense-flat": {
-      const affinities = ["guardian"].filter(context.hasTrait);
-      return { score: effect.value * (affinities.length ? 1.6 : 1), affinities };
-    }
-    case "attack-flat": {
-      const affinities = ["swordsman", "brawler"].filter(context.hasTrait);
-      return {
-        score: effect.value * (affinities.length ? 1.45 : 1),
-        affinities,
-      };
-    }
-    case "attack-speed-percent": {
-      const affinities = ["marksman"].filter(context.hasTrait);
-      return {
-        score: effect.value * (affinities.length ? 1.55 : 1),
-        affinities,
-      };
-    }
-    case "critical-chance-percent": {
-      const affinities = ["marksman", "swordsman"].filter(context.hasTrait);
-      return {
-        score: effect.value * (affinities.length ? 1.6 : 1),
-        affinities,
-      };
-    }
-    case "ability-power-percent": {
-      const affinities = ["specialist"].filter(context.hasTrait);
-      return {
-        score: effect.value * (affinities.length ? 1.65 : 1),
-        affinities,
-      };
-    }
-    case "starting-energy": {
-      const affinities = ["specialist"].filter(context.hasTrait);
-      return {
-        score: effect.value * (affinities.length ? 1.45 : 1),
-        affinities,
-      };
-    }
-    case "range-flat":
-      return {
-        score: effect.value * (context.hasRanged ? 28 : 4),
-        affinities: context.hasRanged ? ["long-range"] : [],
-      };
-    case "omnivamp-percent": {
-      const affinities = ["brawler"].filter(context.hasTrait);
-      return {
-        score: effect.value * (affinities.length ? 1.6 : 1),
-        affinities,
-      };
-    }
-  }
-}
-
 function effectLabel(effect: ItemEffect): string {
   switch (effect.kind) {
     case "health-flat":
@@ -468,7 +402,7 @@ function buildUnitItemFit(
 ): UnitItemFit {
   const eligible = instance.items.length < itemCap;
   const reasons = item.effects.map((effect) => {
-    const scored = scoreEffect(effect, {
+    const scored = scoreItemEffect(effect, {
       hasTrait: (traitId) => definition.traits.includes(traitId),
       hasRanged: definition.stats.range >= 4,
     });
@@ -505,31 +439,6 @@ function buildUnitItemFit(
       ? `${item.name} fits ${definition.name}: ${strongest?.explanation ?? item.description}.`
       : `${definition.name} already holds the maximum of ${itemCap} items.`,
   };
-}
-
-function rosterItemScore(
-  item: ItemDefinition,
-  player: PlayerState,
-  unitsById: ReadonlyMap<string, UnitDefinition>,
-): Readonly<{ score: number; duplicateOwned: boolean }> {
-  const definitions = Object.values(player.units)
-    .map((instance) => unitsById.get(instance.definitionId))
-    .filter((definition): definition is UnitDefinition => Boolean(definition));
-  const hasTrait = (traitId: string) =>
-    definitions.some((definition) => definition.traits.includes(traitId));
-  const duplicateOwned =
-    player.inventory.includes(item.id) ||
-    Object.values(player.units).some((unit) => unit.items.includes(item.id));
-  const score = item.effects.reduce(
-    (total, effect) =>
-      total +
-      scoreEffect(effect, {
-        hasTrait,
-        hasRanged: definitions.some((definition) => definition.stats.range >= 4),
-      }).score,
-    duplicateOwned ? -8 : 0,
-  );
-  return { score: roundScore(score), duplicateOwned };
 }
 
 export function buildItemDecisionPreview(
@@ -579,7 +488,10 @@ export function buildItemDecisionPreview(
   const selectedFit = selectedUnitId
     ? fits.find((fit) => fit.unitId === selectedUnitId) ?? null
     : null;
-  const rosterScore = rosterItemScore(item, player, unitsById);
+  const rosterScore = {
+    score: roundScore(scoreItemForPlayer(item.id, player, content)),
+    duplicateOwned: playerOwnsItem(player, item.id),
+  };
   const focusFit = selectedFit?.eligible ? selectedFit : bestFit;
   const duplicateNote = rosterScore.duplicateOwned
     ? " A copy is already owned, so the carousel score includes the engine's variety penalty."

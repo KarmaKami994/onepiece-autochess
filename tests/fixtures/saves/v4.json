@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 4,
+  "seed": "fixture-v4",
+  "round": 4,
+  "stageId": "first-bounty-regatta",
+  "rngState": 104,
+  "phase": "preparation",
+  "players": [{ "id": "player-1", "finalCrew": [] }],
+  "pairings": [],
+  "lastResults": [],
+  "pool": {},
+  "pendingItemChoices": {},
+  "carouselChoices": [],
+  "nextChoiceSerial": 1
+}

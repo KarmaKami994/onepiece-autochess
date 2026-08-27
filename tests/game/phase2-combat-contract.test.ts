@@ -128,6 +128,7 @@ describe("Phase 2 combat rules from the vertical-slice contract", () => {
     const smoker = content.units.find((unit) => unit.id === "smoker");
     if (!smoker) throw new Error("Missing smoker definition");
     smoker.ability.power = 1;
+    smoker.stats.range = 10;
 
     const fullEnergy: ActiveTrait = {
       traitId: "test-full-energy",
@@ -168,6 +169,7 @@ describe("Phase 2 combat rules from the vertical-slice contract", () => {
     const smoker = content.units.find((unit) => unit.id === "smoker");
     if (!smoker) throw new Error("Missing smoker definition");
     smoker.ability.power = 1;
+    smoker.stats.range = 10;
 
     const fullEnergy: ActiveTrait = {
       traitId: "test-full-energy",
@@ -264,7 +266,8 @@ describe("Phase 2 combat rules from the vertical-slice contract", () => {
       const state = createMatch(`pve-survivors-${enemyCount}`, content);
       const battle = applyCommand(
         state,
-        { type: "END_PREPARATION", playerId: "player-1" },
+        { type: "END_PREPARATION" },
+        { actorPlayerId: "player-1" },
         content,
       );
       if (!battle.ok) throw new Error(battle.error.message);
