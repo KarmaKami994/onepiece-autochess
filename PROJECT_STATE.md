@@ -22,10 +22,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-Roster expansion 18 → 30 — Pack E.
+Roster expansion 18 → 30 complete — awaiting 30-unit assessment.
 
 ## Last Completed Work
 
+- 2026-08-28 — `0e33663`, PR #18 on `feature/roster-expansion-pack-f`: added Kuzan, Akainu, Shanks and Blackbeard using only existing stun, burn, Defense Pierce, Energy Drain and pull mechanics. The base-shop roster is now 30 units at 6/7/6/7/4 by cost. Added the Emperor origin; two distinct Emperors grant the whole team +8% health and +8% attack. Content moved to `1.11.0`; save schema remains 6. Added no combat primitive, TraitEffect kind, engine/type/persistence/presentation change or asset, and documented the existing shared placeholder's clean-room provenance. Material files: `game/content.ts`, `tests/game/roster-expansion-pack-f.test.ts`, necessary roster/content-version assertions, `ASSET_PROVENANCE.md` and `PROJECT_STATE.md`.
 - 2026-08-28 — PR #17 Browser E2E remediation on `feature/roster-expansion-pack-e`: added one neutral repository-authored SVG placeholder and routed the eight Pack D/E expansion units to it for portraits and tactical tokens. Updated the two sprite-specific E2E flows to select recruits with dedicated animation art instead of assuming the first RNG shop slot has an atlas. Pack E gameplay, content `1.10.0` and save schema 6 are unchanged. Material files: `public/assets/characters/placeholder.svg`, `game/content.ts`, `app/selectors.ts`, focused selector/roster tests, `e2e/viewport.spec.ts` and `PROJECT_STATE.md`.
 - 2026-08-28 — `76e6c07`, PR #17 on `feature/roster-expansion-pack-e`: added Ivankov, Jinbe, Kuma and Kizaru as content-driven base-shop units using only existing heal, conditional shield, line targeting, Defense Pierce and knockback mechanics. The roster is now 26 units with cost distribution 6/7/6/5/2. Content moved to `1.10.0`; save schema remains 6. No existing character, trait, pool, shop, economy, combat-engine, type, persistence or presentation values changed. Material files: `game/content.ts`, `tests/game/roster-expansion-pack-e.test.ts`, necessary roster/content-version assertions and `PROJECT_STATE.md`.
 - 2026-08-27 — `9419b8c`, PR #16 on `feature/roster-expansion-pack-d`: added Koby, Koala, Franky and Brook as content-driven base-shop units using only existing lunge, stun and knockback mechanics. The roster is now 22 units with cost distribution 6/6/4/4/2. Content moved to `1.9.0`; save schema remains 6. No existing character, trait, pool, shop or economy values changed. Material files: `game/content.ts`, `tests/game/roster-expansion-pack-d.test.ts`, necessary roster/content-version assertions and `PROJECT_STATE.md`.
@@ -42,6 +43,19 @@ Roster expansion 18 → 30 — Pack E.
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+Roster Expansion Pack F:
+
+- PASS — focused Pack F test: 1 file, 10 tests.
+- PASS — affected roster/trait/combat/content/production tests: 7 files, 64 tests.
+- PASS — `npm run typecheck` (run through the installed npm CLI).
+- PASS — `npm run lint` (run through the installed npm CLI).
+- PASS — `npm test`: 35 files, 285 tests.
+- PASS — `npm run assets:validate`: 41 animation atlases, maps, Carousel assets and provenance files validated.
+- PASS — `npm run test:production-smoke`: 50/50 complete matches, zero crashes.
+- PASS — `npm run build`.
+- NOT RUN — `npm run test:e2e`; no app, selector, Phaser or presentation source changed.
+- NOT RUN — `npm run test:production-soak`; the deliberate 1,000-seed run belongs to the separate 30-unit assessment.
 
 Roster Expansion Pack E:
 
@@ -170,6 +184,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- Kuzan adds global damage plus 700ms stun; Akainu adds nearest-cluster damage plus 32-power/4000ms burn; Shanks adds nearest-cluster burst with 35% transient Defense Pierce; Blackbeard adds global damage, 20-Energy Drain and deterministic pull. The new Emperor 2 origin grants +8% team health and attack. The roster is 30 units at 6/7/6/7/4; content is `1.11.0` and save schema remains 6.
 - Koby, Koala, Franky, Brook, Ivankov, Jinbe, Kuma and Kizaru now use one neutral local placeholder for portraits and tactical tokens until dedicated art exists; existing units with real art keep their current portrait/token assets.
 - The base shop roster now also includes Ivankov (2-cost Revolutionary/Specialist targeted heal with an inclusive 50%-HP pre-heal shield condition), Jinbe (3-cost Straw Hat/Guardian adjacent knockback), Kuma (3-cost Revolutionary/Guardian all-enemy knockback) and Kizaru (4-cost Navy/Marksman farthest line damage with transient 40% Defense Pierce). Content is `1.10.0`; save schema remains 6.
 - The base shop roster now includes Koby (1-cost Navy/Brawler lunge), Koala (1-cost Revolutionary/Brawler adjacent 300ms stun), Franky (2-cost Straw Hat/Guardian adjacent knockback) and Brook (2-cost Straw Hat/Swordsman line 400ms stun). Content is `1.9.0`; save schema remains 6.
@@ -185,6 +200,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- None for Pack F. It reused the existing shared placeholder and all required combat/trait infrastructure; E2E and the 1,000-seed soak were omitted exactly as scoped.
 - Pack E gameplay stayed within scope. CI remediation required exactly one generic repository-authored SVG plus the smallest selector and E2E fixture corrections because active missing portrait/token requests violated the browser QA contract; no gameplay, combat, type, persistence or version value changed.
 - None for Pack D. No new primitive, combat/type/persistence/presentation change or fabricated asset was needed; intended character paths rely on existing portrait/token fallbacks.
 - None for the full-roster assessment; the 1,000-seed production soak was run exactly once after all required pre-soak verification passed.
@@ -200,6 +216,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- The Pack F 50-seed smoke completed without structural failure: 50/50 matches, zero crashes, 1.00% timeout rate and 0.05% draw rate. Kuzan, Akainu, Shanks and Blackbeard recorded respectively 34/82.4%/38.2%, 38/81.6%/39.5%, 5/100%/80.0% and 6/100%/50.0% final-board observations/top-four rates/conditional win rates. Emperor was not reached. The high-cost samples are very small and are not tuning evidence; reachability belongs to the separate 1,000-seed assessment.
 - PAC/Tashigi gameplay changes need separate product/balance review.
 - The Pack E 50-seed smoke completed without structural failure. Ivankov, Jinbe, Kuma and Kizaru had respectively 95/5.3%, 113/21.2%, 96/24.0% and 57/33.3% final-board observations/conditional win rates; these small-sample observations are not tuning evidence.
 - The Pack D 50-seed smoke completed without structural failure. Koby, Koala, Franky and Brook had respectively 87/14.9%, 88/14.8%, 137/15.3% and 121/6.6% final-board observations/conditional win rates; these small-sample observations are not tuning evidence.
@@ -222,7 +239,7 @@ Final current-roster high-cost identity pack:
 - Add no multiplayer infrastructure yet.
 - Keep a shared deterministic game domain.
 - Defense Pierce is transient per-ability mitigation behavior, not a persistent Defense mutation, status or debuff.
-- Base-roster expansion is Pack D (Koby/Koala/Franky/Brook), Pack E (Ivankov/Jinbe/Kuma/Kizaru) and Pack F (Kuzan/Akainu/Shanks/Blackbeard), targeting 30 units at 6/7/6/7/4 by cost. Pack F is expected to introduce an Emperor origin for Shanks/Blackbeard, but its effect is not designed or implemented.
+- Base-roster expansion is complete at 30 units and 6/7/6/7/4 by cost. Pack F added the Emperor origin for Shanks/Blackbeard; its single two-unit tier grants +8% team health and +8% team attack through existing team-wide trait semantics.
 - Run a new full 1,000-seed roster/shop/trait/balance assessment after Pack F reaches 30 units and before broad balance tuning.
 - The future Character Form System remains documentation-only: star and form progression are separate; forms are not shop/pool units; an eventual instance may carry a form identity beside `definitionId` and star and alter a controlled subset of stats/ability/role/traits/presentation; permanent and temporary forms share one conceptual model with different lifetimes. Initial pilots are Robin (star-triggered Demonio-style), Luffy (star/item-dependent Gear 4 branches) and Chopper (synergy/combat-condition Monster Point-style). No form code exists yet.
 - All future Codex work must be bounded and branch/PR based.
@@ -230,7 +247,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-Implement only Roster Expansion Pack F (Kuzan, Akainu, Shanks and Blackbeard) in its own bounded specification/PR, targeting the locked 30-unit distribution 6/7/6/7/4; do not start it automatically. Preserve the completed assessment history and defer broad tuning until the 30-unit post-Pack-F assessment.
+Run the separate 30-unit full-roster/shop/trait/balance/readability assessment with the deliberate 1,000-seed soak after Pack F is merged; do not tune or begin it automatically. The Character Form System remains after that assessment.
 
 ## Codex Update Contract
 
