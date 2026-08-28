@@ -5,6 +5,7 @@ import {
   applyCommand as applyDomainCommand,
   createMatch,
   getActiveTraits,
+  refillEmptyShopSlots,
   type GameCommand,
   type MatchState,
   type PlayerState,
@@ -50,6 +51,54 @@ function buyForced(
   return result.state;
 }
 
+function forceShop(
+  state: MatchState,
+  offers: Array<string | null>,
+): void {
+  const human = player(state);
+  for (const definitionId of human.shop) {
+    if (definitionId) state.pool[definitionId] += 1;
+  }
+  human.shop = [...offers];
+  for (const definitionId of offers) {
+    if (definitionId) state.pool[definitionId] -= 1;
+  }
+}
+
+function accountedCopies(state: MatchState, definitionId: string): number {
+  const poolCopies = state.pool[definitionId] ?? 0;
+  const shopCopies = state.players.reduce(
+    (total, candidate) =>
+      total + candidate.shop.filter((offer) => offer === definitionId).length,
+    0,
+  );
+  const ownedCopies = state.players.reduce(
+    (total, candidate) =>
+      total +
+      Object.values(candidate.units)
+        .filter((unit) => unit.definitionId === definitionId)
+        .reduce(
+          (unitTotal, unit) =>
+            unitTotal + (unit.star === 3 ? 9 : unit.star === 2 ? 3 : 1),
+          0,
+        ),
+    0,
+  );
+  return poolCopies + shopCopies + ownedCopies;
+}
+
+function advanceAutomaticShop(state: MatchState): MatchState {
+  for (const candidate of state.players) {
+    if (candidate.id !== "player-1" && candidate.alive) {
+      candidate.shopLocked = true;
+    }
+  }
+  state.round = 5;
+  state.phase = "battle";
+  state.lastResults = [];
+  return advanceMatchPhase(state);
+}
+
 describe("shop, economy, pool, and upgrades", () => {
   it("starts with the requested economy and reserves shop copies", () => {
     const state = createMatch("economy");
@@ -93,6 +142,131 @@ describe("shop, economy, pool, and upgrades", () => {
         0,
       ),
     ).toBe(beforeTotal);
+  });
+
+  it("retains a full locked shop without pool or RNG changes and clears the lock", () => {
+    const state = createMatch("locked-full-shop");
+    const offers = ["nami", "usopp", "koby", "koala", "sanji", "robin"];
+    forceShop(state, offers);
+    player(state).shopLocked = true;
+    const poolBefore = structuredClone(state.pool);
+    const rngBefore = state.rngState;
+
+    const next = advanceAutomaticShop(state);
+
+    expect(player(next).shop).toEqual(offers);
+    expect(player(next).shopLocked).toBe(false);
+    expect(next.pool).toEqual(poolBefore);
+    expect(next.rngState).toBe(rngBefore);
+  });
+
+  it("refills only a purchased slot through the round transition and conserves every copy", () => {
+    let state = createMatch("locked-purchased-slot");
+    player(state).gold = 99;
+    const offers = ["koby", "koala", "robin", "sanji", "usopp", "nami"];
+    forceShop(state, offers);
+    const purchase = applyCommand(state, { type: "BUY_UNIT", shopIndex: 2 });
+    expect(purchase.ok).toBe(true);
+    if (!purchase.ok) return;
+    state = purchase.state;
+    const lock = applyCommand(state, { type: "TOGGLE_SHOP_LOCK" });
+    expect(lock.ok).toBe(true);
+    if (!lock.ok) return;
+    state = lock.state;
+    for (const unit of DEFAULT_CONTENT.units.filter((unit) => unit.cost === 1)) {
+      state.pool[unit.id] = 0;
+    }
+    const accountedBefore = Object.fromEntries(
+      DEFAULT_CONTENT.units.map((unit) => [
+        unit.id,
+        accountedCopies(state, unit.id),
+      ]),
+    );
+    const poolBefore = Object.values(state.pool).reduce(
+      (total, count) => total + count,
+      0,
+    );
+
+    const first = advanceAutomaticShop(structuredClone(state));
+    const second = advanceAutomaticShop(structuredClone(state));
+    const nextShop = player(first).shop;
+
+    expect(nextShop[2]).not.toBeNull();
+    expect(player(first).level).toBe(3);
+    expect(
+      DEFAULT_CONTENT.units.find((unit) => unit.id === nextShop[2])?.cost,
+    ).toBe(2);
+    expect(nextShop.filter(Boolean)).toHaveLength(DEFAULT_CONTENT.config.shopSize);
+    for (const index of [0, 1, 3, 4, 5]) {
+      expect(nextShop[index]).toBe(offers[index]);
+    }
+    expect(player(first).shopLocked).toBe(false);
+    expect(
+      Object.values(first.pool).reduce((total, count) => total + count, 0),
+    ).toBe(poolBefore - 1);
+    for (const unit of DEFAULT_CONTENT.units) {
+      expect(accountedCopies(first, unit.id)).toBe(accountedBefore[unit.id]);
+    }
+    expect(first).toEqual(second);
+  });
+
+  it("consumes RNG only for empty locked slots", () => {
+    const first = createMatch("locked-shop-rng");
+    forceShop(first, ["nami", null, "usopp", null, "koby", null]);
+    const second = structuredClone(first);
+    player(second).shop = ["koala", null, "tashigi", null, "chopper", null];
+
+    refillEmptyShopSlots(first, player(first), DEFAULT_CONTENT);
+    refillEmptyShopSlots(second, player(second), DEFAULT_CONTENT);
+
+    expect([1, 3, 5].map((index) => player(first).shop[index])).toEqual(
+      [1, 3, 5].map((index) => player(second).shop[index]),
+    );
+    expect(player(first).shop).toMatchObject({
+      0: "nami",
+      2: "usopp",
+      4: "koby",
+    });
+    expect(player(second).shop).toMatchObject({
+      0: "koala",
+      2: "tashigi",
+      4: "chopper",
+    });
+    expect(first.rngState).toBe(second.rngState);
+  });
+
+  it("keeps a manual reroll full even while the shop is locked", () => {
+    const state = createMatch("locked-manual-reroll");
+    player(state).gold = 99;
+    player(state).shopLocked = true;
+    forceShop(state, ["shanks", "shanks", null, "shanks", "shanks", "shanks"]);
+
+    const result = applyCommand(state, { type: "REROLL_SHOP" });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(player(result.state).gold).toBe(98);
+    expect(player(result.state).shop).toHaveLength(DEFAULT_CONTENT.config.shopSize);
+    expect(player(result.state).shop.every((offer) => offer !== null)).toBe(true);
+    expect(player(result.state).shop).not.toContain("shanks");
+    expect(player(result.state).shopLocked).toBe(true);
+  });
+
+  it("preserves deterministic full automatic refreshes for unlocked shops", () => {
+    const state = createMatch("unlocked-automatic-refresh");
+    forceShop(state, Array.from({ length: 6 }, () => "shanks"));
+    player(state).shopLocked = false;
+    const shanksPoolBefore = state.pool.shanks;
+
+    const first = advanceAutomaticShop(structuredClone(state));
+    const second = advanceAutomaticShop(structuredClone(state));
+
+    expect(player(first).shop).toHaveLength(DEFAULT_CONTENT.config.shopSize);
+    expect(player(first).shop.every((offer) => offer !== null)).toBe(true);
+    expect(player(first).shop).not.toContain("shanks");
+    expect(first.pool.shanks).toBe(shanksPoolBefore + 6);
+    expect(player(first).shopLocked).toBe(false);
+    expect(first).toEqual(second);
   });
 
   it("applies base income, capped interest and streak, win gold, and auto XP", () => {

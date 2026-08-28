@@ -10,7 +10,13 @@ import { getActiveTraits } from "./traits";
 import { CURRENT_SAVE_SCHEMA_VERSION } from "./schema";
 import { createPairings } from "./pairing";
 import { cellKey, cloneMatch, copiesForStar, findPlayer, parseCell } from "./state";
-import { gainXp, returnShopToPool, rollShop, streakIncome } from "./economy";
+import {
+  gainXp,
+  refillEmptyShopSlots,
+  returnShopToPool,
+  rollShop,
+  streakIncome,
+} from "./economy";
 import {
   addUnitToPlayer,
   boardUnitCount,
@@ -1246,6 +1252,7 @@ function beginNextRound(
     gainXp(player, content.config.autoXpPerRound, content);
     player.ready = false;
     if (player.shopLocked) {
+      refillEmptyShopSlots(state, player, content);
       player.shopLocked = false;
     } else {
       returnShopToPool(state, player);
