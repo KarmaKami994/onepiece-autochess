@@ -459,6 +459,7 @@ export interface BattleUnitSnapshot {
   definitionId: string;
   teamId: string;
   star: StarLevel;
+  items?: string[];
   x: number;
   y: number;
   hp: number;

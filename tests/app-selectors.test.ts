@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { createMatch, type BattleUnitSnapshot } from "../game";
+import {
+  applyCommand,
+  createMatch,
+  type BattleUnitSnapshot,
+  type MatchState,
+  type PlayerState,
+} from "../game";
 import { selectCarouselView, selectMatchView } from "../app/selectors";
+import { preservesActiveBattleTimeline } from "../components/PhaserBoard";
 
 function snapshot(
   id: string,
@@ -23,6 +30,28 @@ function snapshot(
     range: 1,
     state: "seek",
   };
+}
+
+function human(state: MatchState): PlayerState {
+  const player = state.players.find((candidate) => candidate.id === "player-1");
+  if (!player) throw new Error("Missing selector test player");
+  return player;
+}
+
+function forceOffer(state: MatchState, definitionId: string, index = 0): void {
+  const current = human(state).shop[index];
+  if (current) state.pool[current] += 1;
+  human(state).shop[index] = definitionId;
+  state.pool[definitionId] -= 1;
+}
+
+function command(
+  state: MatchState,
+  value: Parameters<typeof applyCommand>[1],
+): MatchState {
+  const result = applyCommand(state, value, { actorPlayerId: "player-1" });
+  if (!result.ok) throw new Error(result.error.message);
+  return result.state;
 }
 
 describe("typed application selectors", () => {
@@ -212,5 +241,103 @@ describe("typed application selectors", () => {
         }),
       ]),
     );
+  });
+
+  it("preserves both deployed fighter snapshots when a battle purchase merges them", () => {
+    let state = createMatch("selector-battle-economy");
+    human(state).gold = 99;
+    forceOffer(state, "luffy");
+    state = command(state, { type: "BUY_UNIT", shopIndex: 0 });
+    const boardId = human(state).bench.find(
+      (unitId): unitId is string => Boolean(unitId),
+    );
+    if (!boardId) throw new Error("Missing snapshot fighter");
+    human(state).units[boardId].items = ["meat-platter"];
+    state = command(state, {
+      type: "MOVE_UNIT",
+      unitId: boardId,
+      to: { zone: "board", x: 0, y: 5 },
+    });
+    forceOffer(state, "luffy");
+    state = command(state, { type: "BUY_UNIT", shopIndex: 0 });
+    const benchLuffyId = human(state).bench.find(
+      (unitId): unitId is string => Boolean(unitId),
+    );
+    if (!benchLuffyId) throw new Error("Missing merge copy");
+    human(state).units[benchLuffyId].items = ["black-blade"];
+    state = command(state, {
+      type: "MOVE_UNIT",
+      unitId: benchLuffyId,
+      to: { zone: "board", x: 1, y: 5 },
+    });
+    forceOffer(state, "luffy", 0);
+    forceOffer(state, "nami", 1);
+    state = command(state, { type: "END_PREPARATION" });
+    const combatStartView = selectMatchView(state);
+    state = command(state, { type: "BUY_UNIT", shopIndex: 0 });
+    state = command(state, { type: "BUY_UNIT", shopIndex: 1 });
+
+    expect(human(state).units[boardId]).toMatchObject({
+      star: 2,
+      items: ["meat-platter", "black-blade"],
+    });
+    expect(human(state).units[benchLuffyId]).toBeUndefined();
+    const view = selectMatchView(state);
+    const fighter = view.boardUnits.find(
+      (unit) => unit.id === `player-1:${boardId}`,
+    );
+    expect(fighter).toMatchObject({
+      contentId: "luffy",
+      star: 1,
+      items: ["meat-platter"],
+      zone: "board",
+    });
+    expect(view.boardUnits).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: `player-1:${benchLuffyId}`,
+          contentId: "luffy",
+          star: 1,
+          items: ["black-blade"],
+          zone: "board",
+        }),
+      ]),
+    );
+    expect(view.selectedDefinitionByUnit.get(fighter?.id ?? "")?.name).toBe("Luffy");
+    expect(view.boardUnits).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          contentId: "nami",
+          team: "player",
+          zone: "bench",
+        }),
+      ]),
+    );
+
+    const currentTimeline = {
+      units: combatStartView.boardUnits,
+      selectedId: null,
+      interactionMode: "bench-only" as const,
+      phase: "battle",
+      capacity: combatStartView.capacity,
+      boardSkin: "pirate-ship" as const,
+    };
+    const reconstructedTimeline = {
+      ...currentTimeline,
+      units: [...view.boardUnits].reverse(),
+      capacity: view.capacity,
+    };
+    expect(
+      currentTimeline.units
+        .filter((unit) => unit.zone === "board")
+        .map((unit) => unit.id),
+    ).not.toEqual(
+      reconstructedTimeline.units
+        .filter((unit) => unit.zone === "board")
+        .map((unit) => unit.id),
+    );
+    expect(
+      preservesActiveBattleTimeline(currentTimeline, reconstructedTimeline),
+    ).toBe(true);
   });
 });

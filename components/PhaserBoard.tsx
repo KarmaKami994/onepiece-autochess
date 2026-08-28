@@ -58,6 +58,7 @@ import {
 import { BOARD_SCENE_KEY, createBoardGameConfig } from "./BoardScene";
 
 export type BoardZone = "board" | "bench";
+export type BoardInteractionMode = "formation" | "bench-only" | "none";
 
 export type BoardUnit = {
   id: string;
@@ -141,7 +142,7 @@ export type CombatFxEvent = {
 type BoardPayload = {
   units: BoardUnit[];
   selectedId: string | null;
-  interactive: boolean;
+  interactionMode: BoardInteractionMode;
   phase: string;
   capacity: number;
   boardSkin: BoardSkin;
@@ -151,14 +152,37 @@ export function preservesActiveBattleTimeline(
   current: BoardPayload,
   next: BoardPayload,
 ): boolean {
+  const deployedUnits = (units: BoardUnit[]) =>
+    units
+      .filter((unit) => unit.zone === "board")
+      .sort((left, right) =>
+        left.id < right.id ? -1 : left.id > right.id ? 1 : 0,
+      );
+
   return (
     current.phase === "battle" &&
     next.phase === "battle" &&
-    current.units === next.units &&
-    current.interactive === next.interactive &&
-    current.capacity === next.capacity &&
+    JSON.stringify(deployedUnits(current.units)) ===
+      JSON.stringify(deployedUnits(next.units)) &&
     current.boardSkin === next.boardSkin
   );
+}
+
+export function interactionAllowsUnit(
+  mode: BoardInteractionMode,
+  unit: Pick<BoardUnit, "team" | "zone">,
+): boolean {
+  return (
+    unit.team === "player" &&
+    (mode === "formation" || (mode === "bench-only" && unit.zone === "bench"))
+  );
+}
+
+export function interactionAllowsDestination(
+  mode: BoardInteractionMode,
+  destination: Pick<BoardDestination, "zone">,
+): boolean {
+  return mode === "formation" || (mode === "bench-only" && destination.zone === "bench");
 }
 
 type PhaserBoardProps = BoardPayload & {
@@ -195,7 +219,7 @@ const GRID_Y = BOARD_GEOMETRY.gridY;
 export default function PhaserBoard({
   units,
   selectedId,
-  interactive,
+  interactionMode,
   phase,
   capacity,
   boardSkin,
@@ -215,7 +239,7 @@ export default function PhaserBoard({
   const latestRef = useRef<BoardPayload>({
     units,
     selectedId,
-    interactive,
+    interactionMode,
     phase,
     capacity,
     boardSkin,
@@ -228,7 +252,7 @@ export default function PhaserBoard({
   latestRef.current = {
     units,
     selectedId,
-    interactive,
+    interactionMode,
     phase,
     capacity,
     boardSkin,
@@ -260,6 +284,10 @@ export default function PhaserBoard({
           private tokenObjects = new Map<
             string,
             Phaser.GameObjects.Container
+          >();
+          private selectionMarkers = new Map<
+            string,
+            Phaser.GameObjects.Text
           >();
           private animatedUnitSprites = new Map<
             string,
@@ -820,9 +848,11 @@ export default function PhaserBoard({
 
           private selectedPlayerUnit(preferredId?: string | null) {
             const unitId = preferredId ?? this.payload.selectedId;
-            if (!this.payload.interactive || !unitId) return undefined;
+            if (!unitId) return undefined;
             const unit = this.payload.units.find((item) => item.id === unitId);
-            return unit?.team === "player" ? unit : undefined;
+            return unit && interactionAllowsUnit(this.payload.interactionMode, unit)
+              ? unit
+              : undefined;
           }
 
           private unitAtDestination(destination: BoardDestination) {
@@ -839,11 +869,15 @@ export default function PhaserBoard({
             );
 
             for (const [key, target] of this.destinationTargets) {
+              const destinationAllowed = interactionAllowsDestination(
+                this.payload.interactionMode,
+                target.destination,
+              );
               if (target.surface.input) {
-                target.surface.input.enabled = Boolean(selected);
+                target.surface.input.enabled = Boolean(selected && destinationAllowed);
               }
 
-              if (!selected) {
+              if (!selected || !destinationAllowed) {
                 target.surface
                   .setFillStyle(0x3b9f91, 0)
                   .setStrokeStyle(2, 0x7fe4cc, 0);
@@ -894,7 +928,11 @@ export default function PhaserBoard({
 
           private moveSelectedTo(destination: BoardDestination) {
             const selected = this.selectedPlayerUnit();
-            if (!selected || isSameDestination(selected, destination)) return;
+            if (
+              !selected ||
+              !interactionAllowsDestination(this.payload.interactionMode, destination) ||
+              isSameDestination(selected, destination)
+            ) return;
             return moveRef.current({
               unitId: selected.id,
               ...destination,
@@ -971,7 +1009,7 @@ export default function PhaserBoard({
           }
 
           private handleUnitClick(unit: BoardUnit) {
-            if (!this.payload.interactive || unit.team !== "player") {
+            if (!interactionAllowsUnit(this.payload.interactionMode, unit)) {
               selectRef.current(
                 this.payload.selectedId === unit.id ? null : unit.id,
               );
@@ -994,7 +1032,9 @@ export default function PhaserBoard({
               this.tokenObjects.size > 0 &&
               preservesActiveBattleTimeline(this.payload, payload)
             ) {
+              const previous = this.payload;
               this.payload = payload;
+              this.syncActiveBattleBench(previous, payload);
               return;
             }
             if (payload.phase !== this.payload.phase) {
@@ -1019,6 +1059,7 @@ export default function PhaserBoard({
             });
             this.tokenLayer.removeAll(true);
             this.tokenObjects.clear();
+            this.selectionMarkers.clear();
             this.animatedUnitSprites.clear();
             this.unitFacings.clear();
             this.resourceBars.clear();
@@ -1034,6 +1075,47 @@ export default function PhaserBoard({
               this.tokenObjects.set(unit.id, token);
             });
             this.faceUnitsTowardOpponents();
+            this.refreshDestinationCues();
+          }
+
+          private removeToken(unitId: string) {
+            const resourceBar = this.resourceBars.get(unitId);
+            if (resourceBar) this.tweens.killTweensOf(resourceBar.display);
+            const token = this.tokenObjects.get(unitId);
+            if (token) {
+              this.tweens.killTweensOf(token);
+              token.destroy(true);
+            }
+            this.tokenObjects.delete(unitId);
+            this.selectionMarkers.delete(unitId);
+            this.animatedUnitSprites.delete(unitId);
+            this.unitFacings.delete(unitId);
+            this.resourceBars.delete(unitId);
+            this.hpState.delete(unitId);
+            this.shieldState.delete(unitId);
+            this.energyState.delete(unitId);
+            this.statusLabels.delete(unitId);
+            this.statusExpiries.delete(unitId);
+          }
+
+          private syncActiveBattleBench(
+            previous: BoardPayload,
+            next: BoardPayload,
+          ) {
+            for (const unit of previous.units) {
+              if (unit.zone === "bench") this.removeToken(unit.id);
+            }
+            const benchUnits = next.units.filter((unit) => unit.zone === "bench");
+            this.requestAnimationTextures(benchUnits);
+            this.requestPortraitTextures(benchUnits);
+            for (const unit of benchUnits) {
+              const token = this.makeToken(unit, next);
+              this.tokenLayer?.add(token);
+              this.tokenObjects.set(unit.id, token);
+            }
+            for (const [unitId, marker] of this.selectionMarkers) {
+              marker.setVisible(next.selectedId === unitId);
+            }
             this.refreshDestinationCues();
           }
 
@@ -1094,7 +1176,7 @@ export default function PhaserBoard({
                 pending.forEach((definition) =>
                   this.createCrewAnimations(definition),
                 );
-                this.sync(this.payload, true);
+                this.sync(this.payload, this.payload.phase !== "battle");
               },
               this,
             );
@@ -1448,6 +1530,7 @@ export default function PhaserBoard({
               )
               .setOrigin(0.5)
               .setVisible(isSelected);
+            this.selectionMarkers.set(unit.id, selectionMarker);
             const itemPips = unit.items.slice(0, 3).map((itemId, index) =>
               this.add
                 .rectangle(
@@ -1498,7 +1581,7 @@ export default function PhaserBoard({
               this.handleUnitClick(unit);
             });
 
-            if (payload.interactive && unit.team === "player") {
+            if (interactionAllowsUnit(payload.interactionMode, unit)) {
               this.input.setDraggable(container);
               container.on("dragstart", () => {
                 wasDragged = true;
@@ -1545,7 +1628,11 @@ export default function PhaserBoard({
                 this.draggingUnitId = null;
                 this.hoverDestinationKey = null;
 
-                if (destination && !isSameDestination(unit, destination)) {
+                if (
+                  destination &&
+                  interactionAllowsDestination(payload.interactionMode, destination) &&
+                  !isSameDestination(unit, destination)
+                ) {
                   const accepted = moveRef.current({
                     unitId: unit.id,
                     ...destination,
@@ -2115,12 +2202,12 @@ export default function PhaserBoard({
     bridgeRef.current?.sync({
       units,
       selectedId,
-      interactive,
+      interactionMode,
       phase,
       capacity,
       boardSkin,
     });
-  }, [units, selectedId, interactive, phase, capacity, boardSkin]);
+  }, [units, selectedId, interactionMode, phase, capacity, boardSkin]);
 
   useEffect(() => {
     const animationKey = `${eventSequence}:${speed}:${Number(particles)}:${Number(combatNumbers)}:${Number(reducedMotion)}`;
@@ -2158,7 +2245,7 @@ export default function PhaserBoard({
       <CssBoardFallback
         units={units}
         selectedId={selectedId}
-        interactive={interactive}
+        interactionMode={interactionMode}
         capacity={capacity}
         boardSkin={boardSkin}
         onMoveUnit={onMoveUnit}
@@ -2172,6 +2259,8 @@ export default function PhaserBoard({
     <div
       className="phaser-stage-frame"
       data-phase={phase}
+      data-event-sequence={eventSequence}
+      data-interaction-mode={interactionMode}
       data-board-skin={boardSkin}
     >
       {!isReady && (
@@ -2203,7 +2292,7 @@ export default function PhaserBoard({
 function CssBoardFallback({
   units,
   selectedId,
-  interactive,
+  interactionMode,
   capacity,
   boardSkin,
   onMoveUnit,
@@ -2212,7 +2301,7 @@ function CssBoardFallback({
   PhaserBoardProps,
   | "units"
   | "selectedId"
-  | "interactive"
+  | "interactionMode"
   | "capacity"
   | "boardSkin"
   | "onMoveUnit"
@@ -2237,7 +2326,7 @@ function CssBoardFallback({
               key={`${x}-${y}`}
               className="css-board-cell"
               disabled={
-                !interactive ||
+                interactionMode !== "formation" ||
                 y < 3 ||
                 (selectedUnit?.zone === "bench" &&
                   deployed >= capacity &&
@@ -2275,7 +2364,7 @@ function CssBoardFallback({
             <button
               type="button"
               key={slot}
-              disabled={!interactive}
+              disabled={interactionMode === "none"}
               onClick={() => {
                 if (!selectedId && unit) {
                   onSelectUnit(unit.id);

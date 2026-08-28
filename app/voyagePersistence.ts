@@ -1,3 +1,12 @@
+import {
+  CURRENT_SAVE_SCHEMA_VERSION,
+  DEFAULT_CONTENT,
+  advanceMatchPhase,
+  migrateMatchState,
+  type GameContent,
+  type MatchState,
+} from "../game";
+
 export type VoyageSaveEnvelope = {
   state: unknown;
   seed: string;
@@ -6,6 +15,38 @@ export type VoyageSaveEnvelope = {
   contentVersion?: string;
   replayBattle?: boolean;
 };
+
+export function createVoyageSaveEnvelope(
+  state: MatchState,
+  seed: string,
+  updatedAt: number,
+): VoyageSaveEnvelope {
+  return {
+    state,
+    seed,
+    updatedAt,
+    schemaVersion: CURRENT_SAVE_SCHEMA_VERSION,
+    contentVersion: state.contentVersion,
+    replayBattle: false,
+  };
+}
+
+export function restoreVoyageState(
+  saved: VoyageSaveEnvelope,
+  content: GameContent = DEFAULT_CONTENT,
+): MatchState {
+  const restored = migrateMatchState(saved.state, content);
+  return saved.replayBattle === true
+    ? advanceMatchPhase(restored, content)
+    : restored;
+}
+
+export function shouldPersistVoyageEnvelope(
+  existing: Pick<VoyageSaveEnvelope, "updatedAt"> | null | undefined,
+  incoming: Pick<VoyageSaveEnvelope, "updatedAt">,
+): boolean {
+  return !existing || incoming.updatedAt >= existing.updatedAt;
+}
 
 const DB_NAME = "grand-line-auto-chess";
 const DB_VERSION = 1;
@@ -41,7 +82,14 @@ export async function writeVoyage(envelope: VoyageSaveEnvelope): Promise<void> {
   const database = await openVoyageDb();
   return new Promise((resolve, reject) => {
     const transaction = database.transaction(STORE_NAME, "readwrite");
-    transaction.objectStore(STORE_NAME).put(envelope, ACTIVE_SAVE);
+    const store = transaction.objectStore(STORE_NAME);
+    const request = store.get(ACTIVE_SAVE);
+    request.onsuccess = () => {
+      const existing = request.result as VoyageSaveEnvelope | undefined;
+      if (shouldPersistVoyageEnvelope(existing, envelope)) {
+        store.put(envelope, ACTIVE_SAVE);
+      }
+    };
     transaction.oncomplete = () => {
       database.close();
       resolve();

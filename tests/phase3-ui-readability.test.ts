@@ -1,7 +1,12 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { preservesActiveBattleTimeline } from "../components/PhaserBoard";
+import {
+  interactionAllowsDestination,
+  interactionAllowsUnit,
+  preservesActiveBattleTimeline,
+  type BoardUnit,
+} from "../components/PhaserBoard";
 
 const projectRoot = path.resolve(import.meta.dirname, "..");
 const source = (file: string) => readFile(path.join(projectRoot, file), "utf8");
@@ -62,8 +67,9 @@ describe("Phase 3 combat presentation", () => {
   });
 
   it("offers persistent presentation controls and clear battle actions", async () => {
-    const [client, screens, css] = await Promise.all([
+    const [client, persistence, screens, css] = await Promise.all([
       source("app/GameClient.tsx"),
+      source("app/voyagePersistence.ts"),
       source("app/screens/GameScreens.tsx"),
       source("app/game.css"),
     ]);
@@ -77,17 +83,42 @@ describe("Phase 3 combat presentation", () => {
       expect(screens).toContain(speed);
     }
     expect(screens).toContain("tutorial-combat-legend");
-    expect(client).toContain("schemaVersion: engine.CURRENT_SAVE_SCHEMA_VERSION");
+    expect(client).toContain("createVoyageSaveEnvelope");
+    expect(persistence).toContain("schemaVersion: CURRENT_SAVE_SCHEMA_VERSION");
     expect(css).toContain(".game-shell.reduced-motion");
     expect(css).toContain(".combat-hud");
   });
 
-  it("does not rebuild an active battle timeline for selection-only syncs", () => {
-    const units: [] = [];
+  it("preserves the deployed timeline across live battle-bench updates", () => {
+    const fighter: BoardUnit = {
+      id: "player-1:luffy",
+      contentId: "luffy",
+      name: "Luffy",
+      shortName: "Luffy",
+      color: 0,
+      team: "player",
+      zone: "board",
+      x: 0,
+      y: 5,
+      slot: 0,
+      star: 1,
+      items: [],
+      hp: 500,
+      maxHp: 500,
+    };
+    const bench: BoardUnit = {
+      ...fighter,
+      id: "player-1:nami",
+      contentId: "nami",
+      name: "Nami",
+      shortName: "Nami",
+      zone: "bench",
+      slot: 0,
+    };
     const current = {
-      units,
+      units: [fighter, bench],
       selectedId: null,
-      interactive: false,
+      interactionMode: "bench-only" as const,
       phase: "battle",
       capacity: 2,
       boardSkin: "pirate-ship" as const,
@@ -96,13 +127,31 @@ describe("Phase 3 combat presentation", () => {
     expect(
       preservesActiveBattleTimeline(current, {
         ...current,
-        selectedId: "player-1:luffy",
+        selectedId: bench.id,
       }),
     ).toBe(true);
     expect(
       preservesActiveBattleTimeline(current, {
         ...current,
-        units: [...units],
+        units: [fighter, { ...bench, slot: 3 }],
+      }),
+    ).toBe(true);
+    expect(
+      preservesActiveBattleTimeline(current, {
+        ...current,
+        units: [fighter],
+      }),
+    ).toBe(true);
+    expect(
+      preservesActiveBattleTimeline(current, {
+        ...current,
+        units: [fighter, bench, { ...bench, id: "player-1:usopp", slot: 1 }],
+      }),
+    ).toBe(true);
+    expect(
+      preservesActiveBattleTimeline(current, {
+        ...current,
+        units: [{ ...fighter, star: 2 }, bench],
       }),
     ).toBe(false);
     expect(
@@ -111,6 +160,24 @@ describe("Phase 3 combat presentation", () => {
         phase: "preparation",
       }),
     ).toBe(false);
+  });
+
+  it("allows only bench units and bench destinations in combat interaction", () => {
+    expect(
+      interactionAllowsUnit("bench-only", { team: "player", zone: "bench" }),
+    ).toBe(true);
+    expect(
+      interactionAllowsUnit("bench-only", { team: "player", zone: "board" }),
+    ).toBe(false);
+    expect(
+      interactionAllowsDestination("bench-only", { zone: "bench" }),
+    ).toBe(true);
+    expect(
+      interactionAllowsDestination("bench-only", { zone: "board" }),
+    ).toBe(false);
+    expect(
+      interactionAllowsDestination("formation", { zone: "board" }),
+    ).toBe(true);
   });
 
   it("refits the tactical camera when returning from a differently sized scene", async () => {

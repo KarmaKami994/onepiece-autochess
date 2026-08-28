@@ -25,10 +25,11 @@ import type {
   MatchState,
 } from "@/game";
 import {
+  createVoyageSaveEnvelope,
   deleteVoyage,
   readVoyage,
+  restoreVoyageState,
   writeVoyage,
-  type VoyageSaveEnvelope,
 } from "./voyagePersistence";
 import { useGameAudio, type SoundName } from "./useGameAudio";
 import { useLocalGameSession } from "./useLocalGameSession";
@@ -88,6 +89,13 @@ const DEFAULT_SETTINGS: Settings = {
   boardSkin: DEFAULT_BOARD_SKIN,
 };
 
+function persistentUnitId(view: MatchView, presentationId: string): string {
+  const battlePrefix = `${view.playerId}:`;
+  return view.phase === "battle" && presentationId.startsWith(battlePrefix)
+    ? presentationId.slice(battlePrefix.length)
+    : presentationId;
+}
+
 function loadStoredSettings(): Settings {
   if (typeof window === "undefined") return DEFAULT_SETTINGS;
   try {
@@ -124,7 +132,6 @@ export default function GameClient() {
     dispatch: dispatchLocalCommand,
     clear: clearLocalSession,
   } = useLocalGameSession(content);
-  const preBattleStateRef = useRef<MatchState | null>(null);
   const [seed, setSeed] = useState("");
   const [hasSave, setHasSave] = useState(false);
   const [saveReady, setSaveReady] = useState(false);
@@ -212,11 +219,6 @@ export default function GameClient() {
     } else {
       setStableMatchView((current) => current ?? selectMatchView(next));
     }
-    if (nextPhase === "preparation") {
-      preBattleStateRef.current = next;
-    } else if (nextPhase !== "battle") {
-      preBattleStateRef.current = null;
-    }
     if (nextPhase === "carousel") {
       setSelectedUnitId(null);
     } else {
@@ -264,20 +266,7 @@ export default function GameClient() {
       if (isCarousel) lastCarouselCheckpointRef.current = Date.now();
       setSaveStatus("saving");
       const updatedAt = Date.now();
-      const replayBattle =
-        engineState.phase === "battle" &&
-        Boolean(preBattleStateRef.current);
-      const stableState = replayBattle
-        ? preBattleStateRef.current!
-        : engineState;
-      const envelope: VoyageSaveEnvelope = {
-        state: stableState,
-        seed,
-        updatedAt,
-        schemaVersion: engine.CURRENT_SAVE_SCHEMA_VERSION,
-        contentVersion: stableState.contentVersion,
-        replayBattle,
-      };
+      const envelope = createVoyageSaveEnvelope(engineState, seed, updatedAt);
       saveWriteChainRef.current = saveWriteChainRef.current
         .catch(() => undefined)
         .then(() => writeVoyage(envelope));
@@ -296,36 +285,31 @@ export default function GameClient() {
   }, [engineState, seed]);
 
   useEffect(() => {
-    const checkpointCarousel = () => {
+    const checkpointActivePhase = () => {
       const current = engineStateRef.current;
       if (
         !current ||
         !seed ||
-        current.phase !== "carousel"
+        (current.phase !== "battle" && current.phase !== "carousel")
       ) {
         return;
       }
       const updatedAt = Date.now();
-      const envelope: VoyageSaveEnvelope = {
-        state: current,
-        seed,
-        updatedAt,
-        schemaVersion: engine.CURRENT_SAVE_SCHEMA_VERSION,
-        contentVersion: current.contentVersion,
-        replayBattle: false,
-      };
-      saveWriteChainRef.current = saveWriteChainRef.current
-        .catch(() => undefined)
-        .then(() => writeVoyage(envelope));
+      const envelope = createVoyageSaveEnvelope(current, seed, updatedAt);
+      const checkpointWrite = writeVoyage(envelope);
+      saveWriteChainRef.current = Promise.all([
+        saveWriteChainRef.current.catch(() => undefined),
+        checkpointWrite,
+      ]).then(() => undefined);
     };
     const onVisibilityChange = () => {
-      if (document.hidden) checkpointCarousel();
+      if (document.hidden) checkpointActivePhase();
     };
     document.addEventListener("visibilitychange", onVisibilityChange);
-    window.addEventListener("pagehide", checkpointCarousel);
+    window.addEventListener("pagehide", checkpointActivePhase);
     return () => {
       document.removeEventListener("visibilitychange", onVisibilityChange);
-      window.removeEventListener("pagehide", checkpointCarousel);
+      window.removeEventListener("pagehide", checkpointActivePhase);
     };
   }, [engineStateRef, seed]);
 
@@ -467,9 +451,6 @@ export default function GameClient() {
         next.phase === currentPhase ||
         currentPhase === "battle"
       ) {
-        if (currentPhase === "preparation") {
-          preBattleStateRef.current = next;
-        }
         next = engine.advanceMatchPhase(next, content);
       }
 
@@ -615,11 +596,7 @@ export default function GameClient() {
           playSound("error");
           return;
         }
-        let restored = engine.migrateMatchState(saved.state, content);
-        if (saved.replayBattle) {
-          preBattleStateRef.current = restored;
-          restored = engine.advanceMatchPhase(restored, content);
-        }
+        const restored = restoreVoyageState(saved, content);
         setSeed(saved.seed);
         setEngineState(restored);
         setScoutedPlayerId(null);
@@ -658,7 +635,6 @@ export default function GameClient() {
   ]);
 
   const leaveVoyage = useCallback(() => {
-    preBattleStateRef.current = null;
     clearLocalSession();
     setStableMatchView(null);
     setSeed("");
@@ -670,7 +646,10 @@ export default function GameClient() {
 
   const buyUnit = useCallback(
     (shopIndex: number) => {
-      if (!view || view.phase !== "preparation") return;
+      const economyPhase =
+        view?.phase === "preparation" ||
+        (view?.phase === "battle" && tutorialStep === null);
+      if (!view || !economyPhase) return;
       if (
         tutorialStep &&
         tutorialStep !== "recruit" &&
@@ -723,14 +702,21 @@ export default function GameClient() {
         returnFromScouting();
         return false;
       }
-      if (!view || view.phase !== "preparation") return false;
+      if (!view) return false;
       const unit = view.boardUnits.find(
         (candidate) => candidate.id === move.unitId,
       );
+      const canMove =
+        view.phase === "preparation" ||
+        (view.phase === "battle" &&
+          tutorialStep === null &&
+          unit?.zone === "bench" &&
+          move.zone === "bench");
+      if (!canMove) return false;
       return issueCommand(
         {
           type: "MOVE_UNIT",
-          unitId: move.unitId,
+          unitId: persistentUnitId(view, move.unitId),
           to:
             move.zone === "bench"
               ? { kind: "bench", index: move.slot ?? 0 }
@@ -746,7 +732,7 @@ export default function GameClient() {
         }.`,
       );
     },
-    [issueCommand, returnFromScouting, scoutedPlayerId, view],
+    [issueCommand, returnFromScouting, scoutedPlayerId, tutorialStep, view],
   );
 
   const sellSelected = useCallback(() => {
@@ -754,15 +740,22 @@ export default function GameClient() {
       returnFromScouting();
       return;
     }
-    if (!view || !selectedUnitId || view.phase !== "preparation") return;
-    const selectedName =
-      view.boardUnits.find((unit) => unit.id === selectedUnitId)?.name ??
-      "the selected crew member";
+    if (!view || !selectedUnitId) return;
+    const selected = view.boardUnits.find(
+      (unit) => unit.id === selectedUnitId,
+    );
+    const canSell =
+      view.phase === "preparation" ||
+      (view.phase === "battle" &&
+        tutorialStep === null &&
+        selected?.zone === "bench");
+    if (!canSell) return;
+    const selectedName = selected?.name ?? "the selected crew member";
     if (
       issueCommand(
         {
           type: "SELL_UNIT",
-          unitId: selectedUnitId,
+          unitId: persistentUnitId(view, selectedUnitId),
         },
         "coin",
         `Sold ${selectedName}; equipped treasure was returned.`,
@@ -775,6 +768,7 @@ export default function GameClient() {
     returnFromScouting,
     scoutedPlayerId,
     selectedUnitId,
+    tutorialStep,
     view,
   ]);
 
@@ -1003,7 +997,7 @@ export default function GameClient() {
         }
         return;
       }
-      if (view.phase !== "preparation") return;
+      if (view.phase !== "preparation" && view.phase !== "battle") return;
       if (tutorialStep && ["r", "l", "x"].includes(key)) {
         event.preventDefault();
         showToast(

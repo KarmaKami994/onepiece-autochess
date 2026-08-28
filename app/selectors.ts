@@ -569,12 +569,21 @@ function buildBoardUnits(
     views.set(snapshot.id, enriched);
     if (existing) {
       Object.assign(existing, {
+        contentId: snapshot.definitionId,
+        name: enriched.name,
+        shortName: enriched.shortName,
+        color: hashColor(snapshot.definitionId),
+        team: snapshot.teamId === player.id ? "player" : "enemy",
+        zone: "board",
         x,
         y,
+        star: snapshot.star,
+        items: (snapshot.items ?? instance?.items ?? []).slice(0, 3),
         hp: snapshot.hp,
         maxHp: snapshot.maxHp,
         shield: snapshot.shield,
         energy: snapshot.energy,
+        portrait: enriched.token,
       });
       continue;
     }
@@ -590,7 +599,7 @@ function buildBoardUnits(
       y,
       slot: 0,
       star: snapshot.star,
-      items: instance?.items.slice(0, 3) ?? [],
+      items: (snapshot.items ?? instance?.items ?? []).slice(0, 3),
       hp: snapshot.hp,
       maxHp: snapshot.maxHp,
       shield: snapshot.shield,

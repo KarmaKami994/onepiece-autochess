@@ -74,7 +74,7 @@ describe("portable deterministic domain contracts", () => {
   it("returns stable machine-readable rejection codes", () => {
     const state = createMatch("command-errors");
     state.phase = "battle";
-    const result = applyCommand(state, { type: "REROLL_SHOP" }, PLAYER_CONTEXT);
+    const result = applyCommand(state, { type: "END_PREPARATION" }, PLAYER_CONTEXT);
     expect(result).toMatchObject({ ok: false, error: { code: "WRONG_PHASE" } });
   });
 

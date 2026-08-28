@@ -80,6 +80,7 @@ import type {
   CommandResult,
   GameCommand,
   GameContent,
+  MatchPhase,
   MatchState,
   PlayerState,
   Position,
@@ -1967,6 +1968,26 @@ function validatePlanningPlayer(
   return findPlayer(state, context.actorPlayerId);
 }
 
+function commandAllowedInPhase(
+  commandType: GameCommand["type"],
+  phase: MatchPhase,
+): boolean {
+  switch (commandType) {
+    case "BUY_UNIT":
+    case "REROLL_SHOP":
+    case "TOGGLE_SHOP_LOCK":
+    case "BUY_XP":
+    case "MOVE_UNIT":
+    case "SELL_UNIT":
+      return phase === "preparation" || phase === "battle";
+    case "EQUIP_ITEM":
+    case "END_PREPARATION":
+      return phase === "preparation";
+    default:
+      return true;
+  }
+}
+
 export function applyCommand(
   state: MatchState,
   command: GameCommand,
@@ -1977,24 +1998,11 @@ export function applyCommand(
     return { ok: true, state: advanceMatchPhase(state, content) };
   }
 
-  const planningCommands = new Set<GameCommand["type"]>([
-    "BUY_UNIT",
-    "REROLL_SHOP",
-    "TOGGLE_SHOP_LOCK",
-    "BUY_XP",
-    "MOVE_UNIT",
-    "SELL_UNIT",
-    "EQUIP_ITEM",
-    "END_PREPARATION",
-  ]);
-  if (
-    planningCommands.has(command.type) &&
-    state.phase !== "preparation"
-  ) {
+  if (!commandAllowedInPhase(command.type, state.phase)) {
     return commandFailure(
       state,
       "WRONG_PHASE",
-      "That action is only available during preparation.",
+      "That action is not available during this phase.",
     );
   }
   if (command.type === "CHOOSE_ITEM" && state.phase !== "item-choice") {
@@ -2074,12 +2082,34 @@ export function applyCommand(
       gainXp(player, content.config.buyXpAmount, content);
       return { ok: true, state: next };
     case "MOVE_UNIT": {
+      const source = locateUnit(player, command.unitId);
+      const destination = normalizeDestination(command.to);
+      if (
+        next.phase === "battle" &&
+        (source?.zone === "board" || destination.zone === "board")
+      ) {
+        return commandFailure(
+          state,
+          "WRONG_PHASE",
+          "The fighting board cannot be rearranged during combat.",
+        );
+      }
       const error = moveUnit(player, command.unitId, command.to, content);
       return error
         ? { ok: false, state, error }
         : { ok: true, state: next };
     }
     case "SELL_UNIT": {
+      if (
+        next.phase === "battle" &&
+        locateUnit(player, command.unitId)?.zone === "board"
+      ) {
+        return commandFailure(
+          state,
+          "WRONG_PHASE",
+          "Units fighting on the board cannot be sold during combat.",
+        );
+      }
       const error = sellUnit(
         next,
         player,

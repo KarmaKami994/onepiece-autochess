@@ -32,6 +32,7 @@ interface MutableBattleUnit {
   definitionId: string;
   teamId: string;
   star: 1 | 2 | 3;
+  items: string[];
   x: number;
   y: number;
   hp: number;
@@ -183,6 +184,7 @@ function createMutableUnits(
       definitionId: setup.definitionId,
       teamId: team.id,
       star: setup.star,
+      items: [...setup.items],
       x: setup.position.x,
       y: setup.position.y,
       hp: maxHp,
@@ -738,6 +740,7 @@ function toSnapshot(unit: MutableBattleUnit): BattleUnitSnapshot {
     definitionId: unit.definitionId,
     teamId: unit.teamId,
     star: unit.star,
+    items: [...unit.items],
     x: unit.x,
     y: unit.y,
     hp: Math.max(0, unit.hp),
