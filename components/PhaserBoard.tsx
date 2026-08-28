@@ -152,11 +152,18 @@ export function preservesActiveBattleTimeline(
   current: BoardPayload,
   next: BoardPayload,
 ): boolean {
+  const deployedUnits = (units: BoardUnit[]) =>
+    units
+      .filter((unit) => unit.zone === "board")
+      .sort((left, right) =>
+        left.id < right.id ? -1 : left.id > right.id ? 1 : 0,
+      );
+
   return (
     current.phase === "battle" &&
     next.phase === "battle" &&
-    JSON.stringify(current.units.filter((unit) => unit.zone === "board")) ===
-      JSON.stringify(next.units.filter((unit) => unit.zone === "board")) &&
+    JSON.stringify(deployedUnits(current.units)) ===
+      JSON.stringify(deployedUnits(next.units)) &&
     current.boardSkin === next.boardSkin
   );
 }

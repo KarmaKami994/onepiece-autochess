@@ -11,6 +11,7 @@ import {
 import {
   createVoyageSaveEnvelope,
   restoreVoyageState,
+  shouldPersistVoyageEnvelope,
   type VoyageSaveEnvelope,
 } from "../app/voyagePersistence";
 
@@ -56,6 +57,16 @@ function preparedState(seed: string): MatchState {
 }
 
 describe("voyage battle save compatibility", () => {
+  it("rejects an older queued save after a newer checkpoint", () => {
+    const older = { updatedAt: 1_000 };
+    const newer = { updatedAt: 2_000 };
+
+    expect(shouldPersistVoyageEnvelope(null, older)).toBe(true);
+    expect(shouldPersistVoyageEnvelope(older, newer)).toBe(true);
+    expect(shouldPersistVoyageEnvelope(newer, older)).toBe(false);
+    expect(shouldPersistVoyageEnvelope(newer, { updatedAt: 2_000 })).toBe(true);
+  });
+
   it("restores a direct battle save without rolling back or resimulating", () => {
     let state = command(preparedState("direct-battle-save"), {
       type: "END_PREPARATION",

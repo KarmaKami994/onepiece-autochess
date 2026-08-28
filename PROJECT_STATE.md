@@ -26,7 +26,7 @@ Gameplay baseline upgrades — Combat Economy complete; awaiting Live Opponent S
 
 ## Last Completed Work
 
-- 2026-08-28 — PR #20 on `feature/combat-economy-actions`: enabled PAC-style Buy, Reroll, Lock and Buy XP actions during battle plus bench selling and bench-to-bench movement while keeping the deployed formation, item equip, pairings and precomputed `MatchBattleResult` immutable. Battle presentation now uses self-contained battle-start star/item snapshots while the live bench updates without resetting Phaser combat playback. New battle saves persist the current battle state directly; legacy schema-6 `replayBattle` saves still reconstruct once. Content remains `1.11.0`; save schema remains 6. Material files: `game/engine.ts`, `game/types.ts`, `game/combat.ts`, `app/GameClient.tsx`, `app/selectors.ts`, `app/voyagePersistence.ts`, `app/screens/GameScreens.tsx`, `components/PhaserBoard.tsx`, focused domain/selector/Phaser/save/E2E tests and `PROJECT_STATE.md`.
+- 2026-08-28 — PR #20 on `feature/combat-economy-actions`: enabled PAC-style Buy, Reroll, Lock and Buy XP actions during battle plus bench selling and bench-to-bench movement while keeping the deployed formation, item equip, pairings and precomputed `MatchBattleResult` immutable. Battle presentation now uses self-contained battle-start star/item snapshots while the live bench updates without resetting Phaser combat playback. Review hardening made deployed-fighter comparison order-independent without weakening fighter-property checks and made `ACTIVE_SAVE` writes monotonic by `updatedAt` within one IndexedDB transaction. New battle saves persist the current battle state directly; legacy schema-6 `replayBattle` saves still reconstruct once. Content remains `1.11.0`; save schema remains 6. Material files: `game/engine.ts`, `game/types.ts`, `game/combat.ts`, `app/GameClient.tsx`, `app/selectors.ts`, `app/voyagePersistence.ts`, `app/screens/GameScreens.tsx`, `components/PhaserBoard.tsx`, focused domain/selector/Phaser/save/E2E tests and `PROJECT_STATE.md`.
 - 2026-08-28 — `bf96b62`, PR #19 on `feature/pac-style-shop-lock`: adapted PAC-style automatic locked-shop refill semantics. Retained offers stay in place and preserve their shared-pool reservation; only empty/purchased slots roll through the existing current-level odds and consume deterministic RNG/pool copies; the one-round lock then clears. Manual rerolls remain full and unlocked automatic refreshes are unchanged. Content remains `1.11.0`; save schema remains 6. Material files: `game/economy.ts`, `game/engine.ts`, `tests/game/economy-board.test.ts`, `PROJECT_STATE.md`.
 - 2026-08-28 — `0e33663`, PR #18 on `feature/roster-expansion-pack-f`: added Kuzan, Akainu, Shanks and Blackbeard using only existing stun, burn, Defense Pierce, Energy Drain and pull mechanics. The base-shop roster is now 30 units at 6/7/6/7/4 by cost. Added the Emperor origin; two distinct Emperors grant the whole team +8% health and +8% attack. Content moved to `1.11.0`; save schema remains 6. Added no combat primitive, TraitEffect kind, engine/type/persistence/presentation change or asset, and documented the existing shared placeholder's clean-room provenance. Material files: `game/content.ts`, `tests/game/roster-expansion-pack-f.test.ts`, necessary roster/content-version assertions, `ASSET_PROVENANCE.md` and `PROJECT_STATE.md`.
 - 2026-08-28 — PR #17 Browser E2E remediation on `feature/roster-expansion-pack-e`: added one neutral repository-authored SVG placeholder and routed the eight Pack D/E expansion units to it for portraits and tactical tokens. Updated the two sprite-specific E2E flows to select recruits with dedicated animation art instead of assuming the first RNG shop slot has an atlas. Pack E gameplay, content `1.10.0` and save schema 6 are unchanged. Material files: `public/assets/characters/placeholder.svg`, `game/content.ts`, `app/selectors.ts`, focused selector/roster tests, `e2e/viewport.spec.ts` and `PROJECT_STATE.md`.
@@ -48,10 +48,11 @@ Gameplay baseline upgrades — Combat Economy complete; awaiting Live Opponent S
 
 Combat Economy:
 
+- PASS — PR #20 review-fix regressions: 2 files, 9 tests.
 - PASS — focused domain/selector/Phaser/save and affected phase-guard tests: 6 files, 37 tests.
 - PASS — `npm run typecheck`.
 - PASS — `npm run lint`.
-- PASS — `npm test`: 37 files, 299 tests.
+- PASS — `npm test`: 37 files, 300 tests.
 - PASS — `npm run assets:validate`: 41 animation atlases, maps, Carousel assets and provenance files validated.
 - PASS — `npm run test:production-smoke`: 50/50 complete matches, zero crashes.
 - PASS — `npm run build`.
@@ -210,7 +211,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
-- During normal battles, players may now buy units, fully reroll, toggle shop lock, buy XP, sell bench units and rearrange bench slots. Board movement/selling, item equip and readiness remain blocked; purchases and merges affect future persistent state only. The current combat result and deployed battle-start star/item identity remain frozen, while live bench changes synchronize without restarting Phaser playback. New battle saves preserve the current economy state and frozen results directly; legacy `replayBattle` saves remain compatible.
+- During normal battles, players may now buy units, fully reroll, toggle shop lock, buy XP, sell bench units and rearrange bench slots. Board movement/selling, item equip and readiness remain blocked; purchases and merges affect future persistent state only. The current combat result and deployed battle-start star/item identity remain frozen, while live bench changes synchronize without restarting Phaser playback even if fighter arrays are reconstructed in a different order. New battle saves preserve the current economy state and frozen results directly; stale writes cannot overwrite a newer `updatedAt`, and legacy `replayBattle` saves remain compatible.
 - Automatic round refreshes of locked shops now retain every non-empty offer in its slot, fill only empty/purchased slots through existing current-level shop odds, preserve retained pool reservations, consume RNG only for replacement slots and clear the one-round lock. Manual rerolls remain full; unlocked refreshes are unchanged.
 - Kuzan adds global damage plus 700ms stun; Akainu adds nearest-cluster damage plus 32-power/4000ms burn; Shanks adds nearest-cluster burst with 35% transient Defense Pierce; Blackbeard adds global damage, 20-Energy Drain and deterministic pull. The new Emperor 2 origin grants +8% team health and attack. The roster is 30 units at 6/7/6/7/4; content is `1.11.0` and save schema remains 6.
 - Koby, Koala, Franky, Brook, Ivankov, Jinbe, Kuma and Kizaru now use one neutral local placeholder for portraits and tactical tokens until dedicated art exists; existing units with real art keep their current portrait/token assets.
@@ -228,7 +229,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
-- None for Combat Economy. PAC's combat-phase economy authorization, bench-only selling and bench movement were adapted from pinned commit `a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee`; PAC networking, server state, Simulation and Pokémon-specific systems were not ported.
+- None for Combat Economy or its two review fixes. PAC's combat-phase economy authorization, bench-only selling and bench movement were adapted from pinned commit `a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee`; PAC networking, server state, Simulation and Pokémon-specific systems were not ported.
 - None for PAC-style Shop Lock. Only PAC `Shop.refillShop(...)` empty/default-slot behavior from pinned commit `a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee` was adapted; unrelated PAC systems were not ported.
 - None for Pack F. It reused the existing shared placeholder and all required combat/trait infrastructure; E2E and the 1,000-seed soak were omitted exactly as scoped.
 - Pack E gameplay stayed within scope. CI remediation required exactly one generic repository-authored SVG plus the smallest selector and E2E fixture corrections because active missing portrait/token requests violated the browser QA contract; no gameplay, combat, type, persistence or version value changed.
@@ -260,11 +261,11 @@ Final current-roster high-cost identity pack:
 - `engine.ts`, `GameScreens.tsx`, `selectors.ts` and `PhaserBoard` still contain substantial responsibilities.
 - `game/index.ts` still exposes a broad internal API.
 - The host's default `npm` shim resolves to a missing roaming npm CLI; verification passed through the installed npm CLI without repository changes.
-- On Windows, the first E2E process hung while tearing down its owned Vinext server after all assertions passed; a clean rerun reused that server and exited successfully.
+- On Windows, Playwright can hang while tearing down its owned Vinext server after all assertions pass; this run exited successfully after that exact owned server process was stopped.
 
 ## Important Decisions
 
-- Active combat remains an immutable precomputed `MatchBattleResult`; battle economy mutates only persistent future state. Optional snapshot item IDs make current-fight presentation self-contained without changing combat mechanics or save schema. New battle saves store the current canonical battle state directly, while `replayBattle` remains compatibility-only for legacy saves.
+- Active combat remains an immutable precomputed `MatchBattleResult`; battle economy mutates only persistent future state. Optional snapshot item IDs make current-fight presentation self-contained without changing combat mechanics or save schema. New battle saves store the current canonical battle state directly, `ACTIVE_SAVE` accepts only equal-or-newer `updatedAt` writes, and `replayBattle` remains compatibility-only for legacy saves.
 - Keep the current prototype offline-capable.
 - Future multiplayer is server authoritative.
 - Add no multiplayer infrastructure yet.
