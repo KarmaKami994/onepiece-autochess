@@ -27,9 +27,9 @@ describe("production configuration audit", () => {
     expect(report.timeoutRate).toBeLessThanOrEqual(1);
     expect(report.drawRate).toBeGreaterThanOrEqual(0);
     expect(report.drawRate).toBeLessThanOrEqual(1);
-    expect(Object.keys(report.characterPresence)).toHaveLength(26);
+    expect(Object.keys(report.characterPresence)).toHaveLength(30);
     expect(Object.keys(report.costBands)).toEqual(["1", "2", "3", "4", "5"]);
-    expect(Object.keys(report.characterCombatExpression)).toHaveLength(26);
+    expect(Object.keys(report.characterCombatExpression)).toHaveLength(30);
     expect(report.combatReadability.pvpBattleCount).toBeGreaterThan(0);
     expect(report.combatReadability.castsPerPvpBattle).toBeGreaterThanOrEqual(0);
     expect(
@@ -51,7 +51,7 @@ describe("production configuration audit", () => {
         0,
       ),
     ).toBeLessThanOrEqual(report.seeds * 8 * 9);
-    expect(Object.keys(report.traitReachability)).toHaveLength(12);
+    expect(Object.keys(report.traitReachability)).toHaveLength(13);
     expect(Object.keys(report.itemUsage)).toHaveLength(8);
 
     for (const character of Object.values(report.characterPresence)) {

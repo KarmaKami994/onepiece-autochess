@@ -219,7 +219,7 @@ describe("Combat Identity Pack A content", () => {
       pattern: "line",
       signatureMechanics: [{ kind: "knockback" }],
     });
-    expect(DEFAULT_CONTENT.version).toBe("1.10.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.11.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 });

@@ -38,14 +38,18 @@ describe("canonical game content", () => {
       "hancock",
       "doflamingo",
       "kizaru",
+      "kuzan",
+      "akainu",
       "garp",
       "mihawk",
+      "shanks",
+      "blackbeard",
     ]);
     expect(DEFAULT_CONTENT.units.map((unit) => unit.cost)).toEqual([
       1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4,
-      4, 4, 5, 5,
+      4, 4, 4, 4, 5, 5, 5, 5,
     ]);
-    expect(DEFAULT_CONTENT.traits).toHaveLength(12);
+    expect(DEFAULT_CONTENT.traits).toHaveLength(13);
     expect(DEFAULT_CONTENT.items).toHaveLength(8);
     expect(DEFAULT_CONTENT.enemies).toHaveLength(5);
     expect(
@@ -96,8 +100,12 @@ describe("canonical game content", () => {
       "Mero Mero",
       "String Bind",
       "Sacred Jewel",
+      "Ice Age",
+      "Great Eruption",
       "Galaxy Impact",
       "Black Blade Wave",
+      "Divine Departure",
+      "Black Hole",
     ]);
     expect(DEFAULT_CONTENT.traits.map((trait) => trait.name)).toEqual([
       "Straw Hat",
@@ -106,6 +114,7 @@ describe("canonical game content", () => {
       "Supernova",
       "Brotherhood",
       "Revolutionary",
+      "Emperor",
       "Captain",
       "Brawler",
       "Swordsman",

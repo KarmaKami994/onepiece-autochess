@@ -6,6 +6,13 @@ This non-commercial, localhost-only fan prototype has both original generated pr
 
 On `2026-08-14`, the project owner explicitly attested in the project conversation that the 17 listed source sheets may be used, adapted, and distributed in this public collaboration repository. That owner attestation is the recorded permission basis for these imports; a Sprite Database URL is not treated as permission, and this repository does not independently establish chain of title or grant a downstream asset license. The MIT license applies to code only. Reuse, redistribution, or commercialization of franchise or imported art requires its own appropriate rights clearance.
 
+## Roster-expansion placeholder
+
+- Runtime asset: `public/assets/characters/placeholder.svg`
+- Source: repository-authored clean-room SVG; external source artwork: none
+- Purpose: temporary portrait/token fallback for roster-expansion characters pending dedicated artwork
+- Added: `2026-08-28`
+
 ## Animation v2 source gate and PvE batch
 
 - Source matrix: `art/animation-v2/source-matrix.json`
