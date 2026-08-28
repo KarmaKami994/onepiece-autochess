@@ -58,6 +58,16 @@ export function rollShop(
   );
 }
 
+export function refillEmptyShopSlots(
+  state: MatchState,
+  player: PlayerState,
+  content: GameContent,
+): void {
+  player.shop = player.shop.map((definitionId) =>
+    definitionId ?? rollOneShopUnit(state, player, content),
+  );
+}
+
 export function gainXp(
   player: PlayerState,
   amount: number,
