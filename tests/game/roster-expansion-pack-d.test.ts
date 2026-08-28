@@ -168,7 +168,7 @@ describe("Roster Expansion Pack D content", () => {
         requiresTarget: false,
         signatureMechanics: [{ kind: "lunge" }],
       },
-      assetPath: "/assets/characters/koby.png",
+      assetPath: "/assets/characters/placeholder.svg",
     });
     expect(definition(DEFAULT_CONTENT, "koala")).toMatchObject({
       name: "Koala",
@@ -190,7 +190,7 @@ describe("Roster Expansion Pack D content", () => {
         pattern: "adjacent",
         stunMs: 300,
       },
-      assetPath: "/assets/characters/koala.png",
+      assetPath: "/assets/characters/placeholder.svg",
     });
     expect(definition(DEFAULT_CONTENT, "franky")).toMatchObject({
       name: "Franky",
@@ -212,7 +212,7 @@ describe("Roster Expansion Pack D content", () => {
         pattern: "adjacent",
         signatureMechanics: [{ kind: "knockback" }],
       },
-      assetPath: "/assets/characters/franky.png",
+      assetPath: "/assets/characters/placeholder.svg",
     });
     expect(definition(DEFAULT_CONTENT, "brook")).toMatchObject({
       name: "Brook",
@@ -234,7 +234,7 @@ describe("Roster Expansion Pack D content", () => {
         pattern: "line",
         stunMs: 400,
       },
-      assetPath: "/assets/characters/brook.png",
+      assetPath: "/assets/characters/placeholder.svg",
     });
 
     expect(definition(DEFAULT_CONTENT, "koby").ability.stunMs).toBeUndefined();

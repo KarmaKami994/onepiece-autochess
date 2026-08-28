@@ -227,7 +227,7 @@ describe("Roster Expansion Pack E content", () => {
         requiresTarget: false,
         conditionalShield: { healthThresholdPercent: 50, power: 120 },
       },
-      assetPath: "/assets/characters/ivankov.png",
+      assetPath: "/assets/characters/placeholder.svg",
     });
     expect(definition(DEFAULT_CONTENT, "jinbe")).toMatchObject({
       name: "Jinbe",
@@ -249,7 +249,7 @@ describe("Roster Expansion Pack E content", () => {
         pattern: "adjacent",
         signatureMechanics: [{ kind: "knockback" }],
       },
-      assetPath: "/assets/characters/jinbe.png",
+      assetPath: "/assets/characters/placeholder.svg",
     });
     expect(definition(DEFAULT_CONTENT, "kuma")).toMatchObject({
       name: "Kuma",
@@ -272,7 +272,7 @@ describe("Roster Expansion Pack E content", () => {
         castAnimationMs: 600,
         signatureMechanics: [{ kind: "knockback" }],
       },
-      assetPath: "/assets/characters/kuma.png",
+      assetPath: "/assets/characters/placeholder.svg",
     });
     expect(definition(DEFAULT_CONTENT, "kizaru")).toMatchObject({
       name: "Kizaru",
@@ -295,7 +295,7 @@ describe("Roster Expansion Pack E content", () => {
         defensePiercePercent: 40,
         castAnimationMs: 600,
       },
-      assetPath: "/assets/characters/kizaru.png",
+      assetPath: "/assets/characters/placeholder.svg",
     });
 
     expect(definition(DEFAULT_CONTENT, "ivankov").ability.signatureMechanics)

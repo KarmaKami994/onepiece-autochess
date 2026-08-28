@@ -158,7 +158,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
         signatureMechanics: [{ kind: "lunge" }],
       },
     ),
-    assetPath: "/assets/characters/koby.png",
+    assetPath: "/assets/characters/placeholder.svg",
   },
   {
     id: "koala",
@@ -182,7 +182,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
       "adjacent",
       { stunMs: 300 },
     ),
-    assetPath: "/assets/characters/koala.png",
+    assetPath: "/assets/characters/placeholder.svg",
   },
   {
     id: "sanji",
@@ -306,7 +306,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
       "adjacent",
       { signatureMechanics: [{ kind: "knockback" }] },
     ),
-    assetPath: "/assets/characters/franky.png",
+    assetPath: "/assets/characters/placeholder.svg",
   },
   {
     id: "brook",
@@ -330,7 +330,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
       "line",
       { stunMs: 400 },
     ),
-    assetPath: "/assets/characters/brook.png",
+    assetPath: "/assets/characters/placeholder.svg",
   },
   {
     id: "ivankov",
@@ -358,7 +358,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
       requiresTarget: false,
       conditionalShield: { healthThresholdPercent: 50, power: 120 },
     },
-    assetPath: "/assets/characters/ivankov.png",
+    assetPath: "/assets/characters/placeholder.svg",
   },
   {
     id: "luffy",
@@ -493,7 +493,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
       "adjacent",
       { signatureMechanics: [{ kind: "knockback" }] },
     ),
-    assetPath: "/assets/characters/jinbe.png",
+    assetPath: "/assets/characters/placeholder.svg",
   },
   {
     id: "kuma",
@@ -520,7 +520,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
         signatureMechanics: [{ kind: "knockback" }],
       },
     ),
-    assetPath: "/assets/characters/kuma.png",
+    assetPath: "/assets/characters/placeholder.svg",
   },
   {
     id: "law",
@@ -644,7 +644,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
       "line",
       { castAnimationMs: 600, defensePiercePercent: 40 },
     ),
-    assetPath: "/assets/characters/kizaru.png",
+    assetPath: "/assets/characters/placeholder.svg",
   },
   {
     id: "garp",

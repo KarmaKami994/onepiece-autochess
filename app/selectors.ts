@@ -300,6 +300,9 @@ function baseUnitView(
   const playable = "cost" in definition;
   const ability = definition.ability;
   const traits = playable ? definition.traits : [];
+  const sharedPlaceholder = definition.assetPath.endsWith("/placeholder.svg")
+    ? definition.assetPath
+    : null;
   return {
     id: definition.id,
     name: definition.name,
@@ -307,8 +310,8 @@ function baseUnitView(
     cost: playable ? definition.cost : 1,
     rarity: rarityForCost(playable ? definition.cost : 1),
     traits,
-    portrait: `/assets/portraits/${slugify(definition.id)}.png`,
-    token: `/assets/tokens/${slugify(definition.id)}.png`,
+    portrait: sharedPlaceholder ?? `/assets/portraits/${slugify(definition.id)}.png`,
+    token: sharedPlaceholder ?? `/assets/tokens/${slugify(definition.id)}.png`,
     color: cssColor(definition.id),
     description:
       ability?.description ??
