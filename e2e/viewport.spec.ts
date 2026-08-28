@@ -43,7 +43,12 @@ test("full-playfield map keeps sprite picking and drag placement calibrated", as
   expect(Math.abs((canvasBounds?.width ?? 0) - (frameBounds?.width ?? 0))).toBeLessThan(1);
   expect(Math.abs((canvasBounds?.height ?? 0) - (frameBounds?.height ?? 0))).toBeLessThan(1);
 
-  await page.locator("button.shop-card:not([disabled])").first().click();
+  const animatedRecruit = page
+    .locator('button.shop-card:not([disabled])')
+    .filter({ has: page.locator('img[src^="/assets/portraits/"]') })
+    .first();
+  await expect(animatedRecruit).toBeVisible();
+  await animatedRecruit.click();
   const inspector = page.locator(".unit-inspector");
   await expect(inspector).toBeVisible();
   const inspectorLabel = await inspector.getAttribute("aria-label");
@@ -123,7 +128,10 @@ for (const viewport of BENCH_VIEWPORTS) {
     );
     expect(visualBottomRight.y).toBeLessThanOrEqual(footerBounds?.y ?? 0);
 
-    const recruit = page.locator("button.shop-card:not([disabled])").first();
+    const recruit = page
+      .locator('button.shop-card:not([disabled])')
+      .filter({ has: page.locator('img[src^="/assets/portraits/"]') })
+      .first();
     await expect(recruit).toBeVisible();
     const portraitSrc = await recruit.locator("img").getAttribute("src");
     const contentId = portraitSrc?.match(/\/portraits\/([^/.]+)\.png/)?.[1];

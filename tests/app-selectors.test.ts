@@ -38,6 +38,19 @@ describe("typed application selectors", () => {
     expect(view.carouselSession).toBeNull();
   });
 
+  it("uses the shared local placeholder for expansion portraits and tokens", () => {
+    const state = createMatch("selector-expansion-placeholder");
+    const player = state.players.find((candidate) => candidate.id === "player-1")!;
+    player.shop[0] = "koby";
+
+    const view = selectMatchView(state);
+
+    expect(view.shop[0]).toMatchObject({
+      portrait: "/assets/characters/placeholder.svg",
+      token: "/assets/characters/placeholder.svg",
+    });
+  });
+
   it("maps owned board and bench units without compatibility normalization", () => {
     const state = createMatch("selector-roster");
     const player = state.players.find((candidate) => candidate.id === "player-1")!;
