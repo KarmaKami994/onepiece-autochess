@@ -308,13 +308,11 @@ describe("elimination and phase guards", () => {
     expect(next.pool.nami).toBe(poolBeforeResolve + 3 + reservedNami);
   });
 
-  it("rejects planning commands during battle", () => {
+  it("rejects preparation-only commands during battle", () => {
     const state = createMatch("phase-guard");
     state.phase = "battle";
     expect(
-      applyCommand(state, {
-        type: "REROLL_SHOP",
-      }, PLAYER_CONTEXT),
+      applyCommand(state, { type: "END_PREPARATION" }, PLAYER_CONTEXT),
     ).toMatchObject({
       ok: false,
       error: { code: "WRONG_PHASE" },

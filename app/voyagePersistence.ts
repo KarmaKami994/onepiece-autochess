@@ -1,3 +1,12 @@
+import {
+  CURRENT_SAVE_SCHEMA_VERSION,
+  DEFAULT_CONTENT,
+  advanceMatchPhase,
+  migrateMatchState,
+  type GameContent,
+  type MatchState,
+} from "../game";
+
 export type VoyageSaveEnvelope = {
   state: unknown;
   seed: string;
@@ -6,6 +15,31 @@ export type VoyageSaveEnvelope = {
   contentVersion?: string;
   replayBattle?: boolean;
 };
+
+export function createVoyageSaveEnvelope(
+  state: MatchState,
+  seed: string,
+  updatedAt: number,
+): VoyageSaveEnvelope {
+  return {
+    state,
+    seed,
+    updatedAt,
+    schemaVersion: CURRENT_SAVE_SCHEMA_VERSION,
+    contentVersion: state.contentVersion,
+    replayBattle: false,
+  };
+}
+
+export function restoreVoyageState(
+  saved: VoyageSaveEnvelope,
+  content: GameContent = DEFAULT_CONTENT,
+): MatchState {
+  const restored = migrateMatchState(saved.state, content);
+  return saved.replayBattle === true
+    ? advanceMatchPhase(restored, content)
+    : restored;
+}
 
 const DB_NAME = "grand-line-auto-chess";
 const DB_VERSION = 1;

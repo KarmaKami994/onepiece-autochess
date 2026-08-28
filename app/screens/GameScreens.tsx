@@ -648,6 +648,8 @@ export function MatchScreen({
   const [previewShopIndex, setPreviewShopIndex] = useState<number | null>(null);
   const planning = view.phase === "preparation";
   const scouting = planning && Boolean(scoutedStanding);
+  const battleEconomy = view.phase === "battle" && tutorialStep === null;
+  const economyPhase = planning || battleEconomy;
   const tacticalUnits = scoutedStanding?.boardUnits ?? view.boardUnits;
   const tacticalTraits = scoutedStanding?.traits ?? view.traits;
   const tacticalCapacity = scoutedStanding?.level ?? view.capacity;
@@ -662,7 +664,7 @@ export function MatchScreen({
   const tutorialAllowsSailing =
     tutorialStep === null || tutorialStep === "sail";
   let quickMove: BoardMove | null = null;
-  if (!scouting && selectedUnit?.team === "player") {
+  if (planning && !scouting && selectedUnit?.team === "player") {
     if (selectedUnit.zone === "bench") {
       if (view.deployed < view.capacity) {
         const occupied = new Set(
@@ -754,7 +756,15 @@ export function MatchScreen({
         <PhaserBoard
           units={tacticalUnits}
           selectedId={selectedUnit?.id ?? null}
-          interactive={planning && !scouting}
+          interactionMode={
+            scouting
+              ? "none"
+              : planning
+                ? "formation"
+                : battleEconomy
+                  ? "bench-only"
+                  : "none"
+          }
           phase={scouting ? "scouting" : view.phase}
           capacity={tacticalCapacity}
           boardSkin={settings.boardSkin}
@@ -825,7 +835,7 @@ export function MatchScreen({
                 <strong>
                   {planning
                     ? "Select or drag crew onto highlighted deck tiles"
-                    : "The crew fights on its own"}
+                    : "Combat formation locked · bench remains manageable"}
                 </strong>
                 <i />
                 <span className={!planning ? "active" : ""}>COMBAT</span>
@@ -867,7 +877,11 @@ export function MatchScreen({
               unit={selectedUnit}
               definition={selectedDefinition}
               itemsById={view.itemsById}
-              canSell={planning && !scouting}
+              canMove={planning && !scouting}
+              canSell={
+                !scouting &&
+                (planning || (battleEconomy && selectedUnit.zone === "bench"))
+              }
               allowSell={tutorialStep === null}
               quickMove={planning && !scouting ? quickMove : null}
               onClose={() => onSelectUnit(null)}
@@ -911,7 +925,7 @@ export function MatchScreen({
           <button
             type="button"
             className="economy-button"
-            disabled={!planning || view.level >= 9 || tutorialStep !== null}
+            disabled={!economyPhase || view.level >= 9 || tutorialStep !== null}
             onClick={onBuyXp}
             data-tooltip="Buy 4 XP for 4 gold · X"
           >
@@ -934,7 +948,7 @@ export function MatchScreen({
               : ""
           }`}
         >
-          {planning && previewShopIndex !== null && view.shop[previewShopIndex] && (
+          {economyPhase && previewShopIndex !== null && view.shop[previewShopIndex] && (
             <ShopDecisionPreview unit={view.shop[previewShopIndex]} />
           )}
           <div className="shop-heading">
@@ -950,7 +964,7 @@ export function MatchScreen({
                 unit={unit}
                 index={index}
                 disabled={
-                  !planning ||
+                  !economyPhase ||
                   !unit ||
                   Boolean(unit.disabledReason) ||
                   !tutorialAllowsShop
@@ -978,7 +992,7 @@ export function MatchScreen({
           <button
             type="button"
             className="control-button"
-            disabled={!planning || tutorialStep !== null}
+            disabled={!economyPhase || tutorialStep !== null}
             onClick={onReroll}
             data-tooltip="Refresh all recruits for 1 gold · R"
           >
@@ -989,7 +1003,7 @@ export function MatchScreen({
           <button
             type="button"
             className={`control-button ${view.shopLocked ? "is-active" : ""}`}
-            disabled={!planning || tutorialStep !== null}
+            disabled={!economyPhase || tutorialStep !== null}
             onClick={onToggleLock}
             data-tooltip="Keep this shop next round · L"
           >
@@ -1555,6 +1569,7 @@ function UnitInspector({
   unit,
   definition,
   itemsById,
+  canMove,
   canSell,
   allowSell,
   quickMove,
@@ -1565,6 +1580,7 @@ function UnitInspector({
   unit: BoardUnit;
   definition: ShopUnitView;
   itemsById: Map<string, ChoiceView>;
+  canMove: boolean;
   canSell: boolean;
   allowSell: boolean;
   quickMove: BoardMove | null;
@@ -1696,36 +1712,42 @@ function UnitInspector({
           })}
         </div>
       </div>
-      {canSell && (
+      {(canMove || canSell) && (
         <div className="inspector-actions">
-          <button
-            type="button"
-            className="move-unit-button"
-            disabled={!quickMove}
-            onClick={onMove}
-          >
-            {unit.zone === "bench" ? "DEPLOY" : "TO BENCH"}
-          </button>
-          <button
-            type="button"
-            className="sell-button"
-            onClick={onSell}
-            disabled={!allowSell}
-            title={
-              allowSell
-                ? "Sell this unit and return its equipped treasure"
-                : "Selling unlocks after the first-voyage guide"
-            }
-          >
-            SELL ·{" "}
-            {Math.max(
-              1,
-              definition.cost *
-                (unit.star >= 3 ? 9 : unit.star === 2 ? 3 : 1),
-            )}{" "}
-            ●
-          </button>
-          <small>Selling returns all equipped treasure.</small>
+          {canMove && (
+            <button
+              type="button"
+              className="move-unit-button"
+              disabled={!quickMove}
+              onClick={onMove}
+            >
+              {unit.zone === "bench" ? "DEPLOY" : "TO BENCH"}
+            </button>
+          )}
+          {canSell && (
+            <>
+              <button
+                type="button"
+                className="sell-button"
+                onClick={onSell}
+                disabled={!allowSell}
+                title={
+                  allowSell
+                    ? "Sell this unit and return its equipped treasure"
+                    : "Selling unlocks after the first-voyage guide"
+                }
+              >
+                SELL ·{" "}
+                {Math.max(
+                  1,
+                  definition.cost *
+                    (unit.star >= 3 ? 9 : unit.star === 2 ? 3 : 1),
+                )}{" "}
+                ●
+              </button>
+              <small>Selling returns all equipped treasure.</small>
+            </>
+          )}
         </div>
       )}
     </aside>

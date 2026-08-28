@@ -22,10 +22,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-Gameplay baseline upgrades — PAC-style Shop Lock complete; awaiting combat-phase economy actions.
+Gameplay baseline upgrades — Combat Economy complete; awaiting Live Opponent Spectating.
 
 ## Last Completed Work
 
+- 2026-08-28 — PR #20 on `feature/combat-economy-actions`: enabled PAC-style Buy, Reroll, Lock and Buy XP actions during battle plus bench selling and bench-to-bench movement while keeping the deployed formation, item equip, pairings and precomputed `MatchBattleResult` immutable. Battle presentation now uses self-contained battle-start star/item snapshots while the live bench updates without resetting Phaser combat playback. New battle saves persist the current battle state directly; legacy schema-6 `replayBattle` saves still reconstruct once. Content remains `1.11.0`; save schema remains 6. Material files: `game/engine.ts`, `game/types.ts`, `game/combat.ts`, `app/GameClient.tsx`, `app/selectors.ts`, `app/voyagePersistence.ts`, `app/screens/GameScreens.tsx`, `components/PhaserBoard.tsx`, focused domain/selector/Phaser/save/E2E tests and `PROJECT_STATE.md`.
 - 2026-08-28 — `bf96b62`, PR #19 on `feature/pac-style-shop-lock`: adapted PAC-style automatic locked-shop refill semantics. Retained offers stay in place and preserve their shared-pool reservation; only empty/purchased slots roll through the existing current-level odds and consume deterministic RNG/pool copies; the one-round lock then clears. Manual rerolls remain full and unlocked automatic refreshes are unchanged. Content remains `1.11.0`; save schema remains 6. Material files: `game/economy.ts`, `game/engine.ts`, `tests/game/economy-board.test.ts`, `PROJECT_STATE.md`.
 - 2026-08-28 — `0e33663`, PR #18 on `feature/roster-expansion-pack-f`: added Kuzan, Akainu, Shanks and Blackbeard using only existing stun, burn, Defense Pierce, Energy Drain and pull mechanics. The base-shop roster is now 30 units at 6/7/6/7/4 by cost. Added the Emperor origin; two distinct Emperors grant the whole team +8% health and +8% attack. Content moved to `1.11.0`; save schema remains 6. Added no combat primitive, TraitEffect kind, engine/type/persistence/presentation change or asset, and documented the existing shared placeholder's clean-room provenance. Material files: `game/content.ts`, `tests/game/roster-expansion-pack-f.test.ts`, necessary roster/content-version assertions, `ASSET_PROVENANCE.md` and `PROJECT_STATE.md`.
 - 2026-08-28 — PR #17 Browser E2E remediation on `feature/roster-expansion-pack-e`: added one neutral repository-authored SVG placeholder and routed the eight Pack D/E expansion units to it for portraits and tactical tokens. Updated the two sprite-specific E2E flows to select recruits with dedicated animation art instead of assuming the first RNG shop slot has an atlas. Pack E gameplay, content `1.10.0` and save schema 6 are unchanged. Material files: `public/assets/characters/placeholder.svg`, `game/content.ts`, `app/selectors.ts`, focused selector/roster tests, `e2e/viewport.spec.ts` and `PROJECT_STATE.md`.
@@ -44,6 +45,18 @@ Gameplay baseline upgrades — PAC-style Shop Lock complete; awaiting combat-pha
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+Combat Economy:
+
+- PASS — focused domain/selector/Phaser/save and affected phase-guard tests: 6 files, 37 tests.
+- PASS — `npm run typecheck`.
+- PASS — `npm run lint`.
+- PASS — `npm test`: 37 files, 299 tests.
+- PASS — `npm run assets:validate`: 41 animation atlases, maps, Carousel assets and provenance files validated.
+- PASS — `npm run test:production-smoke`: 50/50 complete matches, zero crashes.
+- PASS — `npm run build`.
+- PASS — `npm run test:e2e`: 15 passed, 3 skipped, including battle economy and direct battle resume in both desktop projects.
+- NOT RUN — `npm run test:production-soak`; intentionally deferred until Live Opponent Spectating is complete.
 
 PAC-style Shop Lock:
 
@@ -197,6 +210,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- During normal battles, players may now buy units, fully reroll, toggle shop lock, buy XP, sell bench units and rearrange bench slots. Board movement/selling, item equip and readiness remain blocked; purchases and merges affect future persistent state only. The current combat result and deployed battle-start star/item identity remain frozen, while live bench changes synchronize without restarting Phaser playback. New battle saves preserve the current economy state and frozen results directly; legacy `replayBattle` saves remain compatible.
 - Automatic round refreshes of locked shops now retain every non-empty offer in its slot, fill only empty/purchased slots through existing current-level shop odds, preserve retained pool reservations, consume RNG only for replacement slots and clear the one-round lock. Manual rerolls remain full; unlocked refreshes are unchanged.
 - Kuzan adds global damage plus 700ms stun; Akainu adds nearest-cluster damage plus 32-power/4000ms burn; Shanks adds nearest-cluster burst with 35% transient Defense Pierce; Blackbeard adds global damage, 20-Energy Drain and deterministic pull. The new Emperor 2 origin grants +8% team health and attack. The roster is 30 units at 6/7/6/7/4; content is `1.11.0` and save schema remains 6.
 - Koby, Koala, Franky, Brook, Ivankov, Jinbe, Kuma and Kizaru now use one neutral local placeholder for portraits and tactical tokens until dedicated art exists; existing units with real art keep their current portrait/token assets.
@@ -214,6 +228,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- None for Combat Economy. PAC's combat-phase economy authorization, bench-only selling and bench movement were adapted from pinned commit `a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee`; PAC networking, server state, Simulation and Pokémon-specific systems were not ported.
 - None for PAC-style Shop Lock. Only PAC `Shop.refillShop(...)` empty/default-slot behavior from pinned commit `a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee` was adapted; unrelated PAC systems were not ported.
 - None for Pack F. It reused the existing shared placeholder and all required combat/trait infrastructure; E2E and the 1,000-seed soak were omitted exactly as scoped.
 - Pack E gameplay stayed within scope. CI remediation required exactly one generic repository-authored SVG plus the smallest selector and E2E fixture corrections because active missing portrait/token requests violated the browser QA contract; no gameplay, combat, type, persistence or version value changed.
@@ -249,20 +264,21 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
+- Active combat remains an immutable precomputed `MatchBattleResult`; battle economy mutates only persistent future state. Optional snapshot item IDs make current-fight presentation self-contained without changing combat mechanics or save schema. New battle saves store the current canonical battle state directly, while `replayBattle` remains compatibility-only for legacy saves.
 - Keep the current prototype offline-capable.
 - Future multiplayer is server authoritative.
 - Add no multiplayer infrastructure yet.
 - Keep a shared deterministic game domain.
 - Defense Pierce is transient per-ability mitigation behavior, not a persistent Defense mutation, status or debuff.
 - Base-roster expansion is complete at 30 units and 6/7/6/7/4 by cost. Pack F added the Emperor origin for Shanks/Blackbeard; its single two-unit tier grants +8% team health and +8% team attack through existing team-wide trait semantics.
-- Gameplay roadmap order is: (1) PAC-style Shop Lock — complete, (2) Economy Actions During Battle, (3) Live Opponent Spectating, (4) 30-unit 1,000-seed assessment, (5) balance decisions, (6) future Character Form System.
+- Gameplay roadmap order is: (1) PAC-style Shop Lock — complete, (2) Economy Actions During Battle — complete, (3) Live Opponent Spectating — next, (4) 30-unit 1,000-seed assessment, (5) balance decisions, (6) future Character Form System.
 - The future Character Form System remains documentation-only: star and form progression are separate; forms are not shop/pool units; an eventual instance may carry a form identity beside `definitionId` and star and alter a controlled subset of stats/ability/role/traits/presentation; permanent and temporary forms share one conceptual model with different lifetimes. Initial pilots are Robin (star-triggered Demonio-style), Luffy (star/item-dependent Gear 4 branches) and Chopper (synergy/combat-condition Monster Point-style). No form code exists yet.
 - All future Codex work must be bounded and branch/PR based.
 - ChatGPT decides architecture and prioritization; Codex executes requested tasks.
 
 ## Next Recommended Task
 
-Implement only Economy Actions During Battle as the next bounded gameplay-baseline task; do not start it automatically.
+Implement only Live Opponent Spectating as the next bounded gameplay-baseline task; do not start it automatically.
 
 ## Codex Update Contract
 
