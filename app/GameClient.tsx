@@ -40,6 +40,7 @@ import {
   type TutorialStep,
 } from "./useTutorial";
 import {
+  selectBattlePresentation,
   selectCarouselView,
   selectMatchView,
   type MatchView,
@@ -173,6 +174,17 @@ export default function GameClient() {
         : null,
     [scoutedPlayerId, view],
   );
+  const battlePresentation = useMemo(
+    () =>
+      engineState && view?.phase === "battle"
+        ? selectBattlePresentation(
+            engineState,
+            scoutedPlayerId ?? view.playerId,
+            content,
+          )
+        : null,
+    [engineState, scoutedPlayerId, view],
+  );
   const activePhase = view?.phase;
   const activeRound = view?.round;
   const activeBattleDuration = view?.battleDurationSeconds ?? 45;
@@ -187,10 +199,14 @@ export default function GameClient() {
     const captain = view.standings.find(
       (standing) => standing.id === scoutedPlayerId,
     );
-    if (view.phase === "preparation" && captain?.alive) return;
+    if (
+      tutorialStep === null &&
+      (view.phase === "preparation" || view.phase === "battle") &&
+      captain?.alive
+    ) return;
     const returnTimer = window.setTimeout(returnFromScouting, 0);
     return () => window.clearTimeout(returnTimer);
-  }, [returnFromScouting, scoutedPlayerId, view]);
+  }, [returnFromScouting, scoutedPlayerId, tutorialStep, view]);
 
   const showToast = useCallback(
     (
@@ -402,7 +418,11 @@ export default function GameClient() {
 
   const scoutPlayer = useCallback(
     (playerId: string | null) => {
-      if (!view || view.phase !== "preparation" || tutorialStep !== null) {
+      if (
+        !view ||
+        (view.phase !== "preparation" && view.phase !== "battle") ||
+        tutorialStep !== null
+      ) {
         return;
       }
       if (!playerId || playerId === view.playerId) {
@@ -432,7 +452,10 @@ export default function GameClient() {
     const resolvedOutcome =
       currentPhase === "battle" ? view?.battleOutcome ?? null : null;
 
-    if (currentPhase === "preparation" && scoutedPlayerId) {
+    if (
+      (currentPhase === "preparation" || currentPhase === "battle") &&
+      scoutedPlayerId
+    ) {
       returnFromScouting();
     }
 
@@ -698,10 +721,7 @@ export default function GameClient() {
 
   const moveUnit = useCallback(
     (move: BoardMove) => {
-      if (scoutedPlayerId) {
-        returnFromScouting();
-        return false;
-      }
+      if (scoutedPlayerId) return false;
       if (!view) return false;
       const unit = view.boardUnits.find(
         (candidate) => candidate.id === move.unitId,
@@ -732,14 +752,11 @@ export default function GameClient() {
         }.`,
       );
     },
-    [issueCommand, returnFromScouting, scoutedPlayerId, tutorialStep, view],
+    [issueCommand, scoutedPlayerId, tutorialStep, view],
   );
 
   const sellSelected = useCallback(() => {
-    if (scoutedPlayerId) {
-      returnFromScouting();
-      return;
-    }
+    if (scoutedPlayerId) return;
     if (!view || !selectedUnitId) return;
     const selected = view.boardUnits.find(
       (unit) => unit.id === selectedUnitId,
@@ -765,7 +782,6 @@ export default function GameClient() {
     }
   }, [
     issueCommand,
-    returnFromScouting,
     scoutedPlayerId,
     selectedUnitId,
     tutorialStep,
@@ -1056,10 +1072,15 @@ export default function GameClient() {
   ]);
 
   const displayedBoardUnits =
-    scoutedStanding?.boardUnits ?? view?.boardUnits ?? [];
+    view?.phase === "battle"
+      ? battlePresentation?.boardUnits ?? view.boardUnits
+      : scoutedStanding?.boardUnits ?? view?.boardUnits ?? [];
   const displayedDefinitions =
-    scoutedStanding?.selectedDefinitionByUnit ??
-    view?.selectedDefinitionByUnit;
+    view?.phase === "battle"
+      ? battlePresentation?.selectedDefinitionByUnit ??
+        view.selectedDefinitionByUnit
+      : scoutedStanding?.selectedDefinitionByUnit ??
+        view?.selectedDefinitionByUnit;
   const selectedUnit = displayedBoardUnits.find(
     (unit) => unit.id === selectedUnitId,
   );
@@ -1209,6 +1230,7 @@ export default function GameClient() {
           selectedUnit={selectedUnit}
           selectedDefinition={selectedDefinition}
           scoutedStanding={scoutedStanding}
+          battlePresentation={battlePresentation}
           tutorialStep={tutorialStep}
           saveStatus={saveStatus}
           isAdvancing={isAdvancing}
@@ -1246,10 +1268,7 @@ export default function GameClient() {
           }
           onSellSelected={sellSelected}
           onEquipItem={(itemId) => {
-            if (scoutedPlayerId) {
-              returnFromScouting();
-              return;
-            }
+            if (scoutedPlayerId) return;
             if (!selectedUnitId) return;
             const item = view.itemsById.get(itemId);
             issueCommand(

@@ -224,6 +224,19 @@ export type MatchView = {
   battleOutcome: BattleOutcomeRecap | null;
 };
 
+export type BattlePresentationView = {
+  perspectivePlayerId: string;
+  perspectiveName: string;
+  opponentName: string;
+  isGhost: boolean;
+  boardUnits: BoardUnit[];
+  traits: TraitView[];
+  selectedDefinitionByUnit: Map<string, ShopUnitView>;
+  events: CombatFxEvent[];
+  eventSequence: number;
+  battleDurationSeconds: number;
+};
+
 export function titleCase(value: string): string {
   return value
     .replace(/[_-]+/g, " ")
@@ -673,7 +686,7 @@ function combatEvents(
   if (!result) {
     return {
       events: [],
-      sequence: state.round * 10 + (state.phase === "battle" ? 1 : 0),
+      sequence: state.round * 100,
       durationSeconds: 1,
     };
   }
@@ -940,13 +953,62 @@ function combatEvents(
   });
   return {
     events,
-    sequence: state.round * 10 + (state.phase === "battle" ? 1 : 0),
+    sequence:
+      state.round * 100 +
+      Math.max(0, state.lastResults.indexOf(result)) * 2 +
+      (result.playerBId === playerId ? 2 : 1),
     durationSeconds: Math.max(
       1,
       Math.ceil(
         (result.durationTicks * content.config.combatTickMs) / 1_000,
       ),
     ),
+  };
+}
+
+export function selectBattlePresentation(
+  state: MatchState,
+  perspectivePlayerId: string,
+  content: GameContent = DEFAULT_CONTENT,
+): BattlePresentationView | null {
+  if (state.phase !== "battle") return null;
+  const perspectivePlayer = state.players.find(
+    (candidate) => candidate.id === perspectivePlayerId,
+  );
+  const result = resultForPlayer(state, perspectivePlayerId);
+  if (!perspectivePlayer || !result) return null;
+
+  const isPlayerA = result.playerAId === perspectivePlayerId;
+  const isGhost =
+    isPlayerA && result.playerBId === null && result.ghostOfPlayerId !== null;
+  const opponentId = isPlayerA
+    ? result.playerBId ?? result.ghostOfPlayerId
+    : result.playerAId;
+  const opponentPlayer = opponentId
+    ? state.players.find((candidate) => candidate.id === opponentId) ?? null
+    : null;
+  const board = buildBoardUnits(
+    state,
+    perspectivePlayer,
+    opponentPlayer,
+    content,
+  );
+  const combat = combatEvents(state, perspectivePlayerId, content);
+  const stage = getStageDefinition(state.round, content);
+
+  return {
+    perspectivePlayerId,
+    perspectiveName: perspectivePlayer.name,
+    opponentName: isGhost
+      ? `Ghost of ${opponentPlayer?.name ?? "Unknown Captain"}`
+      : opponentPlayer?.name ?? stage.name,
+    isGhost,
+    boardUnits: board.units,
+    traits: traitViews(perspectivePlayer, content),
+    selectedDefinitionByUnit: board.views,
+    events: combat.events,
+    eventSequence: combat.sequence,
+    battleDurationSeconds: combat.durationSeconds,
   };
 }
 

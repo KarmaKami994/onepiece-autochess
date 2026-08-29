@@ -7,6 +7,7 @@ import {
 } from "react";
 import PhaserBoard, {
   type BoardMove,
+  type BoardInteractionMode,
   type BoardUnit,
 } from "@/components/PhaserBoard";
 import PhaserCarousel, {
@@ -21,6 +22,7 @@ import {
   cssColor,
   slugify,
   titleCase,
+  type BattlePresentationView,
   type CarouselSessionView,
   type ChoiceView,
   type MatchView,
@@ -46,6 +48,25 @@ export type ToastView = {
   title: string;
   message: string;
 };
+
+export function tacticalInteractionMode(
+  phase: MatchView["phase"],
+  observing: boolean,
+  tutorialActive: boolean,
+): BoardInteractionMode {
+  if (observing) return "none";
+  if (phase === "preparation") return "formation";
+  return phase === "battle" && !tutorialActive ? "bench-only" : "none";
+}
+
+export function standingsInteraction(
+  phase: MatchView["phase"],
+  tutorialActive: boolean,
+): "scout" | "watch" | null {
+  if (tutorialActive) return null;
+  if (phase === "preparation") return "scout";
+  return phase === "battle" ? "watch" : null;
+}
 
 export function MainMenu({
   hasSave,
@@ -604,6 +625,7 @@ export function MatchScreen({
   selectedUnit,
   selectedDefinition,
   scoutedStanding,
+  battlePresentation,
   tutorialStep,
   saveStatus,
   isAdvancing,
@@ -628,6 +650,7 @@ export function MatchScreen({
   selectedUnit?: BoardUnit;
   selectedDefinition?: ShopUnitView;
   scoutedStanding: StandingView | null;
+  battlePresentation: BattlePresentationView | null;
   tutorialStep: TutorialStep | null;
   saveStatus: "idle" | "saving" | "saved";
   isAdvancing: boolean;
@@ -648,10 +671,16 @@ export function MatchScreen({
   const [previewShopIndex, setPreviewShopIndex] = useState<number | null>(null);
   const planning = view.phase === "preparation";
   const scouting = planning && Boolean(scoutedStanding);
+  const watching = view.phase === "battle" && Boolean(scoutedStanding);
+  const observing = scouting || watching;
   const battleEconomy = view.phase === "battle" && tutorialStep === null;
   const economyPhase = planning || battleEconomy;
-  const tacticalUnits = scoutedStanding?.boardUnits ?? view.boardUnits;
-  const tacticalTraits = scoutedStanding?.traits ?? view.traits;
+  const tacticalUnits = scouting
+    ? scoutedStanding?.boardUnits ?? []
+    : battlePresentation?.boardUnits ?? view.boardUnits;
+  const tacticalTraits = scouting
+    ? scoutedStanding?.traits ?? []
+    : battlePresentation?.traits ?? view.traits;
   const tacticalCapacity = scoutedStanding?.level ?? view.capacity;
   const warning = timer <= 8;
   const playerCrewCount = view.boardUnits.filter(
@@ -705,7 +734,9 @@ export function MatchScreen({
         </div>
         <div className="opponent-banner">
           <span className="tiny-label">
-            {scoutedStanding
+            {watching
+              ? "WATCHING"
+              : scoutedStanding
               ? "SCOUTING CAPTAIN"
               : view.opponent
               ? view.phase === "battle"
@@ -714,11 +745,13 @@ export function MatchScreen({
               : "PAIRING"}
           </span>
           <strong>
-            {scoutedStanding?.name ??
-              view.opponent?.name ??
-              "Pairing after preparation"}
+            {watching
+              ? `${battlePresentation?.perspectiveName ?? scoutedStanding?.name} vs ${battlePresentation?.opponentName ?? "Unknown opponent"}`
+              : scoutedStanding?.name ??
+                view.opponent?.name ??
+                "Pairing after preparation"}
           </strong>
-          {(scoutedStanding ?? view.opponent) && (
+          {!watching && (scoutedStanding ?? view.opponent) && (
             <span>Lv. {(scoutedStanding ?? view.opponent)?.level}</span>
           )}
         </div>
@@ -752,30 +785,27 @@ export function MatchScreen({
         className="match-body"
         data-board-skin={settings.boardSkin}
         data-scouting={scouting ? "true" : "false"}
+        data-watching={watching ? "true" : "false"}
       >
         <PhaserBoard
           units={tacticalUnits}
           selectedId={selectedUnit?.id ?? null}
-          interactionMode={
-            scouting
-              ? "none"
-              : planning
-                ? "formation"
-                : battleEconomy
-                  ? "bench-only"
-                  : "none"
-          }
+          interactionMode={tacticalInteractionMode(
+            view.phase,
+            observing,
+            tutorialStep !== null,
+          )}
           phase={scouting ? "scouting" : view.phase}
           capacity={tacticalCapacity}
           boardSkin={settings.boardSkin}
-          combatEvents={scouting ? [] : view.events}
-          eventSequence={view.eventSequence}
+          combatEvents={scouting ? [] : battlePresentation?.events ?? view.events}
+          eventSequence={battlePresentation?.eventSequence ?? view.eventSequence}
           speed={settings.animationSpeed}
           particles={settings.particles}
           combatNumbers={settings.combatNumbers}
           reducedMotion={settings.reducedMotion}
           onMoveUnit={onMoveUnit}
-          onSelectUnit={onSelectUnit}
+          onSelectUnit={observing ? () => undefined : onSelectUnit}
         />
         <div className="left-rail">
           <TraitsPanel traits={tacticalTraits} />
@@ -815,7 +845,24 @@ export function MatchScreen({
           }`}
         >
           <div className="board-ribbon">
-            {scoutedStanding ? (
+            {watching ? (
+              <>
+                <span className="active">WATCHING</span>
+                <i />
+                <strong>
+                  {battlePresentation?.perspectiveName ?? scoutedStanding?.name}
+                  {" vs "}
+                  {battlePresentation?.opponentName ?? "Unknown opponent"}
+                </strong>
+                <button
+                  type="button"
+                  className="return-from-scout"
+                  onClick={onReturnFromScout}
+                >
+                  RETURN TO YOUR FIGHT
+                </button>
+              </>
+            ) : scoutedStanding ? (
               <>
                 <span className="active">SCOUTING</span>
                 <i />
@@ -879,7 +926,7 @@ export function MatchScreen({
               itemsById={view.itemsById}
               canMove={planning && !scouting}
               canSell={
-                !scouting &&
+                !observing &&
                 (planning || (battleEconomy && selectedUnit.zone === "bench"))
               }
               allowSell={tutorialStep === null}
@@ -892,8 +939,11 @@ export function MatchScreen({
           {!selectedUnit && (
             <StandingsPanel
               standings={view.standings}
-              planning={planning && tutorialStep === null}
-              scoutedPlayerId={scoutedStanding?.id ?? null}
+              interaction={standingsInteraction(
+                view.phase,
+                tutorialStep !== null,
+              )}
+              observedPlayerId={scoutedStanding?.id ?? null}
               onScoutPlayer={onScoutPlayer}
             />
           )}
@@ -1193,13 +1243,13 @@ function ScoutIntelPanel({
 
 function StandingsPanel({
   standings,
-  planning,
-  scoutedPlayerId,
+  interaction,
+  observedPlayerId,
   onScoutPlayer,
 }: {
   standings: StandingView[];
-  planning: boolean;
-  scoutedPlayerId: string | null;
+  interaction: "scout" | "watch" | null;
+  observedPlayerId: string | null;
   onScoutPlayer: (playerId: string | null) => void;
 }) {
   return (
@@ -1212,20 +1262,20 @@ function StandingsPanel({
         {standings.map((standing, index) => (
           <li
             key={standing.id}
-            className={`${standing.isHuman ? "is-player" : ""} ${!standing.alive ? "eliminated" : ""} ${scoutedPlayerId === standing.id ? "is-scouted" : ""}`}
+            className={`${standing.isHuman ? "is-player" : ""} ${!standing.alive ? "eliminated" : ""} ${observedPlayerId === standing.id ? "is-scouted" : ""}`}
           >
             <button
               type="button"
               disabled={
-                !planning ||
+                interaction === null ||
                 !standing.alive ||
-                (standing.isHuman && scoutedPlayerId === null)
+                (standing.isHuman && observedPlayerId === null)
               }
-              aria-pressed={scoutedPlayerId === standing.id}
+              aria-pressed={observedPlayerId === standing.id}
               aria-label={
                 standing.isHuman
-                  ? `Return to your crew, level ${standing.level}, ${standing.hp} health`
-                  : `Scout ${standing.name}, level ${standing.level}, ${standing.hp} health`
+                  ? `${interaction === "watch" ? "Return to your fight" : "Return to your crew"}, level ${standing.level}, ${standing.hp} health`
+                  : `${interaction === "watch" ? `Watch ${standing.name}'s battle` : `Scout ${standing.name}`}, level ${standing.level}, ${standing.hp} health`
               }
               title={
                 standing.crewPreview.length
