@@ -44,11 +44,41 @@ export type CostBandReport = {
   unitIds: string[];
   unitCount: number;
   finalBoards: number;
+  finalBoardRepresentationRate: number;
+  finalBoardPlayerPresence: number;
+  finalBoardPlayerPresenceRate: number;
   top4Boards: number;
   winningBoards: number;
   top4Rate: number;
   winRate: number;
   averagePlacement: number;
+};
+
+export type ShopPoolCostReport = {
+  cost: number;
+  unitIds: string[];
+  initialCopiesPerUnit: number;
+  eligiblePlayerPreparations: number;
+  eligibleShopSlots: number;
+  shopOffers: number;
+  playerPreparationsWithOffer: number;
+  offerRatePerEligibleSlot: number;
+  playerPreparationOfferRate: number;
+  poolDefinitionObservations: number;
+  totalAvailablePoolCopies: number;
+  averageAvailablePoolCopiesPerDefinition: number;
+  zeroAvailablePoolDefinitions: number;
+  zeroAvailabilityRate: number;
+  finalCrewUnitInstances: number;
+  finalCrewTwoStarOrHigherInstances: number;
+};
+
+export type TraitReachabilityReport = {
+  activations: number;
+  activationRate: number;
+  matchesReached: number;
+  matchReachRate: number;
+  maxTier: number;
 };
 
 export type CharacterCombatExpressionReport = {
@@ -80,6 +110,8 @@ export type CombatReadabilityReport = {
   displacements: { lunge: number; knockback: number; pull: number };
   abilityDrainEvents: number;
   totalEnergyDrained: number;
+  allEnemyAbilityCasts: number;
+  defensePierceCasts: number;
   castsPerPvpBattle: number;
   castTargetsPerPvpBattle: number;
   multiTargetCastsPerPvpBattle: number;
@@ -90,6 +122,8 @@ export type CombatReadabilityReport = {
   abilityDrainEventsPerPvpBattle: number;
   energyDrainedPerPvpBattle: number;
   controlEventsPerPvpBattle: number;
+  allEnemyAbilityCastsPerPvpBattle: number;
+  defensePierceCastsPerPvpBattle: number;
 };
 
 export type ProductionSoakReport = {
@@ -114,12 +148,29 @@ export type ProductionSoakReport = {
   drawRate: number;
   characterPresence: Record<string, CharacterPresenceReport>;
   costBands: Record<string, CostBandReport>;
+  shopPoolAvailability: {
+    preparationSnapshots: number;
+    shopSlots: number;
+    emptyShopSlots: number;
+    emptyShopSlotRate: number;
+    byCost: Record<string, ShopPoolCostReport>;
+  };
   characterCombatExpression: Record<
     string,
     CharacterCombatExpressionReport
   >;
   combatReadability: CombatReadabilityReport;
-  traitReachability: Record<string, { activations: number; maxTier: number }>;
+  traitPlayerBattleBoards: number;
+  traitReachability: Record<string, TraitReachabilityReport>;
+  traitCombinations: Record<
+    string,
+    {
+      activations: number;
+      activationRate: number;
+      matchesReached: number;
+      matchReachRate: number;
+    }
+  >;
   itemUsage: Record<string, number>;
   targets: {
     matchLength20To30Minutes: boolean;
@@ -189,6 +240,8 @@ type MutableCombatReadability = Omit<
   | "abilityDrainEventsPerPvpBattle"
   | "energyDrainedPerPvpBattle"
   | "controlEventsPerPvpBattle"
+  | "allEnemyAbilityCastsPerPvpBattle"
+  | "defensePierceCastsPerPvpBattle"
 >;
 
 function emptyCharacterCombatExpression(): MutableCharacterCombatExpression {
@@ -219,18 +272,22 @@ function emptyCombatReadability(): MutableCombatReadability {
     displacements: { lunge: 0, knockback: 0, pull: 0 },
     abilityDrainEvents: 0,
     totalEnergyDrained: 0,
+    allEnemyAbilityCasts: 0,
+    defensePierceCasts: 0,
   };
 }
 
 function sourceDefinitionIds(
   result: MatchBattleResult,
   rosterIds: ReadonlySet<string>,
+  includeGhosts = false,
 ): Map<string, string> {
   return new Map(
     result.initialUnits
       .filter(
         (unit) =>
-          rosterIds.has(unit.definitionId) && !unit.teamId.startsWith("ghost-"),
+          rosterIds.has(unit.definitionId) &&
+          (includeGhosts || !unit.teamId.startsWith("ghost-")),
       )
       .map((unit) => [unit.id, unit.definitionId]),
   );
@@ -289,11 +346,18 @@ function recordCharacterEvent(
 function recordPvpResult(
   result: MatchBattleResult,
   rosterIds: ReadonlySet<string>,
+  allEnemyAbilityIds: ReadonlySet<string>,
+  defensePierceAbilityIds: ReadonlySet<string>,
   expressions: Record<string, MutableCharacterCombatExpression>,
   readability: MutableCombatReadability,
 ): void {
   readability.pvpBattleCount += 1;
   const sourceDefinitions = sourceDefinitionIds(result, rosterIds);
+  const readabilitySourceDefinitions = sourceDefinitionIds(
+    result,
+    rosterIds,
+    true,
+  );
   for (const event of result.events) {
     recordCharacterEvent(event, sourceDefinitions, expressions);
     switch (event.type) {
@@ -301,6 +365,15 @@ function recordPvpResult(
         readability.casts += 1;
         readability.castTargets += event.targetIds.length;
         if (event.targetIds.length > 1) readability.multiTargetCasts += 1;
+        {
+          const definitionId = readabilitySourceDefinitions.get(event.sourceId);
+          if (definitionId && allEnemyAbilityIds.has(definitionId)) {
+            readability.allEnemyAbilityCasts += 1;
+          }
+          if (definitionId && defensePierceAbilityIds.has(definitionId)) {
+            readability.defensePierceCasts += 1;
+          }
+        }
         break;
       case "ability-hit":
         readability.abilityHitEvents += 1;
@@ -364,11 +437,23 @@ function recordTraits(
   state: MatchState,
   traitActivations: MutableCounter,
   traitMaxTier: MutableCounter,
+  traitsReachedInMatch: Set<string>,
+  traitObservations: { playerBattleBoards: number; emperorCaptain: number },
 ): void {
   for (const player of state.players.filter((candidate) => candidate.alive)) {
-    for (const active of getActiveTraits(player)) {
+    traitObservations.playerBattleBoards += 1;
+    const activeTraits = getActiveTraits(player).filter(
+      (active) => active.tierIndex >= 0,
+    );
+    const activeTraitIds = new Set(activeTraits.map((active) => active.traitId));
+    if (activeTraitIds.has("emperor") && activeTraitIds.has("captain")) {
+      traitObservations.emperorCaptain += 1;
+      traitsReachedInMatch.add("emperor+captain");
+    }
+    for (const active of activeTraits) {
       if (active.tierIndex < 0) continue;
       increment(traitActivations, active.traitId);
+      traitsReachedInMatch.add(active.traitId);
       traitMaxTier[active.traitId] = Math.max(
         traitMaxTier[active.traitId] ?? 0,
         active.tierIndex + 1,
@@ -389,7 +474,21 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
   const top4Boards: MutableCounter = {};
   const winningBoards: MutableCounter = {};
   const placementTotals: MutableCounter = {};
+  const costFinalBoardPlayerPresence: MutableCounter = {};
   const rosterIds = new Set(DEFAULT_CONTENT.units.map((unit) => unit.id));
+  const unitCostById = new Map(
+    DEFAULT_CONTENT.units.map((unit) => [unit.id, unit.cost]),
+  );
+  const allEnemyAbilityIds = new Set(
+    DEFAULT_CONTENT.units
+      .filter((unit) => unit.ability.pattern === "all-enemies")
+      .map((unit) => unit.id),
+  );
+  const defensePierceAbilityIds = new Set(
+    DEFAULT_CONTENT.units
+      .filter((unit) => (unit.ability.defensePiercePercent ?? 0) > 0)
+      .map((unit) => unit.id),
+  );
   const characterCombatExpressions = Object.fromEntries(
     DEFAULT_CONTENT.units.map((unit) => [
       unit.id,
@@ -399,12 +498,33 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
   const combatReadability = emptyCombatReadability();
   const traitActivations: MutableCounter = {};
   const traitMaxTier: MutableCounter = {};
+  const traitMatchReach: MutableCounter = {};
+  const traitObservations = { playerBattleBoards: 0, emperorCaptain: 0 };
+  const shopPoolCounters = Object.fromEntries(
+    [1, 2, 3, 4, 5].map((cost) => [
+      String(cost),
+      {
+        eligiblePlayerPreparations: 0,
+        eligibleShopSlots: 0,
+        shopOffers: 0,
+        playerPreparationsWithOffer: 0,
+        poolDefinitionObservations: 0,
+        totalAvailablePoolCopies: 0,
+        zeroAvailablePoolDefinitions: 0,
+        finalCrewUnitInstances: 0,
+        finalCrewTwoStarOrHigherInstances: 0,
+      },
+    ]),
+  );
   const itemUsage: MutableCounter = {};
   let completeMatches = 0;
   let crashes = 0;
   let battleCount = 0;
   let timeouts = 0;
   let draws = 0;
+  let preparationSnapshots = 0;
+  let shopSlots = 0;
+  let emptyShopSlots = 0;
 
   for (let seedIndex = 0; seedIndex < seedCount; seedIndex += 1) {
     try {
@@ -414,15 +534,49 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
       human.isBot = true;
       human.personalityId = "balanced";
       const lastDeployedBoards = new Map<string, Set<string>>();
+      const traitsReachedInMatch = new Set<string>();
 
       let transitions = 0;
       let fullSeconds = 0;
       let paced = 0;
       while (state.phase !== "game-over" && transitions < 400) {
         if (state.phase === "preparation") {
+          preparationSnapshots += 1;
           const stage = getStageDefinition(state.round, DEFAULT_CONTENT);
           fullSeconds += stage.preparationSeconds;
           paced += Math.min(stage.preparationSeconds, 15);
+          const alivePlayers = state.players.filter((player) => player.alive);
+          for (const player of alivePlayers) {
+            shopSlots += player.shop.length;
+            emptyShopSlots += player.shop.filter((offer) => offer === null).length;
+            const offersByCost = new Map<number, number>();
+            for (const definitionId of player.shop) {
+              if (!definitionId) continue;
+              const cost = unitCostById.get(definitionId);
+              if (cost) offersByCost.set(cost, (offersByCost.get(cost) ?? 0) + 1);
+            }
+            const odds =
+              DEFAULT_CONTENT.config.shopOddsByLevel[String(player.level)] ??
+              DEFAULT_CONTENT.config.shopOddsByLevel[
+                String(DEFAULT_CONTENT.config.maxLevel)
+              ];
+            for (const cost of [1, 2, 3, 4, 5]) {
+              if ((odds[cost - 1] ?? 0) <= 0) continue;
+              const counter = shopPoolCounters[String(cost)];
+              const offers = offersByCost.get(cost) ?? 0;
+              counter.eligiblePlayerPreparations += 1;
+              counter.eligibleShopSlots += player.shop.length;
+              counter.shopOffers += offers;
+              if (offers > 0) counter.playerPreparationsWithOffer += 1;
+            }
+          }
+          for (const unit of DEFAULT_CONTENT.units) {
+            const counter = shopPoolCounters[String(unit.cost)];
+            const available = state.pool[unit.id] ?? 0;
+            counter.poolDefinitionObservations += 1;
+            counter.totalAvailablePoolCopies += available;
+            if (available === 0) counter.zeroAvailablePoolDefinitions += 1;
+          }
         } else if (state.phase === "battle") {
           const stage = getStageDefinition(state.round, DEFAULT_CONTENT);
           for (const player of state.players.filter((candidate) => candidate.alive)) {
@@ -435,7 +589,13 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
               }
             }
           }
-          recordTraits(state, traitActivations, traitMaxTier);
+          recordTraits(
+            state,
+            traitActivations,
+            traitMaxTier,
+            traitsReachedInMatch,
+            traitObservations,
+          );
           const longestBattleTicks = state.lastResults.reduce(
             (maximum, result) => Math.max(maximum, result.durationTicks),
             0,
@@ -452,6 +612,8 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
               recordPvpResult(
                 result,
                 rosterIds,
+                allEnemyAbilityIds,
+                defensePierceAbilityIds,
                 characterCombatExpressions,
                 combatReadability,
               );
@@ -479,6 +641,9 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
         );
       }
       completeMatches += 1;
+      for (const traitId of traitsReachedInMatch) {
+        increment(traitMatchReach, traitId);
+      }
       rounds.push(state.round);
       fullClockSeconds.push(fullSeconds);
       pacedSeconds.push(paced);
@@ -490,12 +655,26 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
         const definitions =
           lastDeployedBoards.get(player.id) ?? deployedDefinitions(player);
         recordCharacterBoard(definitions, characterBoards);
+        for (const cost of new Set(
+          [...definitions]
+            .map((definitionId) => unitCostById.get(definitionId))
+            .filter((cost): cost is NonNullable<typeof cost> => cost !== undefined),
+        )) {
+          increment(costFinalBoardPlayerPresence, String(cost));
+        }
         for (const definitionId of definitions) {
           increment(placementTotals, definitionId, player.placement);
           if (player.placement <= 4) increment(top4Boards, definitionId);
           if (player.placement === 1) increment(winningBoards, definitionId);
         }
         recordFinalItems(player, itemUsage);
+        for (const unit of finalCrew(player)) {
+          const cost = unitCostById.get(unit.definitionId);
+          if (!cost) continue;
+          const counter = shopPoolCounters[String(cost)];
+          counter.finalCrewUnitInstances += 1;
+          if (unit.star >= 2) counter.finalCrewTwoStarOrHigherInstances += 1;
+        }
       }
       if (seedCount >= 100 && (seedIndex + 1) % 50 === 0) {
         process.stderr.write(
@@ -512,6 +691,11 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
   const average = (values: number[]) =>
     values.reduce((total, value) => total + value, 0) /
     Math.max(1, values.length);
+  const finalBoardSlots = completeMatches * DEFAULT_CONTENT.config.playerCount;
+  const totalFinalBoardDefinitions = Object.values(characterBoards).reduce(
+    (total, count) => total + count,
+    0,
+  );
   const costBands = Object.fromEntries(
     [1, 2, 3, 4, 5].map((cost) => {
       const units = DEFAULT_CONTENT.units.filter((unit) => unit.cost === cost);
@@ -538,6 +722,16 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
           unitIds: units.map((unit) => unit.id),
           unitCount: units.length,
           finalBoards,
+          finalBoardRepresentationRate: rate(
+            finalBoards,
+            totalFinalBoardDefinitions,
+          ),
+          finalBoardPlayerPresence:
+            costFinalBoardPlayerPresence[String(cost)] ?? 0,
+          finalBoardPlayerPresenceRate: rate(
+            costFinalBoardPlayerPresence[String(cost)] ?? 0,
+            finalBoardSlots,
+          ),
           top4Boards: bandTop4Boards,
           winningBoards: bandWinningBoards,
           top4Rate: rate(bandTop4Boards, finalBoards),
@@ -547,7 +741,6 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
       ];
     }),
   ) as Record<string, CostBandReport>;
-  const finalBoardSlots = completeMatches * DEFAULT_CONTENT.config.playerCount;
   const characterPresence = Object.fromEntries(
     DEFAULT_CONTENT.units.map((unit) => {
       const finalBoards = characterBoards[unit.id] ?? 0;
@@ -659,16 +852,65 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
         combatReadability.abilityDrainEvents,
       combatReadability.pvpBattleCount,
     ),
+    allEnemyAbilityCastsPerPvpBattle: rate(
+      combatReadability.allEnemyAbilityCasts,
+      combatReadability.pvpBattleCount,
+    ),
+    defensePierceCastsPerPvpBattle: rate(
+      combatReadability.defensePierceCasts,
+      combatReadability.pvpBattleCount,
+    ),
   };
   const traitReachability = Object.fromEntries(
     DEFAULT_CONTENT.traits.map((trait) => [
       trait.id,
       {
         activations: traitActivations[trait.id] ?? 0,
+        activationRate: rate(
+          traitActivations[trait.id] ?? 0,
+          traitObservations.playerBattleBoards,
+        ),
+        matchesReached: traitMatchReach[trait.id] ?? 0,
+        matchReachRate: rate(
+          traitMatchReach[trait.id] ?? 0,
+          completeMatches,
+        ),
         maxTier: traitMaxTier[trait.id] ?? 0,
-      },
+      } satisfies TraitReachabilityReport,
     ]),
   );
+  const shopPoolAvailability = Object.fromEntries(
+    [1, 2, 3, 4, 5].map((cost) => {
+      const counter = shopPoolCounters[String(cost)];
+      const units = DEFAULT_CONTENT.units.filter((unit) => unit.cost === cost);
+      return [
+        String(cost),
+        {
+          cost,
+          unitIds: units.map((unit) => unit.id),
+          initialCopiesPerUnit:
+            DEFAULT_CONTENT.config.poolCopiesByCost[cost - 1],
+          ...counter,
+          offerRatePerEligibleSlot: rate(
+            counter.shopOffers,
+            counter.eligibleShopSlots,
+          ),
+          playerPreparationOfferRate: rate(
+            counter.playerPreparationsWithOffer,
+            counter.eligiblePlayerPreparations,
+          ),
+          averageAvailablePoolCopiesPerDefinition: rate(
+            counter.totalAvailablePoolCopies,
+            counter.poolDefinitionObservations,
+          ),
+          zeroAvailabilityRate: rate(
+            counter.zeroAvailablePoolDefinitions,
+            counter.poolDefinitionObservations,
+          ),
+        } satisfies ShopPoolCostReport,
+      ];
+    }),
+  ) as Record<string, ShopPoolCostReport>;
   const averagePacedMinutes = average(pacedSeconds) / 60;
   const averageFullClockMinutes = average(fullClockSeconds) / 60;
   const maximumWinnerPresence = Math.max(
@@ -701,9 +943,31 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
     drawRate: draws / Math.max(1, battleCount),
     characterPresence,
     costBands,
+    shopPoolAvailability: {
+      preparationSnapshots,
+      shopSlots,
+      emptyShopSlots,
+      emptyShopSlotRate: rate(emptyShopSlots, shopSlots),
+      byCost: shopPoolAvailability,
+    },
     characterCombatExpression,
     combatReadability: finalizedCombatReadability,
+    traitPlayerBattleBoards: traitObservations.playerBattleBoards,
     traitReachability,
+    traitCombinations: {
+      "emperor+captain": {
+        activations: traitObservations.emperorCaptain,
+        activationRate: rate(
+          traitObservations.emperorCaptain,
+          traitObservations.playerBattleBoards,
+        ),
+        matchesReached: traitMatchReach["emperor+captain"] ?? 0,
+        matchReachRate: rate(
+          traitMatchReach["emperor+captain"] ?? 0,
+          completeMatches,
+        ),
+      },
+    },
     itemUsage: Object.fromEntries(
       DEFAULT_CONTENT.items.map((item) => [item.id, itemUsage[item.id] ?? 0]),
     ),
