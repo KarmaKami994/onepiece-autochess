@@ -7,6 +7,10 @@ import {
   preservesActiveBattleTimeline,
   type BoardUnit,
 } from "../components/PhaserBoard";
+import {
+  standingsInteraction,
+  tacticalInteractionMode,
+} from "../app/screens/GameScreens";
 
 const projectRoot = path.resolve(import.meta.dirname, "..");
 const source = (file: string) => readFile(path.join(projectRoot, file), "utf8");
@@ -178,6 +182,18 @@ describe("Phase 3 combat presentation", () => {
     expect(
       interactionAllowsDestination("formation", { zone: "board" }),
     ).toBe(true);
+  });
+
+  it("keeps scouting, own combat, and observed combat interaction distinct", () => {
+    expect(tacticalInteractionMode("preparation", false, false)).toBe(
+      "formation",
+    );
+    expect(tacticalInteractionMode("preparation", true, false)).toBe("none");
+    expect(tacticalInteractionMode("battle", false, false)).toBe("bench-only");
+    expect(tacticalInteractionMode("battle", true, false)).toBe("none");
+    expect(standingsInteraction("preparation", false)).toBe("scout");
+    expect(standingsInteraction("battle", false)).toBe("watch");
+    expect(standingsInteraction("battle", true)).toBeNull();
   });
 
   it("refits the tactical camera when returning from a differently sized scene", async () => {

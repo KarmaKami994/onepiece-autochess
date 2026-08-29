@@ -2,11 +2,17 @@ import { describe, expect, it } from "vitest";
 import {
   applyCommand,
   createMatch,
+  getStageDefinition,
   type BattleUnitSnapshot,
+  type MatchBattleResult,
   type MatchState,
   type PlayerState,
 } from "../game";
-import { selectCarouselView, selectMatchView } from "../app/selectors";
+import {
+  selectBattlePresentation,
+  selectCarouselView,
+  selectMatchView,
+} from "../app/selectors";
 import { preservesActiveBattleTimeline } from "../components/PhaserBoard";
 
 function snapshot(
@@ -30,6 +36,76 @@ function snapshot(
     range: 1,
     state: "seek",
   };
+}
+
+function battleResult(
+  playerAId: string,
+  playerBId: string | null,
+  initialUnits: BattleUnitSnapshot[],
+  events: MatchBattleResult["events"] = [],
+  ghostOfPlayerId: string | null = null,
+): MatchBattleResult {
+  return {
+    playerAId,
+    playerBId,
+    ghostOfPlayerId,
+    winnerId: null,
+    timedOut: false,
+    playerADamage: 0,
+    playerBDamage: 0,
+    durationTicks: 12,
+    events,
+    initialUnits,
+    finalUnits: structuredClone(initialUnits),
+  };
+}
+
+function spectatorBattleState(): MatchState {
+  const state = createMatch("selector-spectating");
+  state.phase = "battle";
+  state.lastResults = [
+    battleResult(
+      "player-1",
+      "bot-3",
+      [
+        { ...snapshot("player-1:human", "luffy", "player-1"), x: 0, y: 5 },
+        { ...snapshot("bot-3:enemy", "nami", "bot-3"), x: 7, y: 0 },
+      ],
+      [{
+        type: "attack",
+        tick: 1,
+        sourceId: "player-1:human",
+        targetId: "bot-3:enemy",
+        critical: false,
+      }],
+    ),
+    battleResult(
+      "bot-4",
+      null,
+      [
+        { ...snapshot("bot-4:ghost-fighter", "zoro", "bot-4"), x: 0, y: 5 },
+        { ...snapshot("ghost-bot-1:copy", "usopp", "ghost-bot-1"), x: 7, y: 0 },
+      ],
+      [],
+      "bot-1",
+    ),
+    battleResult(
+      "bot-1",
+      "bot-2",
+      [
+        { ...snapshot("bot-1:fighter", "sanji", "bot-1"), x: 1, y: 4 },
+        { ...snapshot("bot-2:fighter", "robin", "bot-2"), x: 6, y: 1 },
+      ],
+      [{
+        type: "unit-move",
+        tick: 1,
+        unitId: "bot-2:fighter",
+        from: { x: 6, y: 1 },
+        to: { x: 5, y: 2 },
+      }],
+    ),
+  ];
+  return state;
 }
 
 function human(state: MatchState): PlayerState {
@@ -339,5 +415,159 @@ describe("typed application selectors", () => {
     expect(
       preservesActiveBattleTimeline(currentTimeline, reconstructedTimeline),
     ).toBe(true);
+  });
+});
+
+describe("battle presentation selection", () => {
+  it("selects the local player's own immutable fight", () => {
+    const state = spectatorBattleState();
+    const presentation = selectBattlePresentation(state, "player-1");
+
+    expect(presentation).toMatchObject({
+      perspectivePlayerId: "player-1",
+      perspectiveName: "You",
+      opponentName: "Rival 3",
+      isGhost: false,
+    });
+    expect(presentation?.boardUnits).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "player-1:human", team: "player" }),
+        expect.objectContaining({ id: "bot-3:enemy", team: "enemy" }),
+      ]),
+    );
+    expect(presentation?.events).toEqual([
+      expect.objectContaining({
+        kind: "attack",
+        sourceId: "player-1:human",
+        targetId: "bot-3:enemy",
+      }),
+    ]);
+  });
+
+  it("selects another captain's own result instead of a separate ghost copy", () => {
+    const presentation = selectBattlePresentation(
+      spectatorBattleState(),
+      "bot-1",
+    );
+
+    expect(presentation).toMatchObject({
+      perspectivePlayerId: "bot-1",
+      perspectiveName: "Rival 1",
+      opponentName: "Rival 2",
+      isGhost: false,
+    });
+    expect(presentation?.boardUnits).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "bot-1:fighter", team: "player" }),
+        expect.objectContaining({ id: "bot-2:fighter", team: "enemy" }),
+      ]),
+    );
+    expect(
+      presentation?.boardUnits.some((unit) => unit.id === "player-1:human"),
+    ).toBe(false);
+  });
+
+  it("mirrors player-B board coordinates and combat events", () => {
+    const presentation = selectBattlePresentation(
+      spectatorBattleState(),
+      "bot-2",
+    );
+
+    expect(presentation).toMatchObject({
+      perspectivePlayerId: "bot-2",
+      opponentName: "Rival 1",
+    });
+    expect(
+      presentation?.boardUnits.find((unit) => unit.id === "bot-2:fighter"),
+    ).toMatchObject({ team: "player", x: 1, y: 4 });
+    expect(presentation?.events).toEqual([
+      expect.objectContaining({
+        kind: "move",
+        sourceId: "bot-2:fighter",
+        toX: 2,
+        toY: 3,
+      }),
+    ]);
+  });
+
+  it("uses stable unique sequences and preserves only the same observed fight", () => {
+    let state = spectatorBattleState();
+    human(state).gold = 99;
+    const own = selectBattlePresentation(state, "player-1");
+    const botA = selectBattlePresentation(state, "bot-1");
+    const botAAgain = selectBattlePresentation(state, "bot-1");
+    const botB = selectBattlePresentation(state, "bot-2");
+    const ghostFight = selectBattlePresentation(state, "bot-4");
+
+    expect(botAAgain?.eventSequence).toBe(botA?.eventSequence);
+    expect(ghostFight?.eventSequence).not.toBe(botA?.eventSequence);
+    expect(botB?.eventSequence).not.toBe(botA?.eventSequence);
+    expect(own?.eventSequence).not.toBe(botA?.eventSequence);
+
+    state = command(state, { type: "REROLL_SHOP" });
+    const afterLocalReroll = selectBattlePresentation(state, "bot-1");
+    const currentTimeline = {
+      units: botA?.boardUnits ?? [],
+      selectedId: null,
+      interactionMode: "none" as const,
+      phase: "battle",
+      capacity: 2,
+      boardSkin: "pirate-ship" as const,
+    };
+    expect(afterLocalReroll?.eventSequence).toBe(botA?.eventSequence);
+    expect(
+      preservesActiveBattleTimeline(currentTimeline, {
+        ...currentTimeline,
+        units: afterLocalReroll?.boardUnits ?? [],
+      }),
+    ).toBe(true);
+    expect(
+      preservesActiveBattleTimeline(currentTimeline, {
+        ...currentTimeline,
+        units: ghostFight?.boardUnits ?? [],
+      }),
+    ).toBe(false);
+  });
+
+  it("selects another captain's PvE result and stage opponent", () => {
+    const state = command(createMatch("selector-spectating-pve"), {
+      type: "END_PREPARATION",
+    });
+    const presentation = selectBattlePresentation(state, "bot-1");
+    const result = state.lastResults.find(
+      (candidate) => candidate.playerAId === "bot-1",
+    );
+    const enemyIds = result?.initialUnits
+      .filter((unit) => unit.teamId !== "bot-1")
+      .map((unit) => unit.id) ?? [];
+
+    expect(presentation?.opponentName).toBe(
+      getStageDefinition(state.round).name,
+    );
+    expect(enemyIds.length).toBeGreaterThan(0);
+    expect(
+      presentation?.boardUnits.filter(
+        (unit) => enemyIds.includes(unit.id) && unit.team === "enemy",
+      ),
+    ).toHaveLength(enemyIds.length);
+  });
+
+  it("labels an existing ghost opponent without making it selectable", () => {
+    const presentation = selectBattlePresentation(
+      spectatorBattleState(),
+      "bot-4",
+    );
+
+    expect(presentation).toMatchObject({
+      perspectivePlayerId: "bot-4",
+      opponentName: "Ghost of Rival 1",
+      isGhost: true,
+    });
+    expect(presentation?.boardUnits).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "bot-4:ghost-fighter", team: "player" }),
+        expect.objectContaining({ id: "ghost-bot-1:copy", team: "enemy" }),
+      ]),
+    );
   });
 });

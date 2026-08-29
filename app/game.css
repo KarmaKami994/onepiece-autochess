@@ -1240,7 +1240,8 @@ details.trait-building {
 .board-ribbon strong { color: #a9bcb8; font-weight: 700; }
 .board-ribbon i { width: 34px; height: 1px; background: #52696b; }
 
-.match-body[data-scouting="true"] .board-ribbon {
+.match-body[data-scouting="true"] .board-ribbon,
+.match-body[data-watching="true"] .board-ribbon {
   border-color: #69aeb4;
   background: #082a34ed;
   box-shadow:
