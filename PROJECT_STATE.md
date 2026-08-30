@@ -22,10 +22,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-30-unit gameplay baseline assessment complete — awaiting an isolated Smoker balance pass.
+Isolated Smoker balance pass complete — PR #23 ready for review; further Smoker tuning requires a separate decision.
 
 ## Last Completed Work
 
+- 2026-08-30 — `08d5d76`, PR #23 on `balance/smoker-white-blow-power`: reduced only Smoker's White Blow base power from 210 to 180 and moved GameContent from `1.11.0` to `1.11.1`; Smoker's stats, cost, Navy / Guardian traits, targeting and knockback are unchanged, and save schema remains 6. Exactly one post-change 1,000-seed soak completed 1,000/1,000 matches with zero crashes. Smoker moved from 65.83% to 64.84% top four, 21.69% to 20.77% conditional wins, 3.636 to 3.705 average placement and 34.4% to 32.9% winner presence, but remains a coherent positive 2-cost outlier; classification B, still clearly overperforming. Material files: `game/content.ts`, focused content/combat and content-version assertions, `docs/analysis/smoker-white-blow-180-1000.json`, `docs/SMOKER_BALANCE_PASS.md`, `PROJECT_STATE.md`.
 - 2026-08-29 — `538c9fa`, PR #22 on `analysis/30-unit-roster-assessment`: completed the first 30-unit production assessment with exactly one 1,000-seed soak. The run completed 1,000/1,000 matches with zero crashes, 33.56 average rounds, 33.59 full-clock minutes, 24.03 paced minutes, 133,841 battles, 1.175% timeouts and 0.030% draws. Diagnostics now report final-board cost representation, observed shop/pool availability, relative trait/match reach, Emperor + Captain reach, all-enemy casts and Defense Pierce casts. Smoker and Luffy are the strongest positive same-cost signals; Nami, Robin, Crocodile and Ivankov are the clearest negatives; Sabo and Ace's old alarms do not persist. Emperor reached only 4/1,000 matches. No gameplay, content, AI, persistence, schema, economy, trait or balance value changed; content remains `1.11.0` and save schema remains 6. Material files: `scripts/run_production_soak.ts`, `tests/production-audit.test.ts`, `docs/analysis/30-unit-roster-assessment-1000.json`, `docs/THIRTY_UNIT_ROSTER_ASSESSMENT.md`, `PROJECT_STATE.md`.
 - 2026-08-29 — PR #21 on `feature/live-opponent-spectating`: added client-only opponent battle spectating for living captains during the active battle phase. A pure presentation selector resolves the observed captain's existing immutable `MatchBattleResult`, reusing playerA/playerB mirroring for boards and events plus current PvE and ghost semantics. Local actor identity remains `player-1`; local Shop, Reroll, Lock and Buy XP stay interactive while the observed tactical board is read-only. Deterministic result/perspective event sequences restart only switched presentations without resetting the local battle clock. Spectator selection is cleared on phase transition and is not saved. No domain, combat, persistence, schema, content or balance change; content remains `1.11.0`, save schema remains 6. Material files: `app/selectors.ts`, `app/GameClient.tsx`, `app/screens/GameScreens.tsx`, `app/game.css`, focused selector/presentation/E2E tests and `PROJECT_STATE.md`.
 - 2026-08-28 — PR #20 on `feature/combat-economy-actions`: enabled PAC-style Buy, Reroll, Lock and Buy XP actions during battle plus bench selling and bench-to-bench movement while keeping the deployed formation, item equip, pairings and precomputed `MatchBattleResult` immutable. Battle presentation now uses self-contained battle-start star/item snapshots while the live bench updates without resetting Phaser combat playback. Review hardening made deployed-fighter comparison order-independent without weakening fighter-property checks and made `ACTIVE_SAVE` writes monotonic by `updatedAt` within one IndexedDB transaction. New battle saves persist the current battle state directly; legacy schema-6 `replayBattle` saves still reconstruct once. Content remains `1.11.0`; save schema remains 6. Material files: `game/engine.ts`, `game/types.ts`, `game/combat.ts`, `app/GameClient.tsx`, `app/selectors.ts`, `app/voyagePersistence.ts`, `app/screens/GameScreens.tsx`, `components/PhaserBoard.tsx`, focused domain/selector/Phaser/save/E2E tests and `PROJECT_STATE.md`.
@@ -47,6 +48,20 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+Isolated Smoker balance pass:
+
+- PASS — focused Smoker content/combat test: 1 file, 18 tests.
+- PASS — focused save/content compatibility tests: 2 files, 19 tests.
+- PASS — `npm run typecheck`.
+- PASS — `npm run lint`.
+- PASS — `npm test`: 37 files, 307 tests.
+- PASS — `npm run assets:validate`: 41 animation atlases, maps, Carousel assets and provenance files validated.
+- PASS — `npm run build`.
+- PASS — `npm run test:production-smoke`: 50/50 complete matches, zero crashes.
+- PASS — `npm run test:production-soak`: exactly one run, 1,000/1,000 complete matches, zero crashes.
+- PASS — saved snapshot byte-for-byte reconciliation and SHA-256 verification.
+- NOT RUN — `npm run test:e2e`; no UI, browser, Phaser or application source changed.
 
 30-unit roster and combat baseline assessment:
 
@@ -237,6 +252,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- Smoker's White Blow base ability power is now 180 instead of 210. Smoker remains a 2-cost Navy / Guardian with unchanged stats, line targeting, cast cadence, star scaling and knockback. GameContent is `1.11.1`; save schema remains 6.
 - None for the 30-unit assessment. Diagnostic output is additively richer, observes existing deterministic state/events after decisions, and changes no gameplay, RNG order, content, AI, presentation, persistence or save behavior.
 - During active battles with the tutorial inactive, living captain rows can switch the tactical board, observed traits and combat events to that captain's immutable current fight. The selected captain is always viewer-side through existing mirroring, PvE uses the stage opponent, and ghost fights use the frozen ghost copy. Standings and a WATCHING ribbon allow direct rival-to-rival switching and return to the local fight. The observed board is read-only; local shop economy remains interactive, the global phase clock remains local, and spectator selection clears after resolution and is not persisted.
 - During normal battles, players may now buy units, fully reroll, toggle shop lock, buy XP, sell bench units and rearrange bench slots. Board movement/selling, item equip and readiness remain blocked; purchases and merges affect future persistent state only. The current combat result and deployed battle-start star/item identity remain frozen, while live bench changes synchronize without restarting Phaser playback even if fighter arrays are reconstructed in a different order. New battle saves preserve the current economy state and frozen results directly; stale writes cannot overwrite a newer `updatedAt`, and legacy `replayBattle` saves remain compatible.
@@ -257,6 +273,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- None for the isolated Smoker pass. The locked value 180 was not revised after smoke or production results, and exactly one post-change 1,000-seed soak was run.
 - None for the 30-unit assessment. Exactly one 1,000-seed soak was run after all required pre-soak checks passed; no Pokémon Auto Chess source or external balance guidance was inspected.
 - None for Live Opponent Spectating. PAC's separation of spectated identity/simulation from local economy was adapted as reference-only architecture from pinned commit `a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee`; no Redux, Colyseus, live Simulation, networking or server synchronization was ported.
 - None for Combat Economy or its two review fixes. PAC's combat-phase economy authorization, bench-only selling and bench movement were adapted from pinned commit `a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee`; PAC networking, server state, Simulation and Pokémon-specific systems were not ported.
@@ -277,7 +294,8 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
-- The 30-unit run is crash-stable but timeout rate increased from 0.126% to 1.175% and full-clock length increased from 32.22 to 33.59 minutes despite 1.41 fewer average rounds. Smoker is the clearest positive same-cost signal (+16.8 pp top-four, +9.8 pp wins); Luffy remains positive. Nami, Robin, Crocodile and Ivankov are the clearest negatives. Emperor activated in only 4/1,000 matches. Costs 4/5 are scarce on final boards, but observed pool exhaustion is not the cause: neither tier recorded a zero-copy definition and all observed shop slots were filled. Combat has 26.7% more casts and 33.4% more displacements per PvP battle while defined control density is nearly flat; knockback/pull distinction, Energy Drain attribution and Defense Pierce visibility remain presentation risks.
+- White Blow 180 moved every requested Smoker outcome signal in the intended direction, but only modestly: post-change same-cost deltas remain +15.61 pp top four, +8.79 pp conditional wins and -0.818 placement, so Smoker is still a coherent positive outlier. Sample presence stayed stable, ability damage per cast fell 13.1%, and system guardrails were materially unchanged. A further adjustment, if approved, must be a separate isolated decision rather than an iteration in PR #23.
+- The 30-unit baseline remains crash-stable but has elevated timeout/full-clock length. Luffy remains positive; Nami, Robin, Crocodile and Ivankov remain negative signals; Emperor is effectively unreachable; high-cost scarcity and combat readability remain separate follow-up concerns outside PR #23.
 - The Pack F 50-seed smoke completed without structural failure: 50/50 matches, zero crashes, 1.00% timeout rate and 0.05% draw rate. Kuzan, Akainu, Shanks and Blackbeard recorded respectively 34/82.4%/38.2%, 38/81.6%/39.5%, 5/100%/80.0% and 6/100%/50.0% final-board observations/top-four rates/conditional win rates. Emperor was not reached. The high-cost samples are very small and are not tuning evidence; reachability belongs to the separate 1,000-seed assessment.
 - PAC/Tashigi gameplay changes need separate product/balance review.
 - The Pack E 50-seed smoke completed without structural failure. Ivankov, Jinbe, Kuma and Kizaru had respectively 95/5.3%, 113/21.2%, 96/24.0% and 57/33.3% final-board observations/conditional win rates; these small-sample observations are not tuning evidence.
@@ -296,7 +314,7 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
-- The next bounded balance task is an isolated Smoker pass using one ability-impact lever. Do not combine it with Luffy, Emperor, timeout, negative-unit or readability changes; the old Sabo tuning plan is no longer supported by current evidence.
+- White Blow remains fixed at 180 for PR #23 despite classification B. Any further Smoker adjustment requires a separate bounded architecture/game-design decision and must not be combined with Luffy, Emperor, timeout, negative-unit or readability changes.
 - Spectating separates the local actor from a client-only viewer target. The viewer target selects an existing immutable battle result and perspective only; it never enters `MatchState`, command context or persistence. Presentation sequences encode round, result index and perspective side deterministically so switching fights replays Phaser without affecting the local phase clock.
 - Active combat remains an immutable precomputed `MatchBattleResult`; battle economy mutates only persistent future state. Optional snapshot item IDs make current-fight presentation self-contained without changing combat mechanics or save schema. New battle saves store the current canonical battle state directly, `ACTIVE_SAVE` accepts only equal-or-newer `updatedAt` writes, and `replayBattle` remains compatibility-only for legacy saves.
 - Keep the current prototype offline-capable.
@@ -312,7 +330,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-Run one isolated Smoker balance pass that changes one ability-impact lever only and reuses the same diagnostics; do not start it automatically.
+Review the classification-B result and make a separate bounded decision on whether Smoker warrants another isolated adjustment; do not start it automatically.
 
 ## Codex Update Contract
 
