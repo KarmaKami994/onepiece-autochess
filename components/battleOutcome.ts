@@ -4,9 +4,12 @@ import {
   getStageDefinition,
 } from "../game/content";
 import {
-  resolvePersistentFormId,
   resolveUnitDefinition,
 } from "../game/forms";
+import {
+  getActiveTraits,
+  getActiveTraitsForUnits,
+} from "../game/traits";
 import type {
   BattleUnitSnapshot,
   GameContent,
@@ -209,45 +212,20 @@ function activeTraitRows(
   result: MatchBattleResult,
   content: GameContent,
 ): BattleOutcomeTraitRow[] {
-  const contributorsByTrait = new Map<string, Set<string>>();
-  const addDefinition = (
-    definitionId: string,
-    formId: string | undefined,
-  ): void => {
-    const definition = resolveUnitDefinition(definitionId, formId, content);
-    for (const traitId of definition?.traits ?? []) {
-      const contributors = contributorsByTrait.get(traitId) ?? new Set<string>();
-      contributors.add(definitionId);
-      contributorsByTrait.set(traitId, contributors);
-    }
-  };
   const snapshots = result.initialUnits.filter((snapshot) =>
     isHumanSnapshot(snapshot, playerId),
   );
-  for (const snapshot of snapshots) {
-    addDefinition(snapshot.definitionId, snapshot.formId);
-  }
-
-  if (snapshots.length === 0) {
-    for (const unitId of Object.values(player.board)) {
-      const instance = player.units[unitId];
-      if (instance) {
-        addDefinition(
-          instance.definitionId,
-          resolvePersistentFormId(instance, content) ?? undefined,
-        );
-      }
-    }
-  }
+  const activeByTrait = new Map(
+    (snapshots.length > 0
+      ? getActiveTraitsForUnits(snapshots, content)
+      : getActiveTraits(player, content)
+    ).map((active) => [active.traitId, active]),
+  );
 
   return content.traits.flatMap((trait) => {
-    const count = contributorsByTrait.get(trait.id)?.size ?? 0;
-    let tierIndex = -1;
-    trait.tiers.forEach((tier, index) => {
-      if (count >= tier.required) {
-        tierIndex = index;
-      }
-    });
+    const active = activeByTrait.get(trait.id);
+    const count = active?.count ?? 0;
+    const tierIndex = active?.tierIndex ?? -1;
     if (tierIndex < 0) {
       return [];
     }

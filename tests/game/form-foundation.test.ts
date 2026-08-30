@@ -28,7 +28,7 @@ import {
 import { preservesActiveBattleTimeline } from "../../components/PhaserBoard";
 
 const persistentAbility: AbilityDefinition = {
-  id: "fixture-persistent-technique",
+  id: "thunderbolt-tempo",
   name: "Persistent Fixture Technique",
   description: "A complete replacement ability used only by tests.",
   targeting: "nearest-enemy",
@@ -36,6 +36,7 @@ const persistentAbility: AbilityDefinition = {
   effect: "damage",
   power: 41,
   castAnimationMs: 250,
+  sequentialStrike: { hitWeightsBasisPoints: [5_000, 5_000] },
 };
 
 const temporaryAbility: AbilityDefinition = {
@@ -492,14 +493,6 @@ describe("character form selector and battle freeze", () => {
       unit.id.endsWith(`:${instance.id}`),
     );
     if (!result || !snapshot) throw new Error("Expected frozen battle snapshot.");
-    const enemy = result.initialUnits.find((unit) => unit.teamId !== player.id);
-    result.events = [{
-      type: "cast",
-      tick: 0,
-      sourceId: snapshot.id,
-      abilityId: persistentAbility.id,
-      targetIds: enemy ? [enemy.id] : [],
-    }];
     const before = selectBattlePresentation(battle, player.id, content);
     human(battle).units[instance.id].formId = "fixture-persistent-alternate";
     const after = selectBattlePresentation(battle, player.id, content);
@@ -509,10 +502,9 @@ describe("character form selector and battle freeze", () => {
       name: "Persistent Fixture Form",
       portrait: "/fixture/persistent-token.png",
     });
-    expect(after?.events).toContainEqual(expect.objectContaining({
-      kind: "cast",
-      abilityId: persistentAbility.id,
-      abilityName: persistentAbility.name,
+    expect(after?.traits).toContainEqual(expect.objectContaining({
+      id: "marksman",
+      count: 1,
     }));
     expect(preservesActiveBattleTimeline(
       {
@@ -533,6 +525,52 @@ describe("character form selector and battle freeze", () => {
       },
     )).toBe(true);
 
+    const enemy = result.initialUnits.find((unit) => unit.teamId !== player.id);
+    const baseSnapshot = {
+      ...snapshot,
+      id: `${player.id}:base-form-source`,
+    };
+    delete baseSnapshot.formId;
+    result.initialUnits.push(baseSnapshot);
+    result.finalUnits.push(structuredClone(baseSnapshot));
+    result.events = [
+      {
+        type: "cast",
+        tick: 0,
+        sourceId: baseSnapshot.id,
+        abilityId: persistentAbility.id,
+        targetIds: enemy ? [enemy.id] : [],
+      },
+      {
+        type: "cast",
+        tick: 1,
+        sourceId: snapshot.id,
+        abilityId: persistentAbility.id,
+        targetIds: enemy ? [enemy.id] : [],
+      },
+    ];
+    const abilityPresentation = selectBattlePresentation(
+      battle,
+      player.id,
+      content,
+    );
+    expect(abilityPresentation?.events).toContainEqual(expect.objectContaining({
+      kind: "cast",
+      sourceId: baseSnapshot.id,
+      abilityId: persistentAbility.id,
+      abilityName: "Thunderbolt Tempo",
+      telegraph: "area",
+      deferImpactToAbilityHits: false,
+    }));
+    expect(abilityPresentation?.events).toContainEqual(expect.objectContaining({
+      kind: "cast",
+      sourceId: snapshot.id,
+      abilityId: persistentAbility.id,
+      abilityName: persistentAbility.name,
+      telegraph: "target",
+      deferImpactToAbilityHits: true,
+    }));
+
     delete snapshot.formId;
     const finalSnapshot = result.finalUnits.find((unit) => unit.id === snapshot.id);
     if (finalSnapshot) delete finalSnapshot.formId;
@@ -542,5 +580,10 @@ describe("character form selector and battle freeze", () => {
     expect(legacyUnit?.name).toBe(
       content.units.find((unit) => unit.id === "nami")?.name,
     );
+    expect(legacy?.traits.some((trait) => trait.id === "marksman")).toBe(false);
+    expect(legacy?.traits).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: "straw-hat", count: 1 }),
+      expect.objectContaining({ id: "specialist", count: 1 }),
+    ]));
   });
 });

@@ -2,30 +2,27 @@ import { DEFAULT_CONTENT, getTraitDefinition } from "./content";
 import { resolvePersistentFormId, resolveUnitDefinition } from "./forms";
 import type {
   ActiveTrait,
+  BattleSetupUnit,
   GameContent,
   PlayerState,
   TraitEffect,
 } from "./types";
 
-export function getActiveTraits(
-  player: PlayerState,
+export function getActiveTraitsForUnits(
+  units: readonly Pick<BattleSetupUnit, "definitionId" | "formId">[],
   content: GameContent = DEFAULT_CONTENT,
 ): ActiveTrait[] {
   const contributorsByTrait = new Map<string, Set<string>>();
-  for (const unitId of Object.values(player.board).sort()) {
-    const instance = player.units[unitId];
-    if (!instance) continue;
+  for (const unit of units) {
     const definition = resolveUnitDefinition(
-      instance.definitionId,
-      resolvePersistentFormId(instance, content),
+      unit.definitionId,
+      unit.formId,
       content,
     );
-    if (!definition) {
-      continue;
-    }
+    if (!definition) continue;
     for (const traitId of definition.traits) {
       const contributors = contributorsByTrait.get(traitId) ?? new Set<string>();
-      contributors.add(instance.definitionId);
+      contributors.add(unit.definitionId);
       contributorsByTrait.set(traitId, contributors);
     }
   }
@@ -34,9 +31,7 @@ export function getActiveTraits(
     const count = contributorsByTrait.get(trait.id)?.size ?? 0;
     let tierIndex = -1;
     trait.tiers.forEach((tier, index) => {
-      if (count >= tier.required) {
-        tierIndex = index;
-      }
+      if (count >= tier.required) tierIndex = index;
     });
     return {
       traitId: trait.id,
@@ -45,6 +40,19 @@ export function getActiveTraits(
       tier: tierIndex >= 0 ? trait.tiers[tierIndex] : null,
     };
   });
+}
+
+export function getActiveTraits(
+  player: PlayerState,
+  content: GameContent = DEFAULT_CONTENT,
+): ActiveTrait[] {
+  const units = Object.values(player.board).sort().flatMap((unitId) => {
+    const instance = player.units[unitId];
+    if (!instance) return [];
+    const formId = resolvePersistentFormId(instance, content) ?? undefined;
+    return [{ definitionId: instance.definitionId, formId }];
+  });
+  return getActiveTraitsForUnits(units, content);
 }
 
 export function getActiveTraitEffects(

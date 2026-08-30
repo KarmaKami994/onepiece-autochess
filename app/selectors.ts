@@ -1,12 +1,14 @@
 import {
   DEFAULT_CONTENT,
   getActiveTraits,
+  getActiveTraitsForUnits,
   getStageDefinition,
   getUnitFormDefinition,
   resolvePersistentFormId,
   resolveUnitDefinition,
 } from "@/game";
 import type {
+  ActiveTrait,
   BattleUnitSnapshot,
   GameContent,
   ItemEffect,
@@ -656,12 +658,12 @@ function buildBoardUnits(
   return { units, views };
 }
 
-function traitViews(
-  player: PlayerState,
+function activeTraitViews(
+  activeTraits: readonly ActiveTrait[],
   content: GameContent,
 ): TraitView[] {
   const definitions = new Map(content.traits.map((trait) => [trait.id, trait]));
-  return getActiveTraits(player, content)
+  return activeTraits
     .filter((active) => active.count > 0)
     .map((active) => {
       const definition = definitions.get(active.traitId);
@@ -688,6 +690,13 @@ function traitViews(
       (left, right) =>
         right.tier - left.tier || right.count - left.count,
     );
+}
+
+function traitViews(
+  player: PlayerState,
+  content: GameContent,
+): TraitView[] {
+  return activeTraitViews(getActiveTraits(player, content), content);
 }
 
 function recentBattleViews(
@@ -859,7 +868,8 @@ function combatEvents(
             (definition) => definition.id === sourceSnapshot.definitionId,
           )?.ability
         : undefined;
-      const pattern = ability?.pattern ?? sourceAbility?.pattern ?? "single";
+      const presentedAbility = sourceAbility ?? ability;
+      const pattern = presentedAbility?.pattern ?? "single";
       const telegraph: CombatFxEvent["telegraph"] =
         pattern === "line"
           ? "line"
@@ -877,10 +887,10 @@ function combatEvents(
         targetIds: [...event.targetIds],
         abilityId: event.abilityId,
         abilityName:
-          ability?.name ?? sourceAbility?.name ?? titleCase(event.abilityId),
+          presentedAbility?.name ?? titleCase(event.abilityId),
         telegraph,
         deferImpactToAbilityHits: Boolean(
-          ability?.sequentialStrike ?? sourceAbility?.sequentialStrike,
+          presentedAbility?.sequentialStrike,
         ),
       }];
     }
@@ -1028,6 +1038,12 @@ export function selectBattlePresentation(
   );
   const combat = combatEvents(state, perspectivePlayerId, content);
   const stage = getStageDefinition(state.round, content);
+  const frozenTraits = getActiveTraitsForUnits(
+    result.initialUnits.filter(
+      (snapshot) => snapshot.teamId === perspectivePlayerId,
+    ),
+    content,
+  );
 
   return {
     perspectivePlayerId,
@@ -1037,7 +1053,7 @@ export function selectBattlePresentation(
       : opponentPlayer?.name ?? stage.name,
     isGhost,
     boardUnits: board.units,
-    traits: traitViews(perspectivePlayer, content),
+    traits: activeTraitViews(frozenTraits, content),
     selectedDefinitionByUnit: board.views,
     events: combat.events,
     eventSequence: combat.sequence,
