@@ -16,6 +16,10 @@ Focused Smoker/combat tests, save compatibility, typecheck, lint, the full unit 
 
 The post-change run uses the same schema (`6`), configuration hash (`977295da`) and deterministic seed range as the frozen baseline. Content hash changed only with the intended content revision, from `c59a272a` to `b2fe4f21`. The exact raw snapshot is [`analysis/smoker-white-blow-180-1000.json`](analysis/smoker-white-blow-180-1000.json), SHA-256 `BB6B7D466A37826ADE3605974C2E457FF26449566ED2F00AE3BD5C478A6351C5`.
 
+### Provenance
+
+The production run was executed before the balance working tree was committed. Consequently, the raw snapshot's `gitSha` (`fa86871dda11483ff7120dc71e663e2a8e551ad4`) records the base HEAD at execution time, not a commit containing the measured balance content. The working tree already contained White Blow power `180` and GameContent `1.11.1`; that measured content was subsequently committed unchanged as `08d5d76447fc16bddc02036213160a0e075a989d` (`balance(smoker): reduce White Blow damage`). Use `08d5d76447fc16bddc02036213160a0e075a989d` as the canonical committed source for reproducing the post-change content, with snapshot `contentHash` `b2fe4f21`, `configHash` `977295da`, and seeds `production-0` through `production-999` as additional reproduction anchors. Checking out the raw snapshot's `gitSha` alone reproduces the pre-change base, not the measured White Blow 180 run.
+
 ## Before vs After
 
 | Smoker metric | White Blow 210 | White Blow 180 | Absolute change |
