@@ -1,5 +1,6 @@
 import { DEFAULT_CONTENT, getStageDefinition } from "./content";
 import { regenerateBattleResults, resolveLegacyCarousel } from "./engine";
+import { reconcileRobinProgressionForm } from "./forms";
 import { CURRENT_SAVE_SCHEMA_VERSION } from "./schema";
 import type { GameContent, MatchState, SaveEnvelope } from "./types";
 
@@ -235,6 +236,18 @@ export function migrateMatchState(
     }
   } else {
     migrated = { ...migrated, carouselSession: null };
+  }
+  for (const player of migrated.players) {
+    if (isRecord(player.units)) {
+      for (const instance of Object.values(player.units)) {
+        reconcileRobinProgressionForm(instance, content);
+      }
+    }
+    if (Array.isArray(player.finalCrew)) {
+      for (const instance of player.finalCrew) {
+        reconcileRobinProgressionForm(instance, content);
+      }
+    }
   }
   return migrated;
 }

@@ -134,7 +134,7 @@ function command(
 describe("character form resolver foundation", () => {
   it("falls back safely and resolves matching overlays without changing economic identity", () => {
     const content = fixtureContent();
-    expect(DEFAULT_CONTENT.forms).toEqual([]);
+    expect(DEFAULT_CONTENT.forms).toHaveLength(1);
     const base = resolveUnitDefinition("nami", undefined, content);
     if (!base) throw new Error("Missing fixture base definition.");
     const sourceBefore = structuredClone({
@@ -394,7 +394,7 @@ describe("character form schema-6 persistence", () => {
     const restoredPlayer = human(restored);
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(restored.schemaVersion).toBe(6);
-    expect(restored.contentVersion).toBe("1.12.0");
+    expect(restored.contentVersion).toBe("1.13.0");
     expect(restoredPlayer.units[persistent.id].formId).toBe(
       "fixture-persistent-form",
     );

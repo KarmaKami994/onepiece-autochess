@@ -800,7 +800,23 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
   },
 ];
 
-export const FORM_DEFINITIONS: UnitFormDefinition[] = [];
+export const FORM_DEFINITIONS: UnitFormDefinition[] = [
+  {
+    id: "robin-demonio-fleur",
+    baseDefinitionId: "robin",
+    name: "Robin — Demonio Fleur",
+    lifecycle: "persistent",
+    ability: ability(
+      "demonio-fleur",
+      "Demonio Fleur",
+      "Crushes the lowest-health enemy's area, stunning enemies and draining 20 Energy from survivors.",
+      180,
+      "lowest-health-enemy",
+      "adjacent",
+      { stunMs: 1_400, energyDrain: 20 },
+    ),
+  },
+];
 
 export const TRAIT_DEFINITIONS: TraitDefinition[] = [
   {
@@ -1476,7 +1492,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.12.0",
+  version: "1.13.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,
