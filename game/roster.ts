@@ -1,4 +1,5 @@
 import { parseCell } from "./state";
+import { reconcileRobinProgressionForm } from "./forms";
 import type {
   GameContent,
   MatchState,
@@ -91,6 +92,7 @@ function mergeUnits(
         if (unit.id !== anchor.id) delete player.units[unit.id];
       }
       anchor.star = (star + 1) as StarLevel;
+      reconcileRobinProgressionForm(anchor, content);
       anchor.items = combinedItems.slice(0, content.config.itemCap);
       player.inventory.push(...combinedItems.slice(content.config.itemCap));
       const safeLocation =

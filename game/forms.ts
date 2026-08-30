@@ -6,6 +6,8 @@ import type {
   UnitInstance,
 } from "./types";
 
+const ROBIN_DEMONIO_FLEUR_FORM_ID = "robin-demonio-fleur";
+
 export function getUnitFormDefinition(
   formId: string | null | undefined,
   content: Pick<GameContent, "forms"> = DEFAULT_CONTENT,
@@ -42,4 +44,24 @@ export function resolvePersistentFormId(
     form.lifecycle === "persistent"
     ? form.id
     : null;
+}
+
+export function reconcileRobinProgressionForm(
+  instance: UnitInstance,
+  content: Pick<GameContent, "forms"> = DEFAULT_CONTENT,
+): void {
+  if (instance.definitionId !== "robin") return;
+  if (instance.star === 3) {
+    const form = getUnitFormDefinition(ROBIN_DEMONIO_FLEUR_FORM_ID, content);
+    if (
+      form?.baseDefinitionId === "robin" &&
+      form.lifecycle === "persistent"
+    ) {
+      instance.formId = form.id;
+    }
+    return;
+  }
+  if (instance.formId === ROBIN_DEMONIO_FLEUR_FORM_ID) {
+    delete instance.formId;
+  }
 }
