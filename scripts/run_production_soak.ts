@@ -81,6 +81,15 @@ export type TraitReachabilityReport = {
   maxTier: number;
 };
 
+export type TraitTierReachabilityReport = {
+  tier: number;
+  required: number;
+  activations: number;
+  activationRate: number;
+  matchesReached: number;
+  matchReachRate: number;
+};
+
 export type CharacterCombatExpressionReport = {
   battleBoardAppearances: number;
   casts: number;
@@ -162,6 +171,7 @@ export type ProductionSoakReport = {
   combatReadability: CombatReadabilityReport;
   traitPlayerBattleBoards: number;
   traitReachability: Record<string, TraitReachabilityReport>;
+  traitTierReachability: Record<string, TraitTierReachabilityReport[]>;
   traitCombinations: Record<
     string,
     {
@@ -436,8 +446,10 @@ function recordFinalItems(
 function recordTraits(
   state: MatchState,
   traitActivations: MutableCounter,
+  traitTierActivations: MutableCounter,
   traitMaxTier: MutableCounter,
   traitsReachedInMatch: Set<string>,
+  traitTiersReachedInMatch: Set<string>,
   traitObservations: { playerBattleBoards: number; emperorCaptain: number },
 ): void {
   for (const player of state.players.filter((candidate) => candidate.alive)) {
@@ -454,6 +466,9 @@ function recordTraits(
       if (active.tierIndex < 0) continue;
       increment(traitActivations, active.traitId);
       traitsReachedInMatch.add(active.traitId);
+      const tierKey = `${active.traitId}:${active.tierIndex + 1}`;
+      increment(traitTierActivations, tierKey);
+      traitTiersReachedInMatch.add(tierKey);
       traitMaxTier[active.traitId] = Math.max(
         traitMaxTier[active.traitId] ?? 0,
         active.tierIndex + 1,
@@ -497,8 +512,10 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
   );
   const combatReadability = emptyCombatReadability();
   const traitActivations: MutableCounter = {};
+  const traitTierActivations: MutableCounter = {};
   const traitMaxTier: MutableCounter = {};
   const traitMatchReach: MutableCounter = {};
+  const traitTierMatchReach: MutableCounter = {};
   const traitObservations = { playerBattleBoards: 0, emperorCaptain: 0 };
   const shopPoolCounters = Object.fromEntries(
     [1, 2, 3, 4, 5].map((cost) => [
@@ -535,6 +552,7 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
       human.personalityId = "balanced";
       const lastDeployedBoards = new Map<string, Set<string>>();
       const traitsReachedInMatch = new Set<string>();
+      const traitTiersReachedInMatch = new Set<string>();
 
       let transitions = 0;
       let fullSeconds = 0;
@@ -592,8 +610,10 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
           recordTraits(
             state,
             traitActivations,
+            traitTierActivations,
             traitMaxTier,
             traitsReachedInMatch,
+            traitTiersReachedInMatch,
             traitObservations,
           );
           const longestBattleTicks = state.lastResults.reduce(
@@ -643,6 +663,9 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
       completeMatches += 1;
       for (const traitId of traitsReachedInMatch) {
         increment(traitMatchReach, traitId);
+      }
+      for (const tierKey of traitTiersReachedInMatch) {
+        increment(traitTierMatchReach, tierKey);
       }
       rounds.push(state.round);
       fullClockSeconds.push(fullSeconds);
@@ -879,6 +902,29 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
       } satisfies TraitReachabilityReport,
     ]),
   );
+  const traitTierReachability = Object.fromEntries(
+    DEFAULT_CONTENT.traits.map((trait) => [
+      trait.id,
+      trait.tiers.map((tier, tierIndex) => {
+        const tierNumber = tierIndex + 1;
+        const tierKey = `${trait.id}:${tierNumber}`;
+        return {
+          tier: tierNumber,
+          required: tier.required,
+          activations: traitTierActivations[tierKey] ?? 0,
+          activationRate: rate(
+            traitTierActivations[tierKey] ?? 0,
+            traitObservations.playerBattleBoards,
+          ),
+          matchesReached: traitTierMatchReach[tierKey] ?? 0,
+          matchReachRate: rate(
+            traitTierMatchReach[tierKey] ?? 0,
+            completeMatches,
+          ),
+        } satisfies TraitTierReachabilityReport;
+      }),
+    ]),
+  );
   const shopPoolAvailability = Object.fromEntries(
     [1, 2, 3, 4, 5].map((cost) => {
       const counter = shopPoolCounters[String(cost)];
@@ -954,6 +1000,7 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
     combatReadability: finalizedCombatReadability,
     traitPlayerBattleBoards: traitObservations.playerBattleBoards,
     traitReachability,
+    traitTierReachability,
     traitCombinations: {
       "emperor+captain": {
         activations: traitObservations.emperorCaptain,

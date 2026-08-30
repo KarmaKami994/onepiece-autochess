@@ -5,6 +5,7 @@ import {
   applyCommand as applyDomainCommand,
   createMatch,
   getActiveTraits,
+  getActiveTraitEffects,
   simulateBattle,
   type ActiveTrait,
   type BattleEvent,
@@ -331,7 +332,7 @@ describe("Roster Expansion Pack F content", () => {
       ),
     ).toEqual([6, 7, 6, 7, 4]);
     expect(DEFAULT_CONTENT.traits).toHaveLength(13);
-    expect(DEFAULT_CONTENT.version).toBe("1.11.1");
+    expect(DEFAULT_CONTENT.version).toBe("1.11.2");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
 
     const state = createMatch("pack-f-pool", DEFAULT_CONTENT);
@@ -350,22 +351,53 @@ describe("Roster Expansion Pack F content", () => {
 });
 
 describe("Emperor origin", () => {
-  it("requires distinct Shanks and Blackbeard definitions and stacks with Captain", () => {
+  it("uses exact highest tiers for unique Emperor definitions and leaves Captain unchanged", () => {
     const shanks = deployedTraits("shanks");
     const blackbeard = deployedTraits("blackbeard");
     const pair = deployedTraits("shanks", "blackbeard");
-    const duplicate = deployedTraits("shanks", "shanks");
+    const duplicateShanks = deployedTraits("shanks", "shanks");
+    const duplicateBlackbeard = deployedTraits("blackbeard", "blackbeard");
+
+    expect(DEFAULT_CONTENT.traits.find((trait) => trait.id === "emperor"))
+      .toMatchObject({
+        description:
+          "Emperors embolden the entire crew, with a stronger bonus when multiple Emperors unite.",
+        tiers: [
+          {
+            required: 1,
+            label: "+4% health and attack",
+            effects: [
+              { kind: "max-health-percent", value: 4 },
+              { kind: "attack-percent", value: 4 },
+            ],
+          },
+          {
+            required: 2,
+            label: "+8% health and attack",
+            effects: [
+              { kind: "max-health-percent", value: 8 },
+              { kind: "attack-percent", value: 8 },
+            ],
+          },
+        ],
+      });
 
     expect(shanks.find((trait) => trait.traitId === "emperor")).toMatchObject({
       count: 1,
-      tierIndex: -1,
-      tier: null,
+      tierIndex: 0,
+      tier: {
+        required: 1,
+        effects: [
+          { kind: "max-health-percent", value: 4 },
+          { kind: "attack-percent", value: 4 },
+        ],
+      },
     });
     expect(blackbeard.find((trait) => trait.traitId === "emperor"))
-      .toMatchObject({ count: 1, tierIndex: -1, tier: null });
+      .toMatchObject({ count: 1, tierIndex: 0, tier: { required: 1 } });
     expect(pair.find((trait) => trait.traitId === "emperor")).toMatchObject({
       count: 2,
-      tierIndex: 0,
+      tierIndex: 1,
       tier: {
         required: 2,
         label: "+8% health and attack",
@@ -375,12 +407,78 @@ describe("Emperor origin", () => {
         ],
       },
     });
-    expect(duplicate.find((trait) => trait.traitId === "emperor"))
-      .toMatchObject({ count: 1, tierIndex: -1, tier: null });
+    expect(duplicateShanks.find((trait) => trait.traitId === "emperor"))
+      .toMatchObject({ count: 1, tierIndex: 0, tier: { required: 1 } });
+    expect(duplicateBlackbeard.find((trait) => trait.traitId === "emperor"))
+      .toMatchObject({ count: 1, tierIndex: 0, tier: { required: 1 } });
+    expect(getActiveTraitEffects(pair)).toContainEqual({
+      kind: "max-health-percent",
+      value: 8,
+    });
+    expect(getActiveTraitEffects(pair)).toContainEqual({
+      kind: "attack-percent",
+      value: 8,
+    });
+    expect(getActiveTraitEffects(pair)).not.toContainEqual({
+      kind: "max-health-percent",
+      value: 4,
+    });
+    expect(getActiveTraitEffects(pair)).not.toContainEqual({
+      kind: "attack-percent",
+      value: 4,
+    });
     expect(pair.find((trait) => trait.traitId === "captain")).toMatchObject({
       count: 2,
       tierIndex: 0,
+      tier: {
+        required: 2,
+        effects: [{ kind: "shield-flat", value: 100 }],
+      },
     });
+    expect(DEFAULT_CONTENT.traits.find((trait) => trait.id === "captain")?.tiers)
+      .toEqual([
+        {
+          required: 2,
+          effects: [{ kind: "shield-flat", value: 100 }],
+          label: "100 starting shield",
+        },
+        {
+          required: 3,
+          effects: [{ kind: "shield-flat", value: 225 }],
+          label: "225 starting shield",
+        },
+      ]);
+  });
+
+  it("applies the non-cumulative two-Emperor tier to the whole team", () => {
+    const content = clonedContent();
+    for (const id of ["shanks", "blackbeard", "chopper", "marine-recruit"]) {
+      configureCombatant(content, id, { health: 1_000, attack: 100 });
+    }
+    const activeTraits = deployedTraits("shanks", "blackbeard");
+    const result = simulateBattle(
+      {
+        id: "a",
+        units: [
+          setupUnit("shanks-unit", "shanks", 0, 5),
+          setupUnit("blackbeard-unit", "blackbeard", 1, 5),
+          setupUnit("crew-unit", "chopper", 2, 5),
+        ],
+        activeTraits,
+      },
+      {
+        id: "b",
+        units: [setupUnit("enemy", "marine-recruit", 7, 0)],
+        activeTraits: [],
+      },
+      { seed: "emperor-team-wide", maxTicks: 1 },
+      content,
+    );
+
+    for (const unitId of ["shanks-unit", "blackbeard-unit", "crew-unit"]) {
+      expect(result.initialUnits.find((unit) => unit.id === unitId))
+        .toMatchObject({ maxHp: 1_080, attack: 108 });
+    }
   });
 });
 
