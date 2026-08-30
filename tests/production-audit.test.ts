@@ -29,9 +29,17 @@ describe("production configuration audit", () => {
     expect(report.drawRate).toBeLessThanOrEqual(1);
     expect(Object.keys(report.characterPresence)).toHaveLength(30);
     expect(Object.keys(report.costBands)).toEqual(["1", "2", "3", "4", "5"]);
+    expect(Object.keys(report.shopPoolAvailability.byCost)).toEqual([
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+    ]);
     expect(Object.keys(report.characterCombatExpression)).toHaveLength(30);
     expect(report.combatReadability.pvpBattleCount).toBeGreaterThan(0);
     expect(report.combatReadability.castsPerPvpBattle).toBeGreaterThanOrEqual(0);
+    expect(report.traitPlayerBattleBoards).toBeGreaterThan(0);
     expect(
       Object.values(report.characterPresence).reduce(
         (total, character) => total + character.winningBoards,
@@ -52,6 +60,9 @@ describe("production configuration audit", () => {
       ),
     ).toBeLessThanOrEqual(report.seeds * 8 * 9);
     expect(Object.keys(report.traitReachability)).toHaveLength(13);
+    expect(Object.keys(report.traitCombinations)).toEqual([
+      "emperor+captain",
+    ]);
     expect(Object.keys(report.itemUsage)).toHaveLength(8);
 
     for (const character of Object.values(report.characterPresence)) {
@@ -93,6 +104,56 @@ describe("production configuration audit", () => {
       expect(band.winningBoards).toBe(
         members.reduce((total, character) => total + character.winningBoards, 0),
       );
+      expect(band.finalBoardRepresentationRate).toBeGreaterThanOrEqual(0);
+      expect(band.finalBoardRepresentationRate).toBeLessThanOrEqual(1);
+      expect(band.finalBoardPlayerPresence).toBeLessThanOrEqual(
+        report.completeMatches * 8,
+      );
+      expect(band.finalBoardPlayerPresenceRate).toBeGreaterThanOrEqual(0);
+      expect(band.finalBoardPlayerPresenceRate).toBeLessThanOrEqual(1);
+    }
+
+    expect(
+      Object.values(report.costBands).reduce(
+        (total, band) => total + band.finalBoardRepresentationRate,
+        0,
+      ),
+    ).toBeCloseTo(1);
+
+    expect(report.shopPoolAvailability.preparationSnapshots).toBeGreaterThan(0);
+    expect(report.shopPoolAvailability.shopSlots).toBeGreaterThan(0);
+    expect(report.shopPoolAvailability.emptyShopSlotRate).toBeGreaterThanOrEqual(0);
+    expect(report.shopPoolAvailability.emptyShopSlotRate).toBeLessThanOrEqual(1);
+    for (const availability of Object.values(
+      report.shopPoolAvailability.byCost,
+    )) {
+      expectFiniteNonNegativeCounters(availability);
+      expect(availability.offerRatePerEligibleSlot).toBeLessThanOrEqual(1);
+      expect(availability.playerPreparationOfferRate).toBeLessThanOrEqual(1);
+      expect(availability.zeroAvailabilityRate).toBeLessThanOrEqual(1);
+    }
+
+    for (const trait of Object.values(report.traitReachability)) {
+      expect(trait.activations).toBeLessThanOrEqual(
+        report.traitPlayerBattleBoards,
+      );
+      expect(trait.activationRate).toBeGreaterThanOrEqual(0);
+      expect(trait.activationRate).toBeLessThanOrEqual(1);
+      expect(trait.matchesReached).toBeLessThanOrEqual(report.completeMatches);
+      expect(trait.matchReachRate).toBeGreaterThanOrEqual(0);
+      expect(trait.matchReachRate).toBeLessThanOrEqual(1);
+    }
+    for (const combination of Object.values(report.traitCombinations)) {
+      expect(combination.activations).toBeLessThanOrEqual(
+        report.traitPlayerBattleBoards,
+      );
+      expect(combination.activationRate).toBeGreaterThanOrEqual(0);
+      expect(combination.activationRate).toBeLessThanOrEqual(1);
+      expect(combination.matchesReached).toBeLessThanOrEqual(
+        report.completeMatches,
+      );
+      expect(combination.matchReachRate).toBeGreaterThanOrEqual(0);
+      expect(combination.matchReachRate).toBeLessThanOrEqual(1);
     }
 
     for (const expression of Object.values(report.characterCombatExpression)) {

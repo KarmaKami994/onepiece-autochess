@@ -22,10 +22,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-Gameplay baseline upgrades complete — awaiting 30-unit 1,000-seed assessment.
+30-unit gameplay baseline assessment complete — awaiting an isolated Smoker balance pass.
 
 ## Last Completed Work
 
+- 2026-08-29 — `538c9fa`, PR #22 on `analysis/30-unit-roster-assessment`: completed the first 30-unit production assessment with exactly one 1,000-seed soak. The run completed 1,000/1,000 matches with zero crashes, 33.56 average rounds, 33.59 full-clock minutes, 24.03 paced minutes, 133,841 battles, 1.175% timeouts and 0.030% draws. Diagnostics now report final-board cost representation, observed shop/pool availability, relative trait/match reach, Emperor + Captain reach, all-enemy casts and Defense Pierce casts. Smoker and Luffy are the strongest positive same-cost signals; Nami, Robin, Crocodile and Ivankov are the clearest negatives; Sabo and Ace's old alarms do not persist. Emperor reached only 4/1,000 matches. No gameplay, content, AI, persistence, schema, economy, trait or balance value changed; content remains `1.11.0` and save schema remains 6. Material files: `scripts/run_production_soak.ts`, `tests/production-audit.test.ts`, `docs/analysis/30-unit-roster-assessment-1000.json`, `docs/THIRTY_UNIT_ROSTER_ASSESSMENT.md`, `PROJECT_STATE.md`.
 - 2026-08-29 — PR #21 on `feature/live-opponent-spectating`: added client-only opponent battle spectating for living captains during the active battle phase. A pure presentation selector resolves the observed captain's existing immutable `MatchBattleResult`, reusing playerA/playerB mirroring for boards and events plus current PvE and ghost semantics. Local actor identity remains `player-1`; local Shop, Reroll, Lock and Buy XP stay interactive while the observed tactical board is read-only. Deterministic result/perspective event sequences restart only switched presentations without resetting the local battle clock. Spectator selection is cleared on phase transition and is not saved. No domain, combat, persistence, schema, content or balance change; content remains `1.11.0`, save schema remains 6. Material files: `app/selectors.ts`, `app/GameClient.tsx`, `app/screens/GameScreens.tsx`, `app/game.css`, focused selector/presentation/E2E tests and `PROJECT_STATE.md`.
 - 2026-08-28 — PR #20 on `feature/combat-economy-actions`: enabled PAC-style Buy, Reroll, Lock and Buy XP actions during battle plus bench selling and bench-to-bench movement while keeping the deployed formation, item equip, pairings and precomputed `MatchBattleResult` immutable. Battle presentation now uses self-contained battle-start star/item snapshots while the live bench updates without resetting Phaser combat playback. Review hardening made deployed-fighter comparison order-independent without weakening fighter-property checks and made `ACTIVE_SAVE` writes monotonic by `updatedAt` within one IndexedDB transaction. New battle saves persist the current battle state directly; legacy schema-6 `replayBattle` saves still reconstruct once. Content remains `1.11.0`; save schema remains 6. Material files: `game/engine.ts`, `game/types.ts`, `game/combat.ts`, `app/GameClient.tsx`, `app/selectors.ts`, `app/voyagePersistence.ts`, `app/screens/GameScreens.tsx`, `components/PhaserBoard.tsx`, focused domain/selector/Phaser/save/E2E tests and `PROJECT_STATE.md`.
 - 2026-08-28 — `bf96b62`, PR #19 on `feature/pac-style-shop-lock`: adapted PAC-style automatic locked-shop refill semantics. Retained offers stay in place and preserve their shared-pool reservation; only empty/purchased slots roll through the existing current-level odds and consume deterministic RNG/pool copies; the one-round lock then clears. Manual rerolls remain full and unlocked automatic refreshes are unchanged. Content remains `1.11.0`; save schema remains 6. Material files: `game/economy.ts`, `game/engine.ts`, `tests/game/economy-board.test.ts`, `PROJECT_STATE.md`.
@@ -46,6 +47,17 @@ Gameplay baseline upgrades complete — awaiting 30-unit 1,000-seed assessment.
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+30-unit roster and combat baseline assessment:
+
+- PASS — focused production-audit test: 1 file, 1 test.
+- PASS — `npm run typecheck`.
+- PASS — `npm run lint`.
+- PASS — `npm test`: 37 files, 307 tests.
+- PASS — `npm run test:production-smoke`: 50/50 complete matches, zero crashes.
+- PASS — `npm run test:production-soak`: exactly one run, 1,000/1,000 complete matches, zero crashes.
+- PASS — post-soak arithmetic reconciliation and SHA-256 snapshot verification.
+- NOT RUN — `npm run test:e2e`; no UI, browser, Phaser or application source changed.
 
 Live Opponent Spectating:
 
@@ -225,6 +237,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- None for the 30-unit assessment. Diagnostic output is additively richer, observes existing deterministic state/events after decisions, and changes no gameplay, RNG order, content, AI, presentation, persistence or save behavior.
 - During active battles with the tutorial inactive, living captain rows can switch the tactical board, observed traits and combat events to that captain's immutable current fight. The selected captain is always viewer-side through existing mirroring, PvE uses the stage opponent, and ghost fights use the frozen ghost copy. Standings and a WATCHING ribbon allow direct rival-to-rival switching and return to the local fight. The observed board is read-only; local shop economy remains interactive, the global phase clock remains local, and spectator selection clears after resolution and is not persisted.
 - During normal battles, players may now buy units, fully reroll, toggle shop lock, buy XP, sell bench units and rearrange bench slots. Board movement/selling, item equip and readiness remain blocked; purchases and merges affect future persistent state only. The current combat result and deployed battle-start star/item identity remain frozen, while live bench changes synchronize without restarting Phaser playback even if fighter arrays are reconstructed in a different order. New battle saves preserve the current economy state and frozen results directly; stale writes cannot overwrite a newer `updatedAt`, and legacy `replayBattle` saves remain compatible.
 - Automatic round refreshes of locked shops now retain every non-empty offer in its slot, fill only empty/purchased slots through existing current-level shop odds, preserve retained pool reservations, consume RNG only for replacement slots and clear the one-round lock. Manual rerolls remain full; unlocked refreshes are unchanged.
@@ -244,6 +257,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- None for the 30-unit assessment. Exactly one 1,000-seed soak was run after all required pre-soak checks passed; no Pokémon Auto Chess source or external balance guidance was inspected.
 - None for Live Opponent Spectating. PAC's separation of spectated identity/simulation from local economy was adapted as reference-only architecture from pinned commit `a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee`; no Redux, Colyseus, live Simulation, networking or server synchronization was ported.
 - None for Combat Economy or its two review fixes. PAC's combat-phase economy authorization, bench-only selling and bench movement were adapted from pinned commit `a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee`; PAC networking, server state, Simulation and Pokémon-specific systems were not ported.
 - None for PAC-style Shop Lock. Only PAC `Shop.refillShop(...)` empty/default-slot behavior from pinned commit `a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee` was adapted; unrelated PAC systems were not ported.
@@ -263,6 +277,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- The 30-unit run is crash-stable but timeout rate increased from 0.126% to 1.175% and full-clock length increased from 32.22 to 33.59 minutes despite 1.41 fewer average rounds. Smoker is the clearest positive same-cost signal (+16.8 pp top-four, +9.8 pp wins); Luffy remains positive. Nami, Robin, Crocodile and Ivankov are the clearest negatives. Emperor activated in only 4/1,000 matches. Costs 4/5 are scarce on final boards, but observed pool exhaustion is not the cause: neither tier recorded a zero-copy definition and all observed shop slots were filled. Combat has 26.7% more casts and 33.4% more displacements per PvP battle while defined control density is nearly flat; knockback/pull distinction, Energy Drain attribution and Defense Pierce visibility remain presentation risks.
 - The Pack F 50-seed smoke completed without structural failure: 50/50 matches, zero crashes, 1.00% timeout rate and 0.05% draw rate. Kuzan, Akainu, Shanks and Blackbeard recorded respectively 34/82.4%/38.2%, 38/81.6%/39.5%, 5/100%/80.0% and 6/100%/50.0% final-board observations/top-four rates/conditional win rates. Emperor was not reached. The high-cost samples are very small and are not tuning evidence; reachability belongs to the separate 1,000-seed assessment.
 - PAC/Tashigi gameplay changes need separate product/balance review.
 - The Pack E 50-seed smoke completed without structural failure. Ivankov, Jinbe, Kuma and Kizaru had respectively 95/5.3%, 113/21.2%, 96/24.0% and 57/33.3% final-board observations/conditional win rates; these small-sample observations are not tuning evidence.
@@ -281,6 +296,7 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
+- The next bounded balance task is an isolated Smoker pass using one ability-impact lever. Do not combine it with Luffy, Emperor, timeout, negative-unit or readability changes; the old Sabo tuning plan is no longer supported by current evidence.
 - Spectating separates the local actor from a client-only viewer target. The viewer target selects an existing immutable battle result and perspective only; it never enters `MatchState`, command context or persistence. Presentation sequences encode round, result index and perspective side deterministically so switching fights replays Phaser without affecting the local phase clock.
 - Active combat remains an immutable precomputed `MatchBattleResult`; battle economy mutates only persistent future state. Optional snapshot item IDs make current-fight presentation self-contained without changing combat mechanics or save schema. New battle saves store the current canonical battle state directly, `ACTIVE_SAVE` accepts only equal-or-newer `updatedAt` writes, and `replayBattle` remains compatibility-only for legacy saves.
 - Keep the current prototype offline-capable.
@@ -289,14 +305,14 @@ Final current-roster high-cost identity pack:
 - Keep a shared deterministic game domain.
 - Defense Pierce is transient per-ability mitigation behavior, not a persistent Defense mutation, status or debuff.
 - Base-roster expansion is complete at 30 units and 6/7/6/7/4 by cost. Pack F added the Emperor origin for Shanks/Blackbeard; its single two-unit tier grants +8% team health and +8% team attack through existing team-wide trait semantics.
-- Gameplay roadmap order is: (1) PAC-style Shop Lock — complete, (2) Economy Actions During Battle — complete, (3) Live Opponent Spectating — complete, (4) 30-unit 1,000-seed assessment — next, (5) balance decisions, (6) future Character Form System.
+- Gameplay roadmap order is: (1) PAC-style Shop Lock — complete, (2) Economy Actions During Battle — complete, (3) Live Opponent Spectating — complete, (4) 30-unit 1,000-seed assessment — complete, (5) isolated Smoker balance pass — next, (6) later evidence-backed balance/readability decisions, (7) future Character Form System.
 - The future Character Form System remains documentation-only: star and form progression are separate; forms are not shop/pool units; an eventual instance may carry a form identity beside `definitionId` and star and alter a controlled subset of stats/ability/role/traits/presentation; permanent and temporary forms share one conceptual model with different lifetimes. Initial pilots are Robin (star-triggered Demonio-style), Luffy (star/item-dependent Gear 4 branches) and Chopper (synergy/combat-condition Monster Point-style). No form code exists yet.
 - All future Codex work must be bounded and branch/PR based.
 - ChatGPT decides architecture and prioritization; Codex executes requested tasks.
 
 ## Next Recommended Task
 
-Run only the deliberate 30-unit 1,000-seed assessment as the next bounded task; do not start it automatically.
+Run one isolated Smoker balance pass that changes one ability-impact lever only and reuses the same diagnostics; do not start it automatically.
 
 ## Codex Update Contract
 
