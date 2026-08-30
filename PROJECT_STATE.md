@@ -22,11 +22,12 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-Robin Demonio Fleur, the first production Character Form pilot, is complete on PR #26; Luffy and Chopper remain future pilots.
+Robin Demonio Fleur is merged, and the Luffy Gear 4 second production Character Form pilot is complete on PR #27; Chopper remains a separate future pilot.
 
 ## Last Completed Work
 
-- 2026-08-30 — PR #26 on `feature/robin-demonio-fleur`: added Robin's persistent Demonio Fleur form after the normal nine-copy 3-star merge while preserving the surviving anchor, base/economic `definitionId`, items, position, shop/pool accounting and sell value. Demonio replaces only Clutch with 180-power lowest-health adjacent damage, 1400ms stun and 20-Energy Drain; base stats, traits and assets remain inherited. Schema-6 loading reconciles persistent current/future 3-star Robin in `player.units` and `finalCrew` without rewriting frozen battle snapshots, clears only invalid 1/2-star Demonio assignments and preserves unrelated unknown form IDs. Production forms are 1; roster remains 30; GameContent is `1.13.0`; save schema remains 6. Material files: `game/content.ts`, `game/forms.ts`, `game/roster.ts`, `game/persistenceFormat.ts`, focused tests, content-version assertions, `docs/CHARACTER_FORM_SYSTEM.md`, `PROJECT_STATE.md`.
+- 2026-08-30 — PR #27 on `feature/luffy-gear-four`: added persistent Luffy Gear 4 Boundman and Snakeman branches while preserving base Luffy and the normal nine-copy 3-star economy. A retained Armament Wraps selects Boundman; retained Sniper Goggles selects Snakeman; earliest equipped-item-array catalyst wins the initial tie, catalysts are not consumed, overflow does not select, and an assigned branch locks. Boundman is 990/86/34/range 1/1000ms with 285-power Kong Gun, 600ms stun and knockback; Snakeman is 850/78/24/range 4/700ms with 300-power four-strike Jet Culverin and in-range KO retargeting. Equip and schema-6 loading use the same explicit character reconciliation, including `finalCrew`, without rewriting frozen battle snapshots; Robin behavior remains intact. Production forms are 3; roster remains 30; GameContent is `1.14.0`; save schema remains 6. Material files: `game/content.ts`, `game/forms.ts`, `game/roster.ts`, `game/engine.ts`, `game/persistenceFormat.ts`, focused tests, content-version assertions, `docs/CHARACTER_FORM_SYSTEM.md`, `PROJECT_STATE.md`.
+- 2026-08-30 — `d7673ba`, merged PR #26: added Robin's persistent Demonio Fleur form after the normal nine-copy 3-star merge while preserving the surviving anchor, base/economic `definitionId`, items, position, shop/pool accounting and sell value. Demonio replaces only Clutch with 180-power lowest-health adjacent damage, 1400ms stun and 20-Energy Drain; base stats, traits and assets remain inherited. Schema-6 loading reconciles persistent current/future 3-star Robin in `player.units` and `finalCrew` without rewriting frozen battle snapshots, clears only invalid 1/2-star Demonio assignments and preserves unrelated unknown form IDs. Production forms were 1; roster remained 30; GameContent was `1.13.0`; save schema remained 6. Material files: `game/content.ts`, `game/forms.ts`, `game/roster.ts`, `game/persistenceFormat.ts`, focused tests, content-version assertions, `docs/CHARACTER_FORM_SYSTEM.md`, `PROJECT_STATE.md`.
 - 2026-08-30 — PR #25 on `feature/character-form-foundation`: added the pure serializable Character Form System seam with separate persistent and battle-temporary lifecycles, optional persistent `UnitInstance.formId`, frozen battle setup/snapshot form identity, stat/ability/trait/presentation overlays, base-definition trait uniqueness and schema-6 save compatibility. Review hardening made battle trait presentation use frozen snapshot forms and made each frozen source ability authoritative over colliding global ability IDs. Production `forms` remains empty; Robin, Luffy and Chopper are unchanged. GameContent is `1.12.0`; save schema remains 6. Material files: `game/types.ts`, `game/forms.ts`, content/trait/combat/engine exports and integration, selector/battle presentation integration, focused tests, `docs/CHARACTER_FORM_SYSTEM.md`, `PROJECT_STATE.md`.
 - 2026-08-30 — `bc0faec`, merged PR #24: added a one-Emperor team-wide +4% health/+4% attack entry tier while preserving the two-distinct-Emperor +8%/+8% tier, highest-tier-only semantics, Shanks, Blackbeard and Captain. Added observational exact-tier production diagnostics. GameContent was `1.11.2`; save schema remained 6. Exactly one clean-commit 1,000-seed soak completed 1,000/1,000 matches with zero crashes: any/exact Tier 1 reached 813 boards and 176 matches, exact Tier 2 reached zero, and system guardrails were materially unchanged. Classification A, good reachability; Shanks' small-sample conditional-win increase remains a watch signal, not tuning evidence. Material files: `game/content.ts`, `scripts/run_production_soak.ts`, focused Emperor/diagnostic/version tests, `docs/analysis/emperor-reachability-1000.json`, `docs/EMPEROR_REACHABILITY_PASS.md`, `PROJECT_STATE.md`.
 - 2026-08-30 — `3826307`, merged PR #23: reduced only Smoker's White Blow base power from 210 to 180 and moved GameContent from `1.11.0` to `1.11.1`; Smoker's stats, cost, Navy / Guardian traits, targeting and knockback are unchanged, and save schema remains 6. Exactly one post-change 1,000-seed soak completed 1,000/1,000 matches with zero crashes. Smoker moved from 65.83% to 64.84% top four, 21.69% to 20.77% conditional wins, 3.636 to 3.705 average placement and 34.4% to 32.9% winner presence, but remains a coherent positive 2-cost outlier; classification B, still clearly overperforming. Material files: `game/content.ts`, focused content/combat and content-version assertions, `docs/analysis/smoker-white-blow-180-1000.json`, `docs/SMOKER_BALANCE_PASS.md`, `PROJECT_STATE.md`.
@@ -51,6 +52,18 @@ Robin Demonio Fleur, the first production Character Form pilot, is complete on P
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+Luffy Gear 4 pilot:
+
+- PASS — focused Luffy, Robin and base-Luffy regressions: 3 files, 40 tests.
+- PASS — `npm run typecheck` through the installed npm CLI.
+- PASS — `npm run lint` through the installed npm CLI.
+- PASS — `npm test`: 40 files, 341 tests.
+- PASS — `npm run assets:validate`: 41 animation atlases, maps, Carousel assets and provenance files validated.
+- PASS — `npm run test:production-smoke`: 50/50 complete matches, zero crashes; used only for regression safety, not balance conclusions.
+- PASS — `npm run build`.
+- PASS — `npm run test:e2e`: 17 passed, 3 skipped; the unchanged suite returned exit 0 against a separately started local Vinext server after the owned-server Windows teardown hang reproduced.
+- NOT RUN — `npm run test:production-soak`; deliberately deferred until the planned form pilots are complete.
 
 Robin Demonio Fleur pilot:
 
@@ -297,6 +310,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- A normal 3-star Luffy remains base Luffy without a retained catalyst. Retained Armament Wraps selects persistent Boundman and retained Sniper Goggles selects persistent Snakeman; the earliest catalyst in `instance.items` wins only the first selection, overflow is ignored, catalysts remain equipped, and the assigned branch locks. Boundman uses the locked 990/86/34/range 1/1000ms overlay and 285-power single-target Kong Gun with 600ms stun/knockback. Snakeman uses 850/78/24/range 4/700ms and 300-power four-strike Jet Culverin with in-range KO retargeting. Normal scaling, base/economic `luffy` identity and active battle snapshot freezing remain unchanged. GameContent is `1.14.0`; save schema remains 6.
 - A normal Robin merge remains base Robin at 2-star; the normal nine-copy 3-star merge now assigns persistent `formId: "robin-demonio-fleur"` to the surviving Robin anchor. Demonio Fleur inherits Robin's unchanged stats, traits and assets, replaces Clutch with 180-power lowest-health adjacent damage, 1400ms stun and 20-Energy Drain, and uses normal 3-star stat/ability scaling. Shop, pool, purchase, sale and analytics identity remain `robin`; active battle snapshots stay frozen. GameContent is `1.13.0`; save schema remains 6.
 - GameContent now has a separate serializable `forms` collection and is version `1.12.0`; production contains zero forms. Valid persistent form IDs can overlay unit name, selected stats, complete ability, traits and portrait/token presentation, while battle setup/snapshots can also carry a battle-temporary form ID. Battle tactical traits and ability presentation resolve from frozen source snapshots, including when form abilities reuse base ability IDs. Invalid or unknown IDs resolve safely to base behavior. `definitionId` remains shop, pool, purchase, sell, merge and analytics identity; save schema remains 6. Robin, Luffy, Chopper and all default gameplay remain unchanged.
 - Emperor now activates team-wide +4% maximum health and +4% attack with one distinct Emperor definition, and the unchanged +8%/+8% payoff with two distinct definitions. Only the highest reached tier applies; duplicate definitions still count once. Shanks, Blackbeard and Captain are unchanged. GameContent is `1.11.2`; save schema remains 6.
@@ -321,6 +335,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- No implementation deviation for Luffy Gear 4. No Chopper work, generic trigger system, form command/UI/assets, schema change, unrelated balance change or 1,000-seed soak was added. Browser E2E's owned Vinext server hung during Windows teardown twice after all scenarios completed; the unchanged suite then passed against a separately started local server and returned exit 0.
 - None for Robin Demonio Fleur. No generic trigger system, command, UI, asset, stat/trait override, unrelated balance change or production soak was added; the locked values were unchanged after the 50-seed smoke.
 - None for the Character Form System foundation. No production form, pilot trigger, form command, UI, VFX, asset, schema change or 1,000-seed soak was added.
 - None for the Emperor reachability pass. Locked +4%/+4% and +8%/+8% values were not revised after smoke or production results; all measured code was committed with a clean tree before exactly one 1,000-seed soak.
@@ -345,7 +360,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
-- No blocking Robin-pilot risk found. The 50-seed smoke completed 50/50 matches with zero crashes and is not balance evidence. Luffy branch selection and Chopper temporary-transform timing remain intentionally unvalidated until their separate bounded pilots.
+- No blocking Luffy-pilot risk found. The 50-seed smoke completed 50/50 matches with zero crashes and is not balance evidence. Chopper temporary-transform timing remains intentionally unvalidated until its separate bounded pilot.
 - Emperor Tier 1 now reaches 17.6% of matches, while the two-Emperor Tier 2 was not reached in the post-change run versus 2/1,000 baseline matches; the preserved chase payoff remains exceptionally rare. Shanks' conditional-win estimate rose from 56.84% to 69.47% on the same 95 final-board observations, but Wilson intervals overlap, top-four rate was stable and winner presence moved only +1.2 pp. Blackbeard and system guardrails were stable; Shanks is a future watch signal, not sufficient isolated tuning evidence.
 - White Blow 180 moved every requested Smoker outcome signal in the intended direction, but only modestly: post-change same-cost deltas remain +15.61 pp top four, +8.79 pp conditional wins and -0.818 placement, so Smoker is still a coherent positive outlier. Sample presence stayed stable, ability damage per cast fell 13.1%, and system guardrails were materially unchanged. A further adjustment, if approved, must be a separate isolated decision rather than an iteration in PR #23.
 - The 30-unit baseline remains crash-stable but has elevated timeout/full-clock length. Luffy remains positive; Nami, Robin, Crocodile and Ivankov remain negative signals; Emperor is effectively unreachable; high-cost scarcity and combat readability remain separate follow-up concerns outside PR #23.
@@ -367,6 +382,7 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
+- Luffy Gear 4 requires 3-star plus a retained catalyst: Armament Wraps selects Boundman and Sniper Goggles selects Snakeman. The earliest catalyst in serialized item-array order wins only when no form is assigned; `formId` then locks the branch. Known Gear 4 IDs are cleared only from invalid 1/2-star Luffy, unrelated unknown IDs survive, and persistent load reconciliation never mutates frozen battle results.
 - Robin's production cap is `definitionId: "robin"`, `star: 3`, `formId: "robin-demonio-fleur"` after the normal nine-copy merge. Only the ability is replaced; legacy schema-6 persistent 3-star Robin reconciles to the form, invalid 1/2-star Demonio is cleared, unrelated unknown IDs survive, and frozen battle results are never rewritten.
 - Forms are optional overlays separate from stars and `content.units`. `definitionId` remains base/economic identity; `UnitInstance.formId` is persistent-only, while battle setup/snapshot form identity may be persistent or temporary and is frozen at battle start. Forms may overlay stats and presentation or replace ability/traits, but cannot alter cost, base identity, shop/pool identity, star or items. Trait uniqueness remains distinct base definitions per effective trait. No trigger framework or form command exists.
 - Emperor uses two non-cumulative, highest-reached-only tiers: one distinct definition grants team-wide +4% health/+4% attack, while two grant the preserved +8%/+8%. Exact tier reachability is the source of truth; Emperor + Captain is contextual and not a double-Emperor proxy.
@@ -379,14 +395,14 @@ Final current-roster high-cost identity pack:
 - Keep a shared deterministic game domain.
 - Defense Pierce is transient per-ability mitigation behavior, not a persistent Defense mutation, status or debuff.
 - Base-roster expansion is complete at 30 units and 6/7/6/7/4 by cost. Pack F added the Emperor origin for Shanks/Blackbeard; its single two-unit tier grants +8% team health and +8% team attack through existing team-wide trait semantics.
-- Gameplay roadmap through the Character Form System foundation and Robin pilot is complete; the next bounded pilot is Luffy, followed separately by Chopper.
-- Character forms remain separate from stars and shop/pool identity. Robin is the first production form; Luffy's star/item branch and Chopper's battle-temporary form remain unimplemented separate pilots.
+- Gameplay roadmap through the Character Form System foundation, Robin and Luffy pilots is complete; the next bounded pilot is Chopper.
+- Character forms remain separate from stars and shop/pool identity. Robin and Luffy are production pilots; Chopper's battle-temporary form remains unimplemented.
 - All future Codex work must be bounded and branch/PR based.
 - ChatGPT decides architecture and prioritization; Codex executes requested tasks.
 
 ## Next Recommended Task
 
-Luffy form pilot, only after PR #26 passes review; do not start it automatically.
+Chopper Monster Point pilot, only after PR #27 passes review; do not start it automatically.
 
 ## Codex Update Contract
 
