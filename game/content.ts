@@ -816,6 +816,55 @@ export const FORM_DEFINITIONS: UnitFormDefinition[] = [
       { stunMs: 1_400, energyDrain: 20 },
     ),
   },
+  {
+    id: "luffy-gear-4-boundman",
+    baseDefinitionId: "luffy",
+    name: "Luffy — Gear 4: Boundman",
+    lifecycle: "persistent",
+    stats: {
+      health: 990,
+      attack: 86,
+      defense: 34,
+      range: 1,
+      attackIntervalMs: 1_000,
+    },
+    ability: ability(
+      "kong-gun",
+      "Kong Gun",
+      "Drives a hardened fist into the nearest enemy, stunning and blasting a surviving target backward.",
+      285,
+      "nearest-enemy",
+      "single",
+      { stunMs: 600, signatureMechanics: [{ kind: "knockback" }] },
+    ),
+  },
+  {
+    id: "luffy-gear-4-snakeman",
+    baseDefinitionId: "luffy",
+    name: "Luffy — Gear 4: Snakeman",
+    lifecycle: "persistent",
+    stats: {
+      health: 850,
+      attack: 78,
+      defense: 24,
+      range: 4,
+      attackIntervalMs: 700,
+    },
+    ability: ability(
+      "jet-culverin",
+      "Jet Culverin",
+      "Launches four accelerating strikes at a weakened enemy, redirecting remaining blows after a knockout.",
+      300,
+      "lowest-health-enemy",
+      "single",
+      {
+        sequentialStrike: {
+          hitWeightsBasisPoints: [2_500, 2_500, 2_500, 2_500],
+          retargetOnKill: "nearest-in-range",
+        },
+      },
+    ),
+  },
 ];
 
 export const TRAIT_DEFINITIONS: TraitDefinition[] = [
@@ -1492,7 +1541,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.13.0",
+  version: "1.14.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,

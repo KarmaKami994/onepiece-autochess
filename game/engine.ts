@@ -5,7 +5,10 @@ import {
   getUnitDefinition,
 } from "./content";
 import { simulateBattle } from "./combat";
-import { resolvePersistentFormId } from "./forms";
+import {
+  reconcileProductionFormProgression,
+  resolvePersistentFormId,
+} from "./forms";
 import { hashSeed, randomInt, shuffleDeterministic } from "./rng";
 import { getActiveTraits } from "./traits";
 import { CURRENT_SAVE_SCHEMA_VERSION } from "./schema";
@@ -2149,6 +2152,7 @@ export function applyCommand(
       }
       player.inventory.splice(inventoryIndex, 1);
       unit.items.push(command.itemId);
+      reconcileProductionFormProgression(unit, content);
       return { ok: true, state: next };
     }
     case "END_PREPARATION": {

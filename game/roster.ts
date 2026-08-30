@@ -1,5 +1,5 @@
 import { parseCell } from "./state";
-import { reconcileRobinProgressionForm } from "./forms";
+import { reconcileProductionFormProgression } from "./forms";
 import type {
   GameContent,
   MatchState,
@@ -92,9 +92,9 @@ function mergeUnits(
         if (unit.id !== anchor.id) delete player.units[unit.id];
       }
       anchor.star = (star + 1) as StarLevel;
-      reconcileRobinProgressionForm(anchor, content);
       anchor.items = combinedItems.slice(0, content.config.itemCap);
       player.inventory.push(...combinedItems.slice(content.config.itemCap));
+      reconcileProductionFormProgression(anchor, content);
       const safeLocation =
         anchorLocation.zone === "bench" && anchorLocation.slot < 0
           ? { zone: "bench" as const, slot: firstEmptyBench(player) }

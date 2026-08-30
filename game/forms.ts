@@ -7,6 +7,8 @@ import type {
 } from "./types";
 
 const ROBIN_DEMONIO_FLEUR_FORM_ID = "robin-demonio-fleur";
+const LUFFY_GEAR_4_BOUNDMAN_FORM_ID = "luffy-gear-4-boundman";
+const LUFFY_GEAR_4_SNAKEMAN_FORM_ID = "luffy-gear-4-snakeman";
 
 export function getUnitFormDefinition(
   formId: string | null | undefined,
@@ -46,22 +48,48 @@ export function resolvePersistentFormId(
     : null;
 }
 
-export function reconcileRobinProgressionForm(
+export function reconcileProductionFormProgression(
   instance: UnitInstance,
   content: Pick<GameContent, "forms"> = DEFAULT_CONTENT,
 ): void {
-  if (instance.definitionId !== "robin") return;
-  if (instance.star === 3) {
-    const form = getUnitFormDefinition(ROBIN_DEMONIO_FLEUR_FORM_ID, content);
-    if (
-      form?.baseDefinitionId === "robin" &&
-      form.lifecycle === "persistent"
-    ) {
-      instance.formId = form.id;
+  if (instance.definitionId === "robin") {
+    if (instance.star === 3) {
+      const form = getUnitFormDefinition(ROBIN_DEMONIO_FLEUR_FORM_ID, content);
+      if (
+        form?.baseDefinitionId === "robin" &&
+        form.lifecycle === "persistent"
+      ) {
+        instance.formId = form.id;
+      }
+      return;
+    }
+    if (instance.formId === ROBIN_DEMONIO_FLEUR_FORM_ID) {
+      delete instance.formId;
     }
     return;
   }
-  if (instance.formId === ROBIN_DEMONIO_FLEUR_FORM_ID) {
-    delete instance.formId;
+
+  if (instance.definitionId !== "luffy") return;
+  const hasGearFourForm =
+    instance.formId === LUFFY_GEAR_4_BOUNDMAN_FORM_ID ||
+    instance.formId === LUFFY_GEAR_4_SNAKEMAN_FORM_ID;
+  if (instance.star !== 3) {
+    if (hasGearFourForm) delete instance.formId;
+    return;
+  }
+  if (instance.formId) return;
+
+  for (const itemId of instance.items) {
+    const formId = itemId === "armament-wraps"
+      ? LUFFY_GEAR_4_BOUNDMAN_FORM_ID
+      : itemId === "sniper-goggles"
+        ? LUFFY_GEAR_4_SNAKEMAN_FORM_ID
+        : null;
+    if (!formId) continue;
+    const form = getUnitFormDefinition(formId, content);
+    if (form?.baseDefinitionId === "luffy" && form.lifecycle === "persistent") {
+      instance.formId = form.id;
+    }
+    return;
   }
 }
