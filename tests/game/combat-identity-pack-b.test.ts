@@ -240,7 +240,7 @@ describe("Combat Identity Pack B content", () => {
         energyDrain: 15,
       },
     });
-    expect(DEFAULT_CONTENT.version).toBe("1.11.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.11.1");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 });

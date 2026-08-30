@@ -253,7 +253,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
       "white-blow",
       "White Blow",
       "Sweeps a line of enemies and pushes surviving targets backward.",
-      210,
+      180,
       "nearest-enemy",
       "line",
       { signatureMechanics: [{ kind: "knockback" }] },
@@ -1464,7 +1464,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.11.0",
+  version: "1.11.1",
   units: UNIT_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,
   items: ITEM_DEFINITIONS,

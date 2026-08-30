@@ -212,14 +212,26 @@ describe("Combat Identity Pack A content", () => {
       stunMs: 1_200,
       energyDrain: 15,
     });
-    expect(definition(DEFAULT_CONTENT, "smoker").ability).toMatchObject({
-      id: "white-blow",
-      power: 210,
-      targeting: "nearest-enemy",
-      pattern: "line",
-      signatureMechanics: [{ kind: "knockback" }],
+    expect(definition(DEFAULT_CONTENT, "smoker")).toMatchObject({
+      cost: 2,
+      traits: ["navy", "guardian"],
+      stats: {
+        health: 820,
+        attack: 62,
+        defense: 28,
+        range: 2,
+        attackIntervalMs: 1_200,
+        moveIntervalMs: 500,
+      },
+      ability: {
+        id: "white-blow",
+        power: 180,
+        targeting: "nearest-enemy",
+        pattern: "line",
+        signatureMechanics: [{ kind: "knockback" }],
+      },
     });
-    expect(DEFAULT_CONTENT.version).toBe("1.11.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.11.1");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 });
@@ -436,8 +448,8 @@ describe("Smoker White Blow line knockback", () => {
     );
 
     expect(abilityDamage(result, "smoker")).toMatchObject([
-      { targetId: "a-near", amount: 210 },
-      { targetId: "b-far", amount: 210 },
+      { targetId: "a-near", amount: 180 },
+      { targetId: "b-far", amount: 180 },
     ]);
     expect(knockbacks(result, "smoker")).toMatchObject([
       { unitId: "a-near", movementKind: "knockback", to: { x: 4, y: 2 } },
@@ -448,7 +460,7 @@ describe("Smoker White Blow line knockback", () => {
 
   it("does not displace dead line targets", () => {
     const content = clonedContent();
-    configureCombatant(content, "chopper", { health: 210 });
+    configureCombatant(content, "chopper", { health: 180 });
     configureCombatant(content, "usopp");
 
     const result = runSingleTickCast(
