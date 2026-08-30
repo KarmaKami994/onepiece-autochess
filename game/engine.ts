@@ -5,6 +5,7 @@ import {
   getUnitDefinition,
 } from "./content";
 import { simulateBattle } from "./combat";
+import { resolvePersistentFormId } from "./forms";
 import { hashSeed, randomInt, shuffleDeterministic } from "./rng";
 import { getActiveTraits } from "./traits";
 import { CURRENT_SAVE_SCHEMA_VERSION } from "./schema";
@@ -351,10 +352,12 @@ function playerBattleTeam(
         return [];
       }
       const position = parseCell(key);
+      const formId = resolvePersistentFormId(instance, content);
       return [
         {
           id: `${overrideId ?? player.id}:${instance.id}`,
           definitionId: instance.definitionId,
+          ...(formId ? { formId } : {}),
           star: instance.star,
           items: [...instance.items],
           position:

@@ -63,6 +63,7 @@ export type BoardInteractionMode = "formation" | "bench-only" | "none";
 export type BoardUnit = {
   id: string;
   contentId: string;
+  formId?: string;
   name: string;
   shortName: string;
   color: number;
@@ -1120,7 +1121,10 @@ export default function PhaserBoard({
           }
 
           private portraitKey(unit: BoardUnit) {
-            return `crew-${unit.contentId.replace(/[^a-z0-9_-]/gi, "-")}`;
+            const presentationId = unit.formId
+              ? `${unit.contentId}-${unit.formId}`
+              : unit.contentId;
+            return `crew-${presentationId.replace(/[^a-z0-9_-]/gi, "-")}`;
           }
 
           private requestMapTexture(boardSkin: BoardSkin) {

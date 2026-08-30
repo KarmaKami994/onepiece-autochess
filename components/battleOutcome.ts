@@ -2,8 +2,11 @@ import {
   DEFAULT_CONTENT,
   getItemDefinition,
   getStageDefinition,
-  getUnitDefinition,
 } from "../game/content";
+import {
+  resolvePersistentFormId,
+  resolveUnitDefinition,
+} from "../game/forms";
 import type {
   BattleUnitSnapshot,
   GameContent,
@@ -150,7 +153,11 @@ function crewRows(
     .map((snapshot) => {
       const instanceId = battleInstanceId(snapshot.id, playerId);
       const instance = instances.get(instanceId);
-      const definition = getUnitDefinition(snapshot.definitionId, content);
+      const definition = resolveUnitDefinition(
+        snapshot.definitionId,
+        snapshot.formId,
+        content,
+      );
       const name = definition?.name ?? snapshot.definitionId;
       const star = snapshot.star;
       const items = (instance?.items ?? []).map((itemId) => {
@@ -202,26 +209,39 @@ function activeTraitRows(
   result: MatchBattleResult,
   content: GameContent,
 ): BattleOutcomeTraitRow[] {
-  const deployedDefinitionIds = new Set(
-    result.initialUnits
-      .filter((snapshot) => isHumanSnapshot(snapshot, playerId))
-      .map((snapshot) => snapshot.definitionId),
+  const contributorsByTrait = new Map<string, Set<string>>();
+  const addDefinition = (
+    definitionId: string,
+    formId: string | undefined,
+  ): void => {
+    const definition = resolveUnitDefinition(definitionId, formId, content);
+    for (const traitId of definition?.traits ?? []) {
+      const contributors = contributorsByTrait.get(traitId) ?? new Set<string>();
+      contributors.add(definitionId);
+      contributorsByTrait.set(traitId, contributors);
+    }
+  };
+  const snapshots = result.initialUnits.filter((snapshot) =>
+    isHumanSnapshot(snapshot, playerId),
   );
+  for (const snapshot of snapshots) {
+    addDefinition(snapshot.definitionId, snapshot.formId);
+  }
 
-  if (deployedDefinitionIds.size === 0) {
+  if (snapshots.length === 0) {
     for (const unitId of Object.values(player.board)) {
       const instance = player.units[unitId];
       if (instance) {
-        deployedDefinitionIds.add(instance.definitionId);
+        addDefinition(
+          instance.definitionId,
+          resolvePersistentFormId(instance, content) ?? undefined,
+        );
       }
     }
   }
 
   return content.traits.flatMap((trait) => {
-    const count = [...deployedDefinitionIds].reduce((total, definitionId) => {
-      const definition = getUnitDefinition(definitionId, content);
-      return total + (definition?.traits.includes(trait.id) ? 1 : 0);
-    }, 0);
+    const count = contributorsByTrait.get(trait.id)?.size ?? 0;
     let tierIndex = -1;
     trait.tiers.forEach((tier, index) => {
       if (count >= tier.required) {

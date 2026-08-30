@@ -1,8 +1,8 @@
 import {
   DEFAULT_CONTENT,
   getItemDefinition,
-  getUnitDefinition,
 } from "./content";
+import { getUnitFormDefinition, resolveUnitDefinition } from "./forms";
 import { hashSeed, nextRandom } from "./rng";
 import { getActiveTraitEffects } from "./traits";
 import type {
@@ -23,6 +23,7 @@ import type {
 
 interface CombatDefinition {
   id: string;
+  formId?: string;
   stats: UnitStats;
   ability: AbilityDefinition | null;
 }
@@ -30,6 +31,7 @@ interface CombatDefinition {
 interface MutableBattleUnit {
   id: string;
   definitionId: string;
+  formId?: string;
   teamId: string;
   star: 1 | 2 | 3;
   items: string[];
@@ -85,11 +87,19 @@ type CombatIntent = AttackIntent | CastIntent | MoveIntent;
 
 function findDefinition(
   id: string,
+  formId: string | undefined,
   content: GameContent,
 ): CombatDefinition | null {
-  const unit = getUnitDefinition(id, content);
+  const form = getUnitFormDefinition(formId, content);
+  const resolvedFormId = form?.baseDefinitionId === id ? form.id : undefined;
+  const unit = resolveUnitDefinition(id, resolvedFormId, content);
   if (unit) {
-    return { id: unit.id, stats: unit.stats, ability: unit.ability };
+    return {
+      id: unit.id,
+      ...(resolvedFormId ? { formId: resolvedFormId } : {}),
+      stats: unit.stats,
+      ability: unit.ability,
+    };
   }
   const enemy = content.enemies.find((candidate) => candidate.id === id);
   return enemy
@@ -169,7 +179,11 @@ function createMutableUnits(
   for (const setup of [...team.units].sort((left, right) =>
     left.id.localeCompare(right.id),
   )) {
-    const definition = findDefinition(setup.definitionId, content);
+    const definition = findDefinition(
+      setup.definitionId,
+      setup.formId,
+      content,
+    );
     if (!definition) {
       continue;
     }
@@ -182,6 +196,7 @@ function createMutableUnits(
     const unit: MutableBattleUnit = {
       id: setup.id,
       definitionId: setup.definitionId,
+      ...(definition.formId ? { formId: definition.formId } : {}),
       teamId: team.id,
       star: setup.star,
       items: [...setup.items],
@@ -738,6 +753,7 @@ function toSnapshot(unit: MutableBattleUnit): BattleUnitSnapshot {
   return {
     id: unit.id,
     definitionId: unit.definitionId,
+    ...(unit.formId ? { formId: unit.formId } : {}),
     teamId: unit.teamId,
     star: unit.star,
     items: [...unit.items],
