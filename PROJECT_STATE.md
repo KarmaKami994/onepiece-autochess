@@ -22,11 +22,12 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-Emperor reachability pass complete — PR #24 ready for review; Character Form System foundation is the next roadmap phase.
+Character Form System foundation complete on PR #25; no playable forms or form triggers exist yet.
 
 ## Last Completed Work
 
-- 2026-08-30 — `41fa892`, PR #24 on `balance/emperor-reachability`: added a one-Emperor team-wide +4% health/+4% attack entry tier while preserving the two-distinct-Emperor +8%/+8% tier, highest-tier-only semantics, Shanks, Blackbeard and Captain. Added observational exact-tier production diagnostics. GameContent is `1.11.2`; save schema remains 6. Exactly one clean-commit 1,000-seed soak completed 1,000/1,000 matches with zero crashes: any/exact Tier 1 reached 813 boards and 176 matches, exact Tier 2 reached zero, and system guardrails were materially unchanged. Classification A, good reachability; Shanks' small-sample conditional-win increase remains a watch signal, not tuning evidence. Material files: `game/content.ts`, `scripts/run_production_soak.ts`, focused Emperor/diagnostic/version tests, `docs/analysis/emperor-reachability-1000.json`, `docs/EMPEROR_REACHABILITY_PASS.md`, `PROJECT_STATE.md`.
+- 2026-08-30 — PR #25 on `feature/character-form-foundation`: added the pure serializable Character Form System seam with separate persistent and battle-temporary lifecycles, optional persistent `UnitInstance.formId`, frozen battle setup/snapshot form identity, stat/ability/trait/presentation overlays, base-definition trait uniqueness and schema-6 save compatibility. Review hardening made battle trait presentation use frozen snapshot forms and made each frozen source ability authoritative over colliding global ability IDs. Production `forms` remains empty; Robin, Luffy and Chopper are unchanged. GameContent is `1.12.0`; save schema remains 6. Material files: `game/types.ts`, `game/forms.ts`, content/trait/combat/engine exports and integration, selector/battle presentation integration, focused tests, `docs/CHARACTER_FORM_SYSTEM.md`, `PROJECT_STATE.md`.
+- 2026-08-30 — `bc0faec`, merged PR #24: added a one-Emperor team-wide +4% health/+4% attack entry tier while preserving the two-distinct-Emperor +8%/+8% tier, highest-tier-only semantics, Shanks, Blackbeard and Captain. Added observational exact-tier production diagnostics. GameContent was `1.11.2`; save schema remained 6. Exactly one clean-commit 1,000-seed soak completed 1,000/1,000 matches with zero crashes: any/exact Tier 1 reached 813 boards and 176 matches, exact Tier 2 reached zero, and system guardrails were materially unchanged. Classification A, good reachability; Shanks' small-sample conditional-win increase remains a watch signal, not tuning evidence. Material files: `game/content.ts`, `scripts/run_production_soak.ts`, focused Emperor/diagnostic/version tests, `docs/analysis/emperor-reachability-1000.json`, `docs/EMPEROR_REACHABILITY_PASS.md`, `PROJECT_STATE.md`.
 - 2026-08-30 — `3826307`, merged PR #23: reduced only Smoker's White Blow base power from 210 to 180 and moved GameContent from `1.11.0` to `1.11.1`; Smoker's stats, cost, Navy / Guardian traits, targeting and knockback are unchanged, and save schema remains 6. Exactly one post-change 1,000-seed soak completed 1,000/1,000 matches with zero crashes. Smoker moved from 65.83% to 64.84% top four, 21.69% to 20.77% conditional wins, 3.636 to 3.705 average placement and 34.4% to 32.9% winner presence, but remains a coherent positive 2-cost outlier; classification B, still clearly overperforming. Material files: `game/content.ts`, focused content/combat and content-version assertions, `docs/analysis/smoker-white-blow-180-1000.json`, `docs/SMOKER_BALANCE_PASS.md`, `PROJECT_STATE.md`.
 - 2026-08-29 — `538c9fa`, PR #22 on `analysis/30-unit-roster-assessment`: completed the first 30-unit production assessment with exactly one 1,000-seed soak. The run completed 1,000/1,000 matches with zero crashes, 33.56 average rounds, 33.59 full-clock minutes, 24.03 paced minutes, 133,841 battles, 1.175% timeouts and 0.030% draws. Diagnostics now report final-board cost representation, observed shop/pool availability, relative trait/match reach, Emperor + Captain reach, all-enemy casts and Defense Pierce casts. Smoker and Luffy are the strongest positive same-cost signals; Nami, Robin, Crocodile and Ivankov are the clearest negatives; Sabo and Ace's old alarms do not persist. Emperor reached only 4/1,000 matches. No gameplay, content, AI, persistence, schema, economy, trait or balance value changed; content remains `1.11.0` and save schema remains 6. Material files: `scripts/run_production_soak.ts`, `tests/production-audit.test.ts`, `docs/analysis/30-unit-roster-assessment-1000.json`, `docs/THIRTY_UNIT_ROSTER_ASSESSMENT.md`, `PROJECT_STATE.md`.
 - 2026-08-29 — PR #21 on `feature/live-opponent-spectating`: added client-only opponent battle spectating for living captains during the active battle phase. A pure presentation selector resolves the observed captain's existing immutable `MatchBattleResult`, reusing playerA/playerB mirroring for boards and events plus current PvE and ghost semantics. Local actor identity remains `player-1`; local Shop, Reroll, Lock and Buy XP stay interactive while the observed tactical board is read-only. Deterministic result/perspective event sequences restart only switched presentations without resetting the local battle clock. Spectator selection is cleared on phase transition and is not saved. No domain, combat, persistence, schema, content or balance change; content remains `1.11.0`, save schema remains 6. Material files: `app/selectors.ts`, `app/GameClient.tsx`, `app/screens/GameScreens.tsx`, `app/game.css`, focused selector/presentation/E2E tests and `PROJECT_STATE.md`.
@@ -49,6 +50,20 @@ Emperor reachability pass complete — PR #24 ready for review; Character Form S
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+Character Form System foundation:
+
+- PASS — focused form foundation: 1 file, 10 tests covering resolver, traits, combat/snapshots, economy/merge, persistence and selectors.
+- PASS — PR #25 review regressions: focused form foundation 10 tests; selector/battle-outcome 2 files, 17 tests.
+- PASS — directly affected regressions: 8 files, 75 tests.
+- PASS — `npm run typecheck` through the installed npm CLI.
+- PASS — `npm run lint` through the installed npm CLI.
+- PASS — `npm test`: 38 files, 318 tests.
+- PASS — `npm run assets:validate`: 41 animation atlases, maps, Carousel assets and provenance files validated.
+- PASS — `npm run test:production-smoke`: 50/50 complete matches, zero crashes.
+- PASS — `npm run build`.
+- PASS — `npm run test:e2e`: 17 passed, 3 skipped.
+- NOT RUN — `npm run test:production-soak`; deliberately excluded because production forms are empty and default gameplay is unchanged.
 
 Emperor reachability pass:
 
@@ -269,6 +284,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- GameContent now has a separate serializable `forms` collection and is version `1.12.0`; production contains zero forms. Valid persistent form IDs can overlay unit name, selected stats, complete ability, traits and portrait/token presentation, while battle setup/snapshots can also carry a battle-temporary form ID. Battle tactical traits and ability presentation resolve from frozen source snapshots, including when form abilities reuse base ability IDs. Invalid or unknown IDs resolve safely to base behavior. `definitionId` remains shop, pool, purchase, sell, merge and analytics identity; save schema remains 6. Robin, Luffy, Chopper and all default gameplay remain unchanged.
 - Emperor now activates team-wide +4% maximum health and +4% attack with one distinct Emperor definition, and the unchanged +8%/+8% payoff with two distinct definitions. Only the highest reached tier applies; duplicate definitions still count once. Shanks, Blackbeard and Captain are unchanged. GameContent is `1.11.2`; save schema remains 6.
 - Smoker's White Blow base ability power is now 180 instead of 210. Smoker remains a 2-cost Navy / Guardian with unchanged stats, line targeting, cast cadence, star scaling and knockback. GameContent is `1.11.1`; save schema remains 6.
 - None for the 30-unit assessment. Diagnostic output is additively richer, observes existing deterministic state/events after decisions, and changes no gameplay, RNG order, content, AI, presentation, persistence or save behavior.
@@ -291,6 +307,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- None for the Character Form System foundation. No production form, pilot trigger, form command, UI, VFX, asset, schema change or 1,000-seed soak was added.
 - None for the Emperor reachability pass. Locked +4%/+4% and +8%/+8% values were not revised after smoke or production results; all measured code was committed with a clean tree before exactly one 1,000-seed soak.
 - None for the isolated Smoker pass. The locked value 180 was not revised after smoke or production results, and exactly one post-change 1,000-seed soak was run.
 - None for the 30-unit assessment. Exactly one 1,000-seed soak was run after all required pre-soak checks passed; no Pokémon Auto Chess source or external balance guidance was inspected.
@@ -313,6 +330,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- No blocking foundation risk found. Actual Robin, Luffy and Chopper transition rules, choices and temporary-transform timing remain intentionally unvalidated until their separate bounded pilot PRs.
 - Emperor Tier 1 now reaches 17.6% of matches, while the two-Emperor Tier 2 was not reached in the post-change run versus 2/1,000 baseline matches; the preserved chase payoff remains exceptionally rare. Shanks' conditional-win estimate rose from 56.84% to 69.47% on the same 95 final-board observations, but Wilson intervals overlap, top-four rate was stable and winner presence moved only +1.2 pp. Blackbeard and system guardrails were stable; Shanks is a future watch signal, not sufficient isolated tuning evidence.
 - White Blow 180 moved every requested Smoker outcome signal in the intended direction, but only modestly: post-change same-cost deltas remain +15.61 pp top four, +8.79 pp conditional wins and -0.818 placement, so Smoker is still a coherent positive outlier. Sample presence stayed stable, ability damage per cast fell 13.1%, and system guardrails were materially unchanged. A further adjustment, if approved, must be a separate isolated decision rather than an iteration in PR #23.
 - The 30-unit baseline remains crash-stable but has elevated timeout/full-clock length. Luffy remains positive; Nami, Robin, Crocodile and Ivankov remain negative signals; Emperor is effectively unreachable; high-cost scarcity and combat readability remain separate follow-up concerns outside PR #23.
@@ -334,6 +352,7 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
+- Forms are optional overlays separate from stars and `content.units`. `definitionId` remains base/economic identity; `UnitInstance.formId` is persistent-only, while battle setup/snapshot form identity may be persistent or temporary and is frozen at battle start. Forms may overlay stats and presentation or replace ability/traits, but cannot alter cost, base identity, shop/pool identity, star or items. Trait uniqueness remains distinct base definitions per effective trait. No trigger framework or form command exists.
 - Emperor uses two non-cumulative, highest-reached-only tiers: one distinct definition grants team-wide +4% health/+4% attack, while two grant the preserved +8%/+8%. Exact tier reachability is the source of truth; Emperor + Captain is contextual and not a double-Emperor proxy.
 - White Blow remains fixed at 180 for PR #23 despite classification B. Any further Smoker adjustment requires a separate bounded architecture/game-design decision and must not be combined with Luffy, Emperor, timeout, negative-unit or readability changes.
 - Spectating separates the local actor from a client-only viewer target. The viewer target selects an existing immutable battle result and perspective only; it never enters `MatchState`, command context or persistence. Presentation sequences encode round, result index and perspective side deterministically so switching fights replays Phaser without affecting the local phase clock.
@@ -351,7 +370,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-Begin the separately scoped Character Form System foundation only after architecture/planning approval; do not start it automatically.
+Robin form pilot, only after PR #25 passes review; do not start it automatically.
 
 ## Codex Update Contract
 

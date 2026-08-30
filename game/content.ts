@@ -7,6 +7,7 @@ import type {
   StageDefinition,
   TraitDefinition,
   UnitDefinition,
+  UnitFormDefinition,
 } from "./types";
 
 const ability = (
@@ -799,6 +800,8 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
   },
 ];
 
+export const FORM_DEFINITIONS: UnitFormDefinition[] = [];
+
 export const TRAIT_DEFINITIONS: TraitDefinition[] = [
   {
     id: "straw-hat",
@@ -1473,8 +1476,9 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.11.2",
+  version: "1.12.0",
   units: UNIT_DEFINITIONS,
+  forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,
   items: ITEM_DEFINITIONS,
   enemies: PVE_ENEMY_DEFINITIONS,

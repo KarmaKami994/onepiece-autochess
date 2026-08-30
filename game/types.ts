@@ -88,6 +88,22 @@ export interface UnitDefinition {
   assetPath: string;
 }
 
+export type UnitFormLifecycle = "persistent" | "battle-temporary";
+
+export interface UnitFormDefinition {
+  id: string;
+  baseDefinitionId: string;
+  name: string;
+  lifecycle: UnitFormLifecycle;
+  stats?: Partial<UnitStats>;
+  ability?: AbilityDefinition;
+  traits?: string[];
+  presentation?: {
+    portrait?: string;
+    token?: string;
+  };
+}
+
 export type TraitEffect =
   | { kind: "max-health-percent"; value: number }
   | { kind: "attack-speed-percent"; value: number }
@@ -203,6 +219,7 @@ export interface GameConfig {
 export interface GameContent {
   version: string;
   units: UnitDefinition[];
+  forms: UnitFormDefinition[];
   traits: TraitDefinition[];
   items: ItemDefinition[];
   enemies: PvEEnemyDefinition[];
@@ -214,6 +231,7 @@ export interface GameContent {
 export interface UnitInstance {
   id: string;
   definitionId: string;
+  formId?: string;
   star: StarLevel;
   items: string[];
   acquiredOrder: number;
@@ -434,6 +452,7 @@ export interface ActiveTrait {
 export interface BattleSetupUnit {
   id: string;
   definitionId: string;
+  formId?: string;
   star: StarLevel;
   items: string[];
   position: Position;
@@ -457,6 +476,7 @@ export type BattleUnitState =
 export interface BattleUnitSnapshot {
   id: string;
   definitionId: string;
+  formId?: string;
   teamId: string;
   star: StarLevel;
   items?: string[];

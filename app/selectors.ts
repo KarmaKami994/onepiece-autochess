@@ -1,9 +1,14 @@
 import {
   DEFAULT_CONTENT,
   getActiveTraits,
+  getActiveTraitsForUnits,
   getStageDefinition,
+  getUnitFormDefinition,
+  resolvePersistentFormId,
+  resolveUnitDefinition,
 } from "@/game";
 import type {
+  ActiveTrait,
   BattleUnitSnapshot,
   GameContent,
   ItemEffect,
@@ -367,11 +372,23 @@ function baseUnitView(
 function definitionView(
   definitionId: string,
   content: GameContent,
+  formId?: string,
 ): ShopUnitView {
-  const definition =
-    content.units.find((candidate) => candidate.id === definitionId) ??
-    content.enemies.find((candidate) => candidate.id === definitionId);
-  if (definition) return baseUnitView(definition, content);
+  const playable = resolveUnitDefinition(definitionId, formId, content);
+  if (playable) {
+    const view = baseUnitView(playable, content);
+    const form = getUnitFormDefinition(formId, content);
+    if (form?.baseDefinitionId !== definitionId) return view;
+    return {
+      ...view,
+      portrait: form.presentation?.portrait ?? view.portrait,
+      token: form.presentation?.token ?? view.token,
+    };
+  }
+  const enemy = content.enemies.find(
+    (candidate) => candidate.id === definitionId,
+  );
+  if (enemy) return baseUnitView(enemy, content);
   const fallback: PvEEnemyDefinition = {
     id: definitionId,
     name: titleCase(definitionId),
@@ -445,8 +462,10 @@ function planningMaxHp(
   instance: UnitInstance,
   content: GameContent,
 ): number {
-  const definition = content.units.find(
-    (candidate) => candidate.id === instance.definitionId,
+  const definition = resolveUnitDefinition(
+    instance.definitionId,
+    resolvePersistentFormId(instance, content),
+    content,
   );
   const scale = instance.star === 3 ? 3.24 : instance.star === 2 ? 1.8 : 1;
   return (
@@ -521,8 +540,9 @@ function buildBoardUnits(
             : owner.id
           : null;
       const id = prefix ? `${prefix}:${instance.id}` : instance.id;
+      const formId = resolvePersistentFormId(instance, content) ?? undefined;
       const view = enrichUnitView(
-        definitionView(instance.definitionId, content),
+        definitionView(instance.definitionId, content, formId),
         owner,
         content,
       );
@@ -531,6 +551,7 @@ function buildBoardUnits(
       units.push({
         id,
         contentId: instance.definitionId,
+        ...(formId ? { formId } : {}),
         name: view.name,
         shortName: view.shortName,
         color: hashColor(instance.definitionId),
@@ -564,7 +585,11 @@ function buildBoardUnits(
   if (!result) return { units, views };
   const mirror = result.playerBId === player.id;
   for (const snapshot of result.initialUnits) {
-    const view = definitionView(snapshot.definitionId, content);
+    const view = definitionView(
+      snapshot.definitionId,
+      content,
+      snapshot.formId,
+    );
     const instance = unitInstanceForSnapshot(snapshot, state.players);
     const owner = instance
       ? state.players.find((candidate) => candidate.units[instance.id])
@@ -583,6 +608,7 @@ function buildBoardUnits(
     if (existing) {
       Object.assign(existing, {
         contentId: snapshot.definitionId,
+        formId: snapshot.formId,
         name: enriched.name,
         shortName: enriched.shortName,
         color: hashColor(snapshot.definitionId),
@@ -603,6 +629,7 @@ function buildBoardUnits(
     units.push({
       id: snapshot.id,
       contentId: snapshot.definitionId,
+      ...(snapshot.formId ? { formId: snapshot.formId } : {}),
       name: enriched.name,
       shortName: enriched.shortName,
       color: hashColor(snapshot.definitionId),
@@ -631,12 +658,12 @@ function buildBoardUnits(
   return { units, views };
 }
 
-function traitViews(
-  player: PlayerState,
+function activeTraitViews(
+  activeTraits: readonly ActiveTrait[],
   content: GameContent,
 ): TraitView[] {
   const definitions = new Map(content.traits.map((trait) => [trait.id, trait]));
-  return getActiveTraits(player, content)
+  return activeTraits
     .filter((active) => active.count > 0)
     .map((active) => {
       const definition = definitions.get(active.traitId);
@@ -663,6 +690,13 @@ function traitViews(
       (left, right) =>
         right.tier - left.tier || right.count - left.count,
     );
+}
+
+function traitViews(
+  player: PlayerState,
+  content: GameContent,
+): TraitView[] {
+  return activeTraitViews(getActiveTraits(player, content), content);
 }
 
 function recentBattleViews(
@@ -692,14 +726,16 @@ function combatEvents(
   }
   const mirror = result.playerBId === playerId;
   const abilityById = new Map(
-    [...content.units, ...content.enemies].flatMap((definition) =>
-      definition.ability
-        ? [[definition.ability.id, definition.ability] as const]
-        : [],
-    ),
+    [
+      ...content.units.flatMap((definition) => [definition.ability]),
+      ...content.enemies.flatMap((definition) =>
+        definition.ability ? [definition.ability] : [],
+      ),
+      ...content.forms.flatMap((form) => form.ability ? [form.ability] : []),
+    ].map((ability) => [ability.id, ability] as const),
   );
   const definitionByUnit = new Map(
-    result.initialUnits.map((unit) => [unit.id, unit.definitionId]),
+    result.initialUnits.map((unit) => [unit.id, unit]),
   );
   const criticalAttacks = new Set(
     result.events.flatMap((event) =>
@@ -822,11 +858,18 @@ function combatEvents(
     }
     if (event.type === "cast") {
       const ability = abilityById.get(event.abilityId);
-      const sourceDefinitionId = definitionByUnit.get(event.sourceId);
-      const sourceAbility = [...content.units, ...content.enemies].find(
-        (definition) => definition.id === sourceDefinitionId,
-      )?.ability;
-      const pattern = ability?.pattern ?? sourceAbility?.pattern ?? "single";
+      const sourceSnapshot = definitionByUnit.get(event.sourceId);
+      const sourceAbility = sourceSnapshot
+        ? resolveUnitDefinition(
+            sourceSnapshot.definitionId,
+            sourceSnapshot.formId,
+            content,
+          )?.ability ?? content.enemies.find(
+            (definition) => definition.id === sourceSnapshot.definitionId,
+          )?.ability
+        : undefined;
+      const presentedAbility = sourceAbility ?? ability;
+      const pattern = presentedAbility?.pattern ?? "single";
       const telegraph: CombatFxEvent["telegraph"] =
         pattern === "line"
           ? "line"
@@ -844,10 +887,10 @@ function combatEvents(
         targetIds: [...event.targetIds],
         abilityId: event.abilityId,
         abilityName:
-          ability?.name ?? sourceAbility?.name ?? titleCase(event.abilityId),
+          presentedAbility?.name ?? titleCase(event.abilityId),
         telegraph,
         deferImpactToAbilityHits: Boolean(
-          ability?.sequentialStrike ?? sourceAbility?.sequentialStrike,
+          presentedAbility?.sequentialStrike,
         ),
       }];
     }
@@ -995,6 +1038,12 @@ export function selectBattlePresentation(
   );
   const combat = combatEvents(state, perspectivePlayerId, content);
   const stage = getStageDefinition(state.round, content);
+  const frozenTraits = getActiveTraitsForUnits(
+    result.initialUnits.filter(
+      (snapshot) => snapshot.teamId === perspectivePlayerId,
+    ),
+    content,
+  );
 
   return {
     perspectivePlayerId,
@@ -1004,7 +1053,7 @@ export function selectBattlePresentation(
       : opponentPlayer?.name ?? stage.name,
     isGhost,
     boardUnits: board.units,
-    traits: traitViews(perspectivePlayer, content),
+    traits: activeTraitViews(frozenTraits, content),
     selectedDefinitionByUnit: board.views,
     events: combat.events,
     eventSequence: combat.sequence,
@@ -1074,8 +1123,13 @@ function finalCrewUnits(
     return board.units.filter((unit) => unit.team === "player");
   }
   return player.finalCrew.map((instance, index) => {
+    const formId = resolvePersistentFormId(instance, content) ?? undefined;
     const view = enrichUnitView(
-      definitionView(instance.definitionId, content),
+      definitionView(
+        instance.definitionId,
+        content,
+        formId,
+      ),
       player,
       content,
     );
@@ -1085,6 +1139,7 @@ function finalCrewUnits(
     return {
       id,
       contentId: instance.definitionId,
+      ...(formId ? { formId } : {}),
       name: view.name,
       shortName: view.shortName,
       color: hashColor(instance.definitionId),
