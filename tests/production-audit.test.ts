@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { DEFAULT_CONTENT } from "../game";
 import { runProductionSoak } from "../scripts/run_production_soak";
 
 function expectFiniteNonNegativeCounters(value: unknown): void {
@@ -60,6 +61,11 @@ describe("production configuration audit", () => {
       ),
     ).toBeLessThanOrEqual(report.seeds * 8 * 9);
     expect(Object.keys(report.traitReachability)).toHaveLength(13);
+    expect(Object.keys(report.traitTierReachability)).toHaveLength(13);
+    expect(report.traitTierReachability.emperor).toMatchObject([
+      { tier: 1, required: 1 },
+      { tier: 2, required: 2 },
+    ]);
     expect(Object.keys(report.traitCombinations)).toEqual([
       "emperor+captain",
     ]);
@@ -142,6 +148,27 @@ describe("production configuration audit", () => {
       expect(trait.matchesReached).toBeLessThanOrEqual(report.completeMatches);
       expect(trait.matchReachRate).toBeGreaterThanOrEqual(0);
       expect(trait.matchReachRate).toBeLessThanOrEqual(1);
+    }
+    for (const definition of DEFAULT_CONTENT.traits) {
+      const tiers = report.traitTierReachability[definition.id];
+      expect(tiers).toHaveLength(definition.tiers.length);
+      expect(tiers.reduce((total, tier) => total + tier.activations, 0)).toBe(
+        report.traitReachability[definition.id].activations,
+      );
+      for (const [tierIndex, tier] of tiers.entries()) {
+        expect(tier).toMatchObject({
+          tier: tierIndex + 1,
+          required: definition.tiers[tierIndex].required,
+        });
+        expect(tier.activations).toBeLessThanOrEqual(
+          report.traitPlayerBattleBoards,
+        );
+        expect(tier.activationRate).toBeGreaterThanOrEqual(0);
+        expect(tier.activationRate).toBeLessThanOrEqual(1);
+        expect(tier.matchesReached).toBeLessThanOrEqual(report.completeMatches);
+        expect(tier.matchReachRate).toBeGreaterThanOrEqual(0);
+        expect(tier.matchReachRate).toBeLessThanOrEqual(1);
+      }
     }
     for (const combination of Object.values(report.traitCombinations)) {
       expect(combination.activations).toBeLessThanOrEqual(

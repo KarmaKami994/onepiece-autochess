@@ -938,8 +938,17 @@ export const TRAIT_DEFINITIONS: TraitDefinition[] = [
     id: "emperor",
     name: "Emperor",
     category: "origin",
-    description: "The presence of multiple Emperors emboldens the entire crew.",
+    description:
+      "Emperors embolden the entire crew, with a stronger bonus when multiple Emperors unite.",
     tiers: [
+      {
+        required: 1,
+        effects: [
+          { kind: "max-health-percent", value: 4 },
+          { kind: "attack-percent", value: 4 },
+        ],
+        label: "+4% health and attack",
+      },
       {
         required: 2,
         effects: [
@@ -1464,7 +1473,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.11.1",
+  version: "1.11.2",
   units: UNIT_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,
   items: ITEM_DEFINITIONS,
