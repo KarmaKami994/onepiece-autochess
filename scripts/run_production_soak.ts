@@ -9,17 +9,109 @@ import {
   advanceMatchPhase,
   createMatch,
   getActiveTraits,
+  getActiveTraitsForUnits,
   getStageDefinition,
   hashCanonicalValue,
   hashGameContent,
+  resolvePersistentFormId,
   type BattleEvent,
   type MatchBattleResult,
   type MatchState,
   type PlayerState,
+  type UnitFormLifecycle,
   type UnitInstance,
 } from "../game/index";
 
 type ConfidenceInterval = { low: number; high: number };
+
+const PRODUCTION_FORM_IDS = [
+  "robin-demonio-fleur",
+  "luffy-gear-4-boundman",
+  "luffy-gear-4-snakeman",
+  "chopper-monster-point",
+] as const;
+
+type ProductionFormId = (typeof PRODUCTION_FORM_IDS)[number];
+
+const PILOT_IDENTITY_KEYS = [
+  "chopper:base",
+  "chopper-monster-point",
+  "robin:base",
+  "robin-demonio-fleur",
+  "luffy:base",
+  "luffy-gear-4-boundman",
+  "luffy-gear-4-snakeman",
+] as const;
+
+type PilotIdentityKey = (typeof PILOT_IDENTITY_KEYS)[number];
+
+export type DeployedPilotUnitSnapshot = {
+  definitionId: string;
+  star: 1 | 2 | 3;
+  formId?: string;
+};
+
+type FinalBoardOutcomeReport = {
+  finalBoards: number;
+  top4Boards: number;
+  winningBoards: number;
+  top4Rate: number | null;
+  winRate: number | null;
+  averagePlacement: number | null;
+  top4RateConfidence95: ConfidenceInterval | null;
+  winRateConfidence95: ConfidenceInterval | null;
+};
+
+export type FormReachabilityReport = FinalBoardOutcomeReport & {
+  baseDefinitionId: string;
+  lifecycle: UnitFormLifecycle;
+  battleStartUnitAppearances: number;
+  transformEvents: number;
+  matchesReached: number;
+  finalBoardShareOfBaseCharacter: number;
+  winnerPresenceRate: number;
+};
+
+export type PilotCombatExpressionReport = Omit<
+  CharacterCombatExpressionReport,
+  "battleBoardAppearances" | "castsPerBattleBoardAppearance"
+> & {
+  sourceAppearances: number;
+  castsPerSourceAppearance: number;
+};
+
+export type PilotFormReachabilityReport = {
+  robin: {
+    allFinalBoards: number;
+    threeStarFinalBoards: number;
+    demonioFinalBoards: number;
+    demonioThreeStarFinalBoards: number;
+    nonDemonioThreeStarFinalBoards: number;
+    demonioShareOfAllFinalBoards: number;
+    demonioShareOfThreeStarFinalBoards: number;
+    threeStarInvariantHolds: boolean;
+  };
+  luffy: {
+    threeStarFinalBoards: number;
+    branches: Record<
+      "base" | "boundman" | "snakeman",
+      FinalBoardOutcomeReport & { shareOfThreeStarFinalBoards: number }
+    >;
+  };
+  chopper: {
+    deployedBoards: number;
+    eligibleBoards: number;
+    eligibleBoardRate: number;
+    eligibleCombatantAppearances: number;
+    eligibleCombatantsDiedBeforeTransform: number;
+    transformEvents: number;
+    transformRateAmongEligibleCombatants: number;
+    survivalToTriggerRate: number;
+    transformedPlayerBattleBoards: number;
+    matchesReached: number;
+    transformsPerPvpBattle: number;
+  };
+};
 
 export type CharacterPresenceReport = {
   cost: number;
@@ -168,6 +260,16 @@ export type ProductionSoakReport = {
     string,
     CharacterCombatExpressionReport
   >;
+  formReachability: Record<ProductionFormId, FormReachabilityReport>;
+  pilotFormReachability: PilotFormReachabilityReport;
+  pilotCombatExpression: Record<
+    PilotIdentityKey,
+    PilotCombatExpressionReport
+  >;
+  formEventVolume: {
+    unitTransformEvents: number;
+    monsterPointTransformsPerPvpBattle: number;
+  };
   combatReadability: CombatReadabilityReport;
   traitPlayerBattleBoards: number;
   traitReachability: Record<string, TraitReachabilityReport>;
@@ -287,6 +389,101 @@ function emptyCombatReadability(): MutableCombatReadability {
   };
 }
 
+function productionFormCounter(): Record<ProductionFormId, number> {
+  return Object.fromEntries(
+    PRODUCTION_FORM_IDS.map((formId) => [formId, 0]),
+  ) as Record<ProductionFormId, number>;
+}
+
+function emptyPilotCombatExpressions(): Record<
+  PilotIdentityKey,
+  MutableCharacterCombatExpression
+> {
+  return Object.fromEntries(
+    PILOT_IDENTITY_KEYS.map((identity) => [
+      identity,
+      emptyCharacterCombatExpression(),
+    ]),
+  ) as Record<PilotIdentityKey, MutableCharacterCombatExpression>;
+}
+
+function isProductionFormId(formId: string | undefined): formId is ProductionFormId {
+  return PRODUCTION_FORM_IDS.some((candidate) => candidate === formId);
+}
+
+function pilotIdentity(
+  definitionId: string,
+  formId: string | undefined,
+): PilotIdentityKey | null {
+  if (definitionId === "chopper") {
+    return formId === "chopper-monster-point"
+      ? "chopper-monster-point"
+      : "chopper:base";
+  }
+  if (definitionId === "robin") {
+    return formId === "robin-demonio-fleur"
+      ? "robin-demonio-fleur"
+      : "robin:base";
+  }
+  if (definitionId === "luffy") {
+    if (formId === "luffy-gear-4-boundman") {
+      return "luffy-gear-4-boundman";
+    }
+    if (formId === "luffy-gear-4-snakeman") {
+      return "luffy-gear-4-snakeman";
+    }
+    return "luffy:base";
+  }
+  return null;
+}
+
+export function auditPilotDeployedBoard(
+  units: readonly DeployedPilotUnitSnapshot[],
+) {
+  const formIds = new Set<ProductionFormId>();
+  const luffyThreeStarBranches = new Set<"base" | "boundman" | "snakeman">();
+  let robinThreeStar = false;
+  let demonio = false;
+  let demonioThreeStar = false;
+  let nonDemonioThreeStar = false;
+
+  for (const unit of units) {
+    if (isProductionFormId(unit.formId)) formIds.add(unit.formId);
+    if (unit.definitionId === "robin") {
+      if (unit.star === 3) {
+        robinThreeStar = true;
+        if (unit.formId !== "robin-demonio-fleur") {
+          nonDemonioThreeStar = true;
+        }
+      }
+      if (unit.formId === "robin-demonio-fleur") {
+        demonio = true;
+        if (unit.star === 3) demonioThreeStar = true;
+      }
+    }
+    if (unit.definitionId === "luffy" && unit.star === 3) {
+      if (unit.formId === "luffy-gear-4-boundman") {
+        luffyThreeStarBranches.add("boundman");
+      } else if (unit.formId === "luffy-gear-4-snakeman") {
+        luffyThreeStarBranches.add("snakeman");
+      } else {
+        luffyThreeStarBranches.add("base");
+      }
+    }
+  }
+
+  return {
+    formIds: [...formIds],
+    robin: {
+      threeStar: robinThreeStar,
+      demonio,
+      demonioThreeStar,
+      nonDemonioThreeStar,
+    },
+    luffyThreeStarBranches: [...luffyThreeStarBranches],
+  };
+}
+
 function sourceDefinitionIds(
   result: MatchBattleResult,
   rosterIds: ReadonlySet<string>,
@@ -351,6 +548,157 @@ function recordCharacterEvent(
     default:
       break;
   }
+}
+
+export function auditFormBattleResult(result: MatchBattleResult) {
+  const battleStartUnitAppearances = productionFormCounter();
+  const transformEvents = productionFormCounter();
+  const formsReached = new Set<ProductionFormId>();
+  const pilotCombatExpression = emptyPilotCombatExpressions();
+  const realUnits = result.initialUnits.filter(
+    (unit) => !unit.teamId.startsWith("ghost-"),
+  );
+  const realUnitIds = new Set(realUnits.map((unit) => unit.id));
+  const definitions = new Map(
+    realUnits.map((unit) => [unit.id, unit.definitionId]),
+  );
+  const teamByUnit = new Map(realUnits.map((unit) => [unit.id, unit.teamId]));
+  const currentIdentities = new Map<string, string>();
+  const unitsByTeam = new Map<string, typeof realUnits>();
+
+  for (const unit of realUnits) {
+    const teamUnits = unitsByTeam.get(unit.teamId) ?? [];
+    teamUnits.push(unit);
+    unitsByTeam.set(unit.teamId, teamUnits);
+    if (isProductionFormId(unit.formId)) {
+      battleStartUnitAppearances[unit.formId] += 1;
+      formsReached.add(unit.formId);
+    }
+    const identity = pilotIdentity(unit.definitionId, unit.formId);
+    if (identity) {
+      currentIdentities.set(unit.id, identity);
+      pilotCombatExpression[identity].battleBoardAppearances += 1;
+    }
+  }
+
+  let deployedChopperBoards = 0;
+  let eligibleChopperBoards = 0;
+  let eligibleChopperCombatantAppearances = 0;
+  const eligibleChopperIds = new Set<string>();
+  for (const units of unitsByTeam.values()) {
+    const choppers = units.filter((unit) => unit.definitionId === "chopper");
+    if (choppers.length === 0) continue;
+    deployedChopperBoards += 1;
+    const hasActiveStrawHat = getActiveTraitsForUnits(units).some(
+      (trait) => trait.traitId === "straw-hat" && trait.tierIndex >= 0,
+    );
+    if (!hasActiveStrawHat) continue;
+    eligibleChopperBoards += 1;
+    eligibleChopperCombatantAppearances += choppers.length;
+    for (const chopper of choppers) eligibleChopperIds.add(chopper.id);
+  }
+
+  let totalTransformEvents = 0;
+  const transformedEligibleChoppers = new Set<string>();
+  const eligibleDeathsBeforeTransform = new Set<string>();
+  const transformedTeams = new Set<string>();
+  for (const event of result.events) {
+    if (event.type === "unit-transform") {
+      if (!realUnitIds.has(event.unitId)) continue;
+      totalTransformEvents += 1;
+      if (isProductionFormId(event.toFormId)) {
+        transformEvents[event.toFormId] += 1;
+        formsReached.add(event.toFormId);
+      }
+      if (
+        event.toFormId === "chopper-monster-point" &&
+        eligibleChopperIds.has(event.unitId)
+      ) {
+        transformedEligibleChoppers.add(event.unitId);
+        const teamId = teamByUnit.get(event.unitId);
+        if (teamId) transformedTeams.add(teamId);
+      }
+      const definitionId = definitions.get(event.unitId);
+      if (definitionId) {
+        const nextIdentity = pilotIdentity(definitionId, event.toFormId);
+        const previousIdentity = currentIdentities.get(event.unitId);
+        if (nextIdentity && nextIdentity !== previousIdentity) {
+          currentIdentities.set(event.unitId, nextIdentity);
+          pilotCombatExpression[nextIdentity].battleBoardAppearances += 1;
+        }
+      }
+      continue;
+    }
+
+    recordCharacterEvent(
+      event,
+      currentIdentities,
+      pilotCombatExpression,
+    );
+    if (
+      event.type === "death" &&
+      eligibleChopperIds.has(event.unitId) &&
+      !transformedEligibleChoppers.has(event.unitId)
+    ) {
+      eligibleDeathsBeforeTransform.add(event.unitId);
+    }
+  }
+
+  return {
+    battleStartUnitAppearances,
+    transformEvents,
+    formsReached: [...formsReached],
+    pilotCombatExpression,
+    totalTransformEvents,
+    chopper: {
+      deployedBoards: deployedChopperBoards,
+      eligibleBoards: eligibleChopperBoards,
+      eligibleCombatantAppearances: eligibleChopperCombatantAppearances,
+      eligibleCombatantsDiedBeforeTransform:
+        eligibleDeathsBeforeTransform.size,
+      transformedPlayerBattleBoards: transformedTeams.size,
+    },
+  };
+}
+
+function mergeCombatExpression(
+  target: MutableCharacterCombatExpression,
+  source: MutableCharacterCombatExpression,
+): void {
+  target.battleBoardAppearances += source.battleBoardAppearances;
+  target.casts += source.casts;
+  target.castTargets += source.castTargets;
+  target.abilityDamageEvents += source.abilityDamageEvents;
+  target.totalAbilityDamage += source.totalAbilityDamage;
+  target.kills += source.kills;
+  target.stunsApplied += source.stunsApplied;
+  target.stunDurationTicks += source.stunDurationTicks;
+  target.burnsApplied += source.burnsApplied;
+  target.displacements.lunge += source.displacements.lunge;
+  target.displacements.knockback += source.displacements.knockback;
+  target.displacements.pull += source.displacements.pull;
+  target.heals.events += source.heals.events;
+  target.heals.amount += source.heals.amount;
+  target.shields.events += source.shields.events;
+  target.shields.amount += source.shields.amount;
+}
+
+function finalBoardOutcome(
+  finalBoards: number,
+  top4Boards: number,
+  winningBoards: number,
+  placementTotal: number,
+): FinalBoardOutcomeReport {
+  return {
+    finalBoards,
+    top4Boards,
+    winningBoards,
+    top4Rate: finalBoards > 0 ? top4Boards / finalBoards : null,
+    winRate: finalBoards > 0 ? winningBoards / finalBoards : null,
+    averagePlacement: finalBoards > 0 ? placementTotal / finalBoards : null,
+    top4RateConfidence95: wilson95(top4Boards, finalBoards),
+    winRateConfidence95: wilson95(winningBoards, finalBoards),
+  };
 }
 
 function recordPvpResult(
@@ -421,6 +769,23 @@ function deployedDefinitions(player: PlayerState): Set<string> {
       .map((unitId) => player.units[unitId]?.definitionId)
       .filter((definitionId): definitionId is string => Boolean(definitionId)),
   );
+}
+
+export function deployedPilotUnitSnapshots(
+  player: Pick<PlayerState, "board" | "units">,
+): DeployedPilotUnitSnapshot[] {
+  return Object.values(player.board).flatMap((unitId) => {
+    const unit = player.units[unitId];
+    if (!unit) return [];
+    const formId = resolvePersistentFormId(unit, DEFAULT_CONTENT) ?? undefined;
+    return [
+      {
+        definitionId: unit.definitionId,
+        star: unit.star,
+        ...(formId ? { formId } : {}),
+      },
+    ];
+  });
 }
 
 function recordCharacterBoard(
@@ -510,6 +875,25 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
       emptyCharacterCombatExpression(),
     ]),
   );
+  const formBattleStartUnitAppearances = productionFormCounter();
+  const formTransformEvents = productionFormCounter();
+  const formMatchReach: MutableCounter = {};
+  const formFinalBoards: MutableCounter = {};
+  const formTop4Boards: MutableCounter = {};
+  const formWinningBoards: MutableCounter = {};
+  const formPlacementTotals: MutableCounter = {};
+  const pilotCombatExpressions = emptyPilotCombatExpressions();
+  const luffyBranchFinalBoards: MutableCounter = {};
+  const luffyBranchTop4Boards: MutableCounter = {};
+  const luffyBranchWinningBoards: MutableCounter = {};
+  const luffyBranchPlacementTotals: MutableCounter = {};
+  const chopperObservations = {
+    deployedBoards: 0,
+    eligibleBoards: 0,
+    eligibleCombatantAppearances: 0,
+    eligibleCombatantsDiedBeforeTransform: 0,
+    transformedPlayerBattleBoards: 0,
+  };
   const combatReadability = emptyCombatReadability();
   const traitActivations: MutableCounter = {};
   const traitTierActivations: MutableCounter = {};
@@ -542,6 +926,11 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
   let preparationSnapshots = 0;
   let shopSlots = 0;
   let emptyShopSlots = 0;
+  let robinThreeStarFinalBoards = 0;
+  let demonioThreeStarFinalBoards = 0;
+  let nonDemonioThreeStarFinalBoards = 0;
+  let luffyThreeStarFinalBoards = 0;
+  let totalTransformEvents = 0;
 
   for (let seedIndex = 0; seedIndex < seedCount; seedIndex += 1) {
     try {
@@ -551,8 +940,13 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
       human.isBot = true;
       human.personalityId = "balanced";
       const lastDeployedBoards = new Map<string, Set<string>>();
+      const lastDeployedPilotUnits = new Map<
+        string,
+        DeployedPilotUnitSnapshot[]
+      >();
       const traitsReachedInMatch = new Set<string>();
       const traitTiersReachedInMatch = new Set<string>();
+      const formsReachedInMatch = new Set<ProductionFormId>();
 
       let transitions = 0;
       let fullSeconds = 0;
@@ -600,6 +994,10 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
           for (const player of state.players.filter((candidate) => candidate.alive)) {
             const definitions = deployedDefinitions(player);
             lastDeployedBoards.set(player.id, definitions);
+            lastDeployedPilotUnits.set(
+              player.id,
+              deployedPilotUnitSnapshots(player),
+            );
             if (stage.kind === "pvp") {
               for (const definitionId of definitions) {
                 const expression = characterCombatExpressions[definitionId];
@@ -629,6 +1027,33 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
             if (result.timedOut) timeouts += 1;
             if (result.winnerId === null) draws += 1;
             if (stage.kind === "pvp") {
+              const formAudit = auditFormBattleResult(result);
+              for (const formId of PRODUCTION_FORM_IDS) {
+                formBattleStartUnitAppearances[formId] +=
+                  formAudit.battleStartUnitAppearances[formId];
+                formTransformEvents[formId] +=
+                  formAudit.transformEvents[formId];
+              }
+              for (const formId of formAudit.formsReached) {
+                formsReachedInMatch.add(formId);
+              }
+              for (const identity of PILOT_IDENTITY_KEYS) {
+                mergeCombatExpression(
+                  pilotCombatExpressions[identity],
+                  formAudit.pilotCombatExpression[identity],
+                );
+              }
+              totalTransformEvents += formAudit.totalTransformEvents;
+              chopperObservations.deployedBoards +=
+                formAudit.chopper.deployedBoards;
+              chopperObservations.eligibleBoards +=
+                formAudit.chopper.eligibleBoards;
+              chopperObservations.eligibleCombatantAppearances +=
+                formAudit.chopper.eligibleCombatantAppearances;
+              chopperObservations.eligibleCombatantsDiedBeforeTransform +=
+                formAudit.chopper.eligibleCombatantsDiedBeforeTransform;
+              chopperObservations.transformedPlayerBattleBoards +=
+                formAudit.chopper.transformedPlayerBattleBoards;
               recordPvpResult(
                 result,
                 rosterIds,
@@ -690,6 +1115,34 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
           if (player.placement <= 4) increment(top4Boards, definitionId);
           if (player.placement === 1) increment(winningBoards, definitionId);
         }
+        const deployedPilotAudit = auditPilotDeployedBoard(
+          lastDeployedPilotUnits.get(player.id) ??
+            deployedPilotUnitSnapshots(player),
+        );
+        for (const formId of deployedPilotAudit.formIds) {
+          increment(formFinalBoards, formId);
+          increment(formPlacementTotals, formId, player.placement);
+          if (player.placement <= 4) increment(formTop4Boards, formId);
+          if (player.placement === 1) increment(formWinningBoards, formId);
+        }
+        if (deployedPilotAudit.robin.threeStar) robinThreeStarFinalBoards += 1;
+        if (deployedPilotAudit.robin.demonioThreeStar) {
+          demonioThreeStarFinalBoards += 1;
+        }
+        if (deployedPilotAudit.robin.nonDemonioThreeStar) {
+          nonDemonioThreeStarFinalBoards += 1;
+        }
+        if (deployedPilotAudit.luffyThreeStarBranches.length > 0) {
+          luffyThreeStarFinalBoards += 1;
+        }
+        for (const branch of deployedPilotAudit.luffyThreeStarBranches) {
+          increment(luffyBranchFinalBoards, branch);
+          increment(luffyBranchPlacementTotals, branch, player.placement);
+          if (player.placement <= 4) increment(luffyBranchTop4Boards, branch);
+          if (player.placement === 1) {
+            increment(luffyBranchWinningBoards, branch);
+          }
+        }
         recordFinalItems(player, itemUsage);
         for (const unit of finalCrew(player)) {
           const cost = unitCostById.get(unit.definitionId);
@@ -698,6 +1151,9 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
           counter.finalCrewUnitInstances += 1;
           if (unit.star >= 2) counter.finalCrewTwoStarOrHigherInstances += 1;
         }
+      }
+      for (const formId of formsReachedInMatch) {
+        increment(formMatchReach, formId);
       }
       if (seedCount >= 100 && (seedIndex + 1) % 50 === 0) {
         process.stderr.write(
@@ -823,6 +1279,131 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
       ];
     }),
   );
+  const formReachability = Object.fromEntries(
+    PRODUCTION_FORM_IDS.map((formId) => {
+      const definition = DEFAULT_CONTENT.forms.find((form) => form.id === formId);
+      if (!definition) throw new Error(`Production form missing: ${formId}`);
+      const outcome = finalBoardOutcome(
+        formFinalBoards[formId] ?? 0,
+        formTop4Boards[formId] ?? 0,
+        formWinningBoards[formId] ?? 0,
+        formPlacementTotals[formId] ?? 0,
+      );
+      return [
+        formId,
+        {
+          baseDefinitionId: definition.baseDefinitionId,
+          lifecycle: definition.lifecycle,
+          battleStartUnitAppearances:
+            formBattleStartUnitAppearances[formId],
+          transformEvents: formTransformEvents[formId],
+          matchesReached: formMatchReach[formId] ?? 0,
+          ...outcome,
+          finalBoardShareOfBaseCharacter: rate(
+            outcome.finalBoards,
+            characterBoards[definition.baseDefinitionId] ?? 0,
+          ),
+          winnerPresenceRate: rate(outcome.winningBoards, completeMatches),
+        } satisfies FormReachabilityReport,
+      ];
+    }),
+  ) as Record<ProductionFormId, FormReachabilityReport>;
+  const pilotCombatExpression = Object.fromEntries(
+    PILOT_IDENTITY_KEYS.map((identity) => {
+      const expression = pilotCombatExpressions[identity];
+      const {
+        battleBoardAppearances: sourceAppearances,
+        ...rawExpression
+      } = expression;
+      const controlEvents =
+        expression.stunsApplied +
+        expression.displacements.lunge +
+        expression.displacements.knockback +
+        expression.displacements.pull;
+      return [
+        identity,
+        {
+          sourceAppearances,
+          ...rawExpression,
+          castsPerSourceAppearance: rate(expression.casts, sourceAppearances),
+          averageTargetsPerCast: rate(expression.castTargets, expression.casts),
+          abilityDamagePerCast: rate(
+            expression.totalAbilityDamage,
+            expression.casts,
+          ),
+          controlEventsPerCast: rate(controlEvents, expression.casts),
+        } satisfies PilotCombatExpressionReport,
+      ];
+    }),
+  ) as Record<PilotIdentityKey, PilotCombatExpressionReport>;
+  const luffyBranches = Object.fromEntries(
+    (["base", "boundman", "snakeman"] as const).map((branch) => {
+      const outcome = finalBoardOutcome(
+        luffyBranchFinalBoards[branch] ?? 0,
+        luffyBranchTop4Boards[branch] ?? 0,
+        luffyBranchWinningBoards[branch] ?? 0,
+        luffyBranchPlacementTotals[branch] ?? 0,
+      );
+      return [
+        branch,
+        {
+          ...outcome,
+          shareOfThreeStarFinalBoards: rate(
+            outcome.finalBoards,
+            luffyThreeStarFinalBoards,
+          ),
+        },
+      ];
+    }),
+  ) as PilotFormReachabilityReport["luffy"]["branches"];
+  const monsterPointTransforms =
+    formTransformEvents["chopper-monster-point"];
+  const pilotFormReachability: PilotFormReachabilityReport = {
+    robin: {
+      allFinalBoards: characterBoards.robin ?? 0,
+      threeStarFinalBoards: robinThreeStarFinalBoards,
+      demonioFinalBoards:
+        formFinalBoards["robin-demonio-fleur"] ?? 0,
+      demonioThreeStarFinalBoards,
+      nonDemonioThreeStarFinalBoards,
+      demonioShareOfAllFinalBoards: rate(
+        formFinalBoards["robin-demonio-fleur"] ?? 0,
+        characterBoards.robin ?? 0,
+      ),
+      demonioShareOfThreeStarFinalBoards: rate(
+        demonioThreeStarFinalBoards,
+        robinThreeStarFinalBoards,
+      ),
+      threeStarInvariantHolds:
+        nonDemonioThreeStarFinalBoards === 0 &&
+        robinThreeStarFinalBoards === demonioThreeStarFinalBoards,
+    },
+    luffy: {
+      threeStarFinalBoards: luffyThreeStarFinalBoards,
+      branches: luffyBranches,
+    },
+    chopper: {
+      ...chopperObservations,
+      eligibleBoardRate: rate(
+        chopperObservations.eligibleBoards,
+        chopperObservations.deployedBoards,
+      ),
+      transformEvents: monsterPointTransforms,
+      transformRateAmongEligibleCombatants: rate(
+        monsterPointTransforms,
+        chopperObservations.eligibleCombatantAppearances,
+      ),
+      survivalToTriggerRate: rate(
+        monsterPointTransforms,
+        chopperObservations.eligibleCombatantAppearances,
+      ),
+      matchesReached: formMatchReach["chopper-monster-point"] ?? 0,
+      transformsPerPvpBattle: rate(
+        monsterPointTransforms,
+        combatReadability.pvpBattleCount,
+      ),
+    },
+  };
   const totalStatusApplications =
     combatReadability.statusApplications.stun +
     combatReadability.statusApplications.burn +
@@ -997,6 +1578,16 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
       byCost: shopPoolAvailability,
     },
     characterCombatExpression,
+    formReachability,
+    pilotFormReachability,
+    pilotCombatExpression,
+    formEventVolume: {
+      unitTransformEvents: totalTransformEvents,
+      monsterPointTransformsPerPvpBattle: rate(
+        monsterPointTransforms,
+        combatReadability.pvpBattleCount,
+      ),
+    },
     combatReadability: finalizedCombatReadability,
     traitPlayerBattleBoards: traitObservations.playerBattleBoards,
     traitReachability,
