@@ -1,6 +1,76 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_CONTENT } from "../game";
-import { runProductionSoak } from "../scripts/run_production_soak";
+import {
+  DEFAULT_CONTENT,
+  type BattleEvent,
+  type BattleUnitSnapshot,
+  type MatchBattleResult,
+  type UnitInstance,
+} from "../game";
+import {
+  auditFormBattleResult,
+  auditPilotFinalCrew,
+  runProductionSoak,
+} from "../scripts/run_production_soak";
+
+function snapshot(
+  id: string,
+  definitionId: string,
+  teamId: string,
+  formId?: string,
+): BattleUnitSnapshot {
+  return {
+    id,
+    definitionId,
+    formId,
+    teamId,
+    star: 1,
+    x: 0,
+    y: 0,
+    hp: 100,
+    maxHp: 100,
+    shield: 0,
+    energy: 0,
+    attack: 10,
+    defense: 10,
+    range: 1,
+    state: "seek",
+  };
+}
+
+function battleResult(
+  initialUnits: BattleUnitSnapshot[],
+  events: BattleEvent[],
+): MatchBattleResult {
+  return {
+    playerAId: "player-1",
+    playerBId: null,
+    ghostOfPlayerId: "player-2",
+    winnerId: "player-1",
+    timedOut: false,
+    playerADamage: 1,
+    playerBDamage: 0,
+    durationTicks: 100,
+    events,
+    initialUnits,
+    finalUnits: initialUnits,
+  };
+}
+
+function crewUnit(
+  id: string,
+  definitionId: string,
+  star: 1 | 2 | 3,
+  formId?: string,
+): UnitInstance {
+  return {
+    id,
+    definitionId,
+    formId,
+    star,
+    items: [],
+    acquiredOrder: 1,
+  };
+}
 
 function expectFiniteNonNegativeCounters(value: unknown): void {
   if (typeof value === "number") {
@@ -38,6 +108,31 @@ describe("production configuration audit", () => {
       "5",
     ]);
     expect(Object.keys(report.characterCombatExpression)).toHaveLength(30);
+    expect(report.characterPresence["robin-demonio-fleur"]).toBeUndefined();
+    expect(
+      report.characterCombatExpression["chopper-monster-point"],
+    ).toBeUndefined();
+    expect(Object.keys(report.formReachability)).toEqual([
+      "robin-demonio-fleur",
+      "luffy-gear-4-boundman",
+      "luffy-gear-4-snakeman",
+      "chopper-monster-point",
+    ]);
+    expect(Object.keys(report.pilotCombatExpression)).toEqual([
+      "chopper:base",
+      "chopper-monster-point",
+      "robin:base",
+      "robin-demonio-fleur",
+      "luffy:base",
+      "luffy-gear-4-boundman",
+      "luffy-gear-4-snakeman",
+    ]);
+    expect(
+      report.formReachability["chopper-monster-point"].finalBoards,
+    ).toBe(0);
+    expect(report.pilotFormReachability.robin.threeStarInvariantHolds).toBe(
+      true,
+    );
     expect(report.combatReadability.pvpBattleCount).toBeGreaterThan(0);
     expect(report.combatReadability.castsPerPvpBattle).toBeGreaterThanOrEqual(0);
     expect(report.traitPlayerBattleBoards).toBeGreaterThan(0);
@@ -186,6 +281,12 @@ describe("production configuration audit", () => {
     for (const expression of Object.values(report.characterCombatExpression)) {
       expectFiniteNonNegativeCounters(expression);
     }
+    for (const expression of Object.values(report.pilotCombatExpression)) {
+      expectFiniteNonNegativeCounters(expression);
+    }
+    expectFiniteNonNegativeCounters(report.formReachability);
+    expectFiniteNonNegativeCounters(report.pilotFormReachability);
+    expectFiniteNonNegativeCounters(report.formEventVolume);
     expectFiniteNonNegativeCounters(report.combatReadability);
 
     expect(JSON.parse(JSON.stringify(report))).toEqual(report);
@@ -196,4 +297,217 @@ describe("production configuration audit", () => {
       generatedAt: "deterministic",
     });
   }, 30_000);
+});
+
+describe("post-forms production diagnostics", () => {
+  it("attributes persistent forms from real initial snapshots and excludes ghosts", () => {
+    const audit = auditFormBattleResult(
+      battleResult(
+        [
+          snapshot(
+            "robin",
+            "robin",
+            "player-1",
+            "robin-demonio-fleur",
+          ),
+          snapshot(
+            "luffy",
+            "luffy",
+            "player-1",
+            "luffy-gear-4-boundman",
+          ),
+          snapshot(
+            "ghost-luffy",
+            "luffy",
+            "ghost-player-2",
+            "luffy-gear-4-snakeman",
+          ),
+        ],
+        [
+          {
+            type: "cast",
+            tick: 1,
+            sourceId: "robin",
+            abilityId: "demonio-fleur",
+            targetIds: ["ghost-luffy"],
+          },
+          {
+            type: "cast",
+            tick: 2,
+            sourceId: "luffy",
+            abilityId: "kong-gun",
+            targetIds: ["ghost-luffy"],
+          },
+          {
+            type: "cast",
+            tick: 3,
+            sourceId: "ghost-luffy",
+            abilityId: "jet-culverin",
+            targetIds: ["robin"],
+          },
+        ],
+      ),
+    );
+
+    expect(audit.battleStartUnitAppearances).toMatchObject({
+      "robin-demonio-fleur": 1,
+      "luffy-gear-4-boundman": 1,
+      "luffy-gear-4-snakeman": 0,
+    });
+    expect(audit.formsReached).toEqual([
+      "robin-demonio-fleur",
+      "luffy-gear-4-boundman",
+    ]);
+    expect(audit.pilotCombatExpression["robin-demonio-fleur"]).toMatchObject({
+      battleBoardAppearances: 1,
+      casts: 1,
+    });
+    expect(
+      audit.pilotCombatExpression["luffy-gear-4-boundman"],
+    ).toMatchObject({ battleBoardAppearances: 1, casts: 1 });
+    expect(
+      audit.pilotCombatExpression["luffy-gear-4-snakeman"],
+    ).toMatchObject({ battleBoardAppearances: 0, casts: 0 });
+  });
+
+  it("switches Chopper event attribution at one real transform and measures eligibility", () => {
+    const audit = auditFormBattleResult(
+      battleResult(
+        [
+          snapshot("chopper", "chopper", "player-1"),
+          snapshot("chopper-dead", "chopper", "player-1"),
+          snapshot("usopp", "usopp", "player-1"),
+          snapshot("ghost-chopper", "chopper", "ghost-player-2"),
+          snapshot("ghost-usopp", "usopp", "ghost-player-2"),
+        ],
+        [
+          {
+            type: "death",
+            tick: 40,
+            unitId: "chopper-dead",
+            sourceId: null,
+          },
+          {
+            type: "cast",
+            tick: 70,
+            sourceId: "chopper",
+            abilityId: "emergency-cure",
+            targetIds: ["chopper"],
+          },
+          {
+            type: "unit-transform",
+            tick: 80,
+            unitId: "chopper",
+            fromFormId: null,
+            toFormId: "chopper-monster-point",
+            hp: 700,
+            maxHp: 800,
+          },
+          {
+            type: "cast",
+            tick: 81,
+            sourceId: "chopper",
+            abilityId: "monster-point-slam",
+            targetIds: ["ghost-chopper"],
+          },
+          {
+            type: "damage",
+            tick: 82,
+            sourceId: "chopper",
+            targetId: "ghost-chopper",
+            amount: 100,
+            healthDamage: 100,
+            shieldDamage: 0,
+            damageKind: "ability",
+          },
+          {
+            type: "status",
+            tick: 83,
+            sourceId: "chopper",
+            targetId: "ghost-chopper",
+            status: "stun",
+            durationTicks: 6,
+          },
+          {
+            type: "unit-transform",
+            tick: 80,
+            unitId: "ghost-chopper",
+            fromFormId: null,
+            toFormId: "chopper-monster-point",
+            hp: 800,
+            maxHp: 800,
+          },
+          {
+            type: "cast",
+            tick: 81,
+            sourceId: "ghost-chopper",
+            abilityId: "monster-point-slam",
+            targetIds: ["chopper"],
+          },
+        ],
+      ),
+    );
+
+    expect(audit.totalTransformEvents).toBe(1);
+    expect(audit.transformEvents["chopper-monster-point"]).toBe(1);
+    expect(audit.chopper).toEqual({
+      deployedBoards: 1,
+      eligibleBoards: 1,
+      eligibleCombatantAppearances: 2,
+      eligibleCombatantsDiedBeforeTransform: 1,
+      transformedPlayerBattleBoards: 1,
+    });
+    expect(audit.pilotCombatExpression["chopper:base"]).toMatchObject({
+      battleBoardAppearances: 2,
+      casts: 1,
+    });
+    expect(
+      audit.pilotCombatExpression["chopper-monster-point"],
+    ).toMatchObject({
+      battleBoardAppearances: 1,
+      casts: 1,
+      abilityDamageEvents: 1,
+      totalAbilityDamage: 100,
+      stunsApplied: 1,
+      stunDurationTicks: 6,
+    });
+  });
+
+  it("counts Robin final-board form identity once and exposes the 3-star invariant", () => {
+    const audit = auditPilotFinalCrew([
+      crewUnit("robin-a", "robin", 3, "robin-demonio-fleur"),
+      crewUnit("robin-b", "robin", 3, "robin-demonio-fleur"),
+    ]);
+
+    expect(audit.formIds).toEqual(["robin-demonio-fleur"]);
+    expect(audit.robin).toEqual({
+      threeStar: true,
+      demonio: true,
+      demonioThreeStar: true,
+      nonDemonioThreeStar: false,
+    });
+    expect(
+      auditPilotFinalCrew([crewUnit("base-robin", "robin", 3)]).robin
+        .nonDemonioThreeStar,
+    ).toBe(true);
+  });
+
+  it("separates base, Boundman, and Snakeman 3-star Luffy branches", () => {
+    const audit = auditPilotFinalCrew([
+      crewUnit("luffy-base", "luffy", 3),
+      crewUnit("luffy-boundman", "luffy", 3, "luffy-gear-4-boundman"),
+      crewUnit("luffy-snakeman", "luffy", 3, "luffy-gear-4-snakeman"),
+      crewUnit("luffy-snakeman-copy", "luffy", 3, "luffy-gear-4-snakeman"),
+    ]);
+
+    expect(audit.formIds).toEqual([
+      "luffy-gear-4-boundman",
+      "luffy-gear-4-snakeman",
+    ]);
+    expect(audit.luffyThreeStarBranches).toEqual([
+      "base",
+      "boundman",
+      "snakeman",
+    ]);
+  });
 });
