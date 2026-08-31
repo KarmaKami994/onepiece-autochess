@@ -9,6 +9,8 @@ import {
   RESOURCE_BAR_COLORS,
   RESOURCE_BAR_GEOMETRY,
   resourceBarFill,
+  resourceHealthAfterSet,
+  resourceHealthAfterTransform,
   resourceBarLayout,
 } from "../components/unitResourceBar";
 
@@ -117,6 +119,21 @@ describe("combat resource bars", () => {
       RESOURCE_BAR_GEOMETRY.segmentCount - 1,
     );
     expect(fill.segmentXs).toEqual([...fill.segmentXs].sort((a, b) => a - b));
+  });
+
+  it("changes the playback HP pool at transform and uses it for later damage and final HP", () => {
+    const initial = { current: 550, max: 650 };
+    const transformed = resourceHealthAfterTransform(700, 800);
+    const damaged = resourceHealthAfterSet(
+      transformed,
+      transformed.current - 100,
+    );
+    const reconciled = resourceHealthAfterSet(damaged, 750);
+
+    expect(initial).toEqual({ current: 550, max: 650 });
+    expect(transformed).toEqual({ current: 700, max: 800 });
+    expect(damaged).toEqual({ current: 600, max: 800 });
+    expect(reconciled).toEqual({ current: 750, max: 800 });
   });
 
   it("keeps every v2 runtime anchor synchronized with generated metadata", async () => {

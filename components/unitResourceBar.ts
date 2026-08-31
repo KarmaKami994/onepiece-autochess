@@ -40,8 +40,28 @@ export type ResourceBarFillInput = {
   team: ResourceBarTeam;
 };
 
+export type ResourceHealthState = {
+  current: number;
+  max: number;
+};
+
 function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
+}
+
+export function resourceHealthAfterTransform(
+  hp: number,
+  maxHp: number,
+): ResourceHealthState {
+  const max = Math.max(1, maxHp);
+  return { current: clamp(hp, 0, max), max };
+}
+
+export function resourceHealthAfterSet(
+  state: ResourceHealthState,
+  hp: number,
+): ResourceHealthState {
+  return { ...state, current: clamp(hp, 0, state.max) };
 }
 
 /**

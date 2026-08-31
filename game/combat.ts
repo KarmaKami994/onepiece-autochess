@@ -1154,6 +1154,8 @@ export function simulateBattle(
             unitId: unit.id,
             fromFormId: null,
             toFormId: MONSTER_POINT_FORM_ID,
+            hp: unit.hp,
+            maxHp: unit.maxHp,
           });
         }
       }

@@ -309,6 +309,8 @@ describe("Chopper Monster Point trigger", () => {
       unitId: "chopper",
       fromFormId: null,
       toFormId: MONSTER_POINT_FORM_ID,
+      hp: 799,
+      maxHp: 800,
     }]);
     expect(final).toMatchObject({
       definitionId: "chopper",
@@ -558,6 +560,10 @@ describe("Chopper Monster Point live state transition", () => {
     if (!damage || damage.type !== "damage") {
       throw new Error("Expected pre-transform Chopper damage.");
     }
+    expect(transformEvents(result)).toMatchObject([{
+      hp: 800 - damage.healthDamage,
+      maxHp: 800,
+    }]);
 
     expect(final).toMatchObject({
       formId: MONSTER_POINT_FORM_ID,
@@ -744,6 +750,8 @@ describe("Monster Point persistence and economy isolation", () => {
       type: "unit-transform",
       tick: 80,
       toFormId: MONSTER_POINT_FORM_ID,
+      hp: 799,
+      maxHp: 800,
     }));
     expect(human(restored).units[chopper.id].formId).toBeUndefined();
 
@@ -817,6 +825,12 @@ describe("Monster Point presentation", () => {
     );
     state.phase = "battle";
     state.lastResults = [matchResult(battle, player.id, opponent.id)];
+    const transform = battle.events.find(
+      (event) => event.type === "unit-transform",
+    );
+    if (!transform || transform.type !== "unit-transform") {
+      throw new Error("Expected Monster Point transform fixture.");
+    }
 
     for (const perspectiveId of [player.id, opponent.id]) {
       const presentation = selectBattlePresentation(
@@ -830,6 +844,8 @@ describe("Monster Point presentation", () => {
         unitId: `${player.id}:chopper`,
         fromFormId: null,
         toFormId: MONSTER_POINT_FORM_ID,
+        hp: transform.hp,
+        maxHp: transform.maxHp,
         label: "Chopper — Monster Point",
       }));
       expect(presentation?.events).toContainEqual(expect.objectContaining({

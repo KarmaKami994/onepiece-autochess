@@ -522,6 +522,8 @@ export type BattleEvent =
       unitId: string;
       fromFormId: string | null;
       toFormId: string;
+      hp: number;
+      maxHp: number;
     }
   | {
       type: "attack";

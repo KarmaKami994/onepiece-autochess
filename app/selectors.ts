@@ -861,6 +861,8 @@ function combatEvents(
         unitId: event.unitId,
         fromFormId: event.fromFormId,
         toFormId: event.toFormId,
+        hp: event.hp,
+        maxHp: event.maxHp,
         label: form?.name ?? titleCase(event.toFormId),
       }];
     }
