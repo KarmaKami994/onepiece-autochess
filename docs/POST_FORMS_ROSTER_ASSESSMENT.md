@@ -13,17 +13,17 @@ This is an analysis-only comparison of the completed 30-unit roster and four pro
 | Provenance | Value |
 |---|---|
 | Base `main` | `bf6b1003da66611e2aa7d429b4cf944e79fe1189` |
-| Measurement implementation | `7780b44a50da9ba0f50151b2f368f17bf5de30ec` |
+| Measurement implementation | `ed1feeeac78c84a6714ba05aa13fee7097a86548` |
 | GameContent / save schema | `1.15.0` / `6` |
 | Content / config hash | `0d45b798` / `977295da` |
 | Node | `v24.3.0` |
 | Seeds | `production-0` through `production-999` (1,000) |
 | Raw snapshot | `docs/analysis/post-forms-roster-assessment-1000.json` |
-| Snapshot SHA-256 | `c726cc18ea5fb3f0a1731ec7a34fe38a04ed2855ed5a632ca9de57b0ba14c236` |
+| Snapshot SHA-256 | `ea07805c335e81e1fd71e77172a77928625668ee8fa6f3cd9e8d9c7a53a6192e` |
 
-The working tree was clean before measurement. Exactly one final post-forms 1,000-seed run occurred. The committed measurement code was not changed after the run; only the exact snapshot and documentation followed.
+The working tree was clean before the corrected measurement. Review found that the initial instrumentation used full crew rather than the last deployed board; that pre-fix measurement remains in Git history at `7780b44a`, but is rejected as authoritative. Exactly one corrected 1,000-seed run occurred at `ed1feeea`. The committed corrected measurement code was not changed after the run; only the exact snapshot and documentation followed.
 
-Form observations use real, non-ghost player units. Persistent final-board forms count once per player board. Combat attribution starts from each immutable battle snapshot and follows recorded `unit-transform` events in order; it does not infer battle identity from later persistent state.
+Form observations use real, non-ghost player units. Persistent final-board forms count once from the same last deployed `player.board` observation as base-character presence; bench and full-crew-only forms are excluded. This is an **ADAPTED PORT** of PAC's deployed-only endgame-statistics semantics while retaining One Piece Autochess's separate board/bench architecture. Combat attribution starts from each immutable battle snapshot and follows recorded `unit-transform` events in order; it does not infer battle identity from later persistent state.
 
 ## 3. Pre-Forms Baseline
 
