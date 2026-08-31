@@ -105,7 +105,7 @@ This is the correct high-level class for local opponents, current production met
 1. **Round resources:** living players receive base income, interest, streak income and automatic XP; shops refresh through the real pool/odds system.
 2. **Initial buy pass:** shop offers are scored and sorted deterministically.
 3. **Offer score:** `cost × 25 + owned-instance count × 24 + preferred-trait match × 20 + top-two current trait-count contributions × 4 − connector penalty`.
-4. **Purchase gate:** buy if reserve remains, the score has at least one non-cost incentive, or the round is at most three. A full bench may sell a lower-cost one-star unit only for a sufficiently stronger higher-cost offer.
+4. **Purchase gate:** buy if reserve remains, the offer score reaches at least the cost baseline plus 24 through copies, traits and preference combinations, or the round is at most three. A preferred-trait bonus of `+20` alone does not reach that non-reserve threshold. A full bench may sell a lower-cost one-star unit only for a sufficiently stronger higher-cost offer.
 5. **XP:** personality aggression becomes a fixed maximum of zero to three attempts; each purchase must preserve `economyReserve`, respect max level and have enough owned units to fill the level.
 6. **Rerolls:** personality aggression becomes zero to three attempts; each must preserve reserve, and every successful reroll is followed by another buy pass.
 7. **Lineup:** all owned instances are scored by unit score plus fixed star bonuses (2-star `+100`, 3-star `+260`) and `+18` per item; the top `player.level` instances are selected independently.
@@ -132,10 +132,11 @@ P2 changes could alter affordability, rarity access, star timing, shop/pool pres
 
 ## 9. Current Meta-Bias Risks
 
-No clear logic defect was confirmed. These are heuristic risks in the current environment, not proof that a result is wrong.
+No gameplay-engine logic defect was confirmed. The heuristic findings below are risks in the current environment, not proof that a result is wrong; the production-soak population asymmetry is a separate confirmed measurement-harness defect.
 
 | Finding | Classification | Evidence-backed risk |
 | --- | --- | --- |
+| Production soak converts `player-1` into a bot only after the first phase transition and leaves `personalityId` null | **CLEAR LOGIC DEFECT / MEASUREMENT-HARNESS POPULATION ASYMMETRY** | `player-1` skips round-1 bot preparation, then resolves to Balanced; the resulting population duplicates Balanced instead of representing eight symmetrically assigned bot personalities. |
 | `cost × 25` dominates base unit score | **PLAUSIBLE META BIAS / NEEDS MEASUREMENT** | Systematically favors higher-cost offers and instances before kit strength; full-bench replacement also requires the incoming unit to be higher cost. |
 | Current owned-instance count gives fixed `+24` each | **INTENTIONAL SIMPLIFICATION / PLAUSIBLE META BIAS** | Encourages copies but measures instances, not marginal merge probability or copies embedded in an existing star. |
 | Trait score uses raw current distinct counts, top two only | **PLAUSIBLE META BIAS** | Favors already-common traits without considering the next tier threshold, actual tier effect or marginal lineup composition. |
@@ -159,7 +160,15 @@ Answers to the high-value questions:
 8. **Progression realism:** reserve and fixed XP/reroll counts are tightly coupled to current P2/P3 curves.
 9. **Likely invalidation:** purchase, XP, reroll, star, trait-reach and reserve conclusions are most exposed to P2/P3; deterministic command seams and formation architecture are more stable.
 
-Existing 1,000-seed runs remain valid **current-environment evidence**. Statements such as “Smoker performed at a measured rate under the current deterministic bot policy” remain supported. Generalization to human play or a future post-P2/P3 bot policy is not established.
+Existing 1,000-seed runs remain valid **exact-current-harness/current-policy evidence**. Statements such as “Smoker performed at a measured rate under the current deterministic production-soak harness and bot policy” remain supported. They do not establish results for a symmetric eight-bot personality population, humans or a future post-P2/P3 bot policy.
+
+### Production-soak population asymmetry
+
+`createMatch()` initializes `player-1` with `isBot: false` and `personalityId: null`; the other seven participants are bots. On round-1 preparation, `advanceMatchPhase()` calls the bot-turn runner only for living players whose `isBot` is true, so `player-1` skips bot preparation before the first PvE battle. The production-soak harness changes `player-1.isBot` to true only after that phase transition and does not assign a personality.
+
+Later personality resolution cannot match the null ID and therefore selects the first configured personality, Balanced: reserve 10, level aggression 0.55, reroll aggression 0.45, no preferred traits and spread formation. From the next preparation onward, the harness consequently has two effective Balanced participants and one participant for each of the other six personalities. This is a **CLEAR LOGIC DEFECT / MEASUREMENT-HARNESS POPULATION ASYMMETRY**, not a gameplay-engine defect. The round-1 difference can affect the first PvE result and potentially early HP/state progression; its size is unmeasured.
+
+Prior snapshots remain valid measurements of this exact harness. Before the next new authoritative production-soak baseline is used to evaluate system or balance changes, participant initialization must be explicitly normalized or the intended asymmetric population must be specified. This audit does not implement that change.
 
 ## 10. Adaptive vs Scripted Bot Roles
 
@@ -218,6 +227,8 @@ Architecture is locked at the role boundary, not at current weights: adaptive bo
 **P1B:** adaptive bot tuning, only if still necessary after P2/P3.
 
 **P4:** Items / Treasure / Form Accessibility research/audit.
+
+Then: **normalize or intentionally specify the production-soak participant population before the next authoritative broad baseline, if not already handled**.
 
 Then: **new broad production baseline**.
 
