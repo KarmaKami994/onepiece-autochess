@@ -22,10 +22,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-PR #27 Luffy Gear 4 is merged at `4de78c7`, and the Chopper Monster Point third production Character Form pilot is complete on PR #28.
+PR #28 Monster Point is merged at `bf6b100`; the three-pilot Character Form sequence is complete. PR #29 post-forms roster measurement and report are complete on `analysis/post-forms-roster-assessment` and await review.
 
 ## Last Completed Work
 
+- 2026-08-31 — PR #29 on `analysis/post-forms-roster-assessment`: completed exactly one clean-commit 1,000-seed post-forms production assessment at measurement SHA `7780b44a50da9ba0f50151b2f368f17bf5de30ec`. The run completed 1,000/1,000 matches with zero crashes; timeout improved from 1.1959% to 0.7283%, draws were 0.0311%, and full-clock / paced duration remained stable. Demonio reached 407 final boards with the 3-star Robin invariant intact; Boundman and Snakeman reached 3 and 1 final boards; Monster Point transformed 56,566 times in all 1,000 matches. Demonio is a healthy signal, Gear 4 is under-sampled, Monster Point/Chopper is an overperforming signal, and Smoker remains clearly overperforming. Overall classification B; the sole recommendation is an isolated Smoker adjustment. The exact snapshot is `docs/analysis/post-forms-roster-assessment-1000.json`, SHA-256 `c726cc18ea5fb3f0a1731ec7a34fe38a04ed2855ed5a632ca9de57b0ba14c236`. GameContent remains `1.15.0`; save schema remains 6. Material files: `scripts/run_production_soak.ts`, `tests/production-audit.test.ts`, the raw snapshot, `docs/POST_FORMS_ROSTER_ASSESSMENT.md`, `PROJECT_STATE.md`.
 - 2026-08-31 — PR #28 on `feature/chopper-monster-point`: added the first production battle-temporary form. Each living base Chopper on a team with a frozen active Straw Hat tier transforms at 8 seconds in deterministic unit-ID order, after periodic deaths and before same-tick actions. Monster Point applies star-scaled live deltas to 800/60/28/range 1, preserves absolute damage and all combat state, and replaces Emergency Cure with 250-power nearest-cluster Monster Point Slam plus 600ms stun. Generic `unit-transform` events drive immutable snapshot/save/spectator playback and a reduced-motion-safe text cue; review hardening now carries exact post-transform live HP/max HP into Phaser resource state so subsequent damage and final reconciliation use the transformed maximum. Persistent Chopper, traits, cadence, economy and next-battle setup remain base. Production forms are 4; roster remains 30; GameContent is `1.15.0`; save schema remains 6. Material files: `game/types.ts`, `game/content.ts`, `game/combat.ts`, `app/selectors.ts`, `components/PhaserBoard.tsx`, `components/unitResourceBar.ts`, focused/version tests, `docs/CHARACTER_FORM_SYSTEM.md`, `PROJECT_STATE.md`.
 - 2026-08-30 — PR #27 on `feature/luffy-gear-four`: added persistent Luffy Gear 4 Boundman and Snakeman branches while preserving base Luffy and the normal nine-copy 3-star economy. A retained Armament Wraps selects Boundman; retained Sniper Goggles selects Snakeman; earliest equipped-item-array catalyst wins the initial tie, catalysts are not consumed, overflow does not select, and an assigned branch locks. Boundman is 990/86/34/range 1/1000ms with 285-power Kong Gun, 600ms stun and knockback; Snakeman is 850/78/24/range 4/700ms with 300-power four-strike Jet Culverin and in-range KO retargeting. Equip and schema-6 loading use the same explicit character reconciliation, including `finalCrew`, without rewriting frozen battle snapshots; Robin behavior remains intact. Production forms are 3; roster remains 30; GameContent is `1.14.0`; save schema remains 6. Material files: `game/content.ts`, `game/forms.ts`, `game/roster.ts`, `game/engine.ts`, `game/persistenceFormat.ts`, focused tests, content-version assertions, `docs/CHARACTER_FORM_SYSTEM.md`, `PROJECT_STATE.md`.
 - 2026-08-30 — `d7673ba`, merged PR #26: added Robin's persistent Demonio Fleur form after the normal nine-copy 3-star merge while preserving the surviving anchor, base/economic `definitionId`, items, position, shop/pool accounting and sell value. Demonio replaces only Clutch with 180-power lowest-health adjacent damage, 1400ms stun and 20-Energy Drain; base stats, traits and assets remain inherited. Schema-6 loading reconciles persistent current/future 3-star Robin in `player.units` and `finalCrew` without rewriting frozen battle snapshots, clears only invalid 1/2-star Demonio assignments and preserves unrelated unknown form IDs. Production forms were 1; roster remained 30; GameContent was `1.13.0`; save schema remained 6. Material files: `game/content.ts`, `game/forms.ts`, `game/roster.ts`, `game/persistenceFormat.ts`, focused tests, content-version assertions, `docs/CHARACTER_FORM_SYSTEM.md`, `PROJECT_STATE.md`.
@@ -53,6 +54,18 @@ PR #27 Luffy Gear 4 is merged at `4de78c7`, and the Chopper Monster Point third 
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+Post-forms roster assessment:
+
+- PASS — focused production-audit tests: 1 file, 5 tests; form pilot regressions: 4 files, 48 tests.
+- PASS — `npm run typecheck` and `npm run lint` through the installed npm CLI before measurement.
+- PASS — `npm test`: 41 files, 361 tests.
+- PASS — `npm run assets:validate`: 41 animation atlases, maps, Carousel assets and provenance files validated.
+- PASS — `npm run test:production-smoke`: 50/50 complete matches, zero crashes; diagnostic validation only.
+- PASS — `npm run build`.
+- PASS — exactly one `npm run test:production-soak`: 1,000/1,000 complete matches, zero crashes, seeds `production-0` through `production-999`.
+- PASS — post-report snapshot/provenance reconciliation, `npm run typecheck`, and focused production-audit test: 1 file, 5 tests.
+- NOT RUN — local Browser E2E; no application, UI or Phaser production code changed, as scoped.
 
 Chopper Monster Point pilot:
 
@@ -323,6 +336,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- None for the post-forms assessment. Diagnostics add form-aware reachability, eligibility, event-volume and pilot combat attribution without changing existing aggregate semantics, gameplay, RNG, content, AI, presentation, persistence or saves.
 - Base Chopper now transforms battle-locally into Monster Point at 8 seconds only when its frozen battle-start team has an active Straw Hat tier and it is still alive. The transition preserves absolute damage, items, star, trait effects, resources, statuses and cadence while applying star-scaled deltas to 800/60/28/range 1 and switching to 250-power adjacent Monster Point Slam with 600ms stun. A generic `unit-transform` event provides immutable playback/save/spectator identity, exact post-transform live HP/max HP and a text cue; Phaser adopts that maximum before subsequent damage/heal playback and final HP reconciliation. `definitionId`, persistent `UnitInstance`, team traits, shops/pools and the next battle remain base Chopper. GameContent is `1.15.0`; save schema remains 6.
 - A normal 3-star Luffy remains base Luffy without a retained catalyst. Retained Armament Wraps selects persistent Boundman and retained Sniper Goggles selects persistent Snakeman; the earliest catalyst in `instance.items` wins only the first selection, overflow is ignored, catalysts remain equipped, and the assigned branch locks. Boundman uses the locked 990/86/34/range 1/1000ms overlay and 285-power single-target Kong Gun with 600ms stun/knockback. Snakeman uses 850/78/24/range 4/700ms and 300-power four-strike Jet Culverin with in-range KO retargeting. Normal scaling, base/economic `luffy` identity and active battle snapshot freezing remain unchanged. GameContent is `1.14.0`; save schema remains 6.
 - A normal Robin merge remains base Robin at 2-star; the normal nine-copy 3-star merge now assigns persistent `formId: "robin-demonio-fleur"` to the surviving Robin anchor. Demonio Fleur inherits Robin's unchanged stats, traits and assets, replaces Clutch with 180-power lowest-health adjacent damage, 1400ms stun and 20-Energy Drain, and uses normal 3-star stat/ability scaling. Shop, pool, purchase, sale and analytics identity remain `robin`; active battle snapshots stay frozen. GameContent is `1.13.0`; save schema remains 6.
@@ -349,6 +363,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- None for the post-forms assessment. Measured diagnostics/tests were committed and the tree was clean before exactly one final 1,000-seed run; measured code remained frozen afterward. Browser E2E was not required locally because no app, UI or Phaser production source changed.
 - No gameplay implementation deviation for Monster Point or its review hardening. No generic trigger/duration framework, command, trait recomputation, art/audio, persistent assignment, schema change, balance revision or 1,000-seed soak was added. Browser E2E hit only the known Windows-owned Vinext server teardown hang after all scenarios passed; stopping that exact spawned server allowed the command to return exit 0.
 - No implementation deviation for Luffy Gear 4. No Chopper work, generic trigger system, form command/UI/assets, schema change, unrelated balance change or 1,000-seed soak was added. Browser E2E's owned Vinext server hung during Windows teardown twice after all scenarios completed; the unchanged suite then passed against a separately started local server and returned exit 0.
 - None for Robin Demonio Fleur. No generic trigger system, command, UI, asset, stat/trait override, unrelated balance change or production soak was added; the locked values were unchanged after the 50-seed smoke.
@@ -375,6 +390,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- The post-forms system baseline is crash-stable and timeout rate improved to 0.7283%. Smoker remains the clearest coherent high-sample positive same-cost outlier. Chopper moved positively across top-four, wins, placement and winner presence while Monster Point transformed in all 1,000 matches, so it is a secondary overperforming watch signal. Natural Gear 4 reach was only four final boards and cannot support branch-specific balance conclusions. Robin, Nami, Crocodile and Ivankov remain negative signals; small 5-cost samples remain inconclusive.
 - No blocking Monster Point risk found. The 50-seed smoke completed 50/50 matches with zero crashes and is not balance evidence; the required post-forms 1,000-seed assessment remains separate. Browser E2E retained the existing Windows owned-server teardown/flaky immediate-save-resume risk, but the focused retry and subsequent full suite passed.
 - No blocking Luffy-pilot risk found. The 50-seed smoke completed 50/50 matches with zero crashes and is not balance evidence. Chopper temporary-transform timing remains intentionally unvalidated until its separate bounded pilot.
 - Emperor Tier 1 now reaches 17.6% of matches, while the two-Emperor Tier 2 was not reached in the post-change run versus 2/1,000 baseline matches; the preserved chase payoff remains exceptionally rare. Shanks' conditional-win estimate rose from 56.84% to 69.47% on the same 95 final-board observations, but Wilson intervals overlap, top-four rate was stable and winner presence moved only +1.2 pp. Blackbeard and system guardrails were stable; Shanks is a future watch signal, not sufficient isolated tuning evidence.
@@ -398,6 +414,7 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
+- The post-forms assessment is classification B — specific balance follow-up warranted. Form-aware diagnostics retain `definitionId` as economic identity, use real non-ghost snapshots, attribute events through the recorded transform timeline, and leave historical aggregate semantics unchanged. The sole next bounded task is an isolated Smoker adjustment; Chopper remains a secondary watch and Gear 4 requires more observations.
 - Monster Point is battle-temporary only: frozen battle-start Straw Hat eligibility triggers living base Choppers at 8 seconds after periodic effects and before action selection. The live combatant receives star-scaled base/form deltas and a new ability without reinitialization; `unit-transform` records battle-local identity, while persistent Chopper and the next battle remain base. No generic trigger or duration system exists.
 - Luffy Gear 4 requires 3-star plus a retained catalyst: Armament Wraps selects Boundman and Sniper Goggles selects Snakeman. The earliest catalyst in serialized item-array order wins only when no form is assigned; `formId` then locks the branch. Known Gear 4 IDs are cleared only from invalid 1/2-star Luffy, unrelated unknown IDs survive, and persistent load reconciliation never mutates frozen battle results.
 - Robin's production cap is `definitionId: "robin"`, `star: 3`, `formId: "robin-demonio-fleur"` after the normal nine-copy merge. Only the ability is replaced; legacy schema-6 persistent 3-star Robin reconciles to the form, invalid 1/2-star Demonio is cleared, unrelated unknown IDs survive, and frozen battle results are never rewritten.
@@ -419,7 +436,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-Post-forms full-roster 1,000-seed assessment in a separate bounded analysis PR; do not start it automatically.
+One isolated Smoker adjustment; do not combine it with Chopper/forms, timeout, traits, shop/pool or other roster tuning, and do not start it automatically.
 
 ## Codex Update Contract
 
