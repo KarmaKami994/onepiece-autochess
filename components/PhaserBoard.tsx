@@ -23,7 +23,10 @@ import {
   RESOURCE_BAR_COLORS,
   RESOURCE_BAR_GEOMETRY,
   resourceBarFill,
+  resourceHealthAfterSet,
+  resourceHealthAfterTransform,
   resourceBarLayout,
+  type ResourceHealthState,
 } from "./unitResourceBar";
 import {
   ANIMATED_BENCH_HIT_AREA,
@@ -99,6 +102,7 @@ export type CombatFxEvent = {
   kind:
     | "move"
     | "displace"
+    | "transform"
     | "attack"
     | "cast"
     | "ability-hit"
@@ -134,6 +138,10 @@ export type CombatFxEvent = {
   label?: string;
   unitId?: string;
   movementKind?: string;
+  fromFormId?: string | null;
+  toFormId?: string;
+  hp?: number;
+  maxHp?: number;
   from?: Readonly<{ x: number; y: number }>;
   to?: Readonly<{ x: number; y: number }>;
   toX?: number;
@@ -320,10 +328,7 @@ export default function PhaserBoard({
               layout: ReturnType<typeof resourceBarLayout>;
             }
           >();
-          private hpState = new Map<
-            string,
-            { current: number; max: number }
-          >();
+          private hpState = new Map<string, ResourceHealthState>();
           private shieldState = new Map<string, number>();
           private energyState = new Map<string, number>();
           private statusLabels = new Map<string, Phaser.GameObjects.Text>();
@@ -1683,7 +1688,10 @@ export default function PhaserBoard({
             ) => {
               const state = this.hpState.get(unitId);
               if (!state) return;
-              state.current = clamp(nextHealth, 0, state.max);
+              this.hpState.set(
+                unitId,
+                resourceHealthAfterSet(state, nextHealth),
+              );
               this.transitionResourceBar(
                 unitId,
                 speed,
@@ -1867,6 +1875,39 @@ export default function PhaserBoard({
                   );
 
                 this.payload.units.forEach((unit) => refreshStatuses(unit.id, event.tick));
+
+                if (event.kind === "transform" && source) {
+                  const unitId = event.unitId ?? event.sourceId;
+                  if (
+                    unitId &&
+                    event.hp !== undefined &&
+                    event.maxHp !== undefined
+                  ) {
+                    const health = resourceHealthAfterTransform(
+                      event.hp,
+                      event.maxHp,
+                    );
+                    this.hpState.set(unitId, health);
+                    const resourceBar = this.resourceBars.get(unitId);
+                    if (resourceBar) resourceBar.maxHp = health.max;
+                    this.transitionResourceBar(
+                      unitId,
+                      speed,
+                      reduceMotion,
+                    );
+                  }
+                  showCastName(source, event.label ?? "Monster Point");
+                  if (!reduceMotion) {
+                    this.tweens.add({
+                      targets: source,
+                      scaleX: 1.22,
+                      scaleY: 1.22,
+                      yoyo: true,
+                      duration: Math.round(180 / speed),
+                    });
+                  }
+                  return;
+                }
 
                 if (
                   event.kind === "move" &&

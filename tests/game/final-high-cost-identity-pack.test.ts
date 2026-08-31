@@ -207,7 +207,7 @@ describe("Final high-cost identity content", () => {
       },
     });
     expect(JSON.parse(JSON.stringify(mihawk.ability))).toEqual(mihawk.ability);
-    expect(DEFAULT_CONTENT.version).toBe("1.14.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.15.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 });

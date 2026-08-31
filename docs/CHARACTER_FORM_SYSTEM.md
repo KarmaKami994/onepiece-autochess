@@ -11,8 +11,8 @@ optional overlay and is separate from star progression.
 Forms live in `GameContent.forms`, separately from `content.units`. A form may
 replace its display name, selected stats, complete ability, traits and optional
 portrait/token presentation. It cannot replace cost, base definition identity,
-shop/pool identity, star or items. Production content currently defines only
-Robin's Demonio Fleur and Luffy's two Gear 4 branches.
+shop/pool identity, star or items. Production content defines Robin's Demonio
+Fleur, Luffy's two Gear 4 branches and Chopper's Monster Point.
 
 ## Persistent vs Battle
 
@@ -73,10 +73,20 @@ with Kong Gun. Snakeman overrides the locked stats and ability with the
 four-strike Jet Culverin sequence. Shop, pool, purchase and sale accounting
 remain base Luffy behavior.
 
-## Explicitly Not Built Yet
+## Production Pilot: Chopper Monster Point
 
-These pilots add no choice UI, battle-time transformation, form VFX, form
-assets or generic transformation framework. Chopper remains a future pilot and
-can later carry a battle-temporary form without mutating his persistent
-instance. Chopper combat timing/synergy rules, transform events and
-form-specific presentation remain separate future work.
+Monster Point is the first production `battle-temporary` form. Chopper starts
+each normal production battle as base Chopper and transforms at 8 seconds only
+when the frozen battle-start team had an active Straw Hat tier. The combat does
+not recompute traits. Monster Point lasts until death or battle end, and the
+next battle starts from base Chopper again.
+
+The transition applies star-scaled base-stat deltas and replaces the ability
+while preserving the live unit's absolute damage, items, trait effects,
+resources, statuses and action timing. A generic `unit-transform` event records
+the battle-local identity for immutable result playback, save/resume and
+spectating. Persistent `UnitInstance` state remains base Chopper.
+
+Monster Point has no art override and uses Chopper's existing assets plus a
+text transformation cue. The Robin, Luffy and Chopper pilots add no form-choice
+UI, form command or generic trigger/duration framework.

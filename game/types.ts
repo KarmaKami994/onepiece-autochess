@@ -517,6 +517,15 @@ export type BattleEvent =
       to: Position;
     }
   | {
+      type: "unit-transform";
+      tick: number;
+      unitId: string;
+      fromFormId: string | null;
+      toFormId: string;
+      hp: number;
+      maxHp: number;
+    }
+  | {
       type: "attack";
       tick: number;
       sourceId: string;
