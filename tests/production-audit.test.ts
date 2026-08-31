@@ -8,7 +8,8 @@ import {
 } from "../game";
 import {
   auditFormBattleResult,
-  auditPilotFinalCrew,
+  auditPilotDeployedBoard,
+  deployedPilotUnitSnapshots,
   runProductionSoak,
 } from "../scripts/run_production_soak";
 
@@ -473,11 +474,54 @@ describe("post-forms production diagnostics", () => {
     });
   });
 
-  it("counts Robin final-board form identity once and exposes the 3-star invariant", () => {
-    const audit = auditPilotFinalCrew([
-      crewUnit("robin-a", "robin", 3, "robin-demonio-fleur"),
-      crewUnit("robin-b", "robin", 3, "robin-demonio-fleur"),
-    ]);
+  it("excludes a bench-only Demonio from deployed final-board metrics", () => {
+    const baseRobin = crewUnit("base-robin", "robin", 2);
+    const benchDemonio = crewUnit(
+      "bench-demonio",
+      "robin",
+      3,
+      "robin-demonio-fleur",
+    );
+    const player = {
+      board: { "0,0": baseRobin.id },
+      bench: [benchDemonio.id],
+      units: {
+        [baseRobin.id]: baseRobin,
+        [benchDemonio.id]: benchDemonio,
+      },
+      finalCrew: [baseRobin, benchDemonio],
+    };
+
+    const audit = auditPilotDeployedBoard(deployedPilotUnitSnapshots(player));
+
+    expect(audit.formIds).toEqual([]);
+    expect(audit.robin).toEqual({
+      threeStar: false,
+      demonio: false,
+      demonioThreeStar: false,
+      nonDemonioThreeStar: false,
+    });
+  });
+
+  it("includes deployed Demonio and counts duplicate copies once", () => {
+    const robinA = crewUnit(
+      "robin-a",
+      "robin",
+      3,
+      "robin-demonio-fleur",
+    );
+    const robinB = crewUnit(
+      "robin-b",
+      "robin",
+      3,
+      "robin-demonio-fleur",
+    );
+    const audit = auditPilotDeployedBoard(
+      deployedPilotUnitSnapshots({
+        board: { "0,0": robinA.id, "1,0": robinB.id },
+        units: { [robinA.id]: robinA, [robinB.id]: robinB },
+      }),
+    );
 
     expect(audit.formIds).toEqual(["robin-demonio-fleur"]);
     expect(audit.robin).toEqual({
@@ -486,28 +530,77 @@ describe("post-forms production diagnostics", () => {
       demonioThreeStar: true,
       nonDemonioThreeStar: false,
     });
-    expect(
-      auditPilotFinalCrew([crewUnit("base-robin", "robin", 3)]).robin
-        .nonDemonioThreeStar,
-    ).toBe(true);
   });
 
-  it("separates base, Boundman, and Snakeman 3-star Luffy branches", () => {
-    const audit = auditPilotFinalCrew([
-      crewUnit("luffy-base", "luffy", 3),
-      crewUnit("luffy-boundman", "luffy", 3, "luffy-gear-4-boundman"),
-      crewUnit("luffy-snakeman", "luffy", 3, "luffy-gear-4-snakeman"),
-      crewUnit("luffy-snakeman-copy", "luffy", 3, "luffy-gear-4-snakeman"),
-    ]);
+  it("exposes a deployed non-Demonio 3-star Robin invariant failure", () => {
+    const baseRobin = crewUnit("base-robin", "robin", 3);
+    const audit = auditPilotDeployedBoard(
+      deployedPilotUnitSnapshots({
+        board: { "0,0": baseRobin.id },
+        units: { [baseRobin.id]: baseRobin },
+      }),
+    );
 
-    expect(audit.formIds).toEqual([
+    expect(audit.robin).toMatchObject({
+      threeStar: true,
+      demonio: false,
+      demonioThreeStar: false,
+      nonDemonioThreeStar: true,
+    });
+  });
+
+  it("excludes bench Gear 4 when deployed Luffy is base", () => {
+    const baseLuffy = crewUnit("luffy-base", "luffy", 3);
+    const benchBoundman = crewUnit(
+      "bench-boundman",
+      "luffy",
+      3,
       "luffy-gear-4-boundman",
+    );
+    const player = {
+      board: { "0,0": baseLuffy.id },
+      bench: [benchBoundman.id],
+      units: {
+        [baseLuffy.id]: baseLuffy,
+        [benchBoundman.id]: benchBoundman,
+      },
+      finalCrew: [baseLuffy, benchBoundman],
+    };
+    const audit = auditPilotDeployedBoard(deployedPilotUnitSnapshots(player));
+
+    expect(audit.formIds).toEqual([]);
+    expect(audit.luffyThreeStarBranches).toEqual(["base"]);
+  });
+
+  it("attributes deployed Boundman and Snakeman to their own branches", () => {
+    const boundman = crewUnit(
+      "luffy-boundman",
+      "luffy",
+      3,
+      "luffy-gear-4-boundman",
+    );
+    const snakeman = crewUnit(
+      "luffy-snakeman",
+      "luffy",
+      3,
       "luffy-gear-4-snakeman",
-    ]);
-    expect(audit.luffyThreeStarBranches).toEqual([
-      "base",
-      "boundman",
-      "snakeman",
-    ]);
+    );
+    const boundmanAudit = auditPilotDeployedBoard(
+      deployedPilotUnitSnapshots({
+        board: { "0,0": boundman.id },
+        units: { [boundman.id]: boundman },
+      }),
+    );
+    const snakemanAudit = auditPilotDeployedBoard(
+      deployedPilotUnitSnapshots({
+        board: { "0,0": snakeman.id },
+        units: { [snakeman.id]: snakeman },
+      }),
+    );
+
+    expect(boundmanAudit.formIds).toEqual(["luffy-gear-4-boundman"]);
+    expect(boundmanAudit.luffyThreeStarBranches).toEqual(["boundman"]);
+    expect(snakemanAudit.formIds).toEqual(["luffy-gear-4-snakeman"]);
+    expect(snakemanAudit.luffyThreeStarBranches).toEqual(["snakeman"]);
   });
 });

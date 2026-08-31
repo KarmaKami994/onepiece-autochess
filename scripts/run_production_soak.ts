@@ -13,6 +13,7 @@ import {
   getStageDefinition,
   hashCanonicalValue,
   hashGameContent,
+  resolvePersistentFormId,
   type BattleEvent,
   type MatchBattleResult,
   type MatchState,
@@ -43,6 +44,12 @@ const PILOT_IDENTITY_KEYS = [
 ] as const;
 
 type PilotIdentityKey = (typeof PILOT_IDENTITY_KEYS)[number];
+
+export type DeployedPilotUnitSnapshot = {
+  definitionId: string;
+  star: 1 | 2 | 3;
+  formId?: string;
+};
 
 type FinalBoardOutcomeReport = {
   finalBoards: number;
@@ -430,7 +437,9 @@ function pilotIdentity(
   return null;
 }
 
-export function auditPilotFinalCrew(units: readonly UnitInstance[]) {
+export function auditPilotDeployedBoard(
+  units: readonly DeployedPilotUnitSnapshot[],
+) {
   const formIds = new Set<ProductionFormId>();
   const luffyThreeStarBranches = new Set<"base" | "boundman" | "snakeman">();
   let robinThreeStar = false;
@@ -762,6 +771,23 @@ function deployedDefinitions(player: PlayerState): Set<string> {
   );
 }
 
+export function deployedPilotUnitSnapshots(
+  player: Pick<PlayerState, "board" | "units">,
+): DeployedPilotUnitSnapshot[] {
+  return Object.values(player.board).flatMap((unitId) => {
+    const unit = player.units[unitId];
+    if (!unit) return [];
+    const formId = resolvePersistentFormId(unit, DEFAULT_CONTENT) ?? undefined;
+    return [
+      {
+        definitionId: unit.definitionId,
+        star: unit.star,
+        ...(formId ? { formId } : {}),
+      },
+    ];
+  });
+}
+
 function recordCharacterBoard(
   definitionIds: Iterable<string>,
   characterBoards: MutableCounter,
@@ -914,6 +940,10 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
       human.isBot = true;
       human.personalityId = "balanced";
       const lastDeployedBoards = new Map<string, Set<string>>();
+      const lastDeployedPilotUnits = new Map<
+        string,
+        DeployedPilotUnitSnapshot[]
+      >();
       const traitsReachedInMatch = new Set<string>();
       const traitTiersReachedInMatch = new Set<string>();
       const formsReachedInMatch = new Set<ProductionFormId>();
@@ -964,6 +994,10 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
           for (const player of state.players.filter((candidate) => candidate.alive)) {
             const definitions = deployedDefinitions(player);
             lastDeployedBoards.set(player.id, definitions);
+            lastDeployedPilotUnits.set(
+              player.id,
+              deployedPilotUnitSnapshots(player),
+            );
             if (stage.kind === "pvp") {
               for (const definitionId of definitions) {
                 const expression = characterCombatExpressions[definitionId];
@@ -1081,25 +1115,27 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
           if (player.placement <= 4) increment(top4Boards, definitionId);
           if (player.placement === 1) increment(winningBoards, definitionId);
         }
-        const finalCrewAudit = auditPilotFinalCrew(finalCrew(player));
-        for (const formId of finalCrewAudit.formIds) {
+        const deployedPilotAudit = auditPilotDeployedBoard(
+          lastDeployedPilotUnits.get(player.id) ??
+            deployedPilotUnitSnapshots(player),
+        );
+        for (const formId of deployedPilotAudit.formIds) {
           increment(formFinalBoards, formId);
           increment(formPlacementTotals, formId, player.placement);
           if (player.placement <= 4) increment(formTop4Boards, formId);
           if (player.placement === 1) increment(formWinningBoards, formId);
-          formsReachedInMatch.add(formId);
         }
-        if (finalCrewAudit.robin.threeStar) robinThreeStarFinalBoards += 1;
-        if (finalCrewAudit.robin.demonioThreeStar) {
+        if (deployedPilotAudit.robin.threeStar) robinThreeStarFinalBoards += 1;
+        if (deployedPilotAudit.robin.demonioThreeStar) {
           demonioThreeStarFinalBoards += 1;
         }
-        if (finalCrewAudit.robin.nonDemonioThreeStar) {
+        if (deployedPilotAudit.robin.nonDemonioThreeStar) {
           nonDemonioThreeStarFinalBoards += 1;
         }
-        if (finalCrewAudit.luffyThreeStarBranches.length > 0) {
+        if (deployedPilotAudit.luffyThreeStarBranches.length > 0) {
           luffyThreeStarFinalBoards += 1;
         }
-        for (const branch of finalCrewAudit.luffyThreeStarBranches) {
+        for (const branch of deployedPilotAudit.luffyThreeStarBranches) {
           increment(luffyBranchFinalBoards, branch);
           increment(luffyBranchPlacementTotals, branch, player.placement);
           if (player.placement <= 4) increment(luffyBranchTop4Boards, branch);
