@@ -247,7 +247,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
       attack: 62,
       defense: 28,
       range: 2,
-      attackIntervalMs: 1_200,
+      attackIntervalMs: 1_400,
       moveIntervalMs: 500,
     },
     ability: ability(
@@ -1562,7 +1562,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.15.0",
+  version: "1.15.1",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,

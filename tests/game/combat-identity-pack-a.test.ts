@@ -212,7 +212,9 @@ describe("Combat Identity Pack A content", () => {
       stunMs: 1_200,
       energyDrain: 15,
     });
-    expect(definition(DEFAULT_CONTENT, "smoker")).toMatchObject({
+    expect(definition(DEFAULT_CONTENT, "smoker")).toEqual({
+      id: "smoker",
+      name: "Smoker",
       cost: 2,
       traits: ["navy", "guardian"],
       stats: {
@@ -220,19 +222,45 @@ describe("Combat Identity Pack A content", () => {
         attack: 62,
         defense: 28,
         range: 2,
-        attackIntervalMs: 1_200,
+        attackIntervalMs: 1_400,
         moveIntervalMs: 500,
       },
       ability: {
         id: "white-blow",
+        name: "White Blow",
+        description:
+          "Sweeps a line of enemies and pushes surviving targets backward.",
         power: 180,
         targeting: "nearest-enemy",
         pattern: "line",
+        effect: "damage",
+        castAnimationMs: 500,
         signatureMechanics: [{ kind: "knockback" }],
       },
+      assetPath: "/assets/characters/smoker.png",
     });
-    expect(DEFAULT_CONTENT.version).toBe("1.15.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.15.1");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
+  });
+});
+
+describe("Smoker attack cadence", () => {
+  it("uses the 1400ms content interval as a 14-tick basic-attack cadence", () => {
+    const content = clonedContent();
+    configureCombatant(content, "chopper", { health: 100_000, range: 100 });
+
+    const result = simulateBattle(
+      team("a", [setupUnit("smoker", "smoker", 2, 2)]),
+      team("b", [setupUnit("target", "chopper", 4, 2)]),
+      { seed: "smoker-1400-cadence", maxTicks: 15 },
+      content,
+    );
+    const attacks = result.events.filter(
+      (event) => event.type === "attack" && event.sourceId === "smoker",
+    );
+
+    expect(attacks.slice(0, 2).map((event) => event.tick)).toEqual([1, 15]);
+    expect(attacks[1].tick - attacks[0].tick).toBe(14);
   });
 });
 
