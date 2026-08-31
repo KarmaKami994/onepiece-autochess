@@ -737,6 +737,9 @@ function combatEvents(
   const definitionByUnit = new Map(
     result.initialUnits.map((unit) => [unit.id, unit]),
   );
+  const formIdByUnit = new Map(
+    result.initialUnits.map((unit) => [unit.id, unit.formId]),
+  );
   const criticalAttacks = new Set(
     result.events.flatMap((event) =>
       event.type === "attack" && event.critical
@@ -846,6 +849,21 @@ function combatEvents(
         to: point(event.to),
       }];
     }
+    if (event.type === "unit-transform") {
+      formIdByUnit.set(event.unitId, event.toFormId);
+      const form = getUnitFormDefinition(event.toFormId, content);
+      return [{
+        id,
+        tick: event.tick,
+        kind: "transform",
+        sourceId: event.unitId,
+        targetId: event.unitId,
+        unitId: event.unitId,
+        fromFormId: event.fromFormId,
+        toFormId: event.toFormId,
+        label: form?.name ?? titleCase(event.toFormId),
+      }];
+    }
     if (event.type === "attack") {
       return [{
         id,
@@ -862,7 +880,7 @@ function combatEvents(
       const sourceAbility = sourceSnapshot
         ? resolveUnitDefinition(
             sourceSnapshot.definitionId,
-            sourceSnapshot.formId,
+            formIdByUnit.get(event.sourceId),
             content,
           )?.ability ?? content.enemies.find(
             (definition) => definition.id === sourceSnapshot.definitionId,

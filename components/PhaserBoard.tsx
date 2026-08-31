@@ -99,6 +99,7 @@ export type CombatFxEvent = {
   kind:
     | "move"
     | "displace"
+    | "transform"
     | "attack"
     | "cast"
     | "ability-hit"
@@ -134,6 +135,8 @@ export type CombatFxEvent = {
   label?: string;
   unitId?: string;
   movementKind?: string;
+  fromFormId?: string | null;
+  toFormId?: string;
   from?: Readonly<{ x: number; y: number }>;
   to?: Readonly<{ x: number; y: number }>;
   toX?: number;
@@ -1867,6 +1870,20 @@ export default function PhaserBoard({
                   );
 
                 this.payload.units.forEach((unit) => refreshStatuses(unit.id, event.tick));
+
+                if (event.kind === "transform" && source) {
+                  showCastName(source, event.label ?? "Monster Point");
+                  if (!reduceMotion) {
+                    this.tweens.add({
+                      targets: source,
+                      scaleX: 1.22,
+                      scaleY: 1.22,
+                      yoyo: true,
+                      duration: Math.round(180 / speed),
+                    });
+                  }
+                  return;
+                }
 
                 if (
                   event.kind === "move" &&

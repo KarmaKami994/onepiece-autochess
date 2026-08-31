@@ -85,6 +85,9 @@ interface MoveIntent {
 
 type CombatIntent = AttackIntent | CastIntent | MoveIntent;
 
+const MONSTER_POINT_FORM_ID = "chopper-monster-point";
+const MONSTER_POINT_DELAY_MS = 8_000;
+
 function findDefinition(
   id: string,
   formId: string | undefined,
@@ -290,6 +293,47 @@ function createMutableUnits(
     result.push(unit);
   }
   return result;
+}
+
+function transformBattleUnit(
+  unit: MutableBattleUnit,
+  formId: string,
+  content: GameContent,
+): boolean {
+  const form = getUnitFormDefinition(formId, content);
+  const base = resolveUnitDefinition(unit.definitionId, undefined, content);
+  const transformed = resolveUnitDefinition(unit.definitionId, formId, content);
+  if (
+    !form ||
+    form.lifecycle !== "battle-temporary" ||
+    form.baseDefinitionId !== unit.definitionId ||
+    !base ||
+    !transformed ||
+    unit.formId === formId
+  ) {
+    return false;
+  }
+
+  const statMultiplier =
+    content.config.starStatBasisPoints[unit.star - 1] ?? 10_000;
+  const scaled = (value: number): number =>
+    Math.floor((value * statMultiplier) / 10_000);
+  const healthDelta = scaled(transformed.stats.health) - scaled(base.stats.health);
+  const attackDelta = scaled(transformed.stats.attack) - scaled(base.stats.attack);
+  const defenseDelta = scaled(transformed.stats.defense) - scaled(base.stats.defense);
+  const missingHp = Math.max(0, unit.maxHp - unit.hp);
+
+  unit.maxHp = Math.max(1, unit.maxHp + healthDelta);
+  unit.hp = Math.max(0, Math.min(unit.maxHp, unit.maxHp - missingHp));
+  unit.attack = Math.max(1, unit.attack + attackDelta);
+  unit.defense = Math.max(0, unit.defense + defenseDelta);
+  unit.range = Math.max(
+    0,
+    unit.range + transformed.stats.range - base.stats.range,
+  );
+  unit.formId = form.id;
+  unit.ability = transformed.ability;
+  return true;
 }
 
 function distance(left: MutableBattleUnit, right: MutableBattleUnit): number {
@@ -790,6 +834,18 @@ export function simulateBattle(
     ...createMutableUnits(teamB, content),
   ].sort((left, right) => left.id.localeCompare(right.id));
   const initialUnits = units.map(toSnapshot);
+  const monsterPointTriggerTick = Math.ceil(
+    MONSTER_POINT_DELAY_MS / Math.max(1, content.config.combatTickMs),
+  );
+  const monsterPointTeamIds = new Set(
+    [teamA, teamB]
+      .filter((team) =>
+        (team.activeTraits ?? []).some(
+          (trait) => trait.traitId === "straw-hat" && trait.tierIndex >= 0,
+        ),
+      )
+      .map((team) => team.id),
+  );
 
   const changeEnergy = (
     tick: number,
@@ -1080,6 +1136,28 @@ export function simulateBattle(
       }
     }
     processDeaths(tick);
+
+    if (tick === monsterPointTriggerTick) {
+      for (const unit of units
+        .filter(
+          (candidate) =>
+            alive(candidate) &&
+            candidate.definitionId === "chopper" &&
+            !candidate.formId &&
+            monsterPointTeamIds.has(candidate.teamId),
+        )
+        .sort((left, right) => left.id.localeCompare(right.id))) {
+        if (transformBattleUnit(unit, MONSTER_POINT_FORM_ID, content)) {
+          emit({
+            type: "unit-transform",
+            tick,
+            unitId: unit.id,
+            fromFormId: null,
+            toFormId: MONSTER_POINT_FORM_ID,
+          });
+        }
+      }
+    }
 
     const livingA = units.some(
       (unit) => alive(unit) && unit.teamId === teamA.id,

@@ -91,7 +91,7 @@ describe("voyage battle save compatibility", () => {
       seed: state.seed,
       replayBattle: false,
       schemaVersion: 6,
-      contentVersion: "1.14.0",
+      contentVersion: "1.15.0",
     });
 
     const restored = restoreVoyageState(envelope);

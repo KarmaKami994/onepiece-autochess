@@ -865,6 +865,27 @@ export const FORM_DEFINITIONS: UnitFormDefinition[] = [
       },
     ),
   },
+  {
+    id: "chopper-monster-point",
+    baseDefinitionId: "chopper",
+    name: "Chopper — Monster Point",
+    lifecycle: "battle-temporary",
+    stats: {
+      health: 800,
+      attack: 60,
+      defense: 28,
+      range: 1,
+    },
+    ability: ability(
+      "monster-point-slam",
+      "Monster Point Slam",
+      "Smashes the nearest enemy cluster with overwhelming force, damaging and stunning nearby foes.",
+      250,
+      "nearest-enemy",
+      "adjacent",
+      { stunMs: 600 },
+    ),
+  },
 ];
 
 export const TRAIT_DEFINITIONS: TraitDefinition[] = [
@@ -1541,7 +1562,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.14.0",
+  version: "1.15.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,
