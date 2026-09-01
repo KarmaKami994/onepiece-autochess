@@ -23,10 +23,12 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-PR #31 is merged at `f618061`, freezing Smoker as a watch item at White Blow 180 / 1400ms. The current task is the analysis-only bot architecture and meta-bias audit on `analysis/bot-architecture-bias-audit`; GameContent remains `1.15.1` and save schema remains 6.
+PR #32 is merged at `c3075ef`, locking adaptive match bots plus a possible separate scripted benchmark role and the pre-baseline soak-population gate. The current task is the analysis-only P2 Economy / Progression audit on `analysis/economy-progression-audit`; Smoker remains frozen, GameContent remains `1.15.1` and save schema remains 6.
 
 ## Last Completed Work
 
+- 2026-09-01 — P2 Economy / Progression PAC-first audit and PR #33 review correction on `analysis/economy-progression-audit`: verified normal PAC economy at pinned commit `a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee` and the local lifecycle at main `c3075ef`. Architecture Option 1 keeps the current deterministic finite-pool economy: liquid start values, income, interest, XP, normal shop, odds, buy price and bench values already match or deliberately adapt PAC. PAC additionally grants a Stage-0 starter selected from three propositions plus its associated item component; this opening-resource difference is REFERENCE ONLY and does not establish a local defect. Full `cost × 1/3/9` sell refund is WATCH / NEEDS MEASUREMENT rather than a defect; fixed per-unit pools preserve contest ceilings but dilute specific-unit rolls as cost bands expand. No transactional economy defect was found. Realized level, streak, reroll, high-cost and star outcomes are P3-coupled, so the sole next task is P3 PAC-first Match Flow / Pacing research. The asymmetric soak population remains a mandatory gate before a new authoritative baseline. No code, value, metric or simulation changed. Material files: `docs/ECONOMY_AND_PROGRESSION_AUDIT.md`, `PROJECT_STATE.md`.
+- 2026-08-31 — `c3075ef`, merged PR #32: completed the bot architecture/meta-bias audit and review hardening. Adaptive bots remain the real-match/production-meta class; a separate scripted benchmark concept may be added later. The current soak duplicates Balanced after `player-1` skips round-one bot preparation and is converted with null personality, so prior snapshots are exact-current-harness evidence and the population must be normalized or intentionally specified before a new authoritative baseline. Smoker remains frozen. Material files: `docs/BOT_ARCHITECTURE_AND_BIAS_AUDIT.md`, `PROJECT_STATE.md`.
 - 2026-08-31 — bot architecture and meta-bias audit on `analysis/bot-architecture-bias-audit`: verified the official PAC scenario-bot model at pinned commit `a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee` and mapped the current adaptive purchase, progression, lineup, formation and item policy. Architecture decision: retain adaptive bots for real-match/meta simulation and consider a separate adapted scripted benchmark-bot concept later; PAC backend infrastructure is rejected. Review hardening confirmed no gameplay-engine defect but identified a production-soak population defect: `player-1` skips round-1 bot preparation, then becomes a null-personality bot that resolves to Balanced, duplicating that policy. Existing snapshots remain valid exact-current-harness evidence; participant initialization must be normalized or intentionally specified before the next authoritative broad baseline. Ordering remains bot audit now and adaptive tuning after P2/P3; the sole next task is P2 PAC-first Economy / Progression research and audit. No gameplay, bot weight, harness code or simulation changed. Material files: `docs/BOT_ARCHITECTURE_AND_BIAS_AUDIT.md`, `PROJECT_STATE.md`.
 - 2026-08-31 — `f618061`, merged PR #31: reviewed the four committed Smoker snapshots, current 2-cost peers, targeted kits, Navy/Guardian/Straw Hat reachability and line/adjacent geometry without changing gameplay or running a simulation. Decision: C — targeted diagnostics first. Smoker remains strongly above the full band but only modestly above Franky (+2.16 pp top four, +3.67 pp conditional wins, 0.152 better placement), while Franky has stronger raw stats and higher measured cast, target, damage and control expression. Aggregate evidence cannot separate intrinsic Smoker strength from Navy/Guardian composition and selective retention. Smoker is now frozen as a watch item while roadmap work proceeds. GameContent remains `1.15.1`; save schema remains 6. Material files: `docs/SMOKER_RESIDUAL_ADVANTAGE_REVIEW.md`, `PROJECT_STATE.md`.
 - 2026-08-31 — `76609be`, merged PR #30: changed only Smoker `attackIntervalMs` from 1200 to 1400 and GameContent from `1.15.0` to `1.15.1`; White Blow remains 180-power nearest-enemy line damage with knockback, and save schema remains 6. The clean measurement SHA is `cf07eb4a690f4437ae476de80b888d175d0b00cf`. Exactly one 1,000-seed run completed 1,000/1,000 with zero crashes. Casts per battle-board appearance fell 1.9963→1.8151, total knockbacks 42,226→36,772, while damage/cast and knockbacks/cast stayed roughly stable. Top four fell 66.06%→61.27%, conditional wins 21.54%→20.10%, average placement worsened 3.640→3.869 and winner presence fell 34.2%→31.3%; same-cost deltas remain coherently positive at +12.37 pp top four, +8.31 pp wins and -0.672 placement. Classification: B — improved but still clearly overperforming. Snapshot: `docs/analysis/smoker-cadence-1400-1000.json`, SHA-256 `b579e4be607f17996b6166a2c2288c0c21849b918cb2e0e3a67df7a4d7dd6cc4`. Material files: `game/content.ts`, focused/version tests, the raw snapshot, `docs/SMOKER_CADENCE_BALANCE_PASS.md`, `PROJECT_STATE.md`.
@@ -58,6 +60,15 @@ PR #31 is merged at `f618061`, freezing Smoker as a watch item at White Blow 180
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+P2 Economy / Progression audit:
+
+- PASS — PAC liquid start, Stage-0 starter/component grant, income, interest, streak, XP, odds, shop, pool, buy/sell, bench and rollover facts were verified against targeted official files at pinned commit `a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee`.
+- PASS — all local values, lifecycle ordering and transactional invariants were verified against current main `c3075ef`; deterministic no-spend progression and current pool totals were recomputed from committed config.
+- PASS — PAC facts are separated from engineering inference; P2-intrinsic and P3-coupled conclusions are explicit; report and project state select the same sole next task.
+- PASS — final diff is documentation-only: `docs/ECONOMY_AND_PROGRESSION_AUDIT.md` and `PROJECT_STATE.md`.
+- NOT RUN — tests, typecheck, lint, production smoke, build or Browser E2E; no source/config changed.
+- NOT RUN — production soak, tournament, parameter sweep, Monte Carlo or match simulation.
 
 Bot architecture and meta-bias audit:
 
@@ -378,6 +389,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- None for the P2 Economy / Progression audit. Gold, income, interest, streaks, XP, shops, pools, sells, bench, battle economy, bots, content and saves are unchanged.
 - None for the bot architecture and bias audit. Bot logic, personalities, weights, gameplay, content and simulation behavior remain unchanged.
 - None for PR #31. The residual-advantage review records decision C — targeted diagnostics first; Smoker, all peers, traits, forms, content, schema and runtime behavior are unchanged.
 - Smoker's base attack interval is now 1400ms instead of 1200ms, reducing basic-attack and self-generated Energy frequency through the existing generic cadence path. Health 820, attack 62, defense 28, range 2, move interval 500, cost 2, Navy/Guardian traits and White Blow 180/nearest-enemy/line/knockback remain unchanged. GameContent is `1.15.1`; save schema remains 6.
@@ -408,6 +420,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- None for the P2 audit. Research stayed on pinned targeted PAC economy sources, targeted local domain ranges and the existing report schema; no P3, harness fix, diagnostic, tuning or simulation was added.
 - None for the bot architecture and bias audit. Research stayed on the pinned targeted PAC files and current targeted bot files; no PAC backend, bot tuning, P2/P3 work, Smoker diagnostic or simulation was added.
 - None for PR #31. No gameplay, production code, analytics code, diagnostics, snapshot, test or simulation was added or changed; only the requested decision report and project handoff were updated.
 - None for PR #30. The locked 1400ms value was not tuned after smoke or measurement; all gameplay/test/version changes were committed cleanly before exactly one 1,000-seed run. No PAC source, analytics semantic, combat system, form, UI, asset or unrelated balance value changed; E2E was not required for this content/tests/docs-only surface.
@@ -438,6 +451,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- Full star-copy sell refund (`cost × 1/3/9`) makes 2-star/3-star units fully liquid, lowers pivot commitment and can move battle-time sales into interest thresholds; classify WATCH / NEEDS MEASUREMENT, not a defect. Constant per-unit pools preserve absolute copies while four-character expansions grow cost-band totals and dilute each specific definition's conditional roll share. Realized gold, levels, streaks, high-cost access, rerolls and star timing are P3-coupled and not currently observable at sufficient grain.
 - The production soak has a clear measurement-harness population defect: `player-1` skips round-1 bot preparation, is converted to a bot only after that transition, retains `personalityId: null` and later falls back to Balanced. The effective later population is Balanced twice plus each other personality once. Prior results remain valid exact-current-harness evidence, not evidence for a symmetric eight-bot, human or future-policy population; the unmeasured round-1 difference may affect the first PvE result and early HP/state progression.
 - Current adaptive bot policy plausibly favors high-cost units (`cost × 25`), existing trait concentration, large fixed star bonuses and explicit item-affinity traits; independent top-score lineup selection can miss lower-score synergy connectors. Fixed reserve/XP/reroll loops are coupled to current economy and round cadence and should not be tuned before P2/P3. These are current-policy bias risks, not confirmed gameplay bugs.
 - Current Smoker remains a suspiciously strong conditional outcome signal, but the full-band delta overstates his distance from the strongest peer because Robin and Ivankov materially pull the band down. Smoker is only modestly above Franky while trailing Franky's raw stats and measured combat expression. Existing snapshots lack Smoker outcomes conditioned on active Navy/Guardian state, so another balance lever cannot yet be attributed responsibly.
@@ -466,6 +480,8 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
+- P2 Economy / Progression selects Architecture Option 1: keep the current deterministic authoritative finite-pool economy and treat values as the measurement baseline, not permanent locks. PAC liquid start values and normal interest/XP/odds/shop/buy/bench behavior are direct or adapted parity, but PAC also has a Stage-0 starter plus component opening grant; that cross-cutting difference and PAC's partial evolved-unit sell pricing are REFERENCE ONLY. No transactional defect requires implementation. Economy tuning waits for P3; per-unit pool scaling and full-refund selling remain KEEP / MEASURE.
+- Roadmap is P2 audit complete → P3 Match Flow / Pacing PAC-first audit → P1B bot recalibration if needed → P4 Items / Treasure / Form Accessibility audit → normalize/specify soak participants → add only necessary diagnostics/baseline → at most one evidence-backed economy change → broad baseline → unit balance. Smoker remains frozen with no immediate diagnostic.
 - Bot architecture uses two distinct future roles: adaptive match bots remain the production-meta/local-opponent class using real domain systems and command intents; a PAC-inspired scripted benchmark-bot concept may later provide authored deterministic combat setups but cannot replace adaptive production bots. PAC Mongo/Firebase/Colyseus/community/Discord infrastructure is rejected. Architecture Option 3 is locked; adaptive tuning waits until P2/P3 stabilize.
 - Roadmap ordering is P1A bot audit complete → P2 Economy / Progression PAC-first audit → P3 Match Flow / Pacing PAC-first audit → P1B adaptive bot tuning if still needed → P4 Items / Treasure / Form Accessibility audit → normalize or intentionally specify the production-soak population before the next authoritative broad baseline if not already handled → new broad production baseline → unit balance. Smoker is frozen as a watch item; no Smoker diagnostic is immediate.
 - PR #31 historically selected targeted diagnostics because aggregate evidence could not justify another Smoker nerf. Subsequent roadmap review superseded that immediate diagnostic; White Blow remains 180 at 1400ms with line, knockback, Navy and Guardian, and Smoker is now frozen as a watch item.
@@ -492,7 +508,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-P2 — one bounded PAC-first Economy / Progression research and architecture audit. Inspect targeted pinned PAC behavior, classify direct/adapted/reference/reject ideas, evaluate deterministic local and future-server fit, and lock architecture before any economy implementation. Do not implement P2 in the audit PR.
+P3 — one bounded PAC-first Match Flow / Pacing research and architecture audit. Inspect targeted pinned PAC stage cadence, preparation/battle timing, PvE/PvP schedule, damage/elimination and match-length behavior; classify direct/adapted/reference/reject ideas and lock architecture without implementation or simulation. The soak-population fix remains mandatory before any later authoritative baseline, but does not block this research-only task.
 
 ## Codex Update Contract
 
