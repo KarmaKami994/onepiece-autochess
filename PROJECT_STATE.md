@@ -23,10 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-PR #36 is merged at `cff9c4ca`, completing production-soak population normalization. The first authoritative normalized pre-P4 baseline is captured from exact clean measurement SHA `cff9c4caed9b09fd64a915908589decc84f02cc8` at `docs/analysis/normalized-pre-p4-baseline-1000.json`: 1,000/1,000 matches completed with zero crashes and no systemic blocker. Balance remains deferred; the next roadmap decision is feature development, with P4 as the expected next major PAC-first research area. GameContent remains `1.15.1` and save schema remains 6.
+P4 core item-system architecture is documented on `analysis/p4-item-system-audit` from exact base `3259895231fde3b77c01f79a62d4cccc32555ca4`. The locked direction is PAC's ten-component, all-unordered-pairs 55-item craft matrix, automatic second-component crafting and three completed items per unit, adapted to existing One Piece traits, deterministic local acquisition and missing combat primitives. This audit changes no runtime behavior. GameContent remains `1.15.1` and save schema remains 6.
 
 ## Last Completed Work
 
+- 2026-09-01 — P4 core item-system PAC-first architecture audit on `analysis/p4-item-system-audit`: verified the ten components, all 55 recipes, stats, behavior identities, triggers, uniqueness/cap rules, early PvE rewards and carousel pools at pinned PAC commit `a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee`; mapped current local inventory/equip/merge/sell/RNG/bot/combat/save/UI support; recorded missing primitives; proposed complete One Piece naming and a four-part bounded decomposition. No gameplay, content, schema, metric, baseline or simulation changed. Material files: `docs/P4_ITEM_SYSTEM_AUDIT.md`, `PROJECT_STATE.md`.
 - 2026-09-01 — Normalized pre-P4 production baseline on `analysis/normalized-pre-p4-baseline`: exactly one 1,000-seed run from clean measurement SHA `cff9c4caed9b09fd64a915908589decc84f02cc8` completed 1,000/1,000 matches with zero crashes. Rounds were 26–51 with 34.036 average; full-clock/paced averages were 33.740/24.064 minutes; timeout/draw rates were 0.8315%/0.0325%. Shops had zero empty slots, every cost band appeared on final boards, Robin's Demonio invariant held, Monster Point reached all matches and Gear 4 remained very rare. Conclusion: baseline healthy enough to continue feature development; defer balance analysis. Snapshot: `docs/analysis/normalized-pre-p4-baseline-1000.json`, SHA-256 `80f4551af28e46f8976a014246b75da42fa1c674de7a0720924e775bfbaffd22`. Material files: the snapshot, `docs/NORMALIZED_PRE_P4_BASELINE.md`, `PROJECT_STATE.md`.
 - 2026-09-01 — `cff9c4ca`, merged PR #36: the production-soak harness assigns all eight participants as bots before the first phase advancement and rotates the seven existing personality IDs with `(seedIndex + playerIndex) % personalityIds.length`. Each match contains all seven personalities plus one rotating duplicate; across seven seeds each personality has eight assignments and each player slot uses every personality once. Normal `createMatch()`, bot policy, gameplay, metrics, RNG, GameContent and schema are unchanged. Historical snapshots retain their exact-harness conclusions. Material files: `scripts/run_production_soak.ts`, `tests/production-audit.test.ts`, `docs/BOT_ARCHITECTURE_AND_BIAS_AUDIT.md`, `PROJECT_STATE.md`.
 - 2026-09-01 — `26b0a75`, merged PR #35: P3B replaced greedy local selection with exhaustive complete-round optimization bounded to eight players. Total directed encounter count is minimized first, total recency distance maximized second, and one project-seeded deterministic choice resolves exact ties. Real pairs score both histories; ghosts score only the real fighter's history. All alive players participate once directly, odd rounds add exactly one ghost, dead players are excluded, and `lastOpponents` preserves compact full PvP/ghost history while ghost owners remain unmodified. Captain damage, combat, battle seeds, cadence, economy, bots, analytics, content and schema are unchanged. Material files: `game/pairing.ts`, `game/engine.ts`, `tests/game/pairing.test.ts`, `docs/MATCH_FLOW_AND_PACING_AUDIT.md`, `PROJECT_STATE.md`.
@@ -64,6 +65,13 @@ PR #36 is merged at `cff9c4ca`, completing production-soak population normalizat
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+P4 core item-system audit:
+
+- PASS — all seven required PAC sources were inspected at pinned commit `a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee`; targeted pinned combat files and English descriptions resolved trigger details and two source discrepancies.
+- PASS — exact inventory reconciliation accounts for 10 components and 55 unique unordered recipes, with complete proposed One Piece naming and no unrelated PAC item family.
+- PASS — local facts were inspected at exact base `3259895231fde3b77c01f79a62d4cccc32555ca4`; final diff is documentation-only.
+- NOT RUN — tests, typecheck, lint, build, Browser E2E, production smoke or production soak; no source/config/runtime behavior changed.
 
 Normalized pre-P4 production baseline:
 
@@ -435,6 +443,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- None for the P4 item-system audit. It locks an architecture direction and changes no inventory, item, combat, acquisition, bot, persistence, content or presentation behavior.
 - None for the normalized pre-P4 baseline. It records existing harness output and changes no gameplay, bot policy, economy, pairing, captain damage, combat, content, schema, metrics or RNG.
 - The production-soak harness now makes every participant a bot before the first phase advancement and assigns existing personality IDs by `(seedIndex + playerIndex) % personalityIds.length`. The eighth slot duplicates one of seven personalities per match, rotating deterministically by seed. Normal match creation, bot decisions, gameplay and analytics definitions are unchanged.
 - PvP rounds now choose one globally optimal complete pairing combination by encounter count, recency and seeded deterministic tie selection. Opponent history grows for the full match instead of truncating to three entries; ghost-owner history remains unchanged by ghost fights.
@@ -470,6 +479,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- None for the P4 audit. Research stayed on the pinned PAC core craftable matrix and targeted local item paths; no implementation, value, version, schema, metric, artifact or simulation was added.
 - None for the normalized pre-P4 baseline. Exactly one 1,000-seed soak was run from the required clean SHA; no instrumentation, historical snapshot, implementation, tuning or follow-on feature work was added.
 - None for production-soak population normalization. No personality, policy, gameplay/domain, metric, RNG, content, schema, baseline artifact or 1,000-seed run was added or changed.
 - None for P3B. No captain-damage, combat, battle-seed, timing, economy, bot, P4, analytics, persistence-schema or soak-harness change was added.
@@ -505,6 +515,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- P4 requires Special Defense, crit power, item shields, ability crits, Luck, triggered-item lifecycles, immunities, Wound, resurrection, trait-granting equipment and several reactive damage/stat primitives that are absent locally. Existing merges silently truncate equipped-item overflow beyond three; current bot scoring and fixed-eight carousel presentation cannot represent the locked matrix. These are implementation gates, not authorization to add a generic framework or tune balance.
 - Existing all-player-elimination behavior still leaves `winnerId` null when no survivor remains. The new deterministic batch ranking applies, but winner semantics remain a separate edge-case watch and were intentionally not redesigned here.
 - Full star-copy sell refund (`cost × 1/3/9`) makes 2-star/3-star units fully liquid, lowers pivot commitment and can move battle-time sales into interest thresholds; classify WATCH / NEEDS MEASUREMENT, not a defect. Constant per-unit pools preserve absolute copies while four-character expansions grow cost-band totals and dilute each specific definition's conditional roll share. Realized gold, levels, streaks, high-cost access, rerolls and star timing are P3-coupled and not currently observable at sufficient grain.
 - The normalized baseline completed 1,000/1,000 matches without crashes and exposes no systemic blocker. Full-clock average duration remains above the 20–30 minute target at 33.740 minutes while paced duration is 24.064 minutes; this remains a pacing watch, not a development blocker. Gear 4 appeared on only two of 130 deployed three-star Luffy final boards and remains accessibility context for future P4 research, not a balance conclusion. Historical results remain valid exact-historical-harness evidence and are not reinterpreted as normalized measurements.
@@ -535,6 +546,7 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
+- P4 adopts the PAC core craftable architecture: ten components, all 55 unordered self-inclusive recipes, automatic second-component crafting, completed-item uniqueness and cap three. General behavior identities are direct; flat units/missing primitives, existing-trait candidates, names/assets/tooltips and local deterministic early acquisition are adapted. Post-20 cadence and later PvE are reference only; unrelated item families and backend/Pokémon-specific systems are rejected. Proposed trait-item mappings remain pending ChatGPT approval, and no non-obvious scaled value is locked.
 - P3 Match Flow / Pacing selects Option 3: keep the current deterministic domain architecture and adapt selected PAC principles. Keep the phase graph, preparation timing, 45-second battle cap, carousel sequencing, early PvE rounds, ghosts, remaining-team-health timeout winner and current draw semantics. Same-round elimination ordering is corrected; P3B implements an ADAPTED PORT of global encounter-count/recency pairing with local seeded deterministic ties and asymmetric ghost scoring. Captain damage remains ADAPT LATER / MEASURE FIRST, and late PAC PvE/event cadence remains P4 REFERENCE ONLY. Future server multiplayer moves deadline authority server-side without changing domain rules.
 - P2 Economy / Progression selects Architecture Option 1: keep the current deterministic authoritative finite-pool economy and treat values as the measurement baseline, not permanent locks. PAC liquid start values and normal interest/XP/odds/shop/buy/bench behavior are direct or adapted parity, but PAC also has a Stage-0 starter plus component opening grant; that cross-cutting difference and PAC's partial evolved-unit sell pricing are REFERENCE ONLY. No transactional defect requires implementation. Economy tuning waits for P3; per-unit pool scaling and full-refund selling remain KEEP / MEASURE.
 - Roadmap is P2/P3 and production-soak normalization complete → normalized pre-P4 baseline complete and healthy → proceed only through a separately approved feature-development decision, with P4 as the expected next major PAC-first research area. P1B, economy, captain damage and balance remain deferred; Smoker remains frozen/watch.
@@ -564,7 +576,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-Await review of the normalized pre-P4 baseline. If accepted, the next roadmap decision is feature development, with P4 as the expected next major PAC-first research area unless a separately approved decision changes ordering. Do not start P1B, P4, captain-damage, economy tuning or balance work automatically.
+Await architecture review of `docs/P4_ITEM_SYSTEM_AUDIT.md`. If approved, ChatGPT should select one separately bounded implementation task from the documented decomposition and explicitly lock its numeric values. Do not start implementation, P1B, captain damage, economy tuning or balance work automatically.
 
 ## Codex Update Contract
 
