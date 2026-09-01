@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  createMatch,
   DEFAULT_CONTENT,
   type BattleEvent,
   type BattleUnitSnapshot,
@@ -10,6 +11,7 @@ import {
   auditFormBattleResult,
   auditPilotDeployedBoard,
   deployedPilotUnitSnapshots,
+  normalizeProductionSoakPopulation,
   runProductionSoak,
 } from "../scripts/run_production_soak";
 
@@ -87,7 +89,83 @@ function expectFiniteNonNegativeCounters(value: unknown): void {
 }
 
 describe("production configuration audit", () => {
-  it("completes unmodified production matches and returns bounded metrics", () => {
+  it("assigns a deterministic valid all-bot production population", () => {
+    const personalityIds = DEFAULT_CONTENT.botPersonalities.map(
+      (personality) => personality.id,
+    );
+    const validPersonalityIds = new Set(personalityIds);
+    const assignmentsFor = (seedIndex: number) => {
+      const state = createMatch(`population-${seedIndex}`, DEFAULT_CONTENT);
+      normalizeProductionSoakPopulation(state, seedIndex);
+      return state.players.map((player) => ({
+        isBot: player.isBot,
+        personalityId: player.personalityId,
+      }));
+    };
+
+    const assignments = assignmentsFor(3);
+    expect(assignmentsFor(3)).toEqual(assignments);
+    expect(assignments).toHaveLength(8);
+    expect(assignments.every((assignment) => assignment.isBot)).toBe(true);
+    expect(
+      assignments.every(
+        (assignment) =>
+          assignment.personalityId !== null &&
+          validPersonalityIds.has(assignment.personalityId),
+      ),
+    ).toBe(true);
+
+    const counts = new Map(personalityIds.map((id) => [id, 0]));
+    for (const assignment of assignments) {
+      if (assignment.personalityId === null) {
+        throw new Error("Production personality must be assigned");
+      }
+      counts.set(
+        assignment.personalityId,
+        (counts.get(assignment.personalityId) ?? 0) + 1,
+      );
+    }
+    expect(new Set(counts.keys())).toEqual(validPersonalityIds);
+    expect([...counts.values()].sort((left, right) => left - right)).toEqual([
+      1, 1, 1, 1, 1, 1, 2,
+    ]);
+  });
+
+  it("rotates personalities evenly across seven seeds and every player slot", () => {
+    const personalityIds = DEFAULT_CONTENT.botPersonalities.map(
+      (personality) => personality.id,
+    );
+    const expectedPersonalityIds = new Set(personalityIds);
+    const personalityTotals = new Map(personalityIds.map((id) => [id, 0]));
+    const personalitiesByPlayerSlot = Array.from(
+      { length: 8 },
+      () => new Set<string>(),
+    );
+
+    for (let seedIndex = 0; seedIndex < 7; seedIndex += 1) {
+      const state = createMatch(`population-${seedIndex}`, DEFAULT_CONTENT);
+      normalizeProductionSoakPopulation(state, seedIndex);
+      state.players.forEach((player, playerIndex) => {
+        if (player.personalityId === null) {
+          throw new Error("Production personality must be assigned");
+        }
+        personalityTotals.set(
+          player.personalityId,
+          (personalityTotals.get(player.personalityId) ?? 0) + 1,
+        );
+        personalitiesByPlayerSlot[playerIndex]?.add(player.personalityId);
+      });
+    }
+
+    expect([...personalityTotals.values()]).toEqual(
+      personalityIds.map(() => 8),
+    );
+    for (const playerPersonalities of personalitiesByPlayerSlot) {
+      expect(playerPersonalities).toEqual(expectedPersonalityIds);
+    }
+  });
+
+  it("completes normalized production matches and returns bounded metrics", () => {
     const report = runProductionSoak(3);
 
     expect(report.completeMatches).toBe(3);

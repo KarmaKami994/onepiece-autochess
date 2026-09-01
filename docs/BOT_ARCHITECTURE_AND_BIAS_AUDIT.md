@@ -132,11 +132,11 @@ P2 changes could alter affordability, rarity access, star timing, shop/pool pres
 
 ## 9. Current Meta-Bias Risks
 
-No gameplay-engine logic defect was confirmed. The heuristic findings below are risks in the current environment, not proof that a result is wrong; the production-soak population asymmetry is a separate confirmed measurement-harness defect.
+No gameplay-engine logic defect was confirmed. The heuristic findings below are risks in the current environment, not proof that a result is wrong; the production-soak personality asymmetry was a separate confirmed measurement-harness defect and is resolved by the harness-only normalization described below.
 
 | Finding | Classification | Evidence-backed risk |
 | --- | --- | --- |
-| Production soak converts `player-1` into a bot only after the first phase transition and leaves `personalityId` null | **CLEAR LOGIC DEFECT / MEASUREMENT-HARNESS POPULATION ASYMMETRY** | `player-1` skips round-1 bot preparation, then resolves to Balanced; the resulting population duplicates Balanced instead of representing eight symmetrically assigned bot personalities. |
+| Pre-fix production soak permanently assigned Balanced to `player-1`, duplicating the existing Balanced bot | **RESOLVED MEASUREMENT-HARNESS POPULATION ASYMMETRY** | Pre-fix main already converted `player-1` before the first preparation transition, so all eight participants acted as bots from round 1; the remaining defect was the fixed Balanced duplicate. The normalized harness rotates the duplicate deterministically. |
 | `cost × 25` dominates base unit score | **PLAUSIBLE META BIAS / NEEDS MEASUREMENT** | Systematically favors higher-cost offers and instances before kit strength; full-bench replacement also requires the incoming unit to be higher cost. |
 | Current owned-instance count gives fixed `+24` each | **INTENTIONAL SIMPLIFICATION / PLAUSIBLE META BIAS** | Encourages copies but measures instances, not marginal merge probability or copies embedded in an existing star. |
 | Trait score uses raw current distinct counts, top two only | **PLAUSIBLE META BIAS** | Favors already-common traits without considering the next tier threshold, actual tier effect or marginal lineup composition. |
@@ -160,15 +160,15 @@ Answers to the high-value questions:
 8. **Progression realism:** reserve and fixed XP/reroll counts are tightly coupled to current P2/P3 curves.
 9. **Likely invalidation:** purchase, XP, reroll, star, trait-reach and reserve conclusions are most exposed to P2/P3; deterministic command seams and formation architecture are more stable.
 
-Existing 1,000-seed runs remain valid **exact-current-harness/current-policy evidence**. Statements such as “Smoker performed at a measured rate under the current deterministic production-soak harness and bot policy” remain supported. They do not establish results for a symmetric eight-bot personality population, humans or a future post-P2/P3 bot policy.
+Existing historical 1,000-seed runs remain valid **exact-historical-harness/current-policy evidence**. Statements such as “Smoker performed at a measured rate under that deterministic production-soak harness and bot policy” remain supported. They do not establish results for the normalized rotating eight-bot population, humans or a future bot policy.
 
-### Production-soak population asymmetry
+### Production-soak population normalization
 
-`createMatch()` initializes `player-1` with `isBot: false` and `personalityId: null`; the other seven participants are bots. On round-1 preparation, `advanceMatchPhase()` calls the bot-turn runner only for living players whose `isBot` is true, so `player-1` skips bot preparation before the first PvE battle. The production-soak harness changes `player-1.isBot` to true only after that phase transition and does not assign a personality.
+`createMatch()` still initializes `player-1` with `isBot: false` and `personalityId: null`; normal game behavior is unchanged. Pre-fix production-soak main immediately changed `player-1` to a bot and assigned Balanced before the first phase advancement, so all eight participants already received round-1 bot preparation. The confirmed defect was instead the permanent second Balanced assignment: the seven existing bot slots already covered all seven configured personalities, and the harness always added Balanced as the eighth.
 
-Later personality resolution cannot match the null ID and therefore selects the first configured personality, Balanced: reserve 10, level aggression 0.55, reroll aggression 0.45, no preferred traits and spread formation. From the next preparation onward, the harness consequently has two effective Balanced participants and one participant for each of the other six personalities. This is a **CLEAR LOGIC DEFECT / MEASUREMENT-HARNESS POPULATION ASYMMETRY**, not a gameplay-engine defect. The round-1 difference can affect the first PvE result and potentially early HP/state progression; its size is unmeasured.
+The normalized harness now marks every participant as a bot and assigns personality IDs in existing content order before the first phase advancement with `personalityIds[(seedIndex + playerIndex) % personalityIds.length]`. With eight slots and seven personalities, every match contains all seven personalities plus one duplicate; the duplicate rotates by seed, and across seven seeds every personality receives eight assignments while every player slot uses each personality once. No eighth personality, bot-policy, gameplay-domain or RNG change is introduced.
 
-Prior snapshots remain valid measurements of this exact harness. Before the next new authoritative production-soak baseline is used to evaluate system or balance changes, participant initialization must be explicitly normalized or the intended asymmetric population must be specified. This audit does not implement that change.
+Prior snapshots remain valid measurements of their exact historical harness and their conclusions are unchanged. A new authoritative broad baseline is required after this normalization PR merges; no historical snapshot is rewritten and no new 1,000-seed run is part of this fix.
 
 ## 10. Adaptive vs Scripted Bot Roles
 
@@ -228,9 +228,9 @@ Architecture is locked at the role boundary, not at current weights: adaptive bo
 
 **P4:** Items / Treasure / Form Accessibility research/audit.
 
-Then: **normalize or intentionally specify the production-soak participant population before the next authoritative broad baseline, if not already handled**.
+Then: **merge the production-soak population normalization**.
 
-Then: **new broad production baseline**.
+Then: **run a new authoritative broad production baseline**.
 
 Then: **unit-level balance**.
 

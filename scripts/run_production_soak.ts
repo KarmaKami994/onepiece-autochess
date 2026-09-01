@@ -842,6 +842,28 @@ function recordTraits(
   }
 }
 
+export function normalizeProductionSoakPopulation(
+  state: MatchState,
+  seedIndex: number,
+): void {
+  const personalityIds = DEFAULT_CONTENT.botPersonalities.map(
+    (personality) => personality.id,
+  );
+  if (personalityIds.length === 0) {
+    throw new Error("Production soak requires at least one bot personality");
+  }
+
+  state.players.forEach((player, playerIndex) => {
+    const personalityId =
+      personalityIds[(seedIndex + playerIndex) % personalityIds.length];
+    if (personalityId === undefined) {
+      throw new Error("Production soak personality assignment failed");
+    }
+    player.isBot = true;
+    player.personalityId = personalityId;
+  });
+}
+
 export function runProductionSoak(seedCount = 50): ProductionSoakReport {
   if (!Number.isInteger(seedCount) || seedCount <= 0) {
     throw new Error("seedCount must be a positive integer");
@@ -935,10 +957,7 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
   for (let seedIndex = 0; seedIndex < seedCount; seedIndex += 1) {
     try {
       let state = createMatch(`production-${seedIndex}`, DEFAULT_CONTENT);
-      const human = state.players.find((player) => player.id === "player-1");
-      if (!human) throw new Error("Human player missing");
-      human.isBot = true;
-      human.personalityId = "balanced";
+      normalizeProductionSoakPopulation(state, seedIndex);
       const lastDeployedBoards = new Map<string, Set<string>>();
       const lastDeployedPilotUnits = new Map<
         string,
@@ -1073,10 +1092,6 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
         }
 
         state = advanceMatchPhase(state, DEFAULT_CONTENT);
-        const activeHuman = state.players.find(
-          (player) => player.id === "player-1",
-        );
-        if (activeHuman) activeHuman.isBot = true;
         transitions += 1;
       }
 
