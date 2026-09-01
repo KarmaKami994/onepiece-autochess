@@ -607,11 +607,11 @@ function resolveBattleResults(
         updateStreak(playerB, "loss");
       }
       playerA.lastOpponents = [
-        ...playerA.lastOpponents.slice(-2),
+        ...playerA.lastOpponents,
         playerB.id,
       ];
       playerB.lastOpponents = [
-        ...playerB.lastOpponents.slice(-2),
+        ...playerB.lastOpponents,
         playerA.id,
       ];
       appendRecentBattle(playerA, {
@@ -632,7 +632,7 @@ function resolveBattleResults(
       });
     } else if (result.ghostOfPlayerId) {
       playerA.lastOpponents = [
-        ...playerA.lastOpponents.slice(-2),
+        ...playerA.lastOpponents,
         result.ghostOfPlayerId,
       ];
       appendRecentBattle(playerA, {
