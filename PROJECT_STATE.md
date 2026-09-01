@@ -23,10 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-PR #33 / P2 is merged at `3eb5168`. ChatGPT has locked P3 Match Flow / Pacing as Option 3: keep the deterministic domain and adapt selected PAC principles. The current task on `fix/simultaneous-elimination-placement` corrects same-round placement ordering only; captain damage, pairing and late PAC PvE/event cadence remain unchanged or deferred. Smoker remains frozen, GameContent remains `1.15.1` and save schema remains 6.
+PR #34 is merged at `b2c18e5`, completing the same-round placement correction. P3B is implemented on `feat/p3b-global-pairing` and awaiting review: PvP pairing now globally optimizes encounter count then recency with seeded deterministic ties. Captain damage and late PAC PvE/event cadence remain unchanged or deferred. Smoker remains frozen, GameContent remains `1.15.1` and save schema remains 6.
 
 ## Last Completed Work
 
+- 2026-09-01 — P3B deterministic global PvP pairing on `feat/p3b-global-pairing`: replaced greedy local selection with exhaustive complete-round optimization bounded to eight players. Total directed encounter count is minimized first, total recency distance maximized second, and one project-seeded deterministic choice resolves exact ties. Real pairs score both histories; ghosts score only the real fighter's history. All alive players participate once directly, odd rounds add exactly one ghost, dead players are excluded, and `lastOpponents` now preserves compact full PvP/ghost history while ghost owners remain unmodified. Captain damage, combat, battle seeds, cadence, economy, bots, analytics, content and schema are unchanged. The production-soak population gate remains mandatory. Material files: `game/pairing.ts`, `game/engine.ts`, `tests/game/pairing.test.ts`, `docs/MATCH_FLOW_AND_PACING_AUDIT.md`, `PROJECT_STATE.md`.
 - 2026-09-01 — P3 Match Flow / Pacing architecture record and simultaneous-elimination correctness fix on `fix/simultaneous-elimination-placement`: same-resolution eliminations now rank best-to-worst by post-damage HP, then level, then ascending ID only for a true state tie, and receive the contiguous placement block derived from the alive count captured before cleanup. Existing final-crew, pool/shop return, winner and zero-survivor behavior remain intact. P3 Option 3 keeps the phase graph, preparation timing, 45-second battle cap, carousel sequencing, early PvE cadence, ghosts, timeout resolution and current draw semantics; pairing and captain damage are deferred without implementation. Late PAC PvE/events remain P4 reference only. No content, schema, analytics, bot or soak change. Material files: `game/matchFlow.ts`, `game/engine.ts`, `tests/game/match-flow.test.ts`, `docs/MATCH_FLOW_AND_PACING_AUDIT.md`, `PROJECT_STATE.md`.
 - 2026-09-01 — P2 Economy / Progression PAC-first audit and PR #33 review correction on `analysis/economy-progression-audit`: verified normal PAC economy at pinned commit `a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee` and the local lifecycle at main `c3075ef`. Architecture Option 1 keeps the current deterministic finite-pool economy: liquid start values, income, interest, XP, normal shop, odds, buy price and bench values already match or deliberately adapt PAC. PAC additionally grants a Stage-0 starter selected from three propositions plus its associated item component; this opening-resource difference is REFERENCE ONLY and does not establish a local defect. Full `cost × 1/3/9` sell refund is WATCH / NEEDS MEASUREMENT rather than a defect; fixed per-unit pools preserve contest ceilings but dilute specific-unit rolls as cost bands expand. No transactional economy defect was found. Realized level, streak, reroll, high-cost and star outcomes are P3-coupled, so the sole next task is P3 PAC-first Match Flow / Pacing research. The asymmetric soak population remains a mandatory gate before a new authoritative baseline. No code, value, metric or simulation changed. Material files: `docs/ECONOMY_AND_PROGRESSION_AUDIT.md`, `PROJECT_STATE.md`.
 - 2026-08-31 — `c3075ef`, merged PR #32: completed the bot architecture/meta-bias audit and review hardening. Adaptive bots remain the real-match/production-meta class; a separate scripted benchmark concept may be added later. The current soak duplicates Balanced after `player-1` skips round-one bot preparation and is converted with null personality, so prior snapshots are exact-current-harness evidence and the population must be normalized or intentionally specified before a new authoritative baseline. Smoker remains frozen. Material files: `docs/BOT_ARCHITECTURE_AND_BIAS_AUDIT.md`, `PROJECT_STATE.md`.
@@ -61,6 +62,17 @@ PR #33 / P2 is merged at `3eb5168`. ChatGPT has locked P3 Match Flow / Pacing as
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+P3B deterministic global PvP pairing:
+
+- PASS — focused `tests/game/pairing.test.ts`: 13 tests passed across deterministic RNG, direct participation, even/odd and ghost structure, global count optimum, count/recency priority, exact ties, bidirectional/ghost scoring, full history and dead-player exclusion.
+- PASS — focused `tests/game/match-flow.test.ts`: 17 tests passed.
+- PASS — `npm run typecheck` equivalent: TypeScript completed with exit 0.
+- PASS — `npm run lint` equivalent: ESLint completed with exit 0.
+- PASS — normal unit suite: 42 files and 383 tests passed; `tests/soak.test.ts` excluded by the normal script.
+- PASS — `npm run build`: Vinext production build completed with exit 0; only the existing chunk-size advisory was reported.
+- NOT RUN — Browser E2E; no UI dependency changed.
+- NOT RUN — 1,000-seed production soak or other balance/pairing simulation.
 
 P3 simultaneous-elimination placement:
 
@@ -400,6 +412,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- PvP rounds now choose one globally optimal complete pairing combination by encounter count, recency and seeded deterministic tie selection. Opponent history grows for the full match instead of truncating to three entries; ghost-owner history remains unchanged by ghost fights.
 - Players eliminated in one result-resolution batch now receive unique contiguous placements ordered by higher post-damage HP, then higher level, then ascending stable ID only for an exact tie. Single eliminations and all existing cleanup/game-over behavior remain unchanged.
 - None for the P2 Economy / Progression audit. Gold, income, interest, streaks, XP, shops, pools, sells, bench, battle economy, bots, content and saves are unchanged.
 - None for the bot architecture and bias audit. Bot logic, personalities, weights, gameplay, content and simulation behavior remain unchanged.
@@ -432,6 +445,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- None for P3B. No captain-damage, combat, battle-seed, timing, economy, bot, P4, analytics, persistence-schema or soak-harness change was added.
 - None for the simultaneous-elimination fix and locked P3 record. Captain damage, pairing, late PAC cadence, P4 content, bots, analytics and production measurement were not changed.
 - None for the P2 audit. Research stayed on pinned targeted PAC economy sources, targeted local domain ranges and the existing report schema; no P3, harness fix, diagnostic, tuning or simulation was added.
 - None for the bot architecture and bias audit. Research stayed on the pinned targeted PAC files and current targeted bot files; no PAC backend, bot tuning, P2/P3 work, Smoker diagnostic or simulation was added.
@@ -494,7 +508,7 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
-- P3 Match Flow / Pacing selects Option 3: keep the current deterministic domain architecture and adapt selected PAC principles. Keep the phase graph, preparation timing, 45-second battle cap, carousel sequencing, early PvE rounds, ghosts, remaining-team-health timeout winner and current draw semantics. Same-round elimination ordering changes now; captain damage is ADAPT LATER / MEASURE FIRST, pairing is ADAPT LATER in P3B, and late PAC PvE/event cadence is P4 REFERENCE ONLY. Future server multiplayer moves deadline authority server-side without changing domain rules.
+- P3 Match Flow / Pacing selects Option 3: keep the current deterministic domain architecture and adapt selected PAC principles. Keep the phase graph, preparation timing, 45-second battle cap, carousel sequencing, early PvE rounds, ghosts, remaining-team-health timeout winner and current draw semantics. Same-round elimination ordering is corrected; P3B implements an ADAPTED PORT of global encounter-count/recency pairing with local seeded deterministic ties and asymmetric ghost scoring. Captain damage remains ADAPT LATER / MEASURE FIRST, and late PAC PvE/event cadence remains P4 REFERENCE ONLY. Future server multiplayer moves deadline authority server-side without changing domain rules.
 - P2 Economy / Progression selects Architecture Option 1: keep the current deterministic authoritative finite-pool economy and treat values as the measurement baseline, not permanent locks. PAC liquid start values and normal interest/XP/odds/shop/buy/bench behavior are direct or adapted parity, but PAC also has a Stage-0 starter plus component opening grant; that cross-cutting difference and PAC's partial evolved-unit sell pricing are REFERENCE ONLY. No transactional defect requires implementation. Economy tuning waits for P3; per-unit pool scaling and full-refund selling remain KEEP / MEASURE.
 - Roadmap is P2 audit complete → P3 Match Flow / Pacing PAC-first audit → P1B bot recalibration if needed → P4 Items / Treasure / Form Accessibility audit → normalize/specify soak participants → add only necessary diagnostics/baseline → at most one evidence-backed economy change → broad baseline → unit balance. Smoker remains frozen with no immediate diagnostic.
 - Bot architecture uses two distinct future roles: adaptive match bots remain the production-meta/local-opponent class using real domain systems and command intents; a PAC-inspired scripted benchmark-bot concept may later provide authored deterministic combat setups but cannot replace adaptive production bots. PAC Mongo/Firebase/Colyseus/community/Discord infrastructure is rejected. Architecture Option 3 is locked; adaptive tuning waits until P2/P3 stabilize.
@@ -523,7 +537,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-P3B — adapt PvP pairing from the current greedy local selection to a global encounter-count + recency objective inspired by PAC, while retaining project-seeded deterministic tie-breaking. The production-soak participant population must still be normalized or intentionally specified before a new authoritative broad baseline.
+Await review and merge of P3B. This bounded implementation does not select another roadmap task. The production-soak participant population must still be normalized or intentionally specified before a new authoritative broad baseline.
 
 ## Codex Update Contract
 

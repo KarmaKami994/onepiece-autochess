@@ -21,13 +21,15 @@ This record transcribes the locked P3 decisions. It is not a new architecture an
 
 Late PAC PvE rounds and later carousel, portal and additional-pick content are **REFERENCE ONLY**. They cross into P4 Items / Treasure / Form Accessibility and are not implemented here.
 
-## Adapt Later
+## Pairing Adaptation and Deferred Captain Damage
 
 ### Pairing
 
-Classification: **ADAPT LATER**.
+Classification: **ADAPTED PORT**.
 
-PAC globally optimizes complete eight-player pairing combinations using encounter count and recency. Current One Piece pairing is deterministic but greedy. A later bounded P3B change should adapt the global objective while retaining project-seeded deterministic tie-breaking. No pairing behavior changes in this PR.
+P3B replaces the local greedy selector with bounded global complete-round optimization. Alive players are stably sorted, deterministically shuffled, and exhaustively combined for the maximum eight-player population. The optimizer minimizes total historical encounter count, then maximizes total recency distance, then uses one project-seeded deterministic selection among exact optimal ties.
+
+Real pair scores sum both players' directed histories. A ghost score uses only the real fighter's directed history toward the ghost owner, preserving the existing asymmetric ghost semantics. Every alive player participates exactly once as a real/direct participant; an odd population adds exactly one ghost matchup whose owner is another alive player. `lastOpponents` now retains the compact full real/ghost history rather than only three entries, while ghost fights still leave the owner's history unchanged. Existing schema-6 histories accumulate from their saved contents without reconstructing discarded encounters.
 
 ### Captain damage
 
@@ -69,6 +71,7 @@ These values describe that prior exact harness only. They are not human-play or 
 
 - Architecture remains Option 3.
 - Same-round elimination placement is corrected.
-- Pairing, captain damage, phase timing, cadence, draws, ghosts and battle duration are unchanged.
+- Pairing now uses the P3B global encounter-count/recency objective with seeded deterministic ties; combat, ghost damage/streak behavior and battle seeds are unchanged.
+- Captain damage, phase timing, cadence, draws and battle duration are unchanged.
 - No P4 content, bot tuning, analytics change or production soak is included.
-- The sole next bounded task after review and merge is **P3B — adapt PvP pairing from the current greedy local selection to a global encounter-count + recency objective inspired by PAC, while retaining project-seeded deterministic tie-breaking**.
+- P3B is complete on its task branch and awaits review; this bounded implementation does not select another roadmap task.
