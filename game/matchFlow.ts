@@ -5,6 +5,19 @@ import type {
   RecentBattleRecord,
 } from "./types";
 
+export function compareSimultaneousEliminations(
+  left: Pick<PlayerState, "hp" | "level" | "id">,
+  right: Pick<PlayerState, "hp" | "level" | "id">,
+): number {
+  if (left.hp !== right.hp) {
+    return right.hp - left.hp;
+  }
+  if (left.level !== right.level) {
+    return right.level - left.level;
+  }
+  return left.id < right.id ? -1 : left.id > right.id ? 1 : 0;
+}
+
 export function calculateLossDamage(
   winnerTeamId: string | null,
   finalUnits: BattleUnitSnapshot[],
