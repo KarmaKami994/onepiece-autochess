@@ -23,10 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-P4 core item-system architecture is documented on `analysis/p4-item-system-audit` from exact base `3259895231fde3b77c01f79a62d4cccc32555ca4`. The locked direction is PAC's ten-component, all-unordered-pairs 55-item craft matrix, automatic second-component crafting and three completed items per unit, adapted to existing One Piece traits, deterministic local acquisition and missing combat primitives. This audit changes no runtime behavior. GameContent remains `1.15.1` and save schema remains 6.
+P4A Component / Recipe / Domain Foundation is implemented on `feat/p4a-item-domain-foundation` from exact base `d6350b3bca9e7743b714663c91353af1699a96e3`. The authoritative catalog now contains ten components and 55 completed outputs with all unordered self-inclusive recipes, deterministic equip crafting, completed-item uniqueness and deterministic merge handling. Normal PvE/carousel acquisition remains the legacy eight completed items. GameContent is `1.16.0`; save schema remains 6. P4B combat primitives/effects and P4C component acquisition/UI have not started.
 
 ## Last Completed Work
 
+- 2026-09-01 — P4A item-domain foundation on `feat/p4a-item-domain-foundation`: added typed component/completed kinds, a pure sorted-pair recipe domain, ten components, all 55 approved completed outputs/recipes, explicit legacy-eight acquisition, preparation-only crafting, completed uniqueness, deterministic completed-first merge retention and schema-6/form-catalyst regressions. Existing eight effects/IDs, reward/carousel RNG, selling, Robin and Gear 4 contracts remain intact. GameContent is `1.16.0`; P4B/P4C, tuning and the 1,000-seed soak were not started. Material files: `game/types.ts`, `game/items.ts`, `game/content.ts`, `game/engine.ts`, `game/roster.ts`, `game/index.ts`, focused/affected tests, `docs/P4_ITEM_SYSTEM_AUDIT.md`, `PROJECT_STATE.md`.
 - 2026-09-01 — P4 core item-system PAC-first architecture audit on `analysis/p4-item-system-audit`: verified the ten components, all 55 recipes, stats, behavior identities, triggers, uniqueness/cap rules, early PvE rewards and carousel pools at pinned PAC commit `a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee`; mapped current local inventory/equip/merge/sell/RNG/bot/combat/save/UI support; recorded missing primitives; proposed complete One Piece naming and a four-part bounded decomposition. No gameplay, content, schema, metric, baseline or simulation changed. Material files: `docs/P4_ITEM_SYSTEM_AUDIT.md`, `PROJECT_STATE.md`.
 - 2026-09-01 — Normalized pre-P4 production baseline on `analysis/normalized-pre-p4-baseline`: exactly one 1,000-seed run from clean measurement SHA `cff9c4caed9b09fd64a915908589decc84f02cc8` completed 1,000/1,000 matches with zero crashes. Rounds were 26–51 with 34.036 average; full-clock/paced averages were 33.740/24.064 minutes; timeout/draw rates were 0.8315%/0.0325%. Shops had zero empty slots, every cost band appeared on final boards, Robin's Demonio invariant held, Monster Point reached all matches and Gear 4 remained very rare. Conclusion: baseline healthy enough to continue feature development; defer balance analysis. Snapshot: `docs/analysis/normalized-pre-p4-baseline-1000.json`, SHA-256 `80f4551af28e46f8976a014246b75da42fa1c674de7a0720924e775bfbaffd22`. Material files: the snapshot, `docs/NORMALIZED_PRE_P4_BASELINE.md`, `PROJECT_STATE.md`.
 - 2026-09-01 — `cff9c4ca`, merged PR #36: the production-soak harness assigns all eight participants as bots before the first phase advancement and rotates the seven existing personality IDs with `(seedIndex + playerIndex) % personalityIds.length`. Each match contains all seven personalities plus one rotating duplicate; across seven seeds each personality has eight assignments and each player slot uses every personality once. Normal `createMatch()`, bot policy, gameplay, metrics, RNG, GameContent and schema are unchanged. Historical snapshots retain their exact-harness conclusions. Material files: `scripts/run_production_soak.ts`, `tests/production-audit.test.ts`, `docs/BOT_ARCHITECTURE_AND_BIAS_AUDIT.md`, `PROJECT_STATE.md`.
@@ -65,6 +66,18 @@ P4 core item-system architecture is documented on `analysis/p4-item-system-audit
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+P4A item-domain foundation:
+
+- PASS — focused `tests/game/item-domain-foundation.test.ts`: 1 file / 25 tests covering catalog, all pair keys, acquisition RNG, crafting, uniqueness/cap/errors, sell, deterministic merge, forms and schema-6 legacy IDs.
+- PASS — affected existing item/form/save/carousel tests: 9 files / 100 tests.
+- PASS — `npm run typecheck` and `npm run lint` equivalents through the installed npm CLI.
+- PASS — `npm test`: 43 files / 410 tests.
+- PASS — `npm run assets:validate`: 41 animation atlases, maps, Carousel assets and provenance files validated.
+- PASS — `npm run test:production-smoke`: 50/50 matches completed with zero crashes; guardrail only, no tuning conclusion.
+- PASS — `npm run build`; only the existing chunk-size advisory was reported.
+- NOT RUN — Browser E2E; no browser/UI/Phaser source changed.
+- NOT RUN — `npm run test:production-soak`; no 1,000-seed run or baseline artifact was generated.
 
 P4 core item-system audit:
 
@@ -443,6 +456,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- GameContent `1.16.0` defines ten zero-effect components and the approved 55 completed recipe outputs. Equipping a second component crafts deterministically even at cap, replaces the held component in place, and returns duplicate results to inventory; direct completed duplicates now fail with `ITEM_DUPLICATE`. Unit merges retain distinct completed items before at most one component and return duplicates/excess without auto-crafting. Normal PvE/carousel acquisition and RNG remain restricted to the unchanged legacy eight-item order; existing legacy effects, selling, forms and schema 6 remain intact.
 - None for the P4 item-system audit. It locks an architecture direction and changes no inventory, item, combat, acquisition, bot, persistence, content or presentation behavior.
 - None for the normalized pre-P4 baseline. It records existing harness output and changes no gameplay, bot policy, economy, pairing, captain damage, combat, content, schema, metrics or RNG.
 - The production-soak harness now makes every participant a bot before the first phase advancement and assigns existing personality IDs by `(seedIndex + playerIndex) % personalityIds.length`. The eighth slot duplicates one of seven personalities per match, rotating deterministically by seed. Normal match creation, bot decisions, gameplay and analytics definitions are unchanged.
@@ -479,6 +493,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- None for P4A. No combat primitive/effect, component stat, component acquisition, UI/asset work, bot strategy, tuning, schema change, P1B or 1,000-seed soak was added.
 - None for the P4 audit. Research stayed on the pinned PAC core craftable matrix and targeted local item paths; no implementation, value, version, schema, metric, artifact or simulation was added.
 - None for the normalized pre-P4 baseline. Exactly one 1,000-seed soak was run from the required clean SHA; no instrumentation, historical snapshot, implementation, tuning or follow-on feature work was added.
 - None for production-soak population normalization. No personality, policy, gameplay/domain, metric, RNG, content, schema, baseline artifact or 1,000-seed run was added or changed.
@@ -515,7 +530,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
-- P4 requires Special Defense, crit power, item shields, ability crits, Luck, triggered-item lifecycles, immunities, Wound, resurrection, trait-granting equipment and several reactive damage/stat primitives that are absent locally. Existing merges silently truncate equipped-item overflow beyond three; current bot scoring and fixed-eight carousel presentation cannot represent the locked matrix. These are implementation gates, not authorization to add a generic framework or tune balance.
+- P4B still requires separately approved Special Defense, crit power, item shields, ability crits, Luck, triggered lifecycles, immunities, Wound, resurrection, trait-granting equipment and reactive damage/stat primitives. Merge overflow was already returned before P4A and remains preserved. Bot scoring and fixed-eight carousel presentation are P4C gates, not authorization to add a generic framework or tune balance.
 - Existing all-player-elimination behavior still leaves `winnerId` null when no survivor remains. The new deterministic batch ranking applies, but winner semantics remain a separate edge-case watch and were intentionally not redesigned here.
 - Full star-copy sell refund (`cost × 1/3/9`) makes 2-star/3-star units fully liquid, lowers pivot commitment and can move battle-time sales into interest thresholds; classify WATCH / NEEDS MEASUREMENT, not a defect. Constant per-unit pools preserve absolute copies while four-character expansions grow cost-band totals and dilute each specific definition's conditional roll share. Realized gold, levels, streaks, high-cost access, rerolls and star timing are P3-coupled and not currently observable at sufficient grain.
 - The normalized baseline completed 1,000/1,000 matches without crashes and exposes no systemic blocker. Full-clock average duration remains above the 20–30 minute target at 33.740 minutes while paced duration is 24.064 minutes; this remains a pacing watch, not a development blocker. Gear 4 appeared on only two of 130 deployed three-star Luffy final boards and remains accessibility context for future P4 research, not a balance conclusion. Historical results remain valid exact-historical-harness evidence and are not reinterpreted as normalized measurements.
@@ -546,6 +561,7 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
+- P4A keeps `EQUIP_ITEM` as the preparation-only authority, uses `minComponentId::maxComponentId` recipe keys, preserves all eight legacy completed IDs/effects, and isolates the current acquisition pool through `acquirableItemIds`. Merge handling is an adapted deterministic completed-first policy with at most one retained component and no merge-time crafting. GameContent is `1.16.0`; schema remains 6.
 - P4 adopts the PAC core craftable architecture: ten components, all 55 unordered self-inclusive recipes, automatic second-component crafting, completed-item uniqueness and cap three. General behavior identities are direct; flat units/missing primitives, existing-trait candidates, names/assets/tooltips and local deterministic early acquisition are adapted. Post-20 cadence and later PvE are reference only; unrelated item families and backend/Pokémon-specific systems are rejected. Proposed trait-item mappings remain pending ChatGPT approval, and no non-obvious scaled value is locked.
 - P3 Match Flow / Pacing selects Option 3: keep the current deterministic domain architecture and adapt selected PAC principles. Keep the phase graph, preparation timing, 45-second battle cap, carousel sequencing, early PvE rounds, ghosts, remaining-team-health timeout winner and current draw semantics. Same-round elimination ordering is corrected; P3B implements an ADAPTED PORT of global encounter-count/recency pairing with local seeded deterministic ties and asymmetric ghost scoring. Captain damage remains ADAPT LATER / MEASURE FIRST, and late PAC PvE/event cadence remains P4 REFERENCE ONLY. Future server multiplayer moves deadline authority server-side without changing domain rules.
 - P2 Economy / Progression selects Architecture Option 1: keep the current deterministic authoritative finite-pool economy and treat values as the measurement baseline, not permanent locks. PAC liquid start values and normal interest/XP/odds/shop/buy/bench behavior are direct or adapted parity, but PAC also has a Stage-0 starter plus component opening grant; that cross-cutting difference and PAC's partial evolved-unit sell pricing are REFERENCE ONLY. No transactional defect requires implementation. Economy tuning waits for P3; per-unit pool scaling and full-refund selling remain KEEP / MEASURE.
@@ -576,7 +592,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-Await architecture review of `docs/P4_ITEM_SYSTEM_AUDIT.md`. If approved, ChatGPT should select one separately bounded implementation task from the documented decomposition and explicitly lock its numeric values. Do not start implementation, P1B, captain damage, economy tuning or balance work automatically.
+Review and merge P4A. Afterward, ChatGPT may separately authorize P4B only with explicit primitive/effect values; do not start P4B, P4C, P1B, captain damage, economy tuning or balance work automatically.
 
 ## Codex Update Contract
 

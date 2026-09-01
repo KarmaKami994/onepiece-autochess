@@ -1,5 +1,7 @@
 import { parseCell } from "./state";
 import { reconcileProductionFormProgression } from "./forms";
+import { getItemDefinition } from "./content";
+import { isComponentItem } from "./items";
 import type {
   GameContent,
   MatchState,
@@ -65,6 +67,46 @@ function unitMergePriority(
   return [2, 0, unit.acquiredOrder];
 }
 
+function resolveMergedItems(
+  itemIds: string[],
+  content: GameContent,
+): { retained: string[]; returned: string[] } {
+  const retained: string[] = [];
+  const returned: string[] = [];
+  const completedIds = new Set<string>();
+  const components: string[] = [];
+
+  for (const itemId of itemIds) {
+    if (isComponentItem(getItemDefinition(itemId, content))) {
+      components.push(itemId);
+      continue;
+    }
+    if (
+      completedIds.has(itemId) ||
+      retained.length >= content.config.itemCap
+    ) {
+      returned.push(itemId);
+      continue;
+    }
+    retained.push(itemId);
+    completedIds.add(itemId);
+  }
+
+  for (const componentId of components) {
+    if (
+      retained.length < content.config.itemCap &&
+      !retained.some((itemId) =>
+        isComponentItem(getItemDefinition(itemId, content))
+      )
+    ) {
+      retained.push(componentId);
+    } else {
+      returned.push(componentId);
+    }
+  }
+  return { retained, returned };
+}
+
 function mergeUnits(
   player: PlayerState,
   definitionId: string,
@@ -92,8 +134,9 @@ function mergeUnits(
         if (unit.id !== anchor.id) delete player.units[unit.id];
       }
       anchor.star = (star + 1) as StarLevel;
-      anchor.items = combinedItems.slice(0, content.config.itemCap);
-      player.inventory.push(...combinedItems.slice(content.config.itemCap));
+      const mergedItems = resolveMergedItems(combinedItems, content);
+      anchor.items = mergedItems.retained;
+      player.inventory.push(...mergedItems.returned);
       reconcileProductionFormProgression(anchor, content);
       const safeLocation =
         anchorLocation.zone === "bench" && anchorLocation.slot < 0

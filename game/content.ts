@@ -9,6 +9,7 @@ import type {
   UnitDefinition,
   UnitFormDefinition,
 } from "./types";
+import { canonicalItemRecipeKey } from "./items";
 
 const ability = (
   id: string,
@@ -1179,12 +1180,44 @@ export const TRAIT_DEFINITIONS: TraitDefinition[] = [
   },
 ];
 
-export const ITEM_DEFINITIONS: ItemDefinition[] = [
+const componentItem = (id: string, name: string): ItemDefinition => ({
+  id,
+  name,
+  description: "A core crafting component.",
+  icon: "◇",
+  kind: "component",
+  effects: [],
+});
+
+const completedItem = (id: string, name: string): ItemDefinition => ({
+  id,
+  name,
+  description: "A completed core item; its combat identity is reserved for P4B.",
+  icon: "◆",
+  kind: "completed",
+  effects: [],
+});
+
+export const COMPONENT_ITEM_DEFINITIONS: ItemDefinition[] = [
+  componentItem("jolly-roger-fragment", "Jolly Roger Fragment"),
+  componentItem("devil-fruit-essence", "Devil Fruit Essence"),
+  componentItem("cola-canister", "Cola Canister"),
+  componentItem("jet-dial", "Jet Dial"),
+  componentItem("sniper-lens", "Sniper Lens"),
+  componentItem("sea-king-meat", "Sea King Meat"),
+  componentItem("sea-prism-shard", "Sea-Prism Shard"),
+  componentItem("black-blade-shard", "Black Blade Shard"),
+  componentItem("armament-plate", "Armament Plate"),
+  componentItem("captains-sash", "Captain's Sash"),
+];
+
+const LEGACY_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
   {
     id: "black-blade",
     name: "Black Blade",
     description: "A supreme blade for raw and critical damage.",
     icon: "†",
+    kind: "completed",
     effects: [
       { kind: "attack-flat", value: 24 },
       { kind: "critical-chance-percent", value: 12 },
@@ -1195,6 +1228,7 @@ export const ITEM_DEFINITIONS: ItemDefinition[] = [
     name: "Meat Platter",
     description: "A hearty meal that greatly increases health.",
     icon: "✚",
+    kind: "completed",
     effects: [{ kind: "health-flat", value: 300 }],
   },
   {
@@ -1202,6 +1236,7 @@ export const ITEM_DEFINITIONS: ItemDefinition[] = [
     name: "Clima-Tact",
     description: "Empowers abilities and supplies starting energy.",
     icon: "ϟ",
+    kind: "completed",
     effects: [
       { kind: "ability-power-percent", value: 25 },
       { kind: "starting-energy", value: 20 },
@@ -1212,6 +1247,7 @@ export const ITEM_DEFINITIONS: ItemDefinition[] = [
     name: "Sniper Goggles",
     description: "Extends attack range and improves critical aim.",
     icon: "◎",
+    kind: "completed",
     effects: [
       { kind: "range-flat", value: 1 },
       { kind: "critical-chance-percent", value: 15 },
@@ -1222,6 +1258,7 @@ export const ITEM_DEFINITIONS: ItemDefinition[] = [
     name: "Sea Prism Stone",
     description: "Dense protection against physical pressure.",
     icon: "◆",
+    kind: "completed",
     effects: [
       { kind: "defense-flat", value: 25 },
       { kind: "health-flat", value: 120 },
@@ -1232,6 +1269,7 @@ export const ITEM_DEFINITIONS: ItemDefinition[] = [
     name: "Armament Wraps",
     description: "Reinforces both attacks and defenses.",
     icon: "◈",
+    kind: "completed",
     effects: [
       { kind: "attack-flat", value: 14 },
       { kind: "defense-flat", value: 14 },
@@ -1242,6 +1280,7 @@ export const ITEM_DEFINITIONS: ItemDefinition[] = [
     name: "Den Den Mushi",
     description: "Coordinates faster attacks and an earlier ability.",
     icon: "☏",
+    kind: "completed",
     effects: [
       { kind: "attack-speed-percent", value: 18 },
       { kind: "starting-energy", value: 10 },
@@ -1252,12 +1291,145 @@ export const ITEM_DEFINITIONS: ItemDefinition[] = [
     name: "Cola Engine",
     description: "A high-powered engine for speed and sustain.",
     icon: "⚙",
+    kind: "completed",
     effects: [
       { kind: "health-flat", value: 160 },
       { kind: "attack-speed-percent", value: 12 },
       { kind: "omnivamp-percent", value: 8 },
     ],
   },
+];
+
+const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
+  completedItem("emperors-jolly-roger", "Emperor's Jolly Roger"),
+  completedItem("specialists-log-pose", "Specialist's Log Pose"),
+  completedItem("marine-justice-coat", "Marine Justice Coat"),
+  completedItem("marksmans-thunder-dial", "Marksman's Thunder Dial"),
+  completedItem("captains-logbook", "Captain's Logbook"),
+  completedItem("brawlers-rumble-emblem", "Brawler's Rumble Emblem"),
+  completedItem("guardians-sea-prism-crest", "Guardian's Sea-Prism Crest"),
+  completedItem("revolutionary-flame", "Revolutionary Flame"),
+  completedItem("straw-hat-token", "Straw Hat Token"),
+  completedItem("swordsmans-knot", "Swordsman's Knot"),
+  completedItem("devil-fruit-codex", "Devil Fruit Codex"),
+  completedItem("observation-haki-mantle", "Observation Haki Mantle"),
+  completedItem("barrier-bubble", "Barrier Bubble"),
+  completedItem("reflect-dial", "Reflect Dial"),
+  completedItem("flame-flame-grimoire", "Flame-Flame Grimoire"),
+  completedItem("sea-prism-boots", "Sea-Prism Boots"),
+  completedItem("lucky-pirate-ribbon", "Lucky Pirate Ribbon"),
+  completedItem("cola-reservoir", "Cola Reservoir"),
+  completedItem("energy-siphon-scope", "Energy-Siphon Scope"),
+  completedItem("healing-bubble", "Healing Bubble"),
+  completedItem("star-shield-dial", "Star Shield Dial"),
+  completedItem("shark-tooth-charm", "Shark Tooth Charm"),
+  completedItem("miracle-talisman", "Miracle Talisman"),
+  completedItem("efficient-bandanna", "Efficient Bandanna"),
+  completedItem("observation-goggles", "Observation Goggles"),
+  completedItem("armor-piercing-scope", "Armor-Piercing Scope"),
+  completedItem("rush-flag", "Rush Flag"),
+  completedItem("ricochet-dial", "Ricochet Dial"),
+  completedItem("impact-dial", "Impact Dial"),
+  completedItem("jet-sash", "Jet Sash"),
+  completedItem("mystery-treasure-chest", "Mystery Treasure Chest"),
+  completedItem("smoke-star-escape", "Smoke-Star Escape"),
+  completedItem("gas-mask", "Gas Mask"),
+  completedItem("armament-sash", "Armament Sash"),
+  completedItem("spiked-armament", "Spiked Armament"),
+  completedItem("impact-proof-gauntlets", "Impact-Proof Gauntlets"),
+  completedItem("phoenix-feather", "Phoenix Feather"),
+  completedItem("banquet-belt", "Banquet Belt"),
+  completedItem("healing-dial", "Healing Dial"),
+  completedItem("guard-point-dummy", "Guard Point Dummy"),
+  completedItem("reversal-band", "Reversal Band"),
+  completedItem("advanced-armament-orb", "Advanced Armament Orb"),
+  completedItem("mera-mera-ember", "Mera Mera Ember"),
+  completedItem("bombardier-band", "Bombardier Band"),
+  completedItem("iron-pirate-helm", "Iron Pirate Helm"),
+  completedItem("bodyguard-band", "Bodyguard Band"),
+  completedItem("nullification-bandanna", "Nullification Bandanna"),
+];
+
+export const ITEM_DEFINITIONS: ItemDefinition[] = [
+  ...LEGACY_COMPLETED_ITEM_DEFINITIONS,
+  ...COMPONENT_ITEM_DEFINITIONS,
+  ...NEW_COMPLETED_ITEM_DEFINITIONS,
+];
+
+const ITEM_RECIPE_TUPLES = [
+  ["jolly-roger-fragment", "jolly-roger-fragment", "emperors-jolly-roger"],
+  ["jolly-roger-fragment", "devil-fruit-essence", "specialists-log-pose"],
+  ["jolly-roger-fragment", "cola-canister", "marine-justice-coat"],
+  ["jolly-roger-fragment", "jet-dial", "marksmans-thunder-dial"],
+  ["jolly-roger-fragment", "sniper-lens", "captains-logbook"],
+  ["jolly-roger-fragment", "sea-king-meat", "brawlers-rumble-emblem"],
+  ["jolly-roger-fragment", "sea-prism-shard", "guardians-sea-prism-crest"],
+  ["jolly-roger-fragment", "black-blade-shard", "revolutionary-flame"],
+  ["jolly-roger-fragment", "armament-plate", "straw-hat-token"],
+  ["jolly-roger-fragment", "captains-sash", "swordsmans-knot"],
+  ["devil-fruit-essence", "devil-fruit-essence", "devil-fruit-codex"],
+  ["devil-fruit-essence", "cola-canister", "clima-tact"],
+  ["devil-fruit-essence", "jet-dial", "cola-engine"],
+  ["devil-fruit-essence", "sniper-lens", "observation-haki-mantle"],
+  ["devil-fruit-essence", "sea-king-meat", "barrier-bubble"],
+  ["devil-fruit-essence", "sea-prism-shard", "reflect-dial"],
+  ["devil-fruit-essence", "black-blade-shard", "flame-flame-grimoire"],
+  ["devil-fruit-essence", "armament-plate", "sea-prism-boots"],
+  ["devil-fruit-essence", "captains-sash", "lucky-pirate-ribbon"],
+  ["cola-canister", "cola-canister", "cola-reservoir"],
+  ["cola-canister", "jet-dial", "den-den-mushi"],
+  ["cola-canister", "sniper-lens", "energy-siphon-scope"],
+  ["cola-canister", "sea-king-meat", "healing-bubble"],
+  ["cola-canister", "sea-prism-shard", "star-shield-dial"],
+  ["cola-canister", "black-blade-shard", "shark-tooth-charm"],
+  ["cola-canister", "armament-plate", "miracle-talisman"],
+  ["cola-canister", "captains-sash", "efficient-bandanna"],
+  ["jet-dial", "jet-dial", "observation-goggles"],
+  ["jet-dial", "sniper-lens", "armor-piercing-scope"],
+  ["jet-dial", "sea-king-meat", "rush-flag"],
+  ["jet-dial", "sea-prism-shard", "ricochet-dial"],
+  ["jet-dial", "black-blade-shard", "impact-dial"],
+  ["jet-dial", "armament-plate", "armament-wraps"],
+  ["jet-dial", "captains-sash", "jet-sash"],
+  ["sniper-lens", "sniper-lens", "mystery-treasure-chest"],
+  ["sniper-lens", "sea-king-meat", "smoke-star-escape"],
+  ["sniper-lens", "sea-prism-shard", "sniper-goggles"],
+  ["sniper-lens", "black-blade-shard", "black-blade"],
+  ["sniper-lens", "armament-plate", "gas-mask"],
+  ["sniper-lens", "captains-sash", "armament-sash"],
+  ["sea-king-meat", "sea-king-meat", "meat-platter"],
+  ["sea-king-meat", "sea-prism-shard", "phoenix-feather"],
+  ["sea-king-meat", "black-blade-shard", "impact-proof-gauntlets"],
+  ["sea-king-meat", "armament-plate", "spiked-armament"],
+  ["sea-king-meat", "captains-sash", "banquet-belt"],
+  ["sea-prism-shard", "sea-prism-shard", "sea-prism-stone"],
+  ["sea-prism-shard", "black-blade-shard", "healing-dial"],
+  ["sea-prism-shard", "armament-plate", "guard-point-dummy"],
+  ["sea-prism-shard", "captains-sash", "reversal-band"],
+  ["black-blade-shard", "black-blade-shard", "advanced-armament-orb"],
+  ["black-blade-shard", "armament-plate", "mera-mera-ember"],
+  ["black-blade-shard", "captains-sash", "bombardier-band"],
+  ["armament-plate", "armament-plate", "iron-pirate-helm"],
+  ["armament-plate", "captains-sash", "bodyguard-band"],
+  ["captains-sash", "captains-sash", "nullification-bandanna"],
+] as const;
+
+export const ITEM_RECIPES: Record<string, string> = Object.fromEntries(
+  ITEM_RECIPE_TUPLES.map(([firstId, secondId, resultId]) => [
+    canonicalItemRecipeKey(firstId, secondId),
+    resultId,
+  ]),
+);
+
+export const ACQUIRABLE_ITEM_IDS = [
+  "black-blade",
+  "meat-platter",
+  "clima-tact",
+  "sniper-goggles",
+  "sea-prism-stone",
+  "armament-wraps",
+  "den-den-mushi",
+  "cola-engine",
 ];
 
 const basicEnemyAbility = (
@@ -1562,11 +1734,13 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.15.1",
+  version: "1.16.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,
   items: ITEM_DEFINITIONS,
+  itemRecipes: ITEM_RECIPES,
+  acquirableItemIds: ACQUIRABLE_ITEM_IDS,
   enemies: PVE_ENEMY_DEFINITIONS,
   stages: STAGE_DEFINITIONS,
   botPersonalities: BOT_PERSONALITIES,

@@ -6,6 +6,11 @@ import {
 } from "./content";
 import { simulateBattle } from "./combat";
 import {
+  getAcquirableItems,
+  isComponentItem,
+  resolveItemRecipe,
+} from "./items";
+import {
   reconcileProductionFormProgression,
   resolvePersistentFormId,
 } from "./forms";
@@ -701,7 +706,10 @@ function prepareItemChoices(
         result.winnerId === candidate.id,
     );
   })) {
-    const shuffled = shuffleDeterministic(content.items, state.rngState);
+    const shuffled = shuffleDeterministic(
+      getAcquirableItems(content),
+      state.rngState,
+    );
     state.rngState = shuffled.state;
     state.pendingItemChoices[player.id] = shuffled.values
       .slice(0, choiceCount)
@@ -739,7 +747,7 @@ function createCarouselChoices(
 ): CarouselChoice[] {
   const livingPlayers = state.players.filter((player) => player.alive).length;
   const desiredCount = Math.min(9, Math.max(5, livingPlayers + 3));
-  const itemDeck = content.items.flatMap((item) => [item, item]);
+  const itemDeck = getAcquirableItems(content).flatMap((item) => [item, item]);
   const itemShuffle = shuffleDeterministic(itemDeck, state.rngState);
   state.rngState = itemShuffle.state;
   return itemShuffle.values
@@ -2132,6 +2140,7 @@ export function applyCommand(
     case "EQUIP_ITEM": {
       const unit = player.units[command.unitId];
       const inventoryIndex = player.inventory.indexOf(command.itemId);
+      const incomingItem = getItemDefinition(command.itemId, content);
       if (!unit) {
         return commandFailure(
           state,
@@ -2139,11 +2148,49 @@ export function applyCommand(
           "That unit does not exist.",
         );
       }
-      if (!getItemDefinition(command.itemId, content) || inventoryIndex < 0) {
+      if (!incomingItem || inventoryIndex < 0) {
         return commandFailure(
           state,
           "ITEM_NOT_FOUND",
           "That item is not in the inventory.",
+        );
+      }
+      if (isComponentItem(incomingItem)) {
+        const heldComponentIndex = unit.items.findIndex((itemId) =>
+          isComponentItem(getItemDefinition(itemId, content))
+        );
+        if (heldComponentIndex >= 0) {
+          const heldComponentId = unit.items[heldComponentIndex];
+          const resultId = resolveItemRecipe(
+            heldComponentId,
+            incomingItem.id,
+            content,
+          );
+          const result = resultId
+            ? getItemDefinition(resultId, content)
+            : null;
+          if (!result || result.kind !== "completed") {
+            return commandFailure(
+              state,
+              "ITEM_RECIPE_NOT_FOUND",
+              "Those components do not resolve to a valid completed item.",
+            );
+          }
+          player.inventory.splice(inventoryIndex, 1);
+          if (unit.items.includes(result.id)) {
+            unit.items.splice(heldComponentIndex, 1);
+            player.inventory.push(result.id);
+            return { ok: true, state: next };
+          }
+          unit.items[heldComponentIndex] = result.id;
+          reconcileProductionFormProgression(unit, content);
+          return { ok: true, state: next };
+        }
+      } else if (unit.items.includes(incomingItem.id)) {
+        return commandFailure(
+          state,
+          "ITEM_DUPLICATE",
+          "That completed item is already equipped on this unit.",
         );
       }
       if (unit.items.length >= content.config.itemCap) {
@@ -2154,7 +2201,7 @@ export function applyCommand(
         );
       }
       player.inventory.splice(inventoryIndex, 1);
-      unit.items.push(command.itemId);
+      unit.items.push(incomingItem.id);
       reconcileProductionFormProgression(unit, content);
       return { ok: true, state: next };
     }

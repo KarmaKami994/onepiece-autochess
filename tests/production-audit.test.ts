@@ -243,7 +243,7 @@ describe("production configuration audit", () => {
     expect(Object.keys(report.traitCombinations)).toEqual([
       "emperor+captain",
     ]);
-    expect(Object.keys(report.itemUsage)).toHaveLength(8);
+    expect(Object.keys(report.itemUsage)).toHaveLength(65);
 
     for (const character of Object.values(report.characterPresence)) {
       expect(character.winningBoards).toBeLessThanOrEqual(character.top4Boards);
