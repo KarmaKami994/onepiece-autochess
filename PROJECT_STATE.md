@@ -23,10 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-PR #32 is merged at `c3075ef`, locking adaptive match bots plus a possible separate scripted benchmark role and the pre-baseline soak-population gate. The current task is the analysis-only P2 Economy / Progression audit on `analysis/economy-progression-audit`; Smoker remains frozen, GameContent remains `1.15.1` and save schema remains 6.
+PR #33 / P2 is merged at `3eb5168`. ChatGPT has locked P3 Match Flow / Pacing as Option 3: keep the deterministic domain and adapt selected PAC principles. The current task on `fix/simultaneous-elimination-placement` corrects same-round placement ordering only; captain damage, pairing and late PAC PvE/event cadence remain unchanged or deferred. Smoker remains frozen, GameContent remains `1.15.1` and save schema remains 6.
 
 ## Last Completed Work
 
+- 2026-09-01 — P3 Match Flow / Pacing architecture record and simultaneous-elimination correctness fix on `fix/simultaneous-elimination-placement`: same-resolution eliminations now rank best-to-worst by post-damage HP, then level, then ascending ID only for a true state tie, and receive the contiguous placement block derived from the alive count captured before cleanup. Existing final-crew, pool/shop return, winner and zero-survivor behavior remain intact. P3 Option 3 keeps the phase graph, preparation timing, 45-second battle cap, carousel sequencing, early PvE cadence, ghosts, timeout resolution and current draw semantics; pairing and captain damage are deferred without implementation. Late PAC PvE/events remain P4 reference only. No content, schema, analytics, bot or soak change. Material files: `game/matchFlow.ts`, `game/engine.ts`, `tests/game/match-flow.test.ts`, `docs/MATCH_FLOW_AND_PACING_AUDIT.md`, `PROJECT_STATE.md`.
 - 2026-09-01 — P2 Economy / Progression PAC-first audit and PR #33 review correction on `analysis/economy-progression-audit`: verified normal PAC economy at pinned commit `a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee` and the local lifecycle at main `c3075ef`. Architecture Option 1 keeps the current deterministic finite-pool economy: liquid start values, income, interest, XP, normal shop, odds, buy price and bench values already match or deliberately adapt PAC. PAC additionally grants a Stage-0 starter selected from three propositions plus its associated item component; this opening-resource difference is REFERENCE ONLY and does not establish a local defect. Full `cost × 1/3/9` sell refund is WATCH / NEEDS MEASUREMENT rather than a defect; fixed per-unit pools preserve contest ceilings but dilute specific-unit rolls as cost bands expand. No transactional economy defect was found. Realized level, streak, reroll, high-cost and star outcomes are P3-coupled, so the sole next task is P3 PAC-first Match Flow / Pacing research. The asymmetric soak population remains a mandatory gate before a new authoritative baseline. No code, value, metric or simulation changed. Material files: `docs/ECONOMY_AND_PROGRESSION_AUDIT.md`, `PROJECT_STATE.md`.
 - 2026-08-31 — `c3075ef`, merged PR #32: completed the bot architecture/meta-bias audit and review hardening. Adaptive bots remain the real-match/production-meta class; a separate scripted benchmark concept may be added later. The current soak duplicates Balanced after `player-1` skips round-one bot preparation and is converted with null personality, so prior snapshots are exact-current-harness evidence and the population must be normalized or intentionally specified before a new authoritative baseline. Smoker remains frozen. Material files: `docs/BOT_ARCHITECTURE_AND_BIAS_AUDIT.md`, `PROJECT_STATE.md`.
 - 2026-08-31 — bot architecture and meta-bias audit on `analysis/bot-architecture-bias-audit`: verified the official PAC scenario-bot model at pinned commit `a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee` and mapped the current adaptive purchase, progression, lineup, formation and item policy. Architecture decision: retain adaptive bots for real-match/meta simulation and consider a separate adapted scripted benchmark-bot concept later; PAC backend infrastructure is rejected. Review hardening confirmed no gameplay-engine defect but identified a production-soak population defect: `player-1` skips round-1 bot preparation, then becomes a null-personality bot that resolves to Balanced, duplicating that policy. Existing snapshots remain valid exact-current-harness evidence; participant initialization must be normalized or intentionally specified before the next authoritative broad baseline. Ordering remains bot audit now and adaptive tuning after P2/P3; the sole next task is P2 PAC-first Economy / Progression research and audit. No gameplay, bot weight, harness code or simulation changed. Material files: `docs/BOT_ARCHITECTURE_AND_BIAS_AUDIT.md`, `PROJECT_STATE.md`.
@@ -60,6 +61,16 @@ PR #32 is merged at `c3075ef`, locking adaptive match bots plus a possible separ
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+P3 simultaneous-elimination placement:
+
+- PASS — focused `tests/game/match-flow.test.ts`: 17 tests passed, including single elimination, HP-first ordering against ID order, level fallback, exact-tie ID fallback, four-player batch, top-four boundary and cleanup.
+- PASS — `npm run typecheck` equivalent: TypeScript completed with exit 0.
+- PASS — `npm run lint` equivalent: ESLint completed with exit 0.
+- PASS — normal unit suite: 41 files and 370 tests passed; `tests/soak.test.ts` excluded by the normal script.
+- PASS — `npm run build`: Vinext production build completed with exit 0; only the existing chunk-size advisory was reported.
+- NOT RUN — Browser E2E; this non-UI change does not require a special local run.
+- NOT RUN — production soak, parameter sweep, balance simulation or pairing tournament.
 
 P2 Economy / Progression audit:
 
@@ -389,6 +400,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- Players eliminated in one result-resolution batch now receive unique contiguous placements ordered by higher post-damage HP, then higher level, then ascending stable ID only for an exact tie. Single eliminations and all existing cleanup/game-over behavior remain unchanged.
 - None for the P2 Economy / Progression audit. Gold, income, interest, streaks, XP, shops, pools, sells, bench, battle economy, bots, content and saves are unchanged.
 - None for the bot architecture and bias audit. Bot logic, personalities, weights, gameplay, content and simulation behavior remain unchanged.
 - None for PR #31. The residual-advantage review records decision C — targeted diagnostics first; Smoker, all peers, traits, forms, content, schema and runtime behavior are unchanged.
@@ -420,6 +432,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- None for the simultaneous-elimination fix and locked P3 record. Captain damage, pairing, late PAC cadence, P4 content, bots, analytics and production measurement were not changed.
 - None for the P2 audit. Research stayed on pinned targeted PAC economy sources, targeted local domain ranges and the existing report schema; no P3, harness fix, diagnostic, tuning or simulation was added.
 - None for the bot architecture and bias audit. Research stayed on the pinned targeted PAC files and current targeted bot files; no PAC backend, bot tuning, P2/P3 work, Smoker diagnostic or simulation was added.
 - None for PR #31. No gameplay, production code, analytics code, diagnostics, snapshot, test or simulation was added or changed; only the requested decision report and project handoff were updated.
@@ -451,6 +464,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- Existing all-player-elimination behavior still leaves `winnerId` null when no survivor remains. The new deterministic batch ranking applies, but winner semantics remain a separate edge-case watch and were intentionally not redesigned here.
 - Full star-copy sell refund (`cost × 1/3/9`) makes 2-star/3-star units fully liquid, lowers pivot commitment and can move battle-time sales into interest thresholds; classify WATCH / NEEDS MEASUREMENT, not a defect. Constant per-unit pools preserve absolute copies while four-character expansions grow cost-band totals and dilute each specific definition's conditional roll share. Realized gold, levels, streaks, high-cost access, rerolls and star timing are P3-coupled and not currently observable at sufficient grain.
 - The production soak has a clear measurement-harness population defect: `player-1` skips round-1 bot preparation, is converted to a bot only after that transition, retains `personalityId: null` and later falls back to Balanced. The effective later population is Balanced twice plus each other personality once. Prior results remain valid exact-current-harness evidence, not evidence for a symmetric eight-bot, human or future-policy population; the unmeasured round-1 difference may affect the first PvE result and early HP/state progression.
 - Current adaptive bot policy plausibly favors high-cost units (`cost × 25`), existing trait concentration, large fixed star bonuses and explicit item-affinity traits; independent top-score lineup selection can miss lower-score synergy connectors. Fixed reserve/XP/reroll loops are coupled to current economy and round cadence and should not be tuned before P2/P3. These are current-policy bias risks, not confirmed gameplay bugs.
@@ -480,6 +494,7 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
+- P3 Match Flow / Pacing selects Option 3: keep the current deterministic domain architecture and adapt selected PAC principles. Keep the phase graph, preparation timing, 45-second battle cap, carousel sequencing, early PvE rounds, ghosts, remaining-team-health timeout winner and current draw semantics. Same-round elimination ordering changes now; captain damage is ADAPT LATER / MEASURE FIRST, pairing is ADAPT LATER in P3B, and late PAC PvE/event cadence is P4 REFERENCE ONLY. Future server multiplayer moves deadline authority server-side without changing domain rules.
 - P2 Economy / Progression selects Architecture Option 1: keep the current deterministic authoritative finite-pool economy and treat values as the measurement baseline, not permanent locks. PAC liquid start values and normal interest/XP/odds/shop/buy/bench behavior are direct or adapted parity, but PAC also has a Stage-0 starter plus component opening grant; that cross-cutting difference and PAC's partial evolved-unit sell pricing are REFERENCE ONLY. No transactional defect requires implementation. Economy tuning waits for P3; per-unit pool scaling and full-refund selling remain KEEP / MEASURE.
 - Roadmap is P2 audit complete → P3 Match Flow / Pacing PAC-first audit → P1B bot recalibration if needed → P4 Items / Treasure / Form Accessibility audit → normalize/specify soak participants → add only necessary diagnostics/baseline → at most one evidence-backed economy change → broad baseline → unit balance. Smoker remains frozen with no immediate diagnostic.
 - Bot architecture uses two distinct future roles: adaptive match bots remain the production-meta/local-opponent class using real domain systems and command intents; a PAC-inspired scripted benchmark-bot concept may later provide authored deterministic combat setups but cannot replace adaptive production bots. PAC Mongo/Firebase/Colyseus/community/Discord infrastructure is rejected. Architecture Option 3 is locked; adaptive tuning waits until P2/P3 stabilize.
@@ -508,7 +523,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-P3 — one bounded PAC-first Match Flow / Pacing research and architecture audit. Inspect targeted pinned PAC stage cadence, preparation/battle timing, PvE/PvP schedule, damage/elimination and match-length behavior; classify direct/adapted/reference/reject ideas and lock architecture without implementation or simulation. The soak-population fix remains mandatory before any later authoritative baseline, but does not block this research-only task.
+P3B — adapt PvP pairing from the current greedy local selection to a global encounter-count + recency objective inspired by PAC, while retaining project-seeded deterministic tie-breaking. The production-soak participant population must still be normalized or intentionally specified before a new authoritative broad baseline.
 
 ## Codex Update Contract
 

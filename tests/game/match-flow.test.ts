@@ -20,6 +20,30 @@ function timeout(state: MatchState): MatchState {
   return result.state;
 }
 
+function resolveEliminationBatch(
+  state: MatchState,
+  eliminations: Array<{ playerId: string; postDamageHp: number }>,
+): MatchState {
+  state.phase = "battle";
+  state.lastResults = eliminations.map(({ playerId, postDamageHp }) => {
+    const player = state.players.find((candidate) => candidate.id === playerId)!;
+    return {
+      playerAId: playerId,
+      playerBId: null,
+      ghostOfPlayerId: null,
+      winnerId: null,
+      timedOut: false,
+      playerADamage: player.hp - postDamageHp,
+      playerBDamage: 0,
+      durationTicks: 1,
+      events: [],
+      initialUnits: [],
+      finalUnits: [],
+    };
+  });
+  return advanceMatchPhase(state);
+}
+
 describe("pairing and bots", () => {
   it("pairs deterministically and creates one harmless ghost when odd", () => {
     const state = createMatch("odd-pairing");
@@ -252,7 +276,7 @@ describe("round and special-stage flow", () => {
 });
 
 describe("elimination and phase guards", () => {
-  it("eliminates, assigns placement, and returns owned copies to the pool", () => {
+  it("preserves single-elimination placement and returns owned copies to the pool", () => {
     const state = createMatch("elimination");
     const human = state.players.find((player) => player.id === "player-1")!;
     const oldOffer = human.shop[0]!;
@@ -306,6 +330,112 @@ describe("elimination and phase guards", () => {
       },
     ]);
     expect(next.pool.nami).toBe(poolBeforeResolve + 3 + reservedNami);
+  });
+
+  it("ranks simultaneous deaths by post-damage HP even when IDs oppose it", () => {
+    const state = createMatch("simultaneous-hp");
+    const better = state.players.find((player) => player.id === "player-1")!;
+    const worse = state.players.find((player) => player.id === "bot-1")!;
+
+    const next = resolveEliminationBatch(state, [
+      { playerId: worse.id, postDamageHp: -20 },
+      { playerId: better.id, postDamageHp: -1 },
+    ]);
+
+    expect(next.players.find((player) => player.id === better.id)?.placement).toBe(7);
+    expect(next.players.find((player) => player.id === worse.id)?.placement).toBe(8);
+  });
+
+  it("uses higher level after equal post-damage HP before the ID fallback", () => {
+    const state = createMatch("simultaneous-level");
+    const higherLevel = state.players.find((player) => player.id === "player-1")!;
+    const lowerLevel = state.players.find((player) => player.id === "bot-1")!;
+    higherLevel.level = 6;
+    lowerLevel.level = 5;
+
+    const next = resolveEliminationBatch(state, [
+      { playerId: lowerLevel.id, postDamageHp: -5 },
+      { playerId: higherLevel.id, postDamageHp: -5 },
+    ]);
+
+    expect(
+      next.players.find((player) => player.id === higherLevel.id)?.placement,
+    ).toBe(7);
+    expect(
+      next.players.find((player) => player.id === lowerLevel.id)?.placement,
+    ).toBe(8);
+  });
+
+  it("uses ascending ID only for an exact HP and level tie", () => {
+    const state = createMatch("simultaneous-exact-tie");
+    const ascendingId = state.players.find((player) => player.id === "bot-1")!;
+    const descendingId = state.players.find(
+      (player) => player.id === "player-1",
+    )!;
+
+    const next = resolveEliminationBatch(state, [
+      { playerId: descendingId.id, postDamageHp: -5 },
+      { playerId: ascendingId.id, postDamageHp: -5 },
+    ]);
+
+    expect(
+      next.players.find((player) => player.id === ascendingId.id)?.placement,
+    ).toBe(7);
+    expect(
+      next.players.find((player) => player.id === descendingId.id)?.placement,
+    ).toBe(8);
+  });
+
+  it("assigns a contiguous unique placement block for batches larger than two", () => {
+    const state = createMatch("simultaneous-batch");
+    const player = state.players.find((candidate) => candidate.id === "player-1")!;
+    const bot1 = state.players.find((candidate) => candidate.id === "bot-1")!;
+    const bot2 = state.players.find((candidate) => candidate.id === "bot-2")!;
+    const bot3 = state.players.find((candidate) => candidate.id === "bot-3")!;
+    player.level = 3;
+    bot1.level = 2;
+    bot2.level = 5;
+    bot3.level = 9;
+
+    const next = resolveEliminationBatch(state, [
+      { playerId: player.id, postDamageHp: -5 },
+      { playerId: bot3.id, postDamageHp: -20 },
+      { playerId: bot1.id, postDamageHp: -1 },
+      { playerId: bot2.id, postDamageHp: -5 },
+    ]);
+
+    const placements = Object.fromEntries(
+      [player.id, bot1.id, bot2.id, bot3.id].map((id) => [
+        id,
+        next.players.find((candidate) => candidate.id === id)?.placement,
+      ]),
+    );
+    expect(placements).toEqual({
+      "player-1": 7,
+      "bot-1": 5,
+      "bot-2": 6,
+      "bot-3": 8,
+    });
+    expect(new Set(Object.values(placements))).toEqual(new Set([5, 6, 7, 8]));
+  });
+
+  it("assigns the top-four boundary fairly when two of five players die", () => {
+    const state = createMatch("simultaneous-top-four");
+    for (const [index, eliminated] of state.players.slice(5).entries()) {
+      eliminated.alive = false;
+      eliminated.hp = 0;
+      eliminated.placement = 6 + index;
+    }
+    const better = state.players.find((player) => player.id === "player-1")!;
+    const worse = state.players.find((player) => player.id === "bot-1")!;
+
+    const next = resolveEliminationBatch(state, [
+      { playerId: worse.id, postDamageHp: -10 },
+      { playerId: better.id, postDamageHp: -1 },
+    ]);
+
+    expect(next.players.find((player) => player.id === better.id)?.placement).toBe(4);
+    expect(next.players.find((player) => player.id === worse.id)?.placement).toBe(5);
   });
 
   it("rejects preparation-only commands during battle", () => {

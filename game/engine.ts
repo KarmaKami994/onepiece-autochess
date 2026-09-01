@@ -44,6 +44,7 @@ import {
   appendRecentBattle,
   battleOutcomeFor,
   calculateLossDamage,
+  compareSimultaneousEliminations,
   updateStreak,
 } from "./matchFlow";
 import {
@@ -645,16 +646,18 @@ function resolveBattleResults(
     }
   }
 
+  const aliveCountBeforeElimination = next.players.filter(
+    (player) => player.alive,
+  ).length;
   const eliminated = next.players
     .filter((player) => player.alive && player.hp <= 0)
-    .sort((left, right) => left.id.localeCompare(right.id));
-  for (const player of eliminated) {
-    const placement = next.players.filter(
-      (candidate) => candidate.alive,
-    ).length;
+    .sort(compareSimultaneousEliminations);
+  const firstEliminatedPlacement =
+    aliveCountBeforeElimination - eliminated.length + 1;
+  for (const [index, player] of eliminated.entries()) {
     player.hp = 0;
     player.alive = false;
-    player.placement = placement;
+    player.placement = firstEliminatedPlacement + index;
     returnEliminatedPlayerPieces(next, player);
   }
   const survivors = next.players.filter((player) => player.alive);
