@@ -218,21 +218,17 @@ Architecture is locked at the role boundary, not at current weights: adaptive bo
 
 ## 14. Roadmap Ordering
 
-**P1A:** current bot architecture/bias conclusion — complete with this audit; retain adaptive match bots, record current-policy generalization limits, defer tuning.
+**P1A:** complete; retain adaptive match bots, record current-policy generalization limits and defer tuning.
 
-**P2:** Economy / Progression PAC-first research + audit.
+**P2/P3:** Economy / Progression and Match Flow / Pacing PAC-first research and audits — complete.
 
-**P3:** Match Flow / Pacing PAC-first research + audit.
-
-**P1B:** adaptive bot tuning, only if still necessary after P2/P3.
-
-**P4:** Items / Treasure / Form Accessibility research/audit.
-
-Then: **merge the production-soak population normalization**.
+Next: **merge this production-soak population normalization**.
 
 Then: **run a new authoritative broad production baseline**.
 
-Then: **unit-level balance**.
+After that measurement: **decide whether P1B adaptive bot recalibration is actually needed or whether to proceed with P4 Items / Treasure / Form Accessibility research and audit**.
+
+No bot tuning, economy change, captain-damage change or unit-balance work follows automatically; each requires separate approval.
 
 Smoker is frozen as a watch item. The previously proposed Smoker trait-state diagnostic is not the immediate roadmap task.
 
