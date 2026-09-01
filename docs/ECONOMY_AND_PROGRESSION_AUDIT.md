@@ -2,7 +2,7 @@
 
 ## 1. Executive Decision
 
-Choose **Option 1 — keep the current economy architecture**. The authoritative finite pool, deterministic shops, gold/XP commands, level-based board cap, automatic progression and battle-economy boundary are structurally sound and already match or deliberately adapt most useful PAC principles. No transactional economy defect was found.
+Choose **Option 1 — keep the current economy architecture**. Gold, starting level, normal shop, XP, interest and the core finite-pool mechanics remain strongly aligned with or intentionally adapted from useful PAC principles. PAC's complete opening package is not identical because its normal Stage-0 flow also grants a selected starter and associated item component; that difference does not by itself establish an economy defect. The authoritative finite pool, deterministic shops, gold/XP commands, level-based board cap, automatic progression and battle-economy boundary remain structurally sound, and no transactional economy defect was found.
 
 Do not tune economy values before P3 Match Flow / Pacing. Full star-copy sell refund is the highest-value P2 watch item, but current evidence supports **WATCH / NEEDS MEASUREMENT**, not a required change. Pool-size suitability beyond 30 units and realized high-cost access are also measurement questions coupled to survival and pacing.
 
@@ -15,10 +15,12 @@ Controlling sources:
 - Official Pokémon Auto Chess repository at pinned commit `a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee`:
   - [`app/config/game/experience.ts`](https://github.com/keldaanCommunity/pokemonAutoChess/blob/a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee/app/config/game/experience.ts)
   - [`app/config/game/shop.ts`](https://github.com/keldaanCommunity/pokemonAutoChess/blob/a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee/app/config/game/shop.ts)
+  - Stage-0 portal inclusion in [`app/config/game/stages.ts`](https://github.com/keldaanCommunity/pokemonAutoChess/blob/a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee/app/config/game/stages.ts)
   - [`app/config/game/pools.ts`](https://github.com/keldaanCommunity/pokemonAutoChess/blob/a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee/app/config/game/pools.ts)
   - [`app/models/colyseus-models/experience-manager.ts`](https://github.com/keldaanCommunity/pokemonAutoChess/blob/a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee/app/models/colyseus-models/experience-manager.ts)
   - targeted economy fields in [`app/models/colyseus-models/player.ts`](https://github.com/keldaanCommunity/pokemonAutoChess/blob/a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee/app/models/colyseus-models/player.ts)
   - targeted pool/shop functions in [`app/models/shop.ts`](https://github.com/keldaanCommunity/pokemonAutoChess/blob/a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee/app/models/shop.ts)
+  - targeted Stage-0 portal completion in [`app/core/mini-game.ts`](https://github.com/keldaanCommunity/pokemonAutoChess/blob/a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee/app/core/mini-game.ts) and starter selection in [`app/rooms/game-room.ts`](https://github.com/keldaanCommunity/pokemonAutoChess/blob/a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee/app/rooms/game-room.ts)
   - targeted buy, sell, reroll, level, income, elimination and rollover ranges in [`app/rooms/commands/game-commands.ts`](https://github.com/keldaanCommunity/pokemonAutoChess/blob/a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee/app/rooms/commands/game-commands.ts)
   - targeted streak resolution in [`app/core/simulation.ts`](https://github.com/keldaanCommunity/pokemonAutoChess/blob/a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee/app/core/simulation.ts)
   - targeted bench helpers in [`app/utils/board.ts`](https://github.com/keldaanCommunity/pokemonAutoChess/blob/a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee/app/utils/board.ts)
@@ -31,7 +33,8 @@ Out of scope: value changes, simulations, new diagnostics, bot tuning, P3 implem
 
 ### Verified normal-mode facts
 
-- Player money starts at 5 outside development mode; progression starts at level 2 with 0 XP and caps at level 9.
+- PAC's normal liquid economy starts at 5 gold; progression starts at level 2 with 0 XP and caps at level 9.
+- Its total opening resource state also includes the normal Stage-0 portal flow. Stage 0 is a portal-carousel stage whose completion calls `assignUniquePropositions(...)`; it creates a `starter` choice with `NB_STARTERS = 3`, and every proposition pairs a Pokémon with an item component. Selecting one records the Pokémon as `firstPartner`, places it on the bench and grants the associated component. The selection starts at zero cost unless that choice explicitly supplies a cost, so this normal path is an opening grant in addition to the normal shop and liquid gold.
 - Level thresholds from levels 2 through 8 are `2 / 6 / 10 / 22 / 34 / 52 / 72` XP.
 - A level purchase costs 4 gold and grants 4 XP. Each completed stage transition grants 2 automatic XP.
 - The shop has six slots. A paid manual reroll costs 1 gold, releases the complete old shop to the shared pool and rolls six new offers.
@@ -96,7 +99,8 @@ Important ordering consequences:
 
 | Concept | PAC normal mode | One Piece Autochess | Meaningful difference? | Likely consequence |
 | --- | --- | --- | --- | --- |
-| Starting level / gold | 2 / 5 | 2 / 5 | No | Same opening budget baseline. |
+| Liquid start | Level 2 / 5 gold | Level 2 / 5 gold | No | Same liquid gold and starting-level baseline. |
+| Opening grant | Starter selected from three propositions plus its associated item component | None | **Yes** | PAC begins with an additional unit, component and build-direction signal; this is not evidence that One Piece needs the same system. |
 | Shop / reroll | 6 slots / 1 gold | 6 / 1 | No | Same immediate roll opportunity cost. |
 | XP purchase / passive XP | 4 gold→4 XP / +2 per stage | 4→4 / +2 per round | Numeric parity | Realized timing still depends on stage cadence and survival. |
 | Thresholds / max level | `2/6/10/22/34/52/72`, max 9 | Same | No | Same no-spend arithmetic. |
@@ -288,6 +292,7 @@ Do not add these metrics until a bounded measurement task after the participant 
 | PvP win income | **DIRECT PORT** | Keep +1. |
 | XP purchase / passive XP / thresholds | **DIRECT PORT** | Keep 4→4, +2 and current threshold parity pending P3 measurement. |
 | Starting level / gold | **DIRECT PORT** | Keep 2 / 5. |
+| Stage-0 starter proposition and component | **REFERENCE ONLY** | Useful reference for opening direction and resource structure, but unnecessary for the deterministic economy backbone and cross-cutting with later item, treasure and form-accessibility work; do not implement now. |
 | Shop size / reroll cost | **DIRECT PORT** | Keep 6 / 1. |
 | Pool-copy counts | **ADAPTED PORT** | Keep PAC three-stage counts for universal local 3-star progression; do not port evolution exceptions. |
 | Buy-price model | **DIRECT PORT** | Standard cost 1–5 parity fits local content. |
@@ -299,7 +304,7 @@ Do not add these metrics until a bounded measurement task after the participant 
 
 **Option 1 — keep current economy architecture.**
 
-- Option 1 fits because the backbone is deterministic, transactional, server-portable and already aligned with useful PAC normal-mode behavior. Values remain a baseline, not permanently locked.
+- Option 1 fits because the backbone is deterministic, transactional, server-portable and already aligned with useful PAC normal-mode behavior. Liquid gold, starting level and normal-shop values align, while the complete opening package does not; the additional PAC starter/component grant is reference-only and does not establish a local economy defect. Values remain a baseline, not permanently locked.
 - Reject Option 2: broad PAC alignment would mostly reproduce existing values while importing irrelevant exceptions and infrastructure.
 - Reject Option 3 for now: no economy structure is proven to require correction. Sell refund and pool scaling are explicit measurement watches, not authorized adaptations.
 - No smaller Option 4 improves on retaining the existing plain domain.
