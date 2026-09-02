@@ -276,17 +276,26 @@ function effectView(effect: ItemEffect): ItemEffectView {
     "health-flat": "Health",
     "attack-flat": "Attack",
     "defense-flat": "Defense",
+    "special-defense-flat": "Special Defense",
+    "shield-flat": "Shield",
     "attack-speed-percent": "Attack Speed",
     "critical-chance-percent": "Critical Chance",
+    "critical-power-percent": "Critical Power",
+    "luck-flat": "Luck",
+    "ability-crit": "Ability Critical",
     "ability-power-percent": "Ability Power",
     "starting-energy": "Starting Energy",
     "range-flat": "Range",
     "omnivamp-percent": "Omnivamp",
   };
+  const value = "value" in effect ? effect.value : 0;
   return {
     kind: effect.kind,
-    value: effect.value,
-    label: `+${effect.value}${effect.kind.endsWith("-percent") ? "%" : ""} ${labels[effect.kind]}`,
+    value,
+    label:
+      effect.kind === "ability-crit"
+        ? labels[effect.kind]
+        : `+${value}${effect.kind.endsWith("-percent") ? "%" : ""} ${labels[effect.kind]}`,
   };
 }
 

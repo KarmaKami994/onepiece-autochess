@@ -17,6 +17,7 @@ export interface UnitStats {
   health: number;
   attack: number;
   defense: number;
+  specialDefense?: number;
   range: number;
   attackIntervalMs: number;
   moveIntervalMs: number;
@@ -35,6 +36,7 @@ export type AbilityPattern =
   | "all-enemies"
   | "single-ally";
 export type AbilityEffectKind = "damage" | "heal" | "shield";
+export type DamageType = "physical" | "special" | "true";
 
 export type SignatureMechanic =
   | { kind: "lunge" }
@@ -63,6 +65,8 @@ export interface AbilityDefinition {
   pattern: AbilityPattern;
   effect: AbilityEffectKind;
   power: number;
+  damageType?: DamageType;
+  canCritByDefault?: boolean;
   /** Presentation timing only. Combat effects resolve in the action tick. */
   castAnimationMs: number;
   /** Targetless abilities may cast from a movement action window. */
@@ -137,8 +141,13 @@ export type ItemEffect =
   | { kind: "health-flat"; value: number }
   | { kind: "attack-flat"; value: number }
   | { kind: "defense-flat"; value: number }
+  | { kind: "special-defense-flat"; value: number }
+  | { kind: "shield-flat"; value: number }
   | { kind: "attack-speed-percent"; value: number }
   | { kind: "critical-chance-percent"; value: number }
+  | { kind: "critical-power-percent"; value: number }
+  | { kind: "luck-flat"; value: number }
+  | { kind: "ability-crit" }
   | { kind: "ability-power-percent"; value: number }
   | { kind: "starting-energy"; value: number }
   | { kind: "range-flat"; value: number }

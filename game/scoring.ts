@@ -82,6 +82,12 @@ export function scoreItemEffect(
         affinities,
       };
     }
+    case "special-defense-flat":
+    case "shield-flat":
+    case "critical-power-percent":
+    case "luck-flat":
+    case "ability-crit":
+      return { score: 0, affinities: [] };
   }
 }
 
