@@ -2,6 +2,7 @@ export * from "./types";
 export * from "./schema";
 export * from "./rng";
 export * from "./content";
+export * from "./items";
 export * from "./forms";
 export * from "./traits";
 export * from "./combat";

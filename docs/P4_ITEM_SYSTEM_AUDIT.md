@@ -192,7 +192,7 @@ These are source facts, not reasons to broaden scope or infer developer intent.
 | Recipe model | No item category, component set or recipe table exists | Add typed data and one pure sorted-pair resolver; no framework |
 | Duplicate items | Human equip permits duplicate completed IDs; bots only apply a score penalty | PAC uniqueness requires an explicit domain rejection/return rule and matching bot eligibility |
 | Sell return | Selling returns all equipped item IDs to inventory before deleting the unit | Already sufficient; retain exactly |
-| Merge | Merge concatenates consumed item arrays then keeps only the first three | Existing overflow is silently discarded; P4 must return overflow deterministically or otherwise preserve it before component rollout |
+| Merge | Merge concatenates consumed item arrays, retains the first `itemCap` entries and already returns overflow deterministically to inventory | Preserve that overflow behavior while adding completed-item uniqueness and component handling |
 | PvE rewards | Winners at rounds 1/2/3/9/14/19 receive three deterministic choices shuffled from all eight current completed items; bots select by item score | Keep timing, victory gate, choice count and explicit RNG; source from components |
 | Carousel | Rounds 4/12/17 build 5–9 choices from two copies of each current item; lower-HP/level captains draft first; RNG is explicit | Keep local simulation/order; source from components only |
 | RNG | Reward, carousel and Wonder-Box-like future randomness can use `MatchState.rngState` / explicit combat RNG | No `Math.random`; random temporary items must be snapshot/event reproducible |
@@ -202,6 +202,8 @@ These are source facts, not reasons to broaden scope or infer developer intent.
 | Save | Schema 6 serializes inventory/equipped IDs; carousel restore validates IDs against current content; no general item migration exists | Reuse the eight IDs identified above or add explicit aliases; no schema bump is required for data-only IDs |
 | UI / accessibility | Selector/tooltips render known static effects; carousel art maps a fixed eight-ID order to an eight-column sheet | Add component/completed/recipe semantics, keyboard-readable recipe previews and scalable icon lookup; fixed eight-column assumptions must be removed |
 | Forms | Gear 4 catalysts are stable IDs `armament-wraps` and `sniper-goggles`; equip reconciles form progression | Those IDs remain completed matrix items and reconciliation runs on the crafted result, never on consumed components |
+
+P4A preserves the existing deterministic consumed-unit priority and per-unit item order, then considers distinct completed items before components. It retains completed items up to cap three, retains at most one component when a slot remains, and returns duplicate/excess completed items plus excess components to inventory without auto-crafting during a unit merge.
 
 ## 9. Missing Primitive Audit
 
@@ -299,7 +301,7 @@ Local carousels already align at rounds 4/12/17, use explicit RNG, offer 5–9 c
 
 - The matrix is architecture-complete, but 55 items create a large balance surface. Implement behavior first with locked values per bounded task; do not tune from a smoke run.
 - Trait-granting candidates can change synergy reachability sharply. The proposed ten-trait mapping requires ChatGPT approval before implementation.
-- Merge overflow currently loses items. Component rollout must not increase that silent-loss path.
+- Pre-P4A merge overflow already returned to inventory; P4A must preserve that behavior while enforcing completed-item uniqueness and the one-component merge invariant.
 - Trigger ordering must be explicit when death, resurrection, shield depletion, on-damage and on-kill occur in one tick.
 - Special Defense adds a second mitigation axis and therefore needs a narrow formula decision, not a copy of PAC's entire damage model.
 - Current bot scoring cannot value delayed, conditional, trait-granting or risk/reward effects. Every implemented effect requires deterministic scoring coverage.

@@ -143,7 +143,7 @@ describe("Nami Thunderbolt Tempo energy drain", () => {
         energyDrain: 15,
       },
     });
-    expect(DEFAULT_CONTENT.version).toBe("1.15.1");
+    expect(DEFAULT_CONTENT.version).toBe("1.16.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(JSON.parse(JSON.stringify(nami.ability))).toEqual(nami.ability);
   });

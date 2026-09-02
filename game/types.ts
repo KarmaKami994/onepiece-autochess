@@ -144,11 +144,14 @@ export type ItemEffect =
   | { kind: "range-flat"; value: number }
   | { kind: "omnivamp-percent"; value: number };
 
+export type ItemKind = "component" | "completed";
+
 export interface ItemDefinition {
   id: string;
   name: string;
   description: string;
   icon: string;
+  kind: ItemKind;
   effects: ItemEffect[];
 }
 
@@ -222,6 +225,8 @@ export interface GameContent {
   forms: UnitFormDefinition[];
   traits: TraitDefinition[];
   items: ItemDefinition[];
+  itemRecipes: Record<string, string>;
+  acquirableItemIds: string[];
   enemies: PvEEnemyDefinition[];
   stages: StageDefinition[];
   botPersonalities: BotPersonality[];
@@ -424,7 +429,9 @@ export type CommandErrorCode =
   | "INVALID_ITEM_CHOICE"
   | "INVALID_SHOP_SLOT"
   | "ITEM_CAP"
+  | "ITEM_DUPLICATE"
   | "ITEM_NOT_FOUND"
+  | "ITEM_RECIPE_NOT_FOUND"
   | "MAX_LEVEL"
   | "NOT_ENOUGH_GOLD"
   | "PLAYER_ELIMINATED"

@@ -239,7 +239,7 @@ describe("Combat Identity Pack A content", () => {
       },
       assetPath: "/assets/characters/smoker.png",
     });
-    expect(DEFAULT_CONTENT.version).toBe("1.15.1");
+    expect(DEFAULT_CONTENT.version).toBe("1.16.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 });
