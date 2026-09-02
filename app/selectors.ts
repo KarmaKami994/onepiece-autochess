@@ -282,9 +282,11 @@ function effectView(effect: ItemEffect): ItemEffectView {
     "critical-chance-percent": "Critical Chance",
     "critical-power-percent": "Critical Power",
     "luck-flat": "Luck",
+    "dodge-percent": "Dodge",
     "ability-crit": "Ability Critical",
     "ability-power-percent": "Ability Power",
     "starting-energy": "Starting Energy",
+    "starting-shield-max-health-percent": "Max HP Starting Shield",
     "range-flat": "Range",
     "omnivamp-percent": "Omnivamp",
   };
@@ -295,6 +297,8 @@ function effectView(effect: ItemEffect): ItemEffectView {
     label:
       effect.kind === "ability-crit"
         ? labels[effect.kind]
+        : effect.kind === "starting-shield-max-health-percent"
+          ? `${value}% ${labels[effect.kind]}`
         : `+${value}${effect.kind.endsWith("-percent") ? "%" : ""} ${labels[effect.kind]}`,
   };
 }

@@ -222,7 +222,7 @@ describe("item and carousel decision support", () => {
       unitId: "unit-2",
       unitName: "Usopp",
       eligible: true,
-      score: 52,
+      score: 80,
     });
     expect(preview.bestFit?.reasons).toEqual(
       expect.arrayContaining([
@@ -239,7 +239,7 @@ describe("item and carousel decision support", () => {
     expect(preview.selectedFit).toMatchObject({
       unitId: "unit-1",
       unitName: "Zoro",
-      score: 28,
+      score: 32,
     });
     expect(preview.explanation).toContain("fits Zoro");
   });
@@ -281,14 +281,14 @@ describe("item and carousel decision support", () => {
     );
 
     expect(ranked.map((preview) => preview.itemId)).toEqual([
-      "clima-tact",
       "black-blade",
       "sniper-goggles",
+      "clima-tact",
     ]);
     expect(
       ranked.map((preview) => (preview.available ? preview.score : null)),
-    ).toEqual([70.25, 54, 52]);
-    expect(ranked[0].available && ranked[0].bestFit?.unitName).toBe("Robin");
+    ).toEqual([93.05, 80, 70.25]);
+    expect(ranked[0].available && ranked[0].bestFit?.unitName).toBe("Zoro");
   });
 
   it("returns a stable unavailable result for missing item content", () => {

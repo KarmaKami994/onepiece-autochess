@@ -874,8 +874,8 @@ describe("P4B1 compatibility locks", () => {
     ).toBe(PRODUCTION_COMBAT_HASH);
   });
 
-  it("keeps GameContent at 1.16.0", () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.16.0");
+  it("keeps the current GameContent version", () => {
+    expect(DEFAULT_CONTENT.version).toBe("1.17.0");
   });
 
   it("keeps save schema 6", () => {

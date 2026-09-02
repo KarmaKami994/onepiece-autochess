@@ -377,12 +377,16 @@ function effectLabel(effect: ItemEffect): string {
       return `+${effect.value}% critical power`;
     case "luck-flat":
       return `+${effect.value} luck`;
+    case "dodge-percent":
+      return `+${effect.value}% dodge`;
     case "ability-crit":
       return "Ability Critical";
     case "ability-power-percent":
       return `+${effect.value}% ability power`;
     case "starting-energy":
       return `+${effect.value} starting energy`;
+    case "starting-shield-max-health-percent":
+      return `${effect.value}% max HP starting shield`;
     case "range-flat":
       return `+${effect.value} range`;
     case "omnivamp-percent":

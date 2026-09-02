@@ -1180,56 +1180,86 @@ export const TRAIT_DEFINITIONS: TraitDefinition[] = [
   },
 ];
 
-const componentItem = (id: string, name: string): ItemDefinition => ({
+const componentItem = (
+  id: string,
+  name: string,
+  effects: ItemDefinition["effects"] = [],
+): ItemDefinition => ({
   id,
   name,
   description: "A core crafting component.",
   icon: "◇",
   kind: "component",
-  effects: [],
+  effects,
 });
 
-const completedItem = (id: string, name: string): ItemDefinition => ({
+const completedItem = (
+  id: string,
+  name: string,
+  effects: ItemDefinition["effects"] = [],
+  description = "A completed core item; its combat identity is reserved for P4B.",
+): ItemDefinition => ({
   id,
   name,
-  description: "A completed core item; its combat identity is reserved for P4B.",
+  description,
   icon: "◆",
   kind: "completed",
-  effects: [],
+  effects,
 });
 
 export const COMPONENT_ITEM_DEFINITIONS: ItemDefinition[] = [
   componentItem("jolly-roger-fragment", "Jolly Roger Fragment"),
-  componentItem("devil-fruit-essence", "Devil Fruit Essence"),
-  componentItem("cola-canister", "Cola Canister"),
-  componentItem("jet-dial", "Jet Dial"),
-  componentItem("sniper-lens", "Sniper Lens"),
-  componentItem("sea-king-meat", "Sea King Meat"),
-  componentItem("sea-prism-shard", "Sea-Prism Shard"),
-  componentItem("black-blade-shard", "Black Blade Shard"),
-  componentItem("armament-plate", "Armament Plate"),
-  componentItem("captains-sash", "Captain's Sash"),
+  componentItem("devil-fruit-essence", "Devil Fruit Essence", [
+    { kind: "ability-power-percent", value: 10 },
+  ]),
+  componentItem("cola-canister", "Cola Canister", [
+    { kind: "starting-energy", value: 15 },
+  ]),
+  componentItem("jet-dial", "Jet Dial", [
+    { kind: "attack-speed-percent", value: 10 },
+  ]),
+  componentItem("sniper-lens", "Sniper Lens", [
+    { kind: "critical-chance-percent", value: 10 },
+  ]),
+  componentItem("sea-king-meat", "Sea King Meat", [
+    { kind: "health-flat", value: 45 },
+  ]),
+  componentItem("sea-prism-shard", "Sea-Prism Shard", [
+    { kind: "special-defense-flat", value: 3 },
+  ]),
+  componentItem("black-blade-shard", "Black Blade Shard", [
+    { kind: "attack-flat", value: 9 },
+  ]),
+  componentItem("armament-plate", "Armament Plate", [
+    { kind: "defense-flat", value: 3 },
+  ]),
+  componentItem("captains-sash", "Captain's Sash", [
+    { kind: "shield-flat", value: 45 },
+  ]),
 ];
 
 const LEGACY_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
   {
     id: "black-blade",
     name: "Black Blade",
-    description: "A supreme blade for raw and critical damage.",
+    description: "Grants 50% critical chance and 9 Attack.",
     icon: "†",
     kind: "completed",
     effects: [
-      { kind: "attack-flat", value: 24 },
-      { kind: "critical-chance-percent", value: 12 },
+      { kind: "critical-chance-percent", value: 50 },
+      { kind: "attack-flat", value: 9 },
     ],
   },
   {
     id: "meat-platter",
     name: "Meat Platter",
-    description: "A hearty meal that greatly increases health.",
+    description: "Grants 300 Max HP and a starting shield equal to 20% of final starting Max HP.",
     icon: "✚",
     kind: "completed",
-    effects: [{ kind: "health-flat", value: 300 }],
+    effects: [
+      { kind: "health-flat", value: 300 },
+      { kind: "starting-shield-max-health-percent", value: 20 },
+    ],
   },
   {
     id: "clima-tact",
@@ -1245,12 +1275,13 @@ const LEGACY_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
   {
     id: "sniper-goggles",
     name: "Sniper Goggles",
-    description: "Extends attack range and improves critical aim.",
+    description: "Grants 2 Range, 15% critical chance, and 3 Special Defense.",
     icon: "◎",
     kind: "completed",
     effects: [
-      { kind: "range-flat", value: 1 },
+      { kind: "range-flat", value: 2 },
       { kind: "critical-chance-percent", value: 15 },
+      { kind: "special-defense-flat", value: 3 },
     ],
   },
   {
@@ -1313,13 +1344,28 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
   completedItem("revolutionary-flame", "Revolutionary Flame"),
   completedItem("straw-hat-token", "Straw Hat Token"),
   completedItem("swordsmans-knot", "Swordsman's Knot"),
-  completedItem("devil-fruit-codex", "Devil Fruit Codex"),
+  completedItem(
+    "devil-fruit-codex",
+    "Devil Fruit Codex",
+    [{ kind: "ability-power-percent", value: 100 }],
+    "Grants 100% ability power.",
+  ),
   completedItem("observation-haki-mantle", "Observation Haki Mantle"),
   completedItem("barrier-bubble", "Barrier Bubble"),
   completedItem("reflect-dial", "Reflect Dial"),
   completedItem("flame-flame-grimoire", "Flame-Flame Grimoire"),
   completedItem("sea-prism-boots", "Sea-Prism Boots"),
-  completedItem("lucky-pirate-ribbon", "Lucky Pirate Ribbon"),
+  completedItem(
+    "lucky-pirate-ribbon",
+    "Lucky Pirate Ribbon",
+    [
+      { kind: "shield-flat", value: 45 },
+      { kind: "ability-power-percent", value: 50 },
+      { kind: "luck-flat", value: 20 },
+      { kind: "dodge-percent", value: 15 },
+    ],
+    "Grants 45 Shield, 50% ability power, 20 Luck, and 15% Dodge.",
+  ),
   completedItem("cola-reservoir", "Cola Reservoir"),
   completedItem("energy-siphon-scope", "Energy-Siphon Scope"),
   completedItem("healing-bubble", "Healing Bubble"),
@@ -1736,7 +1782,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.16.0",
+  version: "1.17.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,
