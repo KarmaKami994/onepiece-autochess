@@ -205,27 +205,28 @@ These are source facts, not reasons to broaden scope or infer developer intent.
 
 P4A preserves the existing deterministic consumed-unit priority and per-unit item order, then considers distinct completed items before components. It retains completed items up to cap three, retains at most one component when a slot remains, and returns duplicate/excess completed items plus excess components to inventory without auto-crafting during a unit merge.
 
+### P4B1 implementation status
+
+P4B1 implements only the reusable combat-stat and damage primitives on GameContent `1.16.0` and save schema 6. Physical/Special/True damage, separate Special Defense with `Defense` fallback, default 10% Crit Chance, default 200% Crit Power, the PAC Luck exponent rule and one Ability-Crit decision per cast are DIRECT PORT concepts. The project keeps its existing deterministic `max(1, floor(raw × 100 / (100 + resistance)))` mitigation curve as an ADAPTED PORT; PAC's `ARMOR_FACTOR = 0.05` is explicitly not ported. Basic attacks are Physical, direct ability damage defaults to Special, burn is Special and True damage still resolves shields before health.
+
+Item Defense and Special Defense are independent: item `defense-flat` affects Physical Defense only, while `special-defense-flat` affects Special Defense only. Existing local trait `defense-flat` remains a temporary dual-resistance compatibility adaptation because the pre-P4B1 single Defense stat protected against both current attack and ability damage. Sea Prism Stone explicitly carries matching +25 Defense / +25 Special Defense and Armament Wraps carries matching +14 / +14 effects so their historical unified-defense combat behavior is preserved. No component receives a stat assignment, and no completed-item behavior from the 55-item matrix is implemented by P4B1; triggered lifecycles and P4C acquisition/UI/bot integration remain separate work.
+
 ## 9. Missing Primitive Audit
 
 ### Present and reusable
 
-The local combat already has deterministic basic critical hits, dodge, shields, healing, omnivamp, Energy gain/drain, burn, stun, knockback/pull, defense pierce, line/adjacent/global targeting, sequential strikes, immutable battle events and explicit RNG. Trait effects can already add starting Energy, shield, dodge, crit chance, Ability Power and range. These are useful building blocks, but most are not exposed through the current static `ItemEffect` union.
+The local combat has deterministic Physical/Special/True damage, separate Defense and Special Defense, basic and opt-in ability critical hits, mutable Crit Power and Luck, dodge, shields, healing, omnivamp, Energy gain/drain, burn, stun, knockback/pull, defense pierce, line/adjacent/global targeting, sequential strikes, immutable battle events and explicit RNG. Trait effects can add starting Energy, shield, dodge, crit chance, Ability Power and range. P4B1's item-effect primitives are otherwise dormant; matching Special Defense on Sea Prism Stone and Armament Wraps is compatibility data, not implementation of their future PAC matrix behaviors.
 
-### Confirmed missing or insufficient
+### Remaining missing or insufficient after P4B1
 
-- **Special Defense:** no separate battle stat or mitigation channel.
-- **Critical power:** attack crits are fixed at double damage; no mutable crit-power stat.
-- **Item shield stat:** battle shields exist, but `ItemEffect` has no `shield-flat` member.
-- **Ability critical strikes:** ability resolution does not roll or carry ability crit state.
-- **Luck:** no Luck stat or probability modifier.
 - **PP/max-PP semantics:** local Energy is fixed around a 100 cap; starting Energy exists, but max-Energy reduction, post-cast restoration and next-attack conversion do not.
 - **Triggered item lifecycle:** no typed item hooks for periodic, combat-start, on-attack/on-hit, on-damage dealt/received, on-cast, on-kill, threshold, shield-depleted, resurrection or item-consumption events.
 - **Immunity/Safeguard:** no general status immunity, Sleep/Blind/Paralysis/Freeze/Locked statuses, board-effect immunity or forced-displacement immunity.
 - **Wound:** no healing-reduction status.
 - **Resurrection:** no prevent-KO/resurrect state or event.
 - **Trait-granting equipment:** effective battle traits resolve from unit definitions/forms only; items cannot add a trait.
-- **Special/True/retaliation item damage:** the damage pipeline can be extended, but items cannot currently schedule damage, split attack damage to True, reflect mitigation or mark recoil/retaliation immunity.
-- **Armor Break / Special Defense shred:** defense pierce is transient per ability; there is no timed defense-reduction status and no Special Defense to shred.
+- **Special/True/retaliation item damage:** the damage-type pipeline exists, but items cannot currently schedule damage, split attack damage to True, reflect mitigation or mark recoil/retaliation immunity.
+- **Armor Break / Special Defense shred:** defense pierce selects the active resistance per ability; there is no timed resistance-reduction status.
 - **Accuracy and miss immunity:** dodge exists, but attacks have no separate accuracy/miss rule or cannot-miss flag.
 - **Target-priority and lethal interception:** no item-driven taunt weight or adjacent bodyguard routing.
 - **Stat-rule transforms:** no buff amplification, debuff inversion, buff-theft protection, AP-to-Attack conversion or resource-to-next-hit conversion.
@@ -295,7 +296,7 @@ Local carousels already align at rounds 4/12/17, use explicit RNG, offer 5–9 c
 - Wonder Box choices and item consumption must be frozen in battle output so save/resume and spectating do not reroll or reconstruct them.
 - Current battle-economy immutability stays intact: purchases/merges/equips cannot rebuild an active deployed combat timeline.
 - Schema remains 6. Existing stable IDs resolve through the eight mapped outputs; any additional legacy alias is explicit and bounded, never inferred from display names.
-- GameContent stays `1.15.1` in this audit. A later content implementation will require its separately approved content-version decision.
+- GameContent is `1.16.0` after P4A and remains unchanged by P4B1.
 
 ## 13. Risks and Review Gates
 
@@ -313,7 +314,7 @@ Local carousels already align at rounds 4/12/17, use explicit RNG, offer 5–9 c
 This is decomposition only; it does not select or start four future PRs.
 
 1. **Component / recipe / domain foundation:** typed component and completed definitions, all 55 recipe keys, auto-craft/uniqueness/cap rules, merge-overflow preservation, stable legacy IDs, sell/save/form-catalyst regressions.
-2. **Missing combat primitives and item effects:** add only the required deterministic stats, trigger seams, statuses and events, then implement the 55 locked identities in reviewable groups with numeric values explicitly approved before code.
+2. **Missing combat primitives and item effects:** P4B1 supplies the bounded damage/stat foundation only. Trigger seams, statuses and the 55 locked identities remain separately reviewable groups with numeric values explicitly approved before code.
 3. **Acquisition / carousel / PvE / UI / bot integration:** switch early sources to components, add recipe/tooltips/icon lookup and deterministic component/completed scoring without changing cadence or later stages.
 4. **Accessibility / treasure / form and regression hardening:** keyboard/screen-reader/reduced-motion presentation, fixed-eight-asset removal, Gear 4 catalyst checks, schema-6/load/spectator/save-resume coverage, production smoke and E2E as appropriate.
 

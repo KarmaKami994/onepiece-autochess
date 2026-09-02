@@ -1261,6 +1261,7 @@ const LEGACY_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
     kind: "completed",
     effects: [
       { kind: "defense-flat", value: 25 },
+      { kind: "special-defense-flat", value: 25 },
       { kind: "health-flat", value: 120 },
     ],
   },
@@ -1273,6 +1274,7 @@ const LEGACY_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
     effects: [
       { kind: "attack-flat", value: 14 },
       { kind: "defense-flat", value: 14 },
+      { kind: "special-defense-flat", value: 14 },
     ],
   },
   {

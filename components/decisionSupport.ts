@@ -365,10 +365,20 @@ function effectLabel(effect: ItemEffect): string {
       return `+${effect.value} attack`;
     case "defense-flat":
       return `+${effect.value} defense`;
+    case "special-defense-flat":
+      return `+${effect.value} special defense`;
+    case "shield-flat":
+      return `+${effect.value} shield`;
     case "attack-speed-percent":
       return `+${effect.value}% attack speed`;
     case "critical-chance-percent":
       return `+${effect.value}% critical chance`;
+    case "critical-power-percent":
+      return `+${effect.value}% critical power`;
+    case "luck-flat":
+      return `+${effect.value} luck`;
+    case "ability-crit":
+      return "Ability Critical";
     case "ability-power-percent":
       return `+${effect.value}% ability power`;
     case "starting-energy":

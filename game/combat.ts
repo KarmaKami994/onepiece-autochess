@@ -13,6 +13,7 @@ import type {
   BattleTeam,
   BattleUnitSnapshot,
   BattleUnitState,
+  DamageType,
   GameContent,
   Position,
   SequentialStrikeDefinition,
@@ -43,12 +44,16 @@ interface MutableBattleUnit {
   energy: number;
   attack: number;
   defense: number;
+  specialDefense: number;
   range: number;
   attackIntervalTicks: number;
   moveIntervalTicks: number;
   nextActionTick: number;
   abilityPowerPercent: number;
   criticalChancePercent: number;
+  criticalPowerPercent: number;
+  luck: number;
+  abilityCrit: boolean;
   dodgePercent: number;
   omnivampPercent: number;
   emergencyShieldPercent: number;
@@ -87,6 +92,25 @@ type CombatIntent = AttackIntent | CastIntent | MoveIntent;
 
 const MONSTER_POINT_FORM_ID = "chopper-monster-point";
 const MONSTER_POINT_DELAY_MS = 8_000;
+
+export function adjustedChancePercent(
+  basePercent: number,
+  luck: number,
+  capPercent = 100,
+): number {
+  const validBase = Number.isFinite(basePercent)
+    ? Math.min(100, Math.max(0, basePercent))
+    : 0;
+  const validCap = Number.isFinite(capPercent)
+    ? Math.min(100, Math.max(0, capPercent))
+    : 0;
+  const validLuck = Number.isFinite(luck) ? luck : 0;
+  if (validBase === 0 || validCap === 0) {
+    return 0;
+  }
+  const adjusted = (validBase / 100) ** (1 - validLuck / 100);
+  return 100 * Math.min(validCap / 100, Math.max(0, adjusted));
+}
 
 function findDefinition(
   id: string,
@@ -135,6 +159,7 @@ function applyTraitEffect(
       break;
     case "defense-flat":
       unit.defense += effect.value;
+      unit.specialDefense += effect.value;
       break;
     case "omnivamp-percent":
       unit.omnivampPercent += effect.value;
@@ -217,6 +242,14 @@ function createMutableUnits(
         0,
         Math.floor((definition.stats.defense * statMultiplier) / 10_000),
       ),
+      specialDefense: Math.max(
+        0,
+        Math.floor(
+          ((definition.stats.specialDefense ?? definition.stats.defense) *
+            statMultiplier) /
+            10_000,
+        ),
+      ),
       range: definition.stats.range,
       attackIntervalTicks: Math.max(
         1,
@@ -229,6 +262,9 @@ function createMutableUnits(
       nextActionTick: 0,
       abilityPowerPercent: 0,
       criticalChancePercent: 10,
+      criticalPowerPercent: 200,
+      luck: 0,
+      abilityCrit: false,
       dodgePercent: 0,
       omnivampPercent: 0,
       emergencyShieldPercent: 0,
@@ -261,6 +297,12 @@ function createMutableUnits(
           case "defense-flat":
             unit.defense += effect.value;
             break;
+          case "special-defense-flat":
+            unit.specialDefense += effect.value;
+            break;
+          case "shield-flat":
+            unit.shield += effect.value;
+            break;
           case "attack-speed-percent":
             unit.attackIntervalTicks = Math.max(
               1,
@@ -271,6 +313,15 @@ function createMutableUnits(
             break;
           case "critical-chance-percent":
             unit.criticalChancePercent += effect.value;
+            break;
+          case "critical-power-percent":
+            unit.criticalPowerPercent += effect.value;
+            break;
+          case "luck-flat":
+            unit.luck += effect.value;
+            break;
+          case "ability-crit":
+            unit.abilityCrit = true;
             break;
           case "ability-power-percent":
             unit.abilityPowerPercent += effect.value;
@@ -321,12 +372,19 @@ function transformBattleUnit(
   const healthDelta = scaled(transformed.stats.health) - scaled(base.stats.health);
   const attackDelta = scaled(transformed.stats.attack) - scaled(base.stats.attack);
   const defenseDelta = scaled(transformed.stats.defense) - scaled(base.stats.defense);
+  const specialDefenseDelta =
+    scaled(transformed.stats.specialDefense ?? transformed.stats.defense) -
+    scaled(base.stats.specialDefense ?? base.stats.defense);
   const missingHp = Math.max(0, unit.maxHp - unit.hp);
 
   unit.maxHp = Math.max(1, unit.maxHp + healthDelta);
   unit.hp = Math.max(0, Math.min(unit.maxHp, unit.maxHp - missingHp));
   unit.attack = Math.max(1, unit.attack + attackDelta);
   unit.defense = Math.max(0, unit.defense + defenseDelta);
+  unit.specialDefense = Math.max(
+    0,
+    unit.specialDefense + specialDefenseDelta,
+  );
   unit.range = Math.max(
     0,
     unit.range + transformed.stats.range - base.stats.range,
@@ -925,12 +983,20 @@ export function simulateBattle(
     target: MutableBattleUnit,
     rawAmount: number,
     damageKind: "attack" | "ability" | "burn",
+    damageType: DamageType,
     defensePiercePercent = 0,
   ): number => {
     if (!alive(target)) {
       return 0;
     }
-    const defense = Math.max(0, target.defense);
+    const resistance = Math.max(
+      0,
+      damageType === "physical"
+        ? target.defense
+        : damageType === "special"
+          ? target.specialDefense
+          : 0,
+    );
     const validDefensePiercePercent =
       Number.isSafeInteger(defensePiercePercent) &&
       defensePiercePercent >= 1 &&
@@ -938,14 +1004,17 @@ export function simulateBattle(
         ? defensePiercePercent
         : 0;
     // Adapted from Pokemon Auto Chess Screech at pinned commit
-    // a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee without mutating Defense.
-    const ignoredDefense = Math.floor(
-      (defense * validDefensePiercePercent) / 100,
+    // a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee without mutating resistance.
+    const ignoredResistance = Math.floor(
+      (resistance * validDefensePiercePercent) / 100,
     );
-    const effectiveDefense = Math.max(0, defense - ignoredDefense);
+    const effectiveResistance = Math.max(
+      0,
+      resistance - ignoredResistance,
+    );
     const mitigated = Math.max(
       1,
-      Math.floor((rawAmount * 100) / (100 + effectiveDefense)),
+      Math.floor((rawAmount * 100) / (100 + effectiveResistance)),
     );
     const shieldDamage = Math.min(target.shield, mitigated);
     target.shield -= shieldDamage;
@@ -1052,6 +1121,7 @@ export function simulateBattle(
         target,
         rawDamage,
         "ability",
+        ability.damageType ?? "special",
         ability.defensePiercePercent,
       );
       if (target.hp <= 0 && index < strikePowers.length - 1) {
@@ -1131,7 +1201,7 @@ export function simulateBattle(
         const source =
           units.find((candidate) => candidate.id === unit.burnSourceId) ??
           null;
-        applyDamage(tick, source, unit, unit.burnPower, "burn");
+        applyDamage(tick, source, unit, unit.burnPower, "burn", "special");
         unit.burnNextTick = tick + Math.round(1_000 / content.config.combatTickMs);
       }
     }
@@ -1248,6 +1318,14 @@ export function simulateBattle(
         targetIds: intent.targetIds,
       });
       changeEnergy(tick, source, -source.energy, "cast-reset");
+      const abilityCritical =
+        (abilityDefinition.canCritByDefault === true || source.abilityCrit) &&
+        roll(
+          adjustedChancePercent(
+            source.criticalChancePercent,
+            source.luck,
+          ),
+        );
       let shouldApplyEffect = true;
       if (hasSignatureMechanic(abilityDefinition, "lunge")) {
         const primaryTarget = units.find(
@@ -1289,6 +1367,14 @@ export function simulateBattle(
             1_000_000,
         ),
       );
+      const directPower = abilityCritical
+        ? Math.max(
+            1,
+            Math.floor(
+              (scaledPower * source.criticalPowerPercent) / 100,
+            ),
+          )
+        : scaledPower;
       for (const targetId of intent.targetIds) {
         const target = units.find((unit) => unit.id === targetId);
         if (!target) {
@@ -1302,7 +1388,7 @@ export function simulateBattle(
             conditionalShield !== null &&
             target.hp * 100 <=
               target.maxHp * conditionalShield.healthThresholdPercent;
-          applyHeal(tick, source, target, scaledPower);
+          applyHeal(tick, source, target, directPower);
           if (shouldApplyConditionalShield && conditionalShield) {
             const shieldPower = Math.max(
               1,
@@ -1313,17 +1399,25 @@ export function simulateBattle(
                   1_000_000,
               ),
             );
-            applyShield(tick, source, target, shieldPower);
+            const directShieldPower = abilityCritical
+              ? Math.max(
+                  1,
+                  Math.floor(
+                    (shieldPower * source.criticalPowerPercent) / 100,
+                  ),
+                )
+              : shieldPower;
+            applyShield(tick, source, target, directShieldPower);
           }
         } else if (abilityDefinition.effect === "shield") {
-          applyShield(tick, source, target, scaledPower);
+          applyShield(tick, source, target, directPower);
         } else {
           const sequentialApplied = applySequentialStrikes(
             tick,
             source,
             target,
             abilityDefinition,
-            scaledPower,
+            directPower,
           );
           if (!sequentialApplied) {
             const hits = Math.max(1, abilityDefinition.hits ?? 1);
@@ -1332,8 +1426,9 @@ export function simulateBattle(
                 tick,
                 source,
                 target,
-                scaledPower,
+                directPower,
                 "ability",
+                abilityDefinition.damageType ?? "special",
                 abilityDefinition.defensePiercePercent,
               );
             }
@@ -1494,8 +1589,17 @@ export function simulateBattle(
       }
       source.nextActionTick = tick + source.attackIntervalTicks;
       source.state = "attack-recovery";
-      const dodged = roll(target.dodgePercent);
-      const critical = dodged ? false : roll(source.criticalChancePercent);
+      const dodged = roll(
+        adjustedChancePercent(target.dodgePercent, target.luck),
+      );
+      const critical = dodged
+        ? false
+        : roll(
+            adjustedChancePercent(
+              source.criticalChancePercent,
+              source.luck,
+            ),
+          );
       emit({
         type: "attack",
         tick,
@@ -1517,8 +1621,16 @@ export function simulateBattle(
         tick,
         source,
         target,
-        critical ? source.attack * 2 : source.attack,
+        critical
+          ? Math.max(
+              1,
+              Math.floor(
+                (source.attack * source.criticalPowerPercent) / 100,
+              ),
+            )
+          : source.attack,
         "attack",
+        "physical",
       );
     }
 
