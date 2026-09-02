@@ -296,7 +296,6 @@ function createMutableUnits(
             break;
           case "defense-flat":
             unit.defense += effect.value;
-            unit.specialDefense += effect.value;
             break;
           case "special-defense-flat":
             unit.specialDefense += effect.value;

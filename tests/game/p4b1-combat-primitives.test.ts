@@ -4,6 +4,7 @@ import {
   CURRENT_SAVE_SCHEMA_VERSION,
   DEFAULT_CONTENT,
   adjustedChancePercent,
+  reconcileProductionFormProgression,
   simulateBattle,
   type AbilityDefinition,
   type ActiveTrait,
@@ -17,6 +18,7 @@ import {
   type TraitEffect,
   type UnitDefinition,
   type UnitFormDefinition,
+  type UnitInstance,
   type UnitStats,
 } from "../../game";
 
@@ -76,6 +78,12 @@ function item(id: string, effects: ItemEffect[]): ItemDefinition {
     kind: "completed",
     effects,
   };
+}
+
+function productionItem(id: string): ItemDefinition {
+  const result = DEFAULT_CONTENT.items.find((entry) => entry.id === id);
+  if (!result) throw new Error(`Missing production item ${id}.`);
+  return structuredClone(result);
 }
 
 function content(
@@ -138,6 +146,7 @@ type CastFixture = {
   seed?: string;
   maxTicks?: number;
   criticalChanceBonus?: number;
+  targetEffects?: TraitEffect[];
   targetForm?: UnitFormDefinition;
 };
 
@@ -193,7 +202,10 @@ function castFixture(options: CastFixture = {}): BattleResult {
             : undefined,
         ),
       ),
-      [{ kind: "critical-chance-percent", value: -10 }],
+      [
+        { kind: "critical-chance-percent", value: -10 },
+        ...(options.targetEffects ?? []),
+      ],
     ),
     {
       seed: options.seed ?? "p4b1-cast",
@@ -503,12 +515,96 @@ describe("P4B1 critical power, Luck, and item primitives", () => {
     ).toBe(75);
   });
 
+  it("applies item defense-flat to physical Defense", () => {
+    const defenseItem = item("fixture-physical-defense", [
+      { kind: "defense-flat", value: 100 },
+    ]);
+    const result = castFixture({
+      ability: { damageType: "physical" },
+      targetItems: [defenseItem],
+    });
+    expect(damageEvents(result, "caster", "ability")[0].amount).toBe(50);
+  });
+
+  it("does not apply item defense-flat to Special Defense", () => {
+    const defenseItem = item("fixture-no-special-defense", [
+      { kind: "defense-flat", value: 100 },
+    ]);
+    const result = castFixture({ targetItems: [defenseItem] });
+    expect(damageEvents(result, "caster", "ability")[0].amount).toBe(100);
+  });
+
   it("adds special-defense-flat only to Special Defense", () => {
     const resistanceItem = item("fixture-special-defense", [
       { kind: "special-defense-flat", value: 100 },
     ]);
-    const result = castFixture({ targetItems: [resistanceItem] });
-    expect(damageEvents(result, "caster", "ability")[0].amount).toBe(50);
+    const special = castFixture({ targetItems: [resistanceItem] });
+    const physical = castFixture({
+      ability: { damageType: "physical" },
+      targetItems: [resistanceItem],
+    });
+    expect(damageEvents(special, "caster", "ability")[0].amount).toBe(50);
+    expect(damageEvents(physical, "caster", "ability")[0].amount).toBe(100);
+  });
+
+  it("applies paired item resistance effects independently", () => {
+    const resistanceItem = item("fixture-paired-defense", [
+      { kind: "defense-flat", value: 100 },
+      { kind: "special-defense-flat", value: 100 },
+    ]);
+    const physical = castFixture({
+      ability: { damageType: "physical" },
+      targetItems: [resistanceItem],
+    });
+    const special = castFixture({ targetItems: [resistanceItem] });
+    expect(damageEvents(physical, "caster", "ability")[0].amount).toBe(50);
+    expect(damageEvents(special, "caster", "ability")[0].amount).toBe(50);
+  });
+
+  it("preserves Sea Prism Stone as +25 to both resistances", () => {
+    const seaPrismStone = productionItem("sea-prism-stone");
+    const physical = castFixture({
+      ability: { damageType: "physical" },
+      targetItems: [seaPrismStone],
+    });
+    const special = castFixture({ targetItems: [seaPrismStone] });
+    expect(damageEvents(physical, "caster", "ability")[0].amount).toBe(80);
+    expect(damageEvents(special, "caster", "ability")[0].amount).toBe(80);
+  });
+
+  it("preserves Armament Wraps as +14 to both resistances", () => {
+    const armamentWraps = productionItem("armament-wraps");
+    const physical = castFixture({
+      ability: { damageType: "physical" },
+      targetItems: [armamentWraps],
+    });
+    const special = castFixture({ targetItems: [armamentWraps] });
+    expect(damageEvents(physical, "caster", "ability")[0].amount).toBe(87);
+    expect(damageEvents(special, "caster", "ability")[0].amount).toBe(87);
+  });
+
+  it("keeps legacy trait defense-flat compatible with both channels", () => {
+    const physical = castFixture({
+      ability: { damageType: "physical" },
+      targetEffects: [{ kind: "defense-flat", value: 100 }],
+    });
+    const special = castFixture({
+      targetEffects: [{ kind: "defense-flat", value: 100 }],
+    });
+    expect(damageEvents(physical, "caster", "ability")[0].amount).toBe(50);
+    expect(damageEvents(special, "caster", "ability")[0].amount).toBe(50);
+  });
+
+  it("keeps Armament Wraps as the Boundman catalyst", () => {
+    const luffy: UnitInstance = {
+      id: "fixture-luffy",
+      definitionId: "luffy",
+      star: 3,
+      items: ["armament-wraps"],
+      acquiredOrder: 1,
+    };
+    reconcileProductionFormProgression(luffy);
+    expect(luffy.formId).toBe("luffy-gear-4-boundman");
   });
 
   it("applies luck-flat to an existing basic critical roll", () => {
