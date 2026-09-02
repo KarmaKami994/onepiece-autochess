@@ -279,6 +279,7 @@ function createMutableUnits(
       state: "seek",
       ability: definition.ability,
     };
+    let startingShieldMaxHealthPercent = 0;
 
     for (const itemId of setup.items) {
       const item = getItemDefinition(itemId, content);
@@ -320,6 +321,9 @@ function createMutableUnits(
           case "luck-flat":
             unit.luck += effect.value;
             break;
+          case "dodge-percent":
+            unit.dodgePercent += effect.value;
+            break;
           case "ability-crit":
             unit.abilityCrit = true;
             break;
@@ -328,6 +332,9 @@ function createMutableUnits(
             break;
           case "starting-energy":
             unit.energy = Math.min(100, unit.energy + effect.value);
+            break;
+          case "starting-shield-max-health-percent":
+            startingShieldMaxHealthPercent += effect.value;
             break;
           case "range-flat":
             unit.range += effect.value;
@@ -340,6 +347,12 @@ function createMutableUnits(
     }
     for (const effect of traitEffects) {
       applyTraitEffect(unit, effect);
+    }
+    const startingShield = Math.floor(
+      (unit.maxHp * startingShieldMaxHealthPercent) / 100,
+    );
+    if (startingShield > 0) {
+      unit.shield += startingShield;
     }
     result.push(unit);
   }

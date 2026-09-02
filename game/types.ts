@@ -147,9 +147,11 @@ export type ItemEffect =
   | { kind: "critical-chance-percent"; value: number }
   | { kind: "critical-power-percent"; value: number }
   | { kind: "luck-flat"; value: number }
+  | { kind: "dodge-percent"; value: number }
   | { kind: "ability-crit" }
   | { kind: "ability-power-percent"; value: number }
   | { kind: "starting-energy"; value: number }
+  | { kind: "starting-shield-max-health-percent"; value: number }
   | { kind: "range-flat"; value: number }
   | { kind: "omnivamp-percent"; value: number };
 

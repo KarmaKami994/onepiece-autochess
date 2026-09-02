@@ -211,16 +211,40 @@ P4B1 implements only the reusable combat-stat and damage primitives on GameConte
 
 Item Defense and Special Defense are independent: item `defense-flat` affects Physical Defense only, while `special-defense-flat` affects Special Defense only. Existing local trait `defense-flat` remains a temporary dual-resistance compatibility adaptation because the pre-P4B1 single Defense stat protected against both current attack and ability damage. Sea Prism Stone explicitly carries matching +25 Defense / +25 Special Defense and Armament Wraps carries matching +14 / +14 effects so their historical unified-defense combat behavior is preserved. No component receives a stat assignment, and no completed-item behavior from the 55-item matrix is implemented by P4B1; triggered lifecycles and P4C acquisition/UI/bot integration remain separate work.
 
+### P4B2 implementation status
+
+P4B2 activates all ten component identities and five bounded completed items on GameContent `1.17.0`; save schema remains 6. The locked initial local translation is:
+
+| PAC stat | Local effect | Translation |
+| --- | --- | --- |
+| AP | `ability-power-percent` | direct 1:1 |
+| Crit Chance | `critical-chance-percent` | direct 1:1 |
+| Luck | `luck-flat` | direct 1:1 |
+| Defense | `defense-flat` | direct 1:1 |
+| Special Defense | `special-defense-flat` | direct 1:1 |
+| Range | `range-flat` | direct 1:1 |
+| PP | `starting-energy` | direct 1:1 |
+| Speed | `attack-speed-percent` | adapted 1:1; no separate Speed stat |
+| HP | `health-flat` | flat value ×3 |
+| Attack | `attack-flat` | flat value ×3 |
+| Shield | `shield-flat` | flat value ×3 |
+
+Accordingly, the components are Jolly Roger Fragment with no stat; Devil Fruit Essence with +10 AP; Cola Canister with +15 starting Energy; Jet Dial with +10% attack speed; Sniper Lens with +10% Crit Chance; Sea King Meat with +45 HP; Sea-Prism Shard with +3 Special Defense; Black Blade Shard with +9 Attack; Armament Plate with +3 Defense; and Captain's Sash with +45 starting Shield. Components remain ordinary held battle items until a second component crafts, and normal PvE/carousel acquisition remains on the unchanged legacy eight-item pool.
+
+At the pinned PAC source, Choice Specs, Razor Claw and Wide Lens are static-only. Their implemented mappings are Devil Fruit Codex (+100 AP), Black Blade (+50% Crit Chance / +9 Attack) and Sniper Goggles (+2 Range / +15% Crit Chance / +3 Special Defense). Meat Platter maps King's Rock as +300 HP plus a battle-start shield equal to 20% of final starting Max HP after static item and trait health effects. Lucky Pirate Ribbon maps Lucky Ribbon as +45 Shield, +50 AP, +20 Luck and an adapted battle-start +15% Dodge applied through the existing seeded Luck-adjusted dodge roll. Percentage starting-shield effects are summed and calculated once from final starting Max HP, independently of item array order.
+
+This slice intentionally changes the production combat interpretation of the stable Black Blade, Meat Platter and Sniper Goggles IDs; it is the approved PAC port, not balance tuning. Sea Prism Stone, Armament Wraps, Clima-Tact, Den Den Mushi and Cola Engine retain their P4B1 behavior, and Sniper Goggles / Armament Wraps remain the Snakeman / Boundman catalysts. P4B2 does not complete the 55-item behavior matrix: periodic, on-attack/on-hit, on-damage, thresholds/consume, status/immunity, resurrection, retaliation, trait-granting, Wonder Box and complex stat-rule effects remain unimplemented. P4C acquisition/UI work has not started.
+
 ## 9. Missing Primitive Audit
 
 ### Present and reusable
 
 The local combat has deterministic Physical/Special/True damage, separate Defense and Special Defense, basic and opt-in ability critical hits, mutable Crit Power and Luck, dodge, shields, healing, omnivamp, Energy gain/drain, burn, stun, knockback/pull, defense pierce, line/adjacent/global targeting, sequential strikes, immutable battle events and explicit RNG. Trait effects can add starting Energy, shield, dodge, crit chance, Ability Power and range. P4B1's item-effect primitives are otherwise dormant; matching Special Defense on Sea Prism Stone and Armament Wraps is compatibility data, not implementation of their future PAC matrix behaviors.
 
-### Remaining missing or insufficient after P4B1
+### Remaining missing or insufficient after P4B2
 
 - **PP/max-PP semantics:** local Energy is fixed around a 100 cap; starting Energy exists, but max-Energy reduction, post-cast restoration and next-attack conversion do not.
-- **Triggered item lifecycle:** no typed item hooks for periodic, combat-start, on-attack/on-hit, on-damage dealt/received, on-cast, on-kill, threshold, shield-depleted, resurrection or item-consumption events.
+- **Triggered item lifecycle:** the narrow derived start-shield primitive is present, but there are no generic item hooks for periodic, on-attack/on-hit, on-damage dealt/received, on-cast, on-kill, threshold, shield-depleted, resurrection or item-consumption events.
 - **Immunity/Safeguard:** no general status immunity, Sleep/Blind/Paralysis/Freeze/Locked statuses, board-effect immunity or forced-displacement immunity.
 - **Wound:** no healing-reduction status.
 - **Resurrection:** no prevent-KO/resurrect state or event.
@@ -296,7 +320,7 @@ Local carousels already align at rounds 4/12/17, use explicit RNG, offer 5–9 c
 - Wonder Box choices and item consumption must be frozen in battle output so save/resume and spectating do not reroll or reconstruct them.
 - Current battle-economy immutability stays intact: purchases/merges/equips cannot rebuild an active deployed combat timeline.
 - Schema remains 6. Existing stable IDs resolve through the eight mapped outputs; any additional legacy alias is explicit and bounded, never inferred from display names.
-- GameContent is `1.16.0` after P4A and remains unchanged by P4B1.
+- GameContent is `1.17.0` after P4B2; schema remains 6 and all serialized item IDs stay stable.
 
 ## 13. Risks and Review Gates
 

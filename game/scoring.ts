@@ -86,7 +86,9 @@ export function scoreItemEffect(
     case "shield-flat":
     case "critical-power-percent":
     case "luck-flat":
+    case "dodge-percent":
     case "ability-crit":
+    case "starting-shield-max-health-percent":
       return { score: 0, affinities: [] };
   }
 }

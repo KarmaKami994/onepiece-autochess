@@ -167,7 +167,7 @@ describe("Chopper Monster Point production content", () => {
     const chopper = DEFAULT_CONTENT.units.find((unit) => unit.id === "chopper");
     const form = getUnitFormDefinition(MONSTER_POINT_FORM_ID);
 
-    expect(DEFAULT_CONTENT.version).toBe("1.16.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.17.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(DEFAULT_CONTENT.units).toHaveLength(30);
     expect([1, 2, 3, 4, 5].map((cost) =>
@@ -513,9 +513,9 @@ describe("Chopper Monster Point live state transition", () => {
       maxHp: 1_617,
       attack: 98,
       defense: 53,
-      range: 5,
+      range: 6,
       energy: 35,
-      shield: 90,
+      shield: 413,
     });
     expect(final).toMatchObject({
       formId: MONSTER_POINT_FORM_ID,
@@ -524,9 +524,9 @@ describe("Chopper Monster Point live state transition", () => {
       hp: 1_887,
       attack: 138,
       defense: 71,
-      range: 4,
+      range: 5,
       energy: 50,
-      shield: 89,
+      shield: 412,
       state: "stunned",
     });
     expect(result.events.some((event) =>
@@ -738,7 +738,7 @@ describe("Monster Point persistence and economy isolation", () => {
     const restored = deserializeMatch(serializeMatch(state, "monster-roundtrip"));
     const restoredResult = restored.lastResults[0];
     expect(restored.schemaVersion).toBe(6);
-    expect(restored.contentVersion).toBe("1.16.0");
+    expect(restored.contentVersion).toBe("1.17.0");
     expect(restoredResult).toEqual(frozen[0]);
     expect(restoredResult.initialUnits.find((unit) =>
       unit.definitionId === "chopper"
