@@ -299,7 +299,7 @@ describe("P4B2 component and simple item content", () => {
     ]);
   });
 
-  it("preserves the deferred legacy completed items exactly", () => {
+  it("preserves the P4B1 compatibility and still-deferred legacy items exactly", () => {
     expect(productionItem("sea-prism-stone").effects).toEqual([
       { kind: "defense-flat", value: 25 },
       { kind: "special-defense-flat", value: 25 },
@@ -310,18 +310,9 @@ describe("P4B2 component and simple item content", () => {
       { kind: "defense-flat", value: 14 },
       { kind: "special-defense-flat", value: 14 },
     ]);
-    expect(productionItem("clima-tact").effects).toEqual([
-      { kind: "ability-power-percent", value: 25 },
-      { kind: "starting-energy", value: 20 },
-    ]);
     expect(productionItem("den-den-mushi").effects).toEqual([
       { kind: "attack-speed-percent", value: 18 },
       { kind: "starting-energy", value: 10 },
-    ]);
-    expect(productionItem("cola-engine").effects).toEqual([
-      { kind: "health-flat", value: 160 },
-      { kind: "attack-speed-percent", value: 12 },
-      { kind: "omnivamp-percent", value: 8 },
     ]);
   });
 
@@ -372,10 +363,10 @@ describe("P4B2 component and simple item content", () => {
     if (!player) throw new Error("Missing player-1.");
     player.inventory = [...LEGACY_ITEM_IDS];
     const restored = deserializeMatch(serializeMatch(state));
-    expect(DEFAULT_CONTENT.version).toBe("1.17.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.18.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(restored.schemaVersion).toBe(6);
-    expect(restored.contentVersion).toBe("1.17.0");
+    expect(restored.contentVersion).toBe("1.18.0");
     expect(
       restored.players.find((candidate) => candidate.id === "player-1")?.inventory,
     ).toEqual(LEGACY_ITEM_IDS);

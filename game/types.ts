@@ -155,6 +155,32 @@ export type ItemEffect =
   | { kind: "range-flat"; value: number }
   | { kind: "omnivamp-percent"; value: number };
 
+export type ItemBehavior =
+  | {
+      kind: "periodic-ability-power-energy";
+      intervalMs: number;
+      abilityPowerPercent: number;
+      energy: number;
+    }
+  | {
+      kind: "periodic-attack-speed";
+      intervalMs: number;
+      attackSpeedPercent: number;
+    }
+  | {
+      kind: "on-basic-attack-attack-speed";
+      attackSpeedPercent: number;
+    }
+  | {
+      kind: "on-basic-attack-energy";
+      energy: number;
+      killBonusEnergy: number;
+    }
+  | {
+      kind: "on-critical-basic-attack-energy-steal";
+      amount: number;
+    };
+
 export type ItemKind = "component" | "completed";
 
 export interface ItemDefinition {
@@ -164,6 +190,7 @@ export interface ItemDefinition {
   icon: string;
   kind: ItemKind;
   effects: ItemEffect[];
+  behaviors?: ItemBehavior[];
 }
 
 export interface PvEEnemyDefinition {
@@ -588,7 +615,7 @@ export type BattleEvent =
       amount: number;
       /** Energy after this event has been applied. */
       value: number;
-      reason: "attack" | "damaged" | "cast-reset" | "ability-drain";
+      reason: "attack" | "damaged" | "cast-reset" | "ability-drain" | "item";
     }
   | {
       type: "dodge";

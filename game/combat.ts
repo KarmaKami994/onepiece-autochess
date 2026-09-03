@@ -15,12 +15,24 @@ import type {
   BattleUnitState,
   DamageType,
   GameContent,
+  ItemBehavior,
   Position,
   SequentialStrikeDefinition,
   SignatureMechanic,
   TraitEffect,
   UnitStats,
 } from "./types";
+
+type PeriodicItemBehavior = Extract<
+  ItemBehavior,
+  { kind: "periodic-ability-power-energy" | "periodic-attack-speed" }
+>;
+
+interface PeriodicItemBehaviorRuntime {
+  behavior: PeriodicItemBehavior;
+  nextTick: number;
+  intervalTicks: number;
+}
 
 interface CombatDefinition {
   id: string;
@@ -47,6 +59,8 @@ interface MutableBattleUnit {
   specialDefense: number;
   range: number;
   attackIntervalTicks: number;
+  dynamicAttackSpeedBaseTicks: number;
+  dynamicAttackSpeedPercent: number;
   moveIntervalTicks: number;
   nextActionTick: number;
   abilityPowerPercent: number;
@@ -67,6 +81,8 @@ interface MutableBattleUnit {
   lastDamagerId: string | null;
   state: BattleUnitState;
   ability: AbilityDefinition | null;
+  itemBehaviors: ItemBehavior[];
+  periodicItemBehaviors: PeriodicItemBehaviorRuntime[];
 }
 
 interface AttackIntent {
@@ -255,6 +271,8 @@ function createMutableUnits(
         1,
         Math.round(definition.stats.attackIntervalMs / tickMs),
       ),
+      dynamicAttackSpeedBaseTicks: 1,
+      dynamicAttackSpeedPercent: 0,
       moveIntervalTicks: Math.max(
         1,
         Math.round(definition.stats.moveIntervalMs / tickMs),
@@ -278,6 +296,8 @@ function createMutableUnits(
       lastDamagerId: null,
       state: "seek",
       ability: definition.ability,
+      itemBehaviors: [],
+      periodicItemBehaviors: [],
     };
     let startingShieldMaxHealthPercent = 0;
 
@@ -344,10 +364,24 @@ function createMutableUnits(
             break;
         }
       }
+      for (const behavior of item.behaviors ?? []) {
+        unit.itemBehaviors.push({ ...behavior });
+      }
     }
     for (const effect of traitEffects) {
       applyTraitEffect(unit, effect);
     }
+    unit.dynamicAttackSpeedBaseTicks = unit.attackIntervalTicks;
+    unit.periodicItemBehaviors = unit.itemBehaviors.flatMap((behavior) => {
+      if (
+        behavior.kind !== "periodic-ability-power-energy" &&
+        behavior.kind !== "periodic-attack-speed"
+      ) {
+        return [];
+      }
+      const intervalTicks = Math.max(1, Math.ceil(behavior.intervalMs / tickMs));
+      return [{ behavior, nextTick: intervalTicks, intervalTicks }];
+    });
     const startingShield = Math.floor(
       (unit.maxHp * startingShieldMaxHealthPercent) / 100,
     );
@@ -357,6 +391,20 @@ function createMutableUnits(
     result.push(unit);
   }
   return result;
+}
+
+function addDynamicAttackSpeed(
+  unit: MutableBattleUnit,
+  amount: number,
+): void {
+  unit.dynamicAttackSpeedPercent += amount;
+  unit.attackIntervalTicks = Math.max(
+    1,
+    Math.round(
+      (unit.dynamicAttackSpeedBaseTicks * 100) /
+        (100 + unit.dynamicAttackSpeedPercent),
+    ),
+  );
 }
 
 function transformBattleUnit(
@@ -922,7 +970,7 @@ export function simulateBattle(
     tick: number,
     unit: MutableBattleUnit,
     requestedAmount: number,
-    reason: "attack" | "damaged" | "cast-reset" | "ability-drain",
+    reason: "attack" | "damaged" | "cast-reset" | "ability-drain" | "item",
   ): void => {
     const previous = unit.energy;
     unit.energy = Math.max(0, Math.min(100, unit.energy + requestedAmount));
@@ -934,6 +982,50 @@ export function simulateBattle(
       value: unit.energy,
       reason,
     });
+  };
+
+  const applyBasicAttackItemBehaviors = (
+    tick: number,
+    source: MutableBattleUnit,
+    target: MutableBattleUnit,
+    critical: boolean,
+    killed: boolean,
+  ): void => {
+    let attackSpeedChanged = false;
+    for (const behavior of source.itemBehaviors) {
+      switch (behavior.kind) {
+        case "on-basic-attack-attack-speed":
+          addDynamicAttackSpeed(source, behavior.attackSpeedPercent);
+          attackSpeedChanged = true;
+          break;
+        case "on-basic-attack-energy":
+          changeEnergy(tick, source, behavior.energy, "item");
+          if (killed) {
+            changeEnergy(tick, source, behavior.killBonusEnergy, "item");
+          }
+          break;
+        case "on-critical-basic-attack-energy-steal": {
+          if (!critical) {
+            break;
+          }
+          const stolen = Math.min(
+            Math.max(0, behavior.amount),
+            Math.max(0, target.energy),
+          );
+          if (stolen > 0) {
+            changeEnergy(tick, target, -stolen, "item");
+            changeEnergy(tick, source, stolen, "item");
+          }
+          break;
+        }
+        case "periodic-ability-power-energy":
+        case "periodic-attack-speed":
+          break;
+      }
+    }
+    if (attackSpeedChanged) {
+      source.nextActionTick = tick + source.attackIntervalTicks;
+    }
   };
 
   const roll = (percent: number): boolean => {
@@ -1204,6 +1296,23 @@ export function simulateBattle(
   let timedOut = false;
   for (let tick = 1; tick <= maxTicks; tick += 1) {
     endTick = tick;
+    for (const unit of units) {
+      if (!alive(unit)) {
+        continue;
+      }
+      for (const runtime of unit.periodicItemBehaviors) {
+        if (tick < runtime.nextTick) {
+          continue;
+        }
+        if (runtime.behavior.kind === "periodic-ability-power-energy") {
+          unit.abilityPowerPercent += runtime.behavior.abilityPowerPercent;
+          changeEnergy(tick, unit, runtime.behavior.energy, "item");
+        } else {
+          addDynamicAttackSpeed(unit, runtime.behavior.attackSpeedPercent);
+        }
+        runtime.nextTick += runtime.intervalTicks;
+      }
+    }
     for (const unit of units) {
       if (
         alive(unit) &&
@@ -1628,8 +1737,10 @@ export function simulateBattle(
           sourceId: source.id,
           targetId: target.id,
         });
+        applyBasicAttackItemBehaviors(tick, source, target, false, false);
         continue;
       }
+      const aliveBefore = alive(target);
       applyDamage(
         tick,
         source,
@@ -1644,6 +1755,13 @@ export function simulateBattle(
           : source.attack,
         "attack",
         "physical",
+      );
+      applyBasicAttackItemBehaviors(
+        tick,
+        source,
+        target,
+        critical,
+        aliveBefore && !alive(target),
       );
     }
 

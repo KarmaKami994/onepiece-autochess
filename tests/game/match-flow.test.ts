@@ -147,12 +147,12 @@ describe("pairing and bots", () => {
     expect(nextBot.units["bot-nami"].items).toEqual([
       "black-blade",
       "meat-platter",
-      "clima-tact",
+      "cola-engine",
     ]);
     expect(nextBot.units["bot-nami"].items).toHaveLength(
       DEFAULT_CONTENT.config.itemCap,
     );
-    expect(nextBot.inventory).toEqual(["cola-engine", "unknown-item"]);
+    expect(nextBot.inventory).toEqual(["clima-tact", "unknown-item"]);
     expect(nextBot.units["bot-nami"].items).not.toContain("unknown-item");
   });
 });

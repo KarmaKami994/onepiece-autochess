@@ -287,7 +287,7 @@ describe("item and carousel decision support", () => {
     ]);
     expect(
       ranked.map((preview) => (preview.available ? preview.score : null)),
-    ).toEqual([93.05, 80, 70.25]);
+    ).toEqual([93.05, 80, 0]);
     expect(ranked[0].available && ranked[0].bestFit?.unitName).toBe("Zoro");
   });
 
