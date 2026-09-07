@@ -253,16 +253,24 @@ PAC PeriodicEffect starts only after one complete interval; local intervals ther
 
 Dynamic Speed is an ADAPTED PORT: P4B2 static Speed initialization remains numerically unchanged, then all battle-time Speed gains add as attack-speed percentage against the post-static resolved interval. Periodic Speed does not rewrite an already scheduled action; Upgrade's post-attack gain does determine the cooldown into the next attack. Energy keeps the local fixed 100 cap; Scope Lens still removes the full available transfer from its target when holder gain overcaps. No battle-time item removal or PAC title/achievement bookkeeping is implemented.
 
+### P4B4 implementation status
+
+P4B4 implements exactly Aqua Egg → Cola Reservoir (+30 starting Energy; after each resolved cast restore `min(90, round(20 + 2 × castCount))`), Star Dust → Star Shield Dial (+10 Special Defense/+15 starting Energy; +50 Shield after each resolved cast), Reaper Cloth → Observation Haki Mantle (+10 AP/+20% Crit Chance/Ability Crit; +50 Crit Power only if the resolved battle-start ability natively crits), and Shell Bell → Healing Dial (+15 Attack/+5 Special Defense; heal `ceil(33% × actual damage dealt)`).
+
+The four additional serializable behavior shapes use private cast count and existing Energy/shield/heal paths. Cast count increments once after the ability and before its item bonuses; multi-hit/target loops do not multiply bonuses, and aborted resolution does not trigger them. The native Crit Power bonus is fixed at construction and is not recomputed on temporary transformation. Shell Bell includes mitigated shield plus health damage from attacks, abilities and attributed burn, excludes self/zero damage, and retains existing health-only omnivamp separately. PAC behavior is adapted to fixed local 100 Energy, Attack ×3 and existing seeded Ability Crit; no additional RNG, generic lifecycle or event bus is introduced.
+
+GameContent is `1.19.0`; schema stays 6. P4B1–P4B3 definitions, acquisition order/RNG, Gear 4 catalysts and bot policy are unchanged. P4C and further item families remain deferred.
+
 ## 9. Missing Primitive Audit
 
 ### Present and reusable
 
 The local combat has deterministic Physical/Special/True damage, separate Defense and Special Defense, basic and opt-in ability critical hits, mutable Crit Power and Luck, dodge, shields, healing, omnivamp, Energy gain/drain, burn, stun, knockback/pull, defense pierce, line/adjacent/global targeting, sequential strikes, immutable battle events and explicit RNG. Trait effects can add starting Energy, shield, dodge, crit chance, Ability Power and range. P4B3 adds bounded periodic AP/Energy/attack-speed and post-basic-attack Speed/Energy/critical-transfer behavior. Matching Special Defense on Sea Prism Stone and Armament Wraps remains compatibility data, not implementation of their future PAC matrix behaviors.
 
-### Remaining missing or insufficient after P4B3
+### Remaining missing or insufficient after P4B4
 
-- **PP/max-PP semantics:** local Energy is fixed around a 100 cap; starting Energy exists, but max-Energy reduction, post-cast restoration and next-attack conversion do not.
-- **Remaining triggered behaviors:** Green Orb healing periodic, Blue Orb chain attacks, Loaded Dice bounce, on-damage/reactive, on-cast, threshold/consume, shield-depleted and item-consumption behaviors remain absent. P4B3 deliberately adds no generic lifecycle.
+- **PP/max-PP semantics:** local Energy stays capped at 100; starting Energy and bounded post-cast restoration exist, but max-Energy reduction and next-attack conversion do not.
+- **Remaining triggered behaviors:** Green Orb healing periodic, Blue Orb chain attacks, Loaded Dice bounce, Muscle Band, other reactive/on-cast effects, threshold/consume, shield-depleted and item-consumption behaviors remain absent. P4B4 deliberately adds no generic lifecycle.
 - **Immunity/Safeguard:** no general status immunity, Sleep/Blind/Paralysis/Freeze/Locked statuses, board-effect immunity or forced-displacement immunity.
 - **Wound:** no healing-reduction status.
 - **Resurrection:** no prevent-KO/resurrect state or event.
@@ -338,7 +346,7 @@ Local carousels already align at rounds 4/12/17, use explicit RNG, offer 5–9 c
 - Wonder Box choices and item consumption must be frozen in battle output so save/resume and spectating do not reroll or reconstruct them.
 - Current battle-economy immutability stays intact: purchases/merges/equips cannot rebuild an active deployed combat timeline.
 - Schema remains 6. Existing stable IDs resolve through the eight mapped outputs; any additional legacy alias is explicit and bounded, never inferred from display names.
-- GameContent is `1.18.0` after P4B3; schema remains 6 and all serialized item IDs stay stable.
+- GameContent is `1.19.0` after P4B4; schema remains 6 and all serialized item IDs stay stable.
 
 ## 13. Risks and Review Gates
 

@@ -23,10 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-P4B3 Periodic + Basic-Attack Item Behaviors is implemented on `feat/p4b3-periodic-attack-items` from exact base `b57e32b258ffd7fa371f3b2f3b4bdbc38c9df236`. Clima-Tact, Jet Sash, Cola Engine, Shark Tooth Charm and Energy-Siphon Scope now use the locked Soul Dew, Mach Ribbon, Upgrade, Deep Sea Tooth and Scope Lens identities through five plain typed behavior shapes and private deterministic battle counters. GameContent is `1.18.0`; save schema remains 6. Static initialization, acquisition and Gear 4 catalysts are unchanged. Remaining P4B effects and P4C have not started.
+P4B4 Cast + Sustain Items is implemented on `feat/p4b4-cast-sustain-items` from exact base `a27d25367680f576298ce32c6c423f06babee664`. Exactly Cola Reservoir, Star Shield Dial, Observation Haki Mantle and Healing Dial gain their approved PAC identities. GameContent is `1.19.0`; schema remains 6. Acquisition, prior item definitions, Gear 4 and bot policy remain unchanged. Remaining P4B families and P4C are deferred.
 
 ## Last Completed Work
 
+- 2026-09-07 — P4B4 cast/sustain items: added post-cast Energy/Shield, battle-start native Ability Crit Power and actual-damage healing for the four approved mappings. Private cast count advances once per resolved cast; Shell Bell includes shield damage and attributed burn while preserving omnivamp. Material files: `game/types.ts`, `game/content.ts`, `game/combat.ts`, focused/version tests, `docs/P4_ITEM_SYSTEM_AUDIT.md`, `PROJECT_STATE.md`. Commit/PR pending publication.
 - 2026-09-07 — P4B3 periodic/basic-attack item effects on `feat/p4b3-periodic-attack-items`: added exactly five PAC mappings for Clima-Tact, Jet Sash, Cola Engine, Shark Tooth Charm and Energy-Siphon Scope. Periodics begin after one complete tick-derived interval before intent selection; post-attack effects include dodge attempts, exact kill attribution and critical Energy transfer. Dynamic Speed accumulates against the post-static resolved interval without changing the P4B2 static formula. Legacy acquisition order, Gear 4 catalysts and schema 6 remain intact; GameContent is `1.18.0`. Material files: `game/types.ts`, `game/content.ts`, `game/combat.ts`, focused/version regression tests, `docs/P4_ITEM_SYSTEM_AUDIT.md`, `PROJECT_STATE.md`.
 - 2026-09-02 — P4B2 component/simple-item effects on `feat/p4b2-simple-item-effects`: activated all ten component stat identities plus Devil Fruit Codex, Black Blade, Sniper Goggles, Meat Platter and Lucky Pirate Ribbon using the locked HP/Attack/Shield ×3 translation, direct AP/Crit/Luck/Defense/Special Defense/Range/PP values and adapted Speed-to-attack-speed mapping. Added only `dodge-percent` and deterministic final-starting-Max-HP shield primitives. Stable IDs, legacy acquisition order, Gear 4 catalysts, schema 6 and deferred item behavior remain intact; GameContent is `1.17.0`. Material files: item/combat/types/scoring/presentation source, focused and version/behavior regression tests, `docs/P4_ITEM_SYSTEM_AUDIT.md`, `PROJECT_STATE.md`.
 - 2026-09-02 — `8130a5c`, PR #40, P4B1 combat primitive foundation on `feat/p4b1-combat-primitives`: added Physical/Special/True damage selection with the existing mitigation curve, Special Defense with Defense fallback across forms, default 200% Crit Power, the deterministic PAC Luck probability helper, one opt-in Ability-Crit result per cast and item-effect support for Special Defense, starting shield, Crit Power, Luck and Ability Crit. Review correction made item Defense and Special Defense independent while retaining dual-resistance trait compatibility; Sea Prism Stone and Armament Wraps now carry matching explicit Special Defense to preserve their previous effective resistance. Event shape, production combat hash, GameContent `1.16.0` and schema 6 remain unchanged. P4B item behavior implementation and P4C were not started. Material files: `game/types.ts`, `game/combat.ts`, `game/content.ts`, `game/scoring.ts`, exhaustive dormant-effect labels, focused tests, `docs/P4_ITEM_SYSTEM_AUDIT.md`, `PROJECT_STATE.md`.
@@ -69,6 +70,15 @@ P4B3 Periodic + Basic-Attack Item Behaviors is implemented on `feat/p4b3-periodi
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+P4B4 cast and sustain item effects:
+
+- PASS — focused P4B4: 16 tests; combined P4B4/P4B3/P4B2/P4B1/P4A and affected regressions: 14 files / 206 tests.
+- PASS — `npm run typecheck`, `npm run lint`, and `npm test`: 47 files / 501 tests.
+- PASS — `npm run assets:validate`: 41 atlases and supporting assets/provenance validated.
+- PASS — `npm run test:production-smoke`: 50/50 completed, zero crashes; regression evidence only, no tuning.
+- PASS — `npm run build` and `git diff --check`.
+- NOT RUN — Browser E2E (no UI/Phaser changes), 1,000-seed soak or new baseline.
 
 P4B3 periodic and basic-attack item effects:
 
@@ -503,6 +513,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- P4B4: Cola Reservoir restores 22 Energy after the first cast, 24 after the second, up to 90; Star Shield Dial grants 50 post-cast Shield. Observation Haki Mantle enables Ability Crit and grants +50 Crit Power only for a natively critical battle-start ability. Healing Dial heals rounded-up 33% of actual damage to others per application, including shield damage and attributed burn.
 - Clima-Tact now gains +5 AP/+5 Energy every second; Jet Sash grants +45 Shield/+10% static attack speed and +20% dynamic attack speed every three seconds; Cola Engine grants +10 AP/+10% static attack speed and +5% dynamic attack speed after each basic-attack attempt; Shark Tooth Charm grants +21 Attack/+15 starting Energy and +5 Energy per attack plus +15 on that attack's kill; Energy-Siphon Scope grants +15 starting Energy/+25% Crit Chance and transfers up to 10 Energy on a critical basic attack. Periodic and attack-time Speed gains are battle-local and cumulative; Energy retains the 100 cap. Clima-Tact and Cola Engine intentionally change production combat as feature ports, not tuning.
 - All ten components now apply their locked battle stats while held. Devil Fruit Codex grants +100 AP; Black Blade grants +50% Crit Chance/+9 Attack; Sniper Goggles grants +2 Range/+15% Crit Chance/+3 Special Defense; Meat Platter grants +300 Max HP plus 20% final-starting-Max-HP shield; and Lucky Pirate Ribbon grants +45 Shield/+50 AP/+20 Luck/+15% Dodge. Percentage starting shields are summed and applied once after static items and traits. Black Blade, Meat Platter and Sniper Goggles intentionally change production combat as approved PAC ports, not tuning. Acquisition, Gear 4 catalysts, deferred legacy items, schema 6 and normal preparation behavior are unchanged.
 - The combat domain now supports Physical damage against Defense, Special damage against Special Defense, and shield-first True damage without resistance. Absent Special Defense falls back to Defense; existing direct abilities default to Special, burn is Special and basic attacks remain Physical. Item Defense and Special Defense are independent, while legacy trait Defense remains dual-resistance. Sea Prism Stone and Armament Wraps explicitly carry equal bonuses to both channels, preserving current production outcomes and RNG. Crit Power defaults to the existing 200%, Luck adjusts existing crit/dodge probabilities, and Ability Crit is opt-in with one shared cast result.
@@ -543,6 +554,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- None for P4B4. No additional item family, acquisition/UI/bot policy, P4C, tuning or soak work.
 - None for P4B3. No other item behavior, generic event/lifecycle framework, battle-time removal, acquisition/UI/bot work, P4C, tuning, schema change or 1,000-seed soak was added.
 - None for P4B2. No other completed-item behavior, generic trigger framework, acquisition/UI/asset redesign, bot optimization, P4B3/P4C, schema change, tuning or 1,000-seed soak was added. Existing generic item scoring naturally reflects the approved Black Blade and Sniper Goggles static-value changes; both new effect kinds remain neutral-scored.
 - None for P4B1. The only production data additions are matching Special Defense on Sea Prism Stone and Armament Wraps to preserve historical resistance; no component assignment, completed PAC behavior, triggered effect, acquisition, screen flow, asset, bot strategy, P4C work, tuning, schema change or 1,000-seed soak was added.
@@ -583,7 +595,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
-- P4B3 covers only the first five periodic/basic-attack identities. Remaining P4B work includes Green Orb/healing periodic, Blue Orb/chain attacks, Loaded Dice/bounce, on-damage/reactive effects, on-cast effects, threshold/consume, Wound/statuses/immunities, resurrection, retaliation, trait-granting equipment, Wonder Box and complex stat transforms. P4C has not started; these gaps do not authorize a generic framework or balance tuning.
+- After P4B4, remaining P4B work includes Green Orb/healing periodic, Blue Orb/chain attacks, Loaded Dice/bounce, Muscle Band, other reactive/on-cast effects, threshold/consume, Wound/statuses/immunities, resurrection, retaliation, trait-granting equipment, Wonder Box and complex stat transforms. P4C has not started; these gaps do not authorize a generic framework or balance tuning.
 - Existing decision support and bots still score static item effects only. Clima-Tact's new dynamic-only identity therefore scores zero, and the existing deterministic bot fixture prefers Cola Engine; dynamic behavior scoring remains a P4C concern rather than part of P4B3.
 - Existing all-player-elimination behavior still leaves `winnerId` null when no survivor remains. The new deterministic batch ranking applies, but winner semantics remain a separate edge-case watch and were intentionally not redesigned here.
 - Full star-copy sell refund (`cost × 1/3/9`) makes 2-star/3-star units fully liquid, lowers pivot commitment and can move battle-time sales into interest thresholds; classify WATCH / NEEDS MEASUREMENT, not a defect. Constant per-unit pools preserve absolute copies while four-character expansions grow cost-band totals and dilute each specific definition's conditional roll share. Realized gold, levels, streaks, high-cost access, rerolls and star timing are P3-coupled and not currently observable at sufficient grain.
@@ -615,6 +627,7 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
+- P4B4 counts only resolved casts and applies item bonuses after complete ability resolution. Native Crit Power is battle-start-only. Shell Bell uses shield plus health damage, separately from unchanged health-only omnivamp; local Energy stays capped at 100.
 - P4B3 keeps item behavior as five plain serializable metadata shapes with private battle-only counters. PAC full-interval periodic timing and every-attempt OnAttack semantics are direct; dynamic Speed is adapted as cumulative attack-speed percentage against the unchanged post-static interval, and local Energy remains capped at 100. GameContent is `1.18.0`; schema remains 6.
 - P4B2 locks HP/Attack/Shield flat translations at PAC ×3; AP/Crit/Luck/Defense/Special Defense/Range/PP remain direct; PAC Speed maps 1:1 to local attack-speed percentage. Start-shield percentage is a narrow derived initialization primitive calculated once from final starting Max HP after static items and traits. GameContent is `1.17.0`; schema remains 6.
 - P4B1 directly adopts PAC's Physical/Special/True categories, independent item Defense/Special Defense, 10% default Crit Chance, 200% default Crit Power, Luck exponent and one Ability-Crit decision per cast. It adapts them to the existing local mitigation curve and seeded RNG, explicitly rejects PAC's `ARMOR_FACTOR = 0.05`, leaves `BattleEvent.damageKind` unchanged and temporarily keeps legacy trait Defense dual-resistance. Sea Prism Stone and Armament Wraps receive matching Special Defense only to preserve their pre-split effective resistance.
@@ -649,7 +662,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-Review P4B3. Do not start another P4B pack, P4C, P1B, captain damage, economy tuning or balance work without separate approval.
+Review P4B4. Do not start another P4B pack, P4C, P1B, captain damage, economy tuning or balance work without separate approval.
 
 ## Codex Update Contract
 
