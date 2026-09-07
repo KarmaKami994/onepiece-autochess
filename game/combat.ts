@@ -82,6 +82,7 @@ interface MutableBattleUnit {
   state: BattleUnitState;
   ability: AbilityDefinition | null;
   itemBehaviors: ItemBehavior[];
+  abilityCastCount: number;
   periodicItemBehaviors: PeriodicItemBehaviorRuntime[];
 }
 
@@ -297,6 +298,7 @@ function createMutableUnits(
       state: "seek",
       ability: definition.ability,
       itemBehaviors: [],
+      abilityCastCount: 0,
       periodicItemBehaviors: [],
     };
     let startingShieldMaxHealthPercent = 0;
@@ -366,6 +368,12 @@ function createMutableUnits(
       }
       for (const behavior of item.behaviors ?? []) {
         unit.itemBehaviors.push({ ...behavior });
+        if (
+          behavior.kind === "native-ability-crit-power" &&
+          unit.ability?.canCritByDefault === true
+        ) {
+          unit.criticalPowerPercent += behavior.criticalPowerPercent;
+        }
       }
     }
     for (const effect of traitEffects) {
@@ -1150,6 +1158,18 @@ export function simulateBattle(
         Math.floor((healthDamage * source.omnivampPercent) / 100),
       );
     }
+    if (source && source.id !== target.id && dealt > 0) {
+      for (const behavior of source.itemBehaviors) {
+        if (behavior.kind === "on-damage-dealt-heal-percent") {
+          applyHeal(
+            tick,
+            source,
+            source,
+            Math.ceil((dealt * behavior.percent) / 100),
+          );
+        }
+      }
+    }
     if (
       target.hp > 0 &&
       !target.emergencyShieldUsed &&
@@ -1497,11 +1517,13 @@ export function simulateBattle(
             ),
           )
         : scaledPower;
+      let resolvedCast = false;
       for (const targetId of intent.targetIds) {
         const target = units.find((unit) => unit.id === targetId);
         if (!target) {
           continue;
         }
+        resolvedCast ||= alive(target);
         if (abilityDefinition.effect === "heal") {
           const conditionalShield = validConditionalShield(
             abilityDefinition.conditionalShield,
@@ -1697,6 +1719,28 @@ export function simulateBattle(
             from,
             to: destination,
           });
+        }
+      }
+      if (!resolvedCast) {
+        continue;
+      }
+      source.abilityCastCount += 1;
+      for (const behavior of source.itemBehaviors) {
+        if (behavior.kind === "on-ability-cast-energy") {
+          changeEnergy(
+            tick,
+            source,
+            Math.min(
+              behavior.maxEnergy,
+              Math.round(
+                behavior.baseEnergy +
+                  behavior.perCastEnergy * source.abilityCastCount,
+              ),
+            ),
+            "item",
+          );
+        } else if (behavior.kind === "on-ability-cast-shield") {
+          applyShield(tick, source, source, behavior.shield);
         }
       }
     }

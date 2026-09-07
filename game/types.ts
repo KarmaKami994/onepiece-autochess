@@ -157,6 +157,15 @@ export type ItemEffect =
 
 export type ItemBehavior =
   | {
+      kind: "on-ability-cast-energy";
+      baseEnergy: number;
+      perCastEnergy: number;
+      maxEnergy: number;
+    }
+  | { kind: "on-ability-cast-shield"; shield: number }
+  | { kind: "native-ability-crit-power"; criticalPowerPercent: number }
+  | { kind: "on-damage-dealt-heal-percent"; percent: number }
+  | {
       kind: "periodic-ability-power-energy";
       intervalMs: number;
       abilityPowerPercent: number;

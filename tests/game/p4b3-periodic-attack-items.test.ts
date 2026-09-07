@@ -323,7 +323,13 @@ describe("P4B3 item content", () => {
     });
     expect(
       DEFAULT_CONTENT.items
-        .filter((item) => item.kind === "completed" && item.behaviors?.length)
+        .filter((item) => item.kind === "completed" && item.behaviors?.some(
+          (behavior) => behavior.kind === "periodic-ability-power-energy" ||
+            behavior.kind === "periodic-attack-speed" ||
+            behavior.kind === "on-basic-attack-attack-speed" ||
+            behavior.kind === "on-basic-attack-energy" ||
+            behavior.kind === "on-critical-basic-attack-energy-steal",
+        ))
         .map((item) => item.id),
     ).toEqual(P4B3_ITEM_IDS);
   });
@@ -771,10 +777,10 @@ describe("P4B3 regressions", () => {
     if (!player) throw new Error("Missing player-1.");
     player.inventory = [...LEGACY_ITEM_IDS, "jet-sash", "shark-tooth-charm", "energy-siphon-scope"];
     const restored = deserializeMatch(serializeMatch(state));
-    expect(DEFAULT_CONTENT.version).toBe("1.18.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.19.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(restored.schemaVersion).toBe(6);
-    expect(restored.contentVersion).toBe("1.18.0");
+    expect(restored.contentVersion).toBe("1.19.0");
     expect(restored.players.find((candidate) => candidate.id === "player-1")?.inventory).toEqual(
       player.inventory,
     );

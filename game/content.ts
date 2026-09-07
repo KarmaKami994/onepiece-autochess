@@ -1362,7 +1362,17 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
     [{ kind: "ability-power-percent", value: 100 }],
     "Grants 100% ability power.",
   ),
-  completedItem("observation-haki-mantle", "Observation Haki Mantle"),
+  completedItem(
+    "observation-haki-mantle",
+    "Observation Haki Mantle",
+    [
+      { kind: "ability-power-percent", value: 10 },
+      { kind: "critical-chance-percent", value: 20 },
+      { kind: "ability-crit" },
+    ],
+    "Grants 10% ability power and 20% critical chance; abilities can crit. Natively critical abilities grant 50% Crit Power at battle start.",
+    [{ kind: "native-ability-crit-power", criticalPowerPercent: 50 }],
+  ),
   completedItem("barrier-bubble", "Barrier Bubble"),
   completedItem("reflect-dial", "Reflect Dial"),
   completedItem("flame-flame-grimoire", "Flame-Flame Grimoire"),
@@ -1378,7 +1388,18 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
     ],
     "Grants 45 Shield, 50% ability power, 20 Luck, and 15% Dodge.",
   ),
-  completedItem("cola-reservoir", "Cola Reservoir"),
+  completedItem(
+    "cola-reservoir",
+    "Cola Reservoir",
+    [{ kind: "starting-energy", value: 30 }],
+    "Grants 30 starting Energy. After each cast, restores 20 plus 2 Energy per cast, up to 90.",
+    [{
+      kind: "on-ability-cast-energy",
+      baseEnergy: 20,
+      perCastEnergy: 2,
+      maxEnergy: 90,
+    }],
+  ),
   completedItem(
     "energy-siphon-scope",
     "Energy-Siphon Scope",
@@ -1390,7 +1411,16 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
     [{ kind: "on-critical-basic-attack-energy-steal", amount: 10 }],
   ),
   completedItem("healing-bubble", "Healing Bubble"),
-  completedItem("star-shield-dial", "Star Shield Dial"),
+  completedItem(
+    "star-shield-dial",
+    "Star Shield Dial",
+    [
+      { kind: "special-defense-flat", value: 10 },
+      { kind: "starting-energy", value: 15 },
+    ],
+    "Grants 10 Special Defense and 15 starting Energy; grants 50 Shield after each cast.",
+    [{ kind: "on-ability-cast-shield", shield: 50 }],
+  ),
   completedItem(
     "shark-tooth-charm",
     "Shark Tooth Charm",
@@ -1438,7 +1468,16 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
   completedItem("impact-proof-gauntlets", "Impact-Proof Gauntlets"),
   completedItem("phoenix-feather", "Phoenix Feather"),
   completedItem("banquet-belt", "Banquet Belt"),
-  completedItem("healing-dial", "Healing Dial"),
+  completedItem(
+    "healing-dial",
+    "Healing Dial",
+    [
+      { kind: "attack-flat", value: 15 },
+      { kind: "special-defense-flat", value: 5 },
+    ],
+    "Grants 15 Attack and 5 Special Defense; heals for 33% of damage dealt to others, including shield damage, rounded up.",
+    [{ kind: "on-damage-dealt-heal-percent", percent: 33 }],
+  ),
   completedItem("guard-point-dummy", "Guard Point Dummy"),
   completedItem("reversal-band", "Reversal Band"),
   completedItem("advanced-armament-orb", "Advanced Armament Orb"),
@@ -1833,7 +1872,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.18.0",
+  version: "1.19.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,
