@@ -1306,24 +1306,42 @@ const LEGACY_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
   {
     id: "armament-wraps",
     name: "Armament Wraps",
-    description: "Reinforces both attacks and defenses.",
+    description: "Grants 10% attack speed and 3 Defense. Every second positive damage event grants 3 Attack, 2 Defense, and 5% attack speed, up to ten times.",
     icon: "◈",
     kind: "completed",
     effects: [
-      { kind: "attack-flat", value: 14 },
-      { kind: "defense-flat", value: 14 },
-      { kind: "special-defense-flat", value: 14 },
+      { kind: "attack-speed-percent", value: 10 },
+      { kind: "defense-flat", value: 3 },
+    ],
+    behaviors: [
+      {
+        kind: "on-damage-received-stack",
+        maxEvents: 20,
+        eventsPerProc: 2,
+        attack: 3,
+        defense: 2,
+        attackSpeedPercent: 5,
+      },
     ],
   },
   {
     id: "den-den-mushi",
     name: "Den Den Mushi",
-    description: "Coordinates faster attacks and an earlier ability.",
+    description: "Grants 15 starting Energy and 10% attack speed. Every third basic attack chains 30 Special damage and drains 15 Energy from up to two closest enemies.",
     icon: "☏",
     kind: "completed",
     effects: [
-      { kind: "attack-speed-percent", value: 18 },
-      { kind: "starting-energy", value: 10 },
+      { kind: "starting-energy", value: 15 },
+      { kind: "attack-speed-percent", value: 10 },
+    ],
+    behaviors: [
+      {
+        kind: "every-n-basic-attacks-chain",
+        every: 3,
+        targets: 2,
+        specialDamage: 30,
+        energyDrain: 15,
+      },
     ],
   },
   {
@@ -1410,7 +1428,18 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
     "Grants 15 starting Energy and 25% critical chance; critical basic attacks steal up to 10 Energy.",
     [{ kind: "on-critical-basic-attack-energy-steal", amount: 10 }],
   ),
-  completedItem("healing-bubble", "Healing Bubble"),
+  completedItem(
+    "healing-bubble",
+    "Healing Bubble",
+    [{ kind: "health-flat", value: 45 }],
+    "Grants 45 Max HP. Every 2 seconds, heals the holder and adjacent allies for 5% of their own Max HP and converts 10% of overheal to Energy.",
+    [{
+      kind: "periodic-adjacent-heal-overheal-energy",
+      intervalMs: 2_000,
+      healMaxHealthPercent: 5,
+      overhealEnergyPercent: 10,
+    }],
+  ),
   completedItem(
     "star-shield-dial",
     "Star Shield Dial",
@@ -1442,8 +1471,27 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
   completedItem("observation-goggles", "Observation Goggles"),
   completedItem("armor-piercing-scope", "Armor-Piercing Scope"),
   completedItem("rush-flag", "Rush Flag"),
-  completedItem("ricochet-dial", "Ricochet Dial"),
-  completedItem("impact-dial", "Impact Dial"),
+  completedItem(
+    "ricochet-dial",
+    "Ricochet Dial",
+    [
+      { kind: "attack-speed-percent", value: 10 },
+      { kind: "special-defense-flat", value: 3 },
+      { kind: "luck-flat", value: 20 },
+    ],
+    "Grants 10% attack speed, 3 Special Defense, and 20 Luck. Basic attacks can bounce 75% of each raw damage component to an adjacent enemy.",
+    [{ kind: "on-basic-attack-bounce", chancePercent: 50, damagePercent: 75 }],
+  ),
+  completedItem(
+    "impact-dial",
+    "Impact Dial",
+    [
+      { kind: "attack-speed-percent", value: 10 },
+      { kind: "attack-flat", value: 9 },
+    ],
+    "Grants 10% attack speed and 9 Attack. Basic attacks add 8% of the target's Max HP as Physical damage, including when dodged.",
+    [{ kind: "on-basic-attack-target-max-health-physical", percent: 8 }],
+  ),
   completedItem(
     "jet-sash",
     "Jet Sash",
@@ -1463,7 +1511,16 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
   completedItem("mystery-treasure-chest", "Mystery Treasure Chest"),
   completedItem("smoke-star-escape", "Smoke-Star Escape"),
   completedItem("gas-mask", "Gas Mask"),
-  completedItem("armament-sash", "Armament Sash"),
+  completedItem(
+    "armament-sash",
+    "Armament Sash",
+    [
+      { kind: "shield-flat", value: 45 },
+      { kind: "critical-chance-percent", value: 30 },
+    ],
+    "Grants 45 Shield and 30% critical chance. Critical basic attacks grant Shield equal to 33% of the complete raw primary damage, rounded up.",
+    [{ kind: "on-critical-basic-attack-shield-damage-percent", percent: 33 }],
+  ),
   completedItem("spiked-armament", "Spiked Armament"),
   completedItem("impact-proof-gauntlets", "Impact-Proof Gauntlets"),
   completedItem("phoenix-feather", "Phoenix Feather"),
@@ -1480,7 +1537,13 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
   ),
   completedItem("guard-point-dummy", "Guard Point Dummy"),
   completedItem("reversal-band", "Reversal Band"),
-  completedItem("advanced-armament-orb", "Advanced Armament Orb"),
+  completedItem(
+    "advanced-armament-orb",
+    "Advanced Armament Orb",
+    [{ kind: "attack-flat", value: 30 }],
+    "Grants 30 Attack and converts 25% of normal basic-attack damage to True damage.",
+    [{ kind: "basic-attack-true-damage-percent", percent: 25 }],
+  ),
   completedItem("mera-mera-ember", "Mera Mera Ember"),
   completedItem("bombardier-band", "Bombardier Band"),
   completedItem("iron-pirate-helm", "Iron Pirate Helm"),
@@ -1872,7 +1935,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.19.0",
+  version: "1.20.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,

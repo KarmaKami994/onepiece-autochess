@@ -25,7 +25,12 @@ import type {
 
 type PeriodicItemBehavior = Extract<
   ItemBehavior,
-  { kind: "periodic-ability-power-energy" | "periodic-attack-speed" }
+  {
+    kind:
+      | "periodic-ability-power-energy"
+      | "periodic-attack-speed"
+      | "periodic-adjacent-heal-overheal-energy";
+  }
 >;
 
 interface PeriodicItemBehaviorRuntime {
@@ -39,6 +44,22 @@ interface CombatDefinition {
   formId?: string;
   stats: UnitStats;
   ability: AbilityDefinition | null;
+}
+
+interface BasicAttackDamage {
+  physical: number;
+  special: number;
+  true: number;
+}
+
+interface ItemRuntimeCounters {
+  basicAttackAttempts: number;
+  damageReceivedEvents: number;
+}
+
+interface HealResult {
+  healed: number;
+  overheal: number;
 }
 
 interface MutableBattleUnit {
@@ -83,6 +104,7 @@ interface MutableBattleUnit {
   ability: AbilityDefinition | null;
   itemBehaviors: ItemBehavior[];
   abilityCastCount: number;
+  itemRuntimeCounters: ItemRuntimeCounters;
   periodicItemBehaviors: PeriodicItemBehaviorRuntime[];
 }
 
@@ -299,6 +321,10 @@ function createMutableUnits(
       ability: definition.ability,
       itemBehaviors: [],
       abilityCastCount: 0,
+      itemRuntimeCounters: {
+        basicAttackAttempts: 0,
+        damageReceivedEvents: 0,
+      },
       periodicItemBehaviors: [],
     };
     let startingShieldMaxHealthPercent = 0;
@@ -383,7 +409,8 @@ function createMutableUnits(
     unit.periodicItemBehaviors = unit.itemBehaviors.flatMap((behavior) => {
       if (
         behavior.kind !== "periodic-ability-power-energy" &&
-        behavior.kind !== "periodic-attack-speed"
+        behavior.kind !== "periodic-attack-speed" &&
+        behavior.kind !== "periodic-adjacent-heal-overheal-energy"
       ) {
         return [];
       }
@@ -992,50 +1019,6 @@ export function simulateBattle(
     });
   };
 
-  const applyBasicAttackItemBehaviors = (
-    tick: number,
-    source: MutableBattleUnit,
-    target: MutableBattleUnit,
-    critical: boolean,
-    killed: boolean,
-  ): void => {
-    let attackSpeedChanged = false;
-    for (const behavior of source.itemBehaviors) {
-      switch (behavior.kind) {
-        case "on-basic-attack-attack-speed":
-          addDynamicAttackSpeed(source, behavior.attackSpeedPercent);
-          attackSpeedChanged = true;
-          break;
-        case "on-basic-attack-energy":
-          changeEnergy(tick, source, behavior.energy, "item");
-          if (killed) {
-            changeEnergy(tick, source, behavior.killBonusEnergy, "item");
-          }
-          break;
-        case "on-critical-basic-attack-energy-steal": {
-          if (!critical) {
-            break;
-          }
-          const stolen = Math.min(
-            Math.max(0, behavior.amount),
-            Math.max(0, target.energy),
-          );
-          if (stolen > 0) {
-            changeEnergy(tick, target, -stolen, "item");
-            changeEnergy(tick, source, stolen, "item");
-          }
-          break;
-        }
-        case "periodic-ability-power-energy":
-        case "periodic-attack-speed":
-          break;
-      }
-    }
-    if (attackSpeedChanged) {
-      source.nextActionTick = tick + source.attackIntervalTicks;
-    }
-  };
-
   const roll = (percent: number): boolean => {
     if (percent <= 0) {
       return false;
@@ -1053,13 +1036,15 @@ export function simulateBattle(
     source: MutableBattleUnit,
     target: MutableBattleUnit,
     rawAmount: number,
-  ): void => {
+  ): HealResult => {
     if (!alive(target)) {
-      return;
+      return { healed: 0, overheal: 0 };
     }
-    const amount = Math.min(rawAmount, target.maxHp - target.hp);
+    const requested = Math.max(0, rawAmount);
+    const amount = Math.min(requested, target.maxHp - target.hp);
+    const overheal = requested - amount;
     if (amount <= 0) {
-      return;
+      return { healed: 0, overheal };
     }
     target.hp += amount;
     emit({
@@ -1069,6 +1054,7 @@ export function simulateBattle(
       targetId: target.id,
       amount,
     });
+    return { healed: amount, overheal };
   };
 
   const applyShield = (
@@ -1095,7 +1081,7 @@ export function simulateBattle(
     source: MutableBattleUnit | null,
     target: MutableBattleUnit,
     rawAmount: number,
-    damageKind: "attack" | "ability" | "burn",
+    damageKind: "attack" | "ability" | "burn" | "item",
     damageType: DamageType,
     defensePiercePercent = 0,
   ): number => {
@@ -1149,6 +1135,25 @@ export function simulateBattle(
         damageKind,
       });
       changeEnergy(tick, target, 5, "damaged");
+      for (const behavior of target.itemBehaviors) {
+        if (
+          behavior.kind !== "on-damage-received-stack" ||
+          target.itemRuntimeCounters.damageReceivedEvents >= behavior.maxEvents
+        ) {
+          continue;
+        }
+        target.itemRuntimeCounters.damageReceivedEvents += 1;
+        if (
+          behavior.eventsPerProc > 0 &&
+          target.itemRuntimeCounters.damageReceivedEvents %
+            behavior.eventsPerProc ===
+            0
+        ) {
+          target.attack += behavior.attack;
+          target.defense += behavior.defense;
+          addDynamicAttackSpeed(target, behavior.attackSpeedPercent);
+        }
+      }
     }
     if (source && source.omnivampPercent > 0 && healthDamage > 0) {
       applyHeal(
@@ -1194,6 +1199,168 @@ export function simulateBattle(
       });
     }
     return healthDamage;
+  };
+
+  const resolveDamageBundle = (
+    tick: number,
+    source: MutableBattleUnit,
+    target: MutableBattleUnit,
+    damage: BasicAttackDamage,
+    damageKind: "attack" | "item",
+  ): void => {
+    if (damage.physical > 0) {
+      applyDamage(tick, source, target, damage.physical, damageKind, "physical");
+    }
+    if (damage.special > 0) {
+      applyDamage(tick, source, target, damage.special, damageKind, "special");
+    }
+    if (damage.true > 0) {
+      applyDamage(tick, source, target, damage.true, damageKind, "true");
+    }
+  };
+
+  const applyBasicAttackItemBehaviors = (
+    tick: number,
+    source: MutableBattleUnit,
+    target: MutableBattleUnit,
+    primaryDamage: BasicAttackDamage,
+    critical: boolean,
+    killed: boolean,
+  ): void => {
+    let attackSpeedChanged = false;
+    for (const behavior of source.itemBehaviors) {
+      if (behavior.kind === "on-basic-attack-attack-speed") {
+        addDynamicAttackSpeed(source, behavior.attackSpeedPercent);
+        attackSpeedChanged = true;
+      }
+    }
+    if (attackSpeedChanged) {
+      source.nextActionTick = tick + source.attackIntervalTicks;
+    }
+
+    for (const behavior of source.itemBehaviors) {
+      if (behavior.kind === "on-basic-attack-energy") {
+        changeEnergy(tick, source, behavior.energy, "item");
+        if (killed) {
+          changeEnergy(tick, source, behavior.killBonusEnergy, "item");
+        }
+      }
+    }
+
+    for (const behavior of source.itemBehaviors) {
+      if (
+        behavior.kind !== "on-critical-basic-attack-energy-steal" ||
+        !critical
+      ) {
+        continue;
+      }
+      const stolen = Math.min(
+        Math.max(0, behavior.amount),
+        Math.max(0, target.energy),
+      );
+      if (stolen > 0) {
+        changeEnergy(tick, target, -stolen, "item");
+        changeEnergy(tick, source, stolen, "item");
+      }
+    }
+
+    const primaryRawTotal =
+      primaryDamage.physical + primaryDamage.special + primaryDamage.true;
+    for (const behavior of source.itemBehaviors) {
+      if (
+        behavior.kind === "on-critical-basic-attack-shield-damage-percent" &&
+        critical
+      ) {
+        applyShield(
+          tick,
+          source,
+          source,
+          Math.ceil((primaryRawTotal * behavior.percent) / 100),
+        );
+      }
+    }
+
+    for (const behavior of source.itemBehaviors) {
+      if (behavior.kind !== "every-n-basic-attacks-chain") {
+        continue;
+      }
+      source.itemRuntimeCounters.basicAttackAttempts += 1;
+      if (
+        source.itemRuntimeCounters.basicAttackAttempts <
+        Math.max(1, behavior.every)
+      ) {
+        continue;
+      }
+      source.itemRuntimeCounters.basicAttackAttempts = 0;
+      const chainTargets = units
+        .filter(
+          (candidate) =>
+            alive(candidate) && candidate.teamId !== source.teamId,
+        )
+        .sort(
+          (left, right) =>
+            distance(source, left) - distance(source, right) ||
+            left.id.localeCompare(right.id),
+        )
+        .slice(0, Math.max(0, behavior.targets));
+      for (const chainTarget of chainTargets) {
+        applyDamage(
+          tick,
+          source,
+          chainTarget,
+          behavior.specialDamage,
+          "item",
+          "special",
+        );
+        changeEnergy(tick, chainTarget, -behavior.energyDrain, "item");
+      }
+    }
+
+    for (const behavior of source.itemBehaviors) {
+      if (
+        behavior.kind !== "on-basic-attack-bounce" ||
+        primaryRawTotal <= 0
+      ) {
+        continue;
+      }
+      if (!roll(adjustedChancePercent(behavior.chancePercent, source.luck))) {
+        continue;
+      }
+      const bounceTarget = units
+        .filter(
+          (candidate) =>
+            alive(candidate) &&
+            candidate.teamId !== source.teamId &&
+            candidate.id !== target.id &&
+            Math.max(
+              Math.abs(candidate.x - target.x),
+              Math.abs(candidate.y - target.y),
+            ) === 1,
+        )
+        .sort(
+          (left, right) =>
+            left.hp - right.hp || left.id.localeCompare(right.id),
+        )[0];
+      if (bounceTarget) {
+        resolveDamageBundle(
+          tick,
+          source,
+          bounceTarget,
+          {
+            physical: Math.round(
+              (primaryDamage.physical * behavior.damagePercent) / 100,
+            ),
+            special: Math.round(
+              (primaryDamage.special * behavior.damagePercent) / 100,
+            ),
+            true: Math.round(
+              (primaryDamage.true * behavior.damagePercent) / 100,
+            ),
+          },
+          "item",
+        );
+      }
+    }
   };
 
   // keldaanCommunity/pokemonAutoChess commit
@@ -1327,8 +1494,28 @@ export function simulateBattle(
         if (runtime.behavior.kind === "periodic-ability-power-energy") {
           unit.abilityPowerPercent += runtime.behavior.abilityPowerPercent;
           changeEnergy(tick, unit, runtime.behavior.energy, "item");
-        } else {
+        } else if (runtime.behavior.kind === "periodic-attack-speed") {
           addDynamicAttackSpeed(unit, runtime.behavior.attackSpeedPercent);
+        } else {
+          const adjacentAllies = units.filter(
+            (candidate) =>
+              alive(candidate) &&
+              candidate.teamId === unit.teamId &&
+              Math.abs(candidate.x - unit.x) <= 1 &&
+              Math.abs(candidate.y - unit.y) <= 1,
+          );
+          for (const ally of adjacentAllies) {
+            const requestedHeal = Math.round(
+              (ally.maxHp * runtime.behavior.healMaxHealthPercent) / 100,
+            );
+            const { overheal } = applyHeal(tick, unit, ally, requestedHeal);
+            const energyGain = Math.round(
+              (overheal * runtime.behavior.overhealEnergyPercent) / 100,
+            );
+            if (energyGain > 0) {
+              changeEnergy(tick, ally, energyGain, "item");
+            }
+          }
         }
         runtime.nextTick += runtime.intervalTicks;
       }
@@ -1781,29 +1968,45 @@ export function simulateBattle(
           sourceId: source.id,
           targetId: target.id,
         });
-        applyBasicAttackItemBehaviors(tick, source, target, false, false);
-        continue;
       }
-      const aliveBefore = alive(target);
-      applyDamage(
-        tick,
-        source,
-        target,
-        critical
+      const baseAttackDamage = dodged
+        ? 0
+        : critical
           ? Math.max(
               1,
               Math.floor(
                 (source.attack * source.criticalPowerPercent) / 100,
               ),
             )
-          : source.attack,
-        "attack",
-        "physical",
+          : source.attack;
+      const trueDamageBehavior = source.itemBehaviors.find(
+        (behavior) => behavior.kind === "basic-attack-true-damage-percent",
       );
+      const trueDamage = trueDamageBehavior
+        ? Math.round(
+            (baseAttackDamage * trueDamageBehavior.percent) / 100,
+          )
+        : 0;
+      const impactBehavior = source.itemBehaviors.find(
+        (behavior) =>
+          behavior.kind === "on-basic-attack-target-max-health-physical",
+      );
+      const primaryDamage: BasicAttackDamage = {
+        physical:
+          baseAttackDamage - trueDamage +
+          (impactBehavior
+            ? Math.round((target.maxHp * impactBehavior.percent) / 100)
+            : 0),
+        special: 0,
+        true: trueDamage,
+      };
+      const aliveBefore = alive(target);
+      resolveDamageBundle(tick, source, target, primaryDamage, "attack");
       applyBasicAttackItemBehaviors(
         tick,
         source,
         target,
+        primaryDamage,
         critical,
         aliveBefore && !alive(target),
       );

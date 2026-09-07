@@ -572,15 +572,15 @@ describe("P4B1 critical power, Luck, and item primitives", () => {
     expect(damageEvents(special, "caster", "ability")[0].amount).toBe(80);
   });
 
-  it("preserves Armament Wraps as +14 to both resistances", () => {
+  it("applies the P4B5 Armament Wraps Defense without Special Defense", () => {
     const armamentWraps = productionItem("armament-wraps");
     const physical = castFixture({
       ability: { damageType: "physical" },
       targetItems: [armamentWraps],
     });
     const special = castFixture({ targetItems: [armamentWraps] });
-    expect(damageEvents(physical, "caster", "ability")[0].amount).toBe(87);
-    expect(damageEvents(special, "caster", "ability")[0].amount).toBe(87);
+    expect(damageEvents(physical, "caster", "ability")[0].amount).toBe(97);
+    expect(damageEvents(special, "caster", "ability")[0].amount).toBe(100);
   });
 
   it("keeps legacy trait defense-flat compatible with both channels", () => {
@@ -875,7 +875,7 @@ describe("P4B1 compatibility locks", () => {
   });
 
   it("keeps the current GameContent version", () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.19.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.20.0");
   });
 
   it("keeps save schema 6", () => {
