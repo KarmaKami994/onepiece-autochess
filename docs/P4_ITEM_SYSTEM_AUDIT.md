@@ -233,18 +233,36 @@ Accordingly, the components are Jolly Roger Fragment with no stat; Devil Fruit E
 
 At the pinned PAC source, Choice Specs, Razor Claw and Wide Lens are static-only. Their implemented mappings are Devil Fruit Codex (+100 AP), Black Blade (+50% Crit Chance / +9 Attack) and Sniper Goggles (+2 Range / +15% Crit Chance / +3 Special Defense). Meat Platter maps King's Rock as +300 HP plus a battle-start shield equal to 20% of final starting Max HP after static item and trait health effects. Lucky Pirate Ribbon maps Lucky Ribbon as +45 Shield, +50 AP, +20 Luck and an adapted battle-start +15% Dodge applied through the existing seeded Luck-adjusted dodge roll. Percentage starting-shield effects are summed and calculated once from final starting Max HP, independently of item array order.
 
-This slice intentionally changes the production combat interpretation of the stable Black Blade, Meat Platter and Sniper Goggles IDs; it is the approved PAC port, not balance tuning. Sea Prism Stone, Armament Wraps, Clima-Tact, Den Den Mushi and Cola Engine retain their P4B1 behavior, and Sniper Goggles / Armament Wraps remain the Snakeman / Boundman catalysts. P4B2 does not complete the 55-item behavior matrix: periodic, on-attack/on-hit, on-damage, thresholds/consume, status/immunity, resurrection, retaliation, trait-granting, Wonder Box and complex stat-rule effects remain unimplemented. P4C acquisition/UI work has not started.
+This slice intentionally changes the production combat interpretation of the stable Black Blade, Meat Platter and Sniper Goggles IDs; it is the approved PAC port, not balance tuning. Sea Prism Stone, Armament Wraps, Clima-Tact, Den Den Mushi and Cola Engine retain their P4B1 behavior at this point in the implementation history, and Sniper Goggles / Armament Wraps remain the Snakeman / Boundman catalysts. P4B2 does not complete the 55-item behavior matrix: periodic, on-attack/on-hit, on-damage, thresholds/consume, status/immunity, resurrection, retaliation, trait-granting, Wonder Box and complex stat-rule effects remain unimplemented. P4C acquisition/UI work has not started.
+
+### P4B3 implementation status
+
+P4B3 adds the first narrow dynamic item-behavior slice on GameContent `1.18.0`; save schema remains 6. Plain serializable `ItemBehavior` metadata covers exactly two periodic and three basic-attack behavior shapes. Private battle runtime derives held behaviors in item-definition order and owns their counters. No generic trigger/event framework, callback-bearing content or persisted timer was introduced.
+
+The five implemented mappings are:
+
+| PAC identity | One Piece item | Static effects | Dynamic behavior |
+| --- | --- | --- | --- |
+| Soul Dew | Clima-Tact | none | Every 1000ms: +5 AP and +5 Energy |
+| Mach Ribbon | Jet Sash | +45 Shield, +10% attack speed | Every 3000ms: +20% dynamic attack speed |
+| Upgrade | Cola Engine | +10 AP, +10% attack speed | After every basic-attack attempt: +5% dynamic attack speed |
+| Deep Sea Tooth | Shark Tooth Charm | +21 Attack, +15 starting Energy | Every basic-attack attempt: +5 Energy, plus +15 when that attack kills |
+| Scope Lens | Energy-Siphon Scope | +15 starting Energy, +25% Crit Chance | Critical basic attacks transfer up to 10 Energy from target to holder |
+
+PAC PeriodicEffect starts only after one complete interval; local intervals therefore use `ceil(intervalMs / combatTickMs)`, first proc at that tick, and deterministic tick increments thereafter. Periodics run for living holders at the start of the tick before intents, so a Clima-Tact proc may enable a same-tick cast. PAC OnAttack applies after every basic-attack attempt, including a dodge; it does not apply to abilities, burn or periodic effects. Deep Sea Tooth kill credit is limited to a target that crosses from alive to dead from that exact attack, and Scope Lens reuses the existing basic-attack critical result without another RNG roll.
+
+Dynamic Speed is an ADAPTED PORT: P4B2 static Speed initialization remains numerically unchanged, then all battle-time Speed gains add as attack-speed percentage against the post-static resolved interval. Periodic Speed does not rewrite an already scheduled action; Upgrade's post-attack gain does determine the cooldown into the next attack. Energy keeps the local fixed 100 cap; Scope Lens still removes the full available transfer from its target when holder gain overcaps. No battle-time item removal or PAC title/achievement bookkeeping is implemented.
 
 ## 9. Missing Primitive Audit
 
 ### Present and reusable
 
-The local combat has deterministic Physical/Special/True damage, separate Defense and Special Defense, basic and opt-in ability critical hits, mutable Crit Power and Luck, dodge, shields, healing, omnivamp, Energy gain/drain, burn, stun, knockback/pull, defense pierce, line/adjacent/global targeting, sequential strikes, immutable battle events and explicit RNG. Trait effects can add starting Energy, shield, dodge, crit chance, Ability Power and range. P4B1's item-effect primitives are otherwise dormant; matching Special Defense on Sea Prism Stone and Armament Wraps is compatibility data, not implementation of their future PAC matrix behaviors.
+The local combat has deterministic Physical/Special/True damage, separate Defense and Special Defense, basic and opt-in ability critical hits, mutable Crit Power and Luck, dodge, shields, healing, omnivamp, Energy gain/drain, burn, stun, knockback/pull, defense pierce, line/adjacent/global targeting, sequential strikes, immutable battle events and explicit RNG. Trait effects can add starting Energy, shield, dodge, crit chance, Ability Power and range. P4B3 adds bounded periodic AP/Energy/attack-speed and post-basic-attack Speed/Energy/critical-transfer behavior. Matching Special Defense on Sea Prism Stone and Armament Wraps remains compatibility data, not implementation of their future PAC matrix behaviors.
 
-### Remaining missing or insufficient after P4B2
+### Remaining missing or insufficient after P4B3
 
 - **PP/max-PP semantics:** local Energy is fixed around a 100 cap; starting Energy exists, but max-Energy reduction, post-cast restoration and next-attack conversion do not.
-- **Triggered item lifecycle:** the narrow derived start-shield primitive is present, but there are no generic item hooks for periodic, on-attack/on-hit, on-damage dealt/received, on-cast, on-kill, threshold, shield-depleted, resurrection or item-consumption events.
+- **Remaining triggered behaviors:** Green Orb healing periodic, Blue Orb chain attacks, Loaded Dice bounce, on-damage/reactive, on-cast, threshold/consume, shield-depleted and item-consumption behaviors remain absent. P4B3 deliberately adds no generic lifecycle.
 - **Immunity/Safeguard:** no general status immunity, Sleep/Blind/Paralysis/Freeze/Locked statuses, board-effect immunity or forced-displacement immunity.
 - **Wound:** no healing-reduction status.
 - **Resurrection:** no prevent-KO/resurrect state or event.
@@ -320,7 +338,7 @@ Local carousels already align at rounds 4/12/17, use explicit RNG, offer 5–9 c
 - Wonder Box choices and item consumption must be frozen in battle output so save/resume and spectating do not reroll or reconstruct them.
 - Current battle-economy immutability stays intact: purchases/merges/equips cannot rebuild an active deployed combat timeline.
 - Schema remains 6. Existing stable IDs resolve through the eight mapped outputs; any additional legacy alias is explicit and bounded, never inferred from display names.
-- GameContent is `1.17.0` after P4B2; schema remains 6 and all serialized item IDs stay stable.
+- GameContent is `1.18.0` after P4B3; schema remains 6 and all serialized item IDs stay stable.
 
 ## 13. Risks and Review Gates
 

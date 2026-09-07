@@ -1198,6 +1198,7 @@ const completedItem = (
   name: string,
   effects: ItemDefinition["effects"] = [],
   description = "A completed core item; its combat identity is reserved for P4B.",
+  behaviors?: ItemDefinition["behaviors"],
 ): ItemDefinition => ({
   id,
   name,
@@ -1205,6 +1206,7 @@ const completedItem = (
   icon: "◆",
   kind: "completed",
   effects,
+  ...(behaviors ? { behaviors } : {}),
 });
 
 export const COMPONENT_ITEM_DEFINITIONS: ItemDefinition[] = [
@@ -1264,12 +1266,17 @@ const LEGACY_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
   {
     id: "clima-tact",
     name: "Clima-Tact",
-    description: "Empowers abilities and supplies starting energy.",
+    description: "Every second, grants 5% ability power and 5 Energy.",
     icon: "ϟ",
     kind: "completed",
-    effects: [
-      { kind: "ability-power-percent", value: 25 },
-      { kind: "starting-energy", value: 20 },
+    effects: [],
+    behaviors: [
+      {
+        kind: "periodic-ability-power-energy",
+        intervalMs: 1_000,
+        abilityPowerPercent: 5,
+        energy: 5,
+      },
     ],
   },
   {
@@ -1322,13 +1329,18 @@ const LEGACY_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
   {
     id: "cola-engine",
     name: "Cola Engine",
-    description: "A high-powered engine for speed and sustain.",
+    description: "Grants 10% ability power and attack speed, then 5% attack speed after every basic attack.",
     icon: "⚙",
     kind: "completed",
     effects: [
-      { kind: "health-flat", value: 160 },
-      { kind: "attack-speed-percent", value: 12 },
-      { kind: "omnivamp-percent", value: 8 },
+      { kind: "ability-power-percent", value: 10 },
+      { kind: "attack-speed-percent", value: 10 },
+    ],
+    behaviors: [
+      {
+        kind: "on-basic-attack-attack-speed",
+        attackSpeedPercent: 5,
+      },
     ],
   },
 ];
@@ -1367,10 +1379,34 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
     "Grants 45 Shield, 50% ability power, 20 Luck, and 15% Dodge.",
   ),
   completedItem("cola-reservoir", "Cola Reservoir"),
-  completedItem("energy-siphon-scope", "Energy-Siphon Scope"),
+  completedItem(
+    "energy-siphon-scope",
+    "Energy-Siphon Scope",
+    [
+      { kind: "starting-energy", value: 15 },
+      { kind: "critical-chance-percent", value: 25 },
+    ],
+    "Grants 15 starting Energy and 25% critical chance; critical basic attacks steal up to 10 Energy.",
+    [{ kind: "on-critical-basic-attack-energy-steal", amount: 10 }],
+  ),
   completedItem("healing-bubble", "Healing Bubble"),
   completedItem("star-shield-dial", "Star Shield Dial"),
-  completedItem("shark-tooth-charm", "Shark Tooth Charm"),
+  completedItem(
+    "shark-tooth-charm",
+    "Shark Tooth Charm",
+    [
+      { kind: "attack-flat", value: 21 },
+      { kind: "starting-energy", value: 15 },
+    ],
+    "Grants 21 Attack and 15 starting Energy; basic attacks grant 5 Energy plus 15 on a kill.",
+    [
+      {
+        kind: "on-basic-attack-energy",
+        energy: 5,
+        killBonusEnergy: 15,
+      },
+    ],
+  ),
   completedItem("miracle-talisman", "Miracle Talisman"),
   completedItem("efficient-bandanna", "Efficient Bandanna"),
   completedItem("observation-goggles", "Observation Goggles"),
@@ -1378,7 +1414,22 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
   completedItem("rush-flag", "Rush Flag"),
   completedItem("ricochet-dial", "Ricochet Dial"),
   completedItem("impact-dial", "Impact Dial"),
-  completedItem("jet-sash", "Jet Sash"),
+  completedItem(
+    "jet-sash",
+    "Jet Sash",
+    [
+      { kind: "shield-flat", value: 45 },
+      { kind: "attack-speed-percent", value: 10 },
+    ],
+    "Grants 45 Shield and 10% attack speed, then 20% attack speed every 3 seconds.",
+    [
+      {
+        kind: "periodic-attack-speed",
+        intervalMs: 3_000,
+        attackSpeedPercent: 20,
+      },
+    ],
+  ),
   completedItem("mystery-treasure-chest", "Mystery Treasure Chest"),
   completedItem("smoke-star-escape", "Smoke-Star Escape"),
   completedItem("gas-mask", "Gas Mask"),
@@ -1782,7 +1833,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.17.0",
+  version: "1.18.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,
