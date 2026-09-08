@@ -463,6 +463,66 @@ describe("P4B6 Razor, mitigation, and critical ordering", () => {
     ], { extraItems: [START_ENERGY, FORCE_CRIT] });
     expect(damageFrom(result, "caster").map((event) => [event.targetId, event.amount])).toEqual([["helmet", 100], ["normal", 200]]);
   });
+
+  it("switches sequential Crit weighting off after retargeting from a normal target to Iron Pirate Helm", () => {
+    const result = run([
+      {
+        id: "caster",
+        teamId: "a",
+        x: 0,
+        y: 0,
+        items: [START_ENERGY.id, FORCE_CRIT.id],
+        ability: {
+          targeting: "nearest-enemy",
+          requiresTarget: true,
+          effect: "damage",
+          power: 100,
+          canCritByDefault: true,
+          sequentialStrike: {
+            hitWeightsBasisPoints: [5_000, 5_000],
+            retargetOnKill: "nearest-in-range",
+          },
+        },
+      },
+      { id: "normal", teamId: "b", x: 0, y: 1, stats: { health: 100 } },
+      { id: "helmet", teamId: "b", x: 1, y: 1, items: ["iron-pirate-helm"] },
+    ], { extraItems: [START_ENERGY, FORCE_CRIT] });
+
+    expect(damageFrom(result, "caster").map((event) => [event.targetId, event.amount])).toEqual([
+      ["normal", 100],
+      ["helmet", 50],
+    ]);
+  });
+
+  it("switches sequential Crit weighting on after retargeting from Iron Pirate Helm to a normal target", () => {
+    const result = run([
+      {
+        id: "caster",
+        teamId: "a",
+        x: 0,
+        y: 0,
+        items: [START_ENERGY.id, FORCE_CRIT.id],
+        ability: {
+          targeting: "nearest-enemy",
+          requiresTarget: true,
+          effect: "damage",
+          power: 100,
+          canCritByDefault: true,
+          sequentialStrike: {
+            hitWeightsBasisPoints: [5_000, 5_000],
+            retargetOnKill: "nearest-in-range",
+          },
+        },
+      },
+      { id: "helmet", teamId: "b", x: 0, y: 1, items: ["iron-pirate-helm"], stats: { health: 50 } },
+      { id: "normal", teamId: "b", x: 1, y: 1 },
+    ], { extraItems: [START_ENERGY, FORCE_CRIT] });
+
+    expect(damageFrom(result, "caster").map((event) => [event.targetId, event.amount])).toEqual([
+      ["helmet", 50],
+      ["normal", 100],
+    ]);
+  });
 });
 
 describe("P4B6 shield and non-True damage ordering", () => {

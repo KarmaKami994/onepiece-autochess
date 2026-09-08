@@ -1681,18 +1681,32 @@ export function simulateBattle(
     initialTarget: MutableBattleUnit,
     ability: AbilityDefinition,
     scaledPower: number,
+    criticalPower: number,
+    abilityCritical: boolean,
   ): boolean => {
     const definition = ability.sequentialStrike;
-    const strikePowers = sequentialStrikePowers(scaledPower, definition);
-    if (!definition || !strikePowers) {
+    const normalStrikePowers = sequentialStrikePowers(scaledPower, definition);
+    const criticalStrikePowers = abilityCritical
+      ? sequentialStrikePowers(criticalPower, definition)
+      : normalStrikePowers;
+    if (!definition || !normalStrikePowers || !criticalStrikePowers) {
       return false;
     }
     let target: MutableBattleUnit | null = alive(initialTarget)
       ? initialTarget
       : null;
     const finalHitBonus = validFinalHitBonus(definition);
-    for (let index = 0; index < strikePowers.length && target; index += 1) {
-      const isFinalHit = index === strikePowers.length - 1;
+    for (
+      let index = 0;
+      index < normalStrikePowers.length && target;
+      index += 1
+    ) {
+      const strikePowers =
+        abilityCritical &&
+        !hasItemBehavior(target, "incoming-critical-bonus-negation")
+          ? criticalStrikePowers
+          : normalStrikePowers;
+      const isFinalHit = index === normalStrikePowers.length - 1;
       const finisher = Boolean(
         isFinalHit &&
           finalHitBonus &&
@@ -1713,7 +1727,7 @@ export function simulateBattle(
         targetId: target.id,
         abilityId: ability.id,
         hitIndex: index + 1,
-        hitCount: strikePowers.length,
+        hitCount: normalStrikePowers.length,
         finisher,
       });
       applyDamage(
@@ -1725,7 +1739,7 @@ export function simulateBattle(
         ability.damageType ?? "special",
         ability.defensePiercePercent,
       );
-      if (target.hp <= 0 && index < strikePowers.length - 1) {
+      if (target.hp <= 0 && index < normalStrikePowers.length - 1) {
         target =
           definition.retargetOnKill === "nearest-in-range"
             ? chooseTarget(
@@ -2064,7 +2078,9 @@ export function simulateBattle(
             source,
             target,
             abilityDefinition,
-            targetDirectPower,
+            scaledPower,
+            directPower,
+            abilityCritical,
           );
           if (!sequentialApplied) {
             const hits = Math.max(1, abilityDefinition.hits ?? 1);
