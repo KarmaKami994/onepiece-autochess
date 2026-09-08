@@ -347,9 +347,7 @@ describe("P4B3 item content", () => {
       { kind: "starting-shield-max-health-percent", value: 20 },
     ]);
     expect(productionItem("sea-prism-stone").effects).toEqual([
-      { kind: "defense-flat", value: 25 },
-      { kind: "special-defense-flat", value: 25 },
-      { kind: "health-flat", value: 120 },
+      { kind: "special-defense-flat", value: 40 },
     ]);
     expect(productionItem("armament-wraps").effects).toEqual([
       { kind: "attack-speed-percent", value: 10 },
@@ -776,10 +774,10 @@ describe("P4B3 regressions", () => {
     if (!player) throw new Error("Missing player-1.");
     player.inventory = [...LEGACY_ITEM_IDS, "jet-sash", "shark-tooth-charm", "energy-siphon-scope"];
     const restored = deserializeMatch(serializeMatch(state));
-    expect(DEFAULT_CONTENT.version).toBe("1.20.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.21.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(restored.schemaVersion).toBe(6);
-    expect(restored.contentVersion).toBe("1.20.0");
+    expect(restored.contentVersion).toBe("1.21.0");
     expect(restored.players.find((candidate) => candidate.id === "player-1")?.inventory).toEqual(
       player.inventory,
     );

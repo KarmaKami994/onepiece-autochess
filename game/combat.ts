@@ -95,6 +95,9 @@ interface MutableBattleUnit {
   stackingAttackPercent: number;
   emergencyShieldUsed: boolean;
   stunUntilTick: number;
+  runeProtectUntilTick: number;
+  resistanceReductionUntilTick: number;
+  woundUntilTick: number;
   burnUntilTick: number;
   burnNextTick: number;
   burnPower: number;
@@ -312,6 +315,9 @@ function createMutableUnits(
       stackingAttackPercent: 0,
       emergencyShieldUsed: false,
       stunUntilTick: 0,
+      runeProtectUntilTick: 0,
+      resistanceReductionUntilTick: 0,
+      woundUntilTick: 0,
       burnUntilTick: 0,
       burnNextTick: 0,
       burnPower: 0,
@@ -405,7 +411,6 @@ function createMutableUnits(
     for (const effect of traitEffects) {
       applyTraitEffect(unit, effect);
     }
-    unit.dynamicAttackSpeedBaseTicks = unit.attackIntervalTicks;
     unit.periodicItemBehaviors = unit.itemBehaviors.flatMap((behavior) => {
       if (
         behavior.kind !== "periodic-ability-power-energy" &&
@@ -426,6 +431,96 @@ function createMutableUnits(
     result.push(unit);
   }
   return result;
+}
+
+function hasItemBehavior(
+  unit: MutableBattleUnit,
+  kind: ItemBehavior["kind"],
+): boolean {
+  return unit.itemBehaviors.some((behavior) => behavior.kind === kind);
+}
+
+function applyStartOfBattleItemSupport(
+  units: MutableBattleUnit[],
+  tickMs: number,
+): void {
+  const shieldByUnitId = new Map<string, number>();
+  const runeProtectByUnitId = new Map<string, number>();
+  const attackSpeedByUnitId = new Map<string, number>();
+
+  for (const source of units) {
+    for (const behavior of source.itemBehaviors) {
+      if (behavior.kind === "starting-rune-protect") {
+        const durationTicks = Math.max(
+          1,
+          Math.ceil(behavior.durationMs / tickMs),
+        );
+        runeProtectByUnitId.set(
+          source.id,
+          Math.max(runeProtectByUnitId.get(source.id) ?? 0, durationTicks),
+        );
+        continue;
+      }
+      if (
+        behavior.kind !== "start-horizontal-shield-rune-protect" &&
+        behavior.kind !== "start-horizontal-attack-speed"
+      ) {
+        continue;
+      }
+      const recipients = units.filter(
+        (candidate) =>
+          candidate.teamId === source.teamId &&
+          candidate.y === source.y &&
+          Math.abs(candidate.x - source.x) <= 1,
+      );
+      for (const recipient of recipients) {
+        if (behavior.kind === "start-horizontal-shield-rune-protect") {
+          const shield = Math.ceil(
+            (recipient.maxHp * behavior.shieldMaxHealthPercent) / 100,
+          );
+          shieldByUnitId.set(
+            recipient.id,
+            (shieldByUnitId.get(recipient.id) ?? 0) + shield,
+          );
+          const durationTicks = Math.max(
+            1,
+            Math.ceil(behavior.runeProtectMs / tickMs),
+          );
+          runeProtectByUnitId.set(
+            recipient.id,
+            Math.max(
+              runeProtectByUnitId.get(recipient.id) ?? 0,
+              durationTicks,
+            ),
+          );
+        } else {
+          attackSpeedByUnitId.set(
+            recipient.id,
+            (attackSpeedByUnitId.get(recipient.id) ?? 0) +
+              behavior.attackSpeedPercent,
+          );
+        }
+      }
+    }
+  }
+
+  for (const unit of units) {
+    unit.shield += shieldByUnitId.get(unit.id) ?? 0;
+    unit.runeProtectUntilTick = Math.max(
+      unit.runeProtectUntilTick,
+      runeProtectByUnitId.get(unit.id) ?? 0,
+    );
+    const attackSpeedPercent = attackSpeedByUnitId.get(unit.id) ?? 0;
+    if (attackSpeedPercent !== 0) {
+      unit.attackIntervalTicks = Math.max(
+        1,
+        Math.round(
+          (unit.attackIntervalTicks * 100) / (100 + attackSpeedPercent),
+        ),
+      );
+    }
+    unit.dynamicAttackSpeedBaseTicks = unit.attackIntervalTicks;
+  }
 }
 
 function addDynamicAttackSpeed(
@@ -502,6 +597,7 @@ function chooseTarget(
   source: MutableBattleUnit,
   candidates: MutableBattleUnit[],
   targeting: AbilityDefinition["targeting"] = "nearest-enemy",
+  basicAttack = false,
 ): MutableBattleUnit | null {
   if (candidates.length === 0) {
     return null;
@@ -525,8 +621,23 @@ function chooseTarget(
         left.id.localeCompare(right.id)
       );
     }
+    const leftPriority = left.itemBehaviors.some(
+      (behavior) =>
+        behavior.kind === "incoming-nontrue-damage-reduction-percent" &&
+        behavior.basicAttackTargetPriority,
+    )
+      ? 0
+      : 1;
+    const rightPriority = right.itemBehaviors.some(
+      (behavior) =>
+        behavior.kind === "incoming-nontrue-damage-reduction-percent" &&
+        behavior.basicAttackTargetPriority,
+    )
+      ? 0
+      : 1;
     return (
       distance(source, left) - distance(source, right) ||
+      (basicAttack ? leftPriority - rightPriority : 0) ||
       left.id.localeCompare(right.id)
     );
   });
@@ -987,6 +1098,7 @@ export function simulateBattle(
     ...createMutableUnits(teamA, content),
     ...createMutableUnits(teamB, content),
   ].sort((left, right) => left.id.localeCompare(right.id));
+  applyStartOfBattleItemSupport(units, content.config.combatTickMs);
   const initialUnits = units.map(toSnapshot);
   const monsterPointTriggerTick = Math.ceil(
     MONSTER_POINT_DELAY_MS / Math.max(1, content.config.combatTickMs),
@@ -1031,13 +1143,131 @@ export function simulateBattle(
     return random.value * 100 < percent;
   };
 
+  const hasRuneProtect = (
+    unit: MutableBattleUnit,
+    tick: number,
+  ): boolean => tick < unit.runeProtectUntilTick;
+
+  const applyStun = (
+    tick: number,
+    source: MutableBattleUnit,
+    target: MutableBattleUnit,
+    durationMs: number,
+  ): void => {
+    if (!alive(target) || hasRuneProtect(target, tick)) {
+      return;
+    }
+    const durationTicks = Math.max(
+      1,
+      Math.round(durationMs / content.config.combatTickMs),
+    );
+    target.stunUntilTick = Math.max(
+      target.stunUntilTick,
+      tick + durationTicks,
+    );
+    emit({
+      type: "status",
+      tick,
+      sourceId: source.id,
+      targetId: target.id,
+      status: "stun",
+      durationTicks,
+    });
+  };
+
+  const applyBurn = (
+    tick: number,
+    source: MutableBattleUnit,
+    target: MutableBattleUnit,
+    power: number,
+    durationMs: number,
+  ): void => {
+    if (!alive(target) || hasRuneProtect(target, tick)) {
+      return;
+    }
+    const durationTicks = Math.max(
+      1,
+      Math.round(durationMs / content.config.combatTickMs),
+    );
+    target.burnPower = Math.max(target.burnPower, power);
+    target.burnUntilTick = Math.max(
+      target.burnUntilTick,
+      tick + durationTicks,
+    );
+    target.burnNextTick =
+      tick + Math.round(1_000 / content.config.combatTickMs);
+    target.burnSourceId = source.id;
+    emit({
+      type: "status",
+      tick,
+      sourceId: source.id,
+      targetId: target.id,
+      status: "burn",
+      durationTicks,
+    });
+  };
+
+  const applyResistanceReduction = (
+    tick: number,
+    source: MutableBattleUnit,
+    target: MutableBattleUnit,
+    durationMs: number,
+  ): void => {
+    if (!alive(target) || hasRuneProtect(target, tick)) {
+      return;
+    }
+    const durationTicks = Math.max(
+      1,
+      Math.ceil(durationMs / content.config.combatTickMs),
+    );
+    target.resistanceReductionUntilTick = Math.max(
+      target.resistanceReductionUntilTick,
+      tick + durationTicks,
+    );
+    emit({
+      type: "status",
+      tick,
+      sourceId: source.id,
+      targetId: target.id,
+      status: "resistance-reduction",
+      durationTicks,
+    });
+  };
+
+  const applyWound = (
+    tick: number,
+    source: MutableBattleUnit,
+    target: MutableBattleUnit,
+    durationMs: number,
+  ): void => {
+    if (!alive(target) || hasRuneProtect(target, tick)) {
+      return;
+    }
+    const durationTicks = Math.max(
+      1,
+      Math.ceil(durationMs / content.config.combatTickMs),
+    );
+    target.woundUntilTick = Math.max(
+      target.woundUntilTick,
+      tick + durationTicks,
+    );
+    emit({
+      type: "status",
+      tick,
+      sourceId: source.id,
+      targetId: target.id,
+      status: "wound",
+      durationTicks,
+    });
+  };
+
   const applyHeal = (
     tick: number,
     source: MutableBattleUnit,
     target: MutableBattleUnit,
     rawAmount: number,
   ): HealResult => {
-    if (!alive(target)) {
+    if (!alive(target) || tick < target.woundUntilTick) {
       return { healed: 0, overheal: 0 };
     }
     const requested = Math.max(0, rawAmount);
@@ -1084,11 +1314,26 @@ export function simulateBattle(
     damageKind: "attack" | "ability" | "burn" | "item",
     damageType: DamageType,
     defensePiercePercent = 0,
+    options: { isRetaliation?: boolean } = {},
   ): number => {
     if (!alive(target)) {
       return 0;
     }
-    const resistance = Math.max(
+    const burnReductionPercent =
+      damageKind === "burn"
+        ? target.itemBehaviors.reduce(
+            (total, behavior) =>
+              behavior.kind === "burn-damage-reduction-percent"
+                ? total + behavior.percent
+                : total,
+            0,
+          )
+        : 0;
+    const adjustedRawAmount =
+      rawAmount *
+      (100 - Math.min(100, Math.max(0, burnReductionPercent))) /
+      100;
+    const baseResistance = Math.max(
       0,
       damageType === "physical"
         ? target.defense
@@ -1096,6 +1341,10 @@ export function simulateBattle(
           ? target.specialDefense
           : 0,
     );
+    const resistance =
+      damageType !== "true" && tick < target.resistanceReductionUntilTick
+        ? Math.round(baseResistance / 2)
+        : baseResistance;
     const validDefensePiercePercent =
       Number.isSafeInteger(defensePiercePercent) &&
       defensePiercePercent >= 1 &&
@@ -1113,11 +1362,46 @@ export function simulateBattle(
     );
     const mitigated = Math.max(
       1,
-      Math.floor((rawAmount * 100) / (100 + effectiveResistance)),
+      Math.floor((adjustedRawAmount * 100) / (100 + effectiveResistance)),
     );
-    const shieldDamage = Math.min(target.shield, mitigated);
+    const resistanceBlocked = Math.max(0, adjustedRawAmount - mitigated);
+    const nonTrueReductionPercent =
+      damageType === "true"
+        ? 0
+        : target.itemBehaviors.reduce(
+            (total, behavior) =>
+              behavior.kind ===
+              "incoming-nontrue-damage-reduction-percent"
+                ? total + behavior.percent
+                : total,
+            0,
+          );
+    let damageBeforeShield = Math.max(
+      1,
+      Math.floor(
+        mitigated *
+          (100 - Math.min(100, Math.max(0, nonTrueReductionPercent))) /
+          100,
+      ),
+    );
+    if (source && source.id !== target.id && target.shield > 0) {
+      for (const behavior of source.itemBehaviors) {
+        if (behavior.kind === "shield-damage-multiplier") {
+          damageBeforeShield = Math.max(
+            1,
+            Math.floor(
+              (damageBeforeShield * behavior.multiplierPercent) / 100,
+            ),
+          );
+        }
+      }
+    }
+    const shieldDamage = Math.min(target.shield, damageBeforeShield);
     target.shield -= shieldDamage;
-    const healthDamage = Math.min(target.hp, mitigated - shieldDamage);
+    const healthDamage = Math.min(
+      target.hp,
+      damageBeforeShield - shieldDamage,
+    );
     target.hp -= healthDamage;
     const dealt = shieldDamage + healthDamage;
     if (source) {
@@ -1197,6 +1481,31 @@ export function simulateBattle(
         status: "emergency-shield",
         durationTicks: 0,
       });
+    }
+    const reflectionEligible =
+      damageType === "special" &&
+      damageKind !== "burn" &&
+      !options.isRetaliation &&
+      source !== null &&
+      source.id !== target.id &&
+      resistanceBlocked > 0 &&
+      hasItemBehavior(target, "reflect-special-resistance-blocked") &&
+      !source.itemBehaviors.some(
+        (behavior) =>
+          behavior.kind === "shield-damage-multiplier" &&
+          behavior.suppressRetaliation,
+      );
+    if (reflectionEligible && source) {
+      applyDamage(
+        tick,
+        target,
+        source,
+        Math.round(resistanceBlocked),
+        "item",
+        "special",
+        0,
+        { isRetaliation: true },
+      );
     }
     return healthDamage;
   };
@@ -1372,18 +1681,32 @@ export function simulateBattle(
     initialTarget: MutableBattleUnit,
     ability: AbilityDefinition,
     scaledPower: number,
+    criticalPower: number,
+    abilityCritical: boolean,
   ): boolean => {
     const definition = ability.sequentialStrike;
-    const strikePowers = sequentialStrikePowers(scaledPower, definition);
-    if (!definition || !strikePowers) {
+    const normalStrikePowers = sequentialStrikePowers(scaledPower, definition);
+    const criticalStrikePowers = abilityCritical
+      ? sequentialStrikePowers(criticalPower, definition)
+      : normalStrikePowers;
+    if (!definition || !normalStrikePowers || !criticalStrikePowers) {
       return false;
     }
     let target: MutableBattleUnit | null = alive(initialTarget)
       ? initialTarget
       : null;
     const finalHitBonus = validFinalHitBonus(definition);
-    for (let index = 0; index < strikePowers.length && target; index += 1) {
-      const isFinalHit = index === strikePowers.length - 1;
+    for (
+      let index = 0;
+      index < normalStrikePowers.length && target;
+      index += 1
+    ) {
+      const strikePowers =
+        abilityCritical &&
+        !hasItemBehavior(target, "incoming-critical-bonus-negation")
+          ? criticalStrikePowers
+          : normalStrikePowers;
+      const isFinalHit = index === normalStrikePowers.length - 1;
       const finisher = Boolean(
         isFinalHit &&
           finalHitBonus &&
@@ -1404,7 +1727,7 @@ export function simulateBattle(
         targetId: target.id,
         abilityId: ability.id,
         hitIndex: index + 1,
-        hitCount: strikePowers.length,
+        hitCount: normalStrikePowers.length,
         finisher,
       });
       applyDamage(
@@ -1416,7 +1739,7 @@ export function simulateBattle(
         ability.damageType ?? "special",
         ability.defensePiercePercent,
       );
-      if (target.hp <= 0 && index < strikePowers.length - 1) {
+      if (target.hp <= 0 && index < normalStrikePowers.length - 1) {
         target =
           definition.retargetOnKill === "nearest-in-range"
             ? chooseTarget(
@@ -1601,6 +1924,8 @@ export function simulateBattle(
           (candidate) =>
             alive(candidate) && candidate.teamId !== source.teamId,
         ),
+        "nearest-enemy",
+        true,
       );
       if (!target) {
         continue;
@@ -1711,6 +2036,11 @@ export function simulateBattle(
           continue;
         }
         resolvedCast ||= alive(target);
+        const targetDirectPower =
+          abilityCritical &&
+          hasItemBehavior(target, "incoming-critical-bonus-negation")
+            ? scaledPower
+            : directPower;
         if (abilityDefinition.effect === "heal") {
           const conditionalShield = validConditionalShield(
             abilityDefinition.conditionalShield,
@@ -1748,7 +2078,9 @@ export function simulateBattle(
             source,
             target,
             abilityDefinition,
+            scaledPower,
             directPower,
+            abilityCritical,
           );
           if (!sequentialApplied) {
             const hits = Math.max(1, abilityDefinition.hits ?? 1);
@@ -1757,7 +2089,7 @@ export function simulateBattle(
                 tick,
                 source,
                 target,
-                directPower,
+                targetDirectPower,
                 "ability",
                 abilityDefinition.damageType ?? "special",
                 abilityDefinition.defensePiercePercent,
@@ -1765,60 +2097,30 @@ export function simulateBattle(
             }
           }
           if (target.hp > 0 && abilityDefinition.stunMs) {
-            const durationTicks = Math.max(
-              1,
-              Math.round(
-                abilityDefinition.stunMs / content.config.combatTickMs,
-              ),
-            );
-            target.stunUntilTick = Math.max(
-              target.stunUntilTick,
-              tick + durationTicks,
-            );
-            emit({
-              type: "status",
+            applyStun(
               tick,
-              sourceId: source.id,
-              targetId: target.id,
-              status: "stun",
-              durationTicks,
-            });
+              source,
+              target,
+              abilityDefinition.stunMs,
+            );
           }
           if (
             target.hp > 0 &&
             abilityDefinition.burnPower &&
             abilityDefinition.burnDurationMs
           ) {
-            const durationTicks = Math.max(
-              1,
-              Math.round(
-                abilityDefinition.burnDurationMs /
-                  content.config.combatTickMs,
-              ),
-            );
-            target.burnPower = Math.max(
-              target.burnPower,
+            applyBurn(
+              tick,
+              source,
+              target,
               Math.floor(
                 (abilityDefinition.burnPower *
                   abilityMultiplier *
                   (100 + source.abilityPowerPercent)) /
                   1_000_000,
               ),
+              abilityDefinition.burnDurationMs,
             );
-            target.burnUntilTick = Math.max(
-              target.burnUntilTick,
-              tick + durationTicks,
-            );
-            target.burnNextTick = tick + Math.round(1_000 / content.config.combatTickMs);
-            target.burnSourceId = source.id;
-            emit({
-              type: "status",
-              tick,
-              sourceId: source.id,
-              targetId: target.id,
-              status: "burn",
-              durationTicks,
-            });
           }
         }
       }
@@ -1848,6 +2150,12 @@ export function simulateBattle(
             (unit) => unit.id === targetId && alive(unit),
           );
           if (!target) {
+            continue;
+          }
+          if (
+            source.teamId !== target.teamId &&
+            hasItemBehavior(target, "forced-movement-immunity")
+          ) {
             continue;
           }
           const destination = chooseKnockbackDestination(
@@ -1882,6 +2190,12 @@ export function simulateBattle(
             (unit) => unit.id === targetId && alive(unit),
           );
           if (!target) {
+            continue;
+          }
+          if (
+            source.teamId !== target.teamId &&
+            hasItemBehavior(target, "forced-movement-immunity")
+          ) {
             continue;
           }
           const destination = choosePullDestination(
@@ -1942,9 +2256,12 @@ export function simulateBattle(
       }
       source.nextActionTick = tick + source.attackIntervalTicks;
       source.state = "attack-recovery";
-      const dodged = roll(
+      const rolledDodge = roll(
         adjustedChancePercent(target.dodgePercent, target.luck),
       );
+      const dodged = hasItemBehavior(source, "basic-attacks-cannot-miss")
+        ? false
+        : rolledDodge;
       const critical = dodged
         ? false
         : roll(
@@ -1972,12 +2289,14 @@ export function simulateBattle(
       const baseAttackDamage = dodged
         ? 0
         : critical
-          ? Math.max(
+          ? hasItemBehavior(target, "incoming-critical-bonus-negation")
+            ? source.attack
+            : Math.max(
               1,
               Math.floor(
                 (source.attack * source.criticalPowerPercent) / 100,
               ),
-            )
+              )
           : source.attack;
       const trueDamageBehavior = source.itemBehaviors.find(
         (behavior) => behavior.kind === "basic-attack-true-damage-percent",
@@ -2000,6 +2319,18 @@ export function simulateBattle(
         special: 0,
         true: trueDamage,
       };
+      if (!dodged) {
+        for (const behavior of source.itemBehaviors) {
+          if (behavior.kind === "on-basic-attack-resistance-reduction") {
+            applyResistanceReduction(
+              tick,
+              source,
+              target,
+              behavior.durationMs,
+            );
+          }
+        }
+      }
       const aliveBefore = alive(target);
       resolveDamageBundle(tick, source, target, primaryDamage, "attack");
       applyBasicAttackItemBehaviors(
@@ -2010,6 +2341,33 @@ export function simulateBattle(
         critical,
         aliveBefore && !alive(target),
       );
+      for (const behavior of target.itemBehaviors) {
+        if (
+          behavior.kind !== "on-basic-attack-received-retaliate-wound" ||
+          Math.max(
+            Math.abs(source.x - target.x),
+            Math.abs(source.y - target.y),
+          ) !== 1 ||
+          source.itemBehaviors.some(
+            (sourceBehavior) =>
+              sourceBehavior.kind === "shield-damage-multiplier" &&
+              sourceBehavior.suppressRetaliation,
+          )
+        ) {
+          continue;
+        }
+        applyDamage(
+          tick,
+          target,
+          source,
+          Math.round(3 * (3 + 0.15 * target.defense)),
+          "item",
+          "true",
+          0,
+          { isRetaliation: true },
+        );
+        applyWound(tick, target, source, behavior.woundMs);
+      }
     }
 
     processDeaths(tick);
