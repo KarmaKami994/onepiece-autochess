@@ -809,6 +809,10 @@ function alive(unit: MutableBattleUnit): boolean {
   return unit.state !== "dead" && unit.hp > 0;
 }
 
+function occupiesBoardCell(unit: MutableBattleUnit): boolean {
+  return alive(unit) || unit.state === "resurrecting";
+}
+
 function battleActive(unit: MutableBattleUnit): boolean {
   return alive(unit) || unit.resurrectAtTick > 0;
 }
@@ -1046,7 +1050,7 @@ function chooseStep(
   }
   const occupied = new Set(
     units
-      .filter((unit) => alive(unit) && unit.id !== source.id)
+      .filter((unit) => occupiesBoardCell(unit) && unit.id !== source.id)
       .map((unit) => positionKey(unit.x, unit.y)),
   );
 
@@ -1177,7 +1181,9 @@ function chooseKnockbackDestination(
       candidate.y < content.config.boardHeight &&
       !units.some(
         (unit) =>
-          alive(unit) && unit.x === candidate.x && unit.y === candidate.y,
+          occupiesBoardCell(unit) &&
+          unit.x === candidate.x &&
+          unit.y === candidate.y,
       )
     ) {
       return candidate;
@@ -1219,7 +1225,9 @@ function choosePullDestination(
       candidate.y < content.config.boardHeight &&
       !units.some(
         (unit) =>
-          alive(unit) && unit.x === candidate.x && unit.y === candidate.y,
+          occupiesBoardCell(unit) &&
+          unit.x === candidate.x &&
+          unit.y === candidate.y,
       )
     ) {
       return candidate;
@@ -1236,7 +1244,7 @@ function firstLungeDestination(
 ): Position | null {
   const occupied = new Set(
     units
-      .filter((unit) => alive(unit))
+      .filter(occupiesBoardCell)
       .map((unit) => positionKey(unit.x, unit.y)),
   );
   for (let y = target.y - 1; y <= target.y + 1; y += 1) {
@@ -1610,7 +1618,9 @@ export function simulateBattle(
       (candidate) => alive(candidate) && candidate.teamId !== holder.teamId,
     );
     const occupied = new Set(
-      units.filter(alive).map((candidate) => positionKey(candidate.x, candidate.y)),
+      units
+        .filter(occupiesBoardCell)
+        .map((candidate) => positionKey(candidate.x, candidate.y)),
     );
     const emptyCells: Position[] = [];
     for (let y = 0; y < content.config.boardHeight; y += 1) {
@@ -3137,7 +3147,9 @@ export function simulateBattle(
     processDeaths(tick);
 
     const reserved = new Set(
-      units.filter(alive).map((unit) => `${unit.x},${unit.y}`),
+      units
+        .filter(occupiesBoardCell)
+        .map((unit) => `${unit.x},${unit.y}`),
     );
     for (const intent of intents.filter(
       (candidate): candidate is MoveIntent => candidate.kind === "move",

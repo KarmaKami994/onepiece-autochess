@@ -661,6 +661,297 @@ describe("Phoenix Feather resurrection", () => {
     expect(result.durationTicks).toBe(21);
   });
 
+  it("reserves its cell through resurrection while remaining untargetable", () => {
+    const result = run([
+      {
+        id: "mover",
+        teamId: "a",
+        x: 0,
+        y: 0,
+        items: [START_100.id],
+        stats: { range: 1, moveIntervalMs: 100 },
+        ability: {
+          targeting: "nearest-enemy",
+          requiresTarget: false,
+          effect: "damage",
+          damageType: "true",
+          power: 2_000,
+        },
+      },
+      {
+        id: "phoenix",
+        teamId: "b",
+        x: 1,
+        y: 0,
+        items: ["phoenix-feather"],
+      },
+      {
+        id: "survivor",
+        teamId: "b",
+        x: 2,
+        y: 0,
+        stats: { health: 10_000 },
+      },
+    ], { maxTicks: 21, extraItems: [START_100] });
+
+    expect(events(result, "unit-resurrect")).toMatchObject([
+      { tick: 21, unitId: "phoenix" },
+    ]);
+    expect(
+      events(result, "unit-move").some(
+        (event) => event.to.x === 1 && event.to.y === 0,
+      ),
+    ).toBe(false);
+    expect(
+      events(result, "attack").some(
+        (event) => event.tick > 1 && event.targetId === "phoenix",
+      ),
+    ).toBe(false);
+    expect(
+      events(result, "cast").some(
+        (event) => event.tick > 1 && event.targetIds.includes("phoenix"),
+      ),
+    ).toBe(false);
+    const battleActivePositions = result.finalUnits
+      .filter((candidate) => candidate.hp > 0 || candidate.state === "resurrecting")
+      .map((candidate) => `${candidate.x},${candidate.y}`);
+    expect(new Set(battleActivePositions).size).toBe(battleActivePositions.length);
+  });
+
+  it("does not let Lunge enter a resurrecting Phoenix cell", () => {
+    const result = run([
+      {
+        id: "killer",
+        teamId: "a",
+        x: 0,
+        y: 1,
+        items: [START_100.id],
+        ability: {
+          targeting: "nearest-enemy",
+          requiresTarget: false,
+          effect: "damage",
+          damageType: "true",
+          power: 2_000,
+        },
+      },
+      {
+        id: "lunger",
+        teamId: "a",
+        x: 6,
+        y: 3,
+        items: [START_90.id],
+        stats: { attackIntervalMs: 100 },
+        ability: {
+          targeting: "nearest-enemy",
+          requiresTarget: true,
+          effect: "damage",
+          damageType: "true",
+          power: 1,
+          signatureMechanics: [{ kind: "lunge" }],
+        },
+      },
+      {
+        id: "phoenix",
+        teamId: "b",
+        x: 0,
+        y: 0,
+        items: ["phoenix-feather"],
+      },
+      {
+        id: "survivor",
+        teamId: "b",
+        x: 1,
+        y: 1,
+        stats: { health: 10_000 },
+      },
+    ], { maxTicks: 2, extraItems: [START_100, START_90] });
+
+    expect(events(result, "unit-displace")).toMatchObject([
+      {
+        tick: 2,
+        unitId: "lunger",
+        movementKind: "lunge",
+        to: { x: 1, y: 0 },
+      },
+    ]);
+    expect(unit(result, "phoenix")).toMatchObject({
+      state: "resurrecting",
+      x: 0,
+      y: 0,
+    });
+  });
+
+  it("does not let Knockback or Pull enter a resurrecting Phoenix cell", () => {
+    const knockback = run([
+      {
+        id: "controller",
+        teamId: "a",
+        x: 0,
+        y: 0,
+        items: [START_90.id],
+        stats: { attackIntervalMs: 100 },
+        ability: {
+          targeting: "nearest-enemy",
+          requiresTarget: true,
+          effect: "damage",
+          damageType: "true",
+          power: 1,
+          signatureMechanics: [{ kind: "knockback" }],
+        },
+      },
+      {
+        id: "killer",
+        teamId: "a",
+        x: 3,
+        y: 0,
+        items: [START_100.id],
+        ability: {
+          targeting: "nearest-enemy",
+          requiresTarget: false,
+          effect: "damage",
+          damageType: "true",
+          power: 2_000,
+        },
+      },
+      { id: "target", teamId: "b", x: 1, y: 0, stats: { health: 10_000 } },
+      {
+        id: "phoenix",
+        teamId: "b",
+        x: 2,
+        y: 0,
+        items: ["phoenix-feather"],
+      },
+    ], { maxTicks: 2, extraItems: [START_100, START_90] });
+    expect(
+      events(knockback, "unit-displace").filter(
+        (event) => event.movementKind === "knockback",
+      ),
+    ).toEqual([]);
+    expect(unit(knockback, "target")).toMatchObject({ x: 1, y: 0 });
+
+    const pull = run([
+      {
+        id: "controller",
+        teamId: "a",
+        x: 4,
+        y: 0,
+        items: [START_90.id],
+        stats: { attackIntervalMs: 100 },
+        ability: {
+          targeting: "nearest-enemy",
+          requiresTarget: true,
+          effect: "damage",
+          damageType: "true",
+          power: 1,
+          signatureMechanics: [{ kind: "pull" }],
+        },
+      },
+      {
+        id: "killer",
+        teamId: "a",
+        x: 3,
+        y: 1,
+        items: [START_100.id],
+        ability: {
+          targeting: "nearest-enemy",
+          requiresTarget: false,
+          effect: "damage",
+          damageType: "true",
+          power: 2_000,
+        },
+      },
+      { id: "target", teamId: "b", x: 2, y: 0, stats: { health: 10_000 } },
+      {
+        id: "phoenix",
+        teamId: "b",
+        x: 3,
+        y: 0,
+        items: ["phoenix-feather"],
+      },
+    ], { maxTicks: 2, extraItems: [START_100, START_90] });
+    expect(
+      events(pull, "unit-displace").filter(
+        (event) => event.movementKind === "pull",
+      ),
+    ).toEqual([]);
+    expect(unit(pull, "target")).toMatchObject({ x: 2, y: 0 });
+  });
+
+  it("does not let Smoke-Star Escape select a resurrecting Phoenix cell", () => {
+    const combatants: Combatant[] = [];
+    for (let y = 0; y < 6; y += 1) {
+      for (let x = 0; x < 8; x += 1) {
+        if ((x === 0 && y === 0) || (x === 3 && y === 3)) continue;
+        combatants.push({
+          id: `blocker-${x}-${y}`,
+          teamId: "a",
+          x,
+          y,
+          stats: { range: 0 },
+        });
+      }
+    }
+    const killer = combatants.find(
+      (candidate) => candidate.x === 3 && candidate.y === 2,
+    );
+    if (!killer) throw new Error("Missing Phoenix killer fixture.");
+    killer.items = [START_100.id];
+    killer.ability = {
+      targeting: "nearest-enemy",
+      requiresTarget: false,
+      effect: "damage",
+      damageType: "true",
+      power: 2_000,
+    };
+    const damager = combatants.find(
+      (candidate) => candidate.x === 0 && candidate.y === 1,
+    );
+    if (!damager) throw new Error("Missing Smoke-Star damager fixture.");
+    damager.items = [START_90.id];
+    damager.stats = { attack: 1, range: 10, attackIntervalMs: 100 };
+    damager.ability = {
+      targeting: "nearest-enemy",
+      requiresTarget: true,
+      effect: "damage",
+      damageType: "true",
+      power: 601,
+    };
+    combatants.push(
+      {
+        id: "holder",
+        teamId: "b",
+        x: 0,
+        y: 0,
+        items: ["smoke-star-escape"],
+      },
+      {
+        id: "phoenix",
+        teamId: "b",
+        x: 3,
+        y: 3,
+        items: ["phoenix-feather"],
+      },
+    );
+
+    const result = run(combatants, {
+      maxTicks: 2,
+      extraItems: [START_100, START_90],
+    });
+    expect(unit(result, "phoenix")).toMatchObject({
+      state: "resurrecting",
+      x: 3,
+      y: 3,
+    });
+    expect(
+      events(result, "unit-displace").filter(
+        (event) => event.unitId === "holder" && event.movementKind === "escape",
+      ),
+    ).toEqual([]);
+    expect(events(result, "shield")).toContainEqual(
+      expect.objectContaining({ targetId: "holder", amount: 150 }),
+    );
+  });
+
   it("restores baseline stats and dynamic counters, then dies normally to a second lethal hit", () => {
     const result = run([
       { id: "killer", teamId: "a", x: 0, y: 0, stats: { attack: 2_000, attackIntervalMs: 2_200 } },
