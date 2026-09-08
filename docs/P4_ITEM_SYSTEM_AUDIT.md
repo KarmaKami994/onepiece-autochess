@@ -309,25 +309,44 @@ PAC clauses without a local host system remain deliberately non-applicable: Obse
 
 Sea Prism Stone intentionally replaces its temporary +120 HP/+25 Defense/+25 Special Defense identity while preserving its stable ID and acquisition position. All other P4B1–P4B5 identities, the ten components, 55 recipes, Gear 4 catalysts, acquisition order/RNG, saves, economy and bots remain unchanged.
 
+### P4B7 implementation status
+
+P4B7 completes the final twelve approved non-trait identities on GameContent `1.22.0`; save schema remains 6:
+
+| PAC identity | One Piece item | Local identity |
+| --- | --- | --- |
+| Pokemonomicon | Flame-Flame Grimoire | +30 AP/+9 Attack; positive Special damage applies a 3-second Burn and -1 Special Defense through the existing damage authority |
+| Shiny Charm | Miracle Talisman | +3 Defense; once per battle, post-Shield damage projected below 30% HP is cancelled, grants 50 Energy, then 1.5 seconds of Protect |
+| Wonder Box | Mystery Treasure Chest | Replaces itself battle-locally with up to two distinct seeded non-trait completed items before normal item setup |
+| Smoke Ball | Smoke-Star Escape | +10% Crit; once below 40% HP, applies 4-second Blind and Paralysis to adjacent enemies, gains 150 Shield and deterministically escapes |
+| Max Revive | Phoenix Feather | Once per battle, delays defeat for 2 seconds, then restores the frozen battle-start fighter at full HP with consumed one-shot state preserved |
+| Big Eater Belt | Banquet Belt | +150 Max HP/+45 Shield; supported positive and friendly-negative combat-stat deltas are 25% stronger |
+| Twist Band | Reversal Band | +20 Special Defense/+150 Shield; supported enemy/environment negative combat-stat deltas invert to positive |
+| Flame Orb | Mera Mera Ember | +15 Attack/+3 Defense; adds star-scaled base Attack and starts a battle-long self-Burn |
+| Explosive Band | Bombardier Band | +150 Shield/+9 Attack; first Shield depletion deals 50% of runtime Shield gained as adjacent Special damage |
+| Cover Band | Bodyguard Band | +12 Defense/+150 Shield; deterministically intercepts one adjacent ally's lethal post-Shield damage |
+| Nullify Bandanna | Nullification Bandanna | +90 Shield; cannot cast, converts AP deltas to Attack at 60% and spends stored Energy as Special basic-attack damage |
+| Efficient Bandanna | Efficient Bandanna | +45 Shield/+15 starting Energy; holder and horizontal allies start with 85% Max Energy |
+
+Protect blocks damage, healing and positive Energy while allowing drain. Blind adds 50 percentage points to the existing seeded dodge decision; Paralysis consumes the same dodge roll but cannot dodge. Resurrection uses a battle event and immutable snapshot fields so deterministic playback restores the correct form, maximum HP and resource cap without rerolling Mystery Treasure Chest. Max Energy is battle-local, defaults to 100 and is used consistently for gain caps and cast readiness.
+
+Mystery Treasure Chest consumes exactly two seeded draws from a stable recipe-output candidate order, excludes trait-granting outputs, itself and already-held/generated items, obeys the three-completed-item cap, and never mutates persistent equipment. Banquet Belt, Reversal Band and Nullification Bandanna share one narrow combat-stat-delta helper with fixed ordering: enemy/environment inversion, supported delta amplification, then AP-to-Attack conversion. Static item and trait values are not amplified, while existing runtime Muscle Band, Rush Flag, Mera Mera Ember and form/stat transitions use the same deterministic path where applicable.
+
+All 45 non-trait completed items now have active effects or behavior. The ten trait-granting recipe outputs remain intentionally behaviorless pending their separately approved trait mappings and P4C acquisition/UI/bot work. PAC dish, stolen-buff protection and Freeze clauses have no local host system and remain non-applicable. No generic lifecycle, status, trigger or persistence framework was added.
+
 ## 9. Missing Primitive Audit
 
 ### Present and reusable
 
-The local combat has deterministic Physical/Special/True damage, separate Defense and Special Defense, basic and opt-in ability critical hits, mutable Crit Power and Luck, dodge, shields, healing, omnivamp, Energy gain/drain, burn, stun, knockback/pull, defense pierce, line/adjacent/global targeting, sequential strikes, immutable battle events and explicit RNG. Trait effects can add starting Energy, shield, dodge, crit chance, Ability Power and range. P4B3 adds bounded periodic AP/Energy/attack-speed and post-basic-attack Speed/Energy/critical-transfer behavior; P4B5 adds narrow multi-component attacks, adjacent healing, chain/bounce item damage and capped damage-received stacking. P4B6 adds the narrow battle-local Rune Protect, Wound and resistance-reduction expiries, cross-unit horizontal start support, forced-movement immunity, cannot-miss adaptation, target-specific Crit-bonus negation, nearest-tie target priority and non-recursive retaliation paths.
+The local combat has deterministic Physical/Special/True damage, separate Defense and Special Defense, basic and opt-in ability critical hits, mutable Crit Power and Luck, dodge, shields, healing, omnivamp, Energy gain/drain, burn, stun, knockback/pull, defense pierce, line/adjacent/global targeting, sequential strikes, immutable battle events and explicit RNG. Trait effects can add starting Energy, shield, dodge, crit chance, Ability Power and range. P4B3 adds bounded periodic AP/Energy/attack-speed and post-basic-attack Speed/Energy/critical-transfer behavior; P4B5 adds narrow multi-component attacks, adjacent healing, chain/bounce item damage and capped damage-received stacking. P4B6 adds narrow battle-local Rune Protect, Wound and resistance-reduction expiries, cross-unit horizontal start support, forced-movement immunity, cannot-miss adaptation, target-specific Crit-bonus negation, nearest-tie target priority and non-recursive retaliation paths. P4B7 adds Protect, Blind, Paralysis, delayed one-shot resurrection, battle-local Max Energy, deterministic escape, lethal interception, threshold consumption, runtime-shield depletion, battle-local generated items and ordered combat-stat-delta adaptation.
 
-### Remaining missing or insufficient after P4B6
+### Remaining missing or insufficient after P4B7
 
-- **PP/max-PP semantics:** local Energy stays capped at 100; starting Energy and bounded post-cast restoration exist, but max-Energy reduction and next-attack conversion do not.
-- **Remaining triggered behaviors:** threshold/consume, shield-depleted, resurrection, lethal interception and item-consumption behaviors remain absent. P4B6 deliberately adds no generic lifecycle.
-- **Remaining status/system families:** Sleep, Blind, Paralysis, Freeze, Locked, Poison and board effects remain absent; P4B6 adds only the locked local status and movement clauses above.
-- **Resurrection:** no prevent-KO/resurrect state or event.
 - **Trait-granting equipment:** effective battle traits resolve from unit definitions/forms only; items cannot add a trait.
-- **Target-priority and lethal interception:** nearest-tie basic priority exists only for Guard Point Dummy; adjacent bodyguard routing remains absent.
-- **Stat-rule transforms:** no buff amplification, debuff inversion, buff-theft protection, AP-to-Attack conversion or resource-to-next-hit conversion.
-- **Dynamic/temporary item replacement:** no battle-local Wonder Box expansion with deterministic item identity in snapshots/events.
-- **Consumable one-shot equipment:** equipped IDs are static for the battle snapshot; no item-consumed event/presentation path.
+- **Unhosted PAC systems:** Sleep, Freeze, Locked, Poison, dishes, stolen-buff protection and board effects remain absent and are not implied by the bounded local identities.
+- **P4C integration:** component acquisition, recipe/tooltips/assets, accessibility and bot valuation remain separately deferred.
 
-The remaining P4 item families are Flame-Flame Grimoire/Pokemonomicon; Mera Mera Ember/Flame Orb; Phoenix Feather/Max Revive; Smoke-Star Escape/Smoke Ball; Miracle Talisman/Shiny Charm; Bombardier Band/Explosive Band; Efficient Bandanna; Reversal Band/Twist Band; Banquet Belt/Big Eater Belt; Bodyguard Band/Cover Band; Nullification Bandanna; Mystery Treasure Chest/Wonder Box; and all trait-granting equipment. P4C acquisition, UI and bot integration also remains separate.
+The only remaining behaviorless recipe outputs are the ten trait-granting equipment identities. Their mappings require separate approval. P4C acquisition, UI and bot integration also remains separate.
 
 These are capability gaps, not permission to build a generic status framework. Each later implementation must add only the smallest reusable primitive required by the locked 55 behaviors.
 
@@ -389,10 +408,10 @@ Local carousels already align at rounds 4/12/17, use explicit RNG, offer 5–9 c
 - Recipe lookup is pure data keyed by two sorted component IDs.
 - All inventory/equip/craft outcomes remain authoritative serializable state mutations under the existing command actor boundary.
 - Combat-start and triggered item effects use explicit battle state, ticks and RNG; presentation only consumes events/snapshots.
-- Wonder Box choices and item consumption must be frozen in battle output so save/resume and spectating do not reroll or reconstruct them.
+- Mystery Treasure Chest choices are resolved into the immutable battle snapshot from explicit battle RNG; they never mutate persistent equipment or reroll during presentation, save/resume or spectating.
 - Current battle-economy immutability stays intact: purchases/merges/equips cannot rebuild an active deployed combat timeline.
 - Schema remains 6. Existing stable IDs resolve through the eight mapped outputs; any additional legacy alias is explicit and bounded, never inferred from display names.
-- GameContent is `1.21.0` after P4B6; schema remains 6 and all serialized item IDs stay stable.
+- GameContent is `1.22.0` after P4B7; schema remains 6 and all serialized item IDs stay stable.
 
 ## 13. Risks and Review Gates
 

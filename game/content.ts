@@ -1409,7 +1409,20 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
     "Grants 10 Special Defense and 10% ability power. Reflects Special damage prevented by resistance.",
     [{ kind: "reflect-special-resistance-blocked" }],
   ),
-  completedItem("flame-flame-grimoire", "Flame-Flame Grimoire"),
+  completedItem(
+    "flame-flame-grimoire",
+    "Flame-Flame Grimoire",
+    [
+      { kind: "ability-power-percent", value: 30 },
+      { kind: "attack-flat", value: 9 },
+    ],
+    "Grants 30% ability power and 9 Attack. Positive Special damage burns for 3 seconds and reduces the target's Special Defense by 1.",
+    [{
+      kind: "on-special-damage-burn-resistance",
+      burnDurationMs: 3_000,
+      specialDefenseDelta: -1,
+    }],
+  ),
   completedItem(
     "sea-prism-boots",
     "Sea-Prism Boots",
@@ -1491,8 +1504,28 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
       },
     ],
   ),
-  completedItem("miracle-talisman", "Miracle Talisman"),
-  completedItem("efficient-bandanna", "Efficient Bandanna"),
+  completedItem(
+    "miracle-talisman",
+    "Miracle Talisman",
+    [{ kind: "defense-flat", value: 3 }],
+    "Grants 3 Defense. Once per battle, damage that would leave the holder below 30% health is cancelled after Shield, grants 50 Energy, and applies Protect for 1.5 seconds.",
+    [{
+      kind: "low-health-protect-energy",
+      healthThresholdPercent: 30,
+      energy: 50,
+      protectMs: 1_500,
+    }],
+  ),
+  completedItem(
+    "efficient-bandanna",
+    "Efficient Bandanna",
+    [
+      { kind: "shield-flat", value: 45 },
+      { kind: "starting-energy", value: 15 },
+    ],
+    "Grants 45 Shield and 15 starting Energy. At battle start, the holder and horizontal allies have 15% lower Max Energy.",
+    [{ kind: "start-horizontal-max-energy", percent: 85 }],
+  ),
   completedItem(
     "observation-goggles",
     "Observation Goggles",
@@ -1555,8 +1588,25 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
       },
     ],
   ),
-  completedItem("mystery-treasure-chest", "Mystery Treasure Chest"),
-  completedItem("smoke-star-escape", "Smoke-Star Escape"),
+  completedItem(
+    "mystery-treasure-chest",
+    "Mystery Treasure Chest",
+    [],
+    "At battle start, replaces itself with up to two distinct seeded non-trait completed items for that battle only.",
+    [{ kind: "battle-random-items", rolls: 2 }],
+  ),
+  completedItem(
+    "smoke-star-escape",
+    "Smoke-Star Escape",
+    [{ kind: "critical-chance-percent", value: 10 }],
+    "Grants 10% critical chance. Once below 40% health, Blinds and Paralyzes adjacent enemies for 4 seconds, grants 150 Shield, and escapes.",
+    [{
+      kind: "low-health-smoke-escape",
+      healthThresholdPercent: 40,
+      statusMs: 4_000,
+      shield: 150,
+    }],
+  ),
   completedItem(
     "gas-mask",
     "Gas Mask",
@@ -1601,8 +1651,23 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
       suppressRetaliation: true,
     }],
   ),
-  completedItem("phoenix-feather", "Phoenix Feather"),
-  completedItem("banquet-belt", "Banquet Belt"),
+  completedItem(
+    "phoenix-feather",
+    "Phoenix Feather",
+    [],
+    "Once per battle, enters a 2-second resurrection instead of dying and returns with battle-start stats and full health.",
+    [{ kind: "resurrect-once", delayMs: 2_000 }],
+  ),
+  completedItem(
+    "banquet-belt",
+    "Banquet Belt",
+    [
+      { kind: "health-flat", value: 150 },
+      { kind: "shield-flat", value: 45 },
+    ],
+    "Grants 150 Max HP and 45 Shield. Supported combat stat buffs and friendly buff losses are 25% stronger.",
+    [{ kind: "combat-stat-delta-amplifier", percent: 25 }],
+  ),
   completedItem(
     "healing-dial",
     "Healing Dial",
@@ -1627,7 +1692,16 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
       basicAttackTargetPriority: true,
     }],
   ),
-  completedItem("reversal-band", "Reversal Band"),
+  completedItem(
+    "reversal-band",
+    "Reversal Band",
+    [
+      { kind: "special-defense-flat", value: 20 },
+      { kind: "shield-flat", value: 150 },
+    ],
+    "Grants 20 Special Defense and 150 Shield. Supported negative enemy or environment combat stat deltas become positive.",
+    [{ kind: "enemy-debuff-inversion" }],
+  ),
   completedItem(
     "advanced-armament-orb",
     "Advanced Armament Orb",
@@ -1635,8 +1709,26 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
     "Grants 30 Attack and converts 25% of normal basic-attack damage to True damage.",
     [{ kind: "basic-attack-true-damage-percent", percent: 25 }],
   ),
-  completedItem("mera-mera-ember", "Mera Mera Ember"),
-  completedItem("bombardier-band", "Bombardier Band"),
+  completedItem(
+    "mera-mera-ember",
+    "Mera Mera Ember",
+    [
+      { kind: "attack-flat", value: 15 },
+      { kind: "defense-flat", value: 3 },
+    ],
+    "Grants 15 Attack and 3 Defense, adds the holder's star-scaled base Attack at battle start, and self-applies a battle-long Burn.",
+    [{ kind: "start-base-attack-self-burn", burnDurationMs: 300_000 }],
+  ),
+  completedItem(
+    "bombardier-band",
+    "Bombardier Band",
+    [
+      { kind: "shield-flat", value: 150 },
+      { kind: "attack-flat", value: 9 },
+    ],
+    "Grants 150 Shield and 9 Attack. The first Shield depletion explodes for half of runtime Shield gained as adjacent Special damage.",
+    [{ kind: "shield-depletion-explosion", percent: 50 }],
+  ),
   completedItem(
     "iron-pirate-helm",
     "Iron Pirate Helm",
@@ -1644,8 +1736,23 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
     "Grants 25 Defense and negates incoming critical bonus damage while preserving critical-hit identity.",
     [{ kind: "incoming-critical-bonus-negation" }],
   ),
-  completedItem("bodyguard-band", "Bodyguard Band"),
-  completedItem("nullification-bandanna", "Nullification Bandanna"),
+  completedItem(
+    "bodyguard-band",
+    "Bodyguard Band",
+    [
+      { kind: "defense-flat", value: 12 },
+      { kind: "shield-flat", value: 150 },
+    ],
+    "Grants 12 Defense and 150 Shield. Intercepts lethal post-Shield damage for one adjacent ally.",
+    [{ kind: "lethal-cover" }],
+  ),
+  completedItem(
+    "nullification-bandanna",
+    "Nullification Bandanna",
+    [{ kind: "shield-flat", value: 90 }],
+    "Grants 90 Shield. Cannot cast, converts Ability Power deltas into Attack, and spends stored Energy as Special damage on basic attacks.",
+    [{ kind: "cannot-cast-energy-attacks", attackConversionPercent: 60 }],
+  ),
 ];
 
 export const ITEM_DEFINITIONS: ItemDefinition[] = [
@@ -2032,7 +2139,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.21.0",
+  version: "1.22.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,

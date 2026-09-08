@@ -79,6 +79,7 @@ describe("combat resource bars", () => {
       maxHp: 1_000,
       shield: 500,
       energy: 0,
+      maxEnergy: 100,
       team: "player",
     });
     const enemy = resourceBarFill({
@@ -86,6 +87,7 @@ describe("combat resource bars", () => {
       maxHp: 1_000,
       shield: 2_000,
       energy: 0,
+      maxEnergy: 100,
       team: "enemy",
     });
 
@@ -107,6 +109,7 @@ describe("combat resource bars", () => {
       maxHp: 1_000,
       shield: 0,
       energy: 140,
+      maxEnergy: 100,
       team: "player",
     });
 
@@ -119,6 +122,21 @@ describe("combat resource bars", () => {
       RESOURCE_BAR_GEOMETRY.segmentCount - 1,
     );
     expect(fill.segmentXs).toEqual([...fill.segmentXs].sort((a, b) => a - b));
+  });
+
+  it("uses the battle snapshot Max Energy as the ready threshold", () => {
+    const fill = resourceBarFill({
+      hp: 1_000,
+      maxHp: 1_000,
+      shield: 0,
+      energy: 85,
+      maxEnergy: 85,
+      team: "player",
+    });
+
+    expect(fill.energy).toBe(85);
+    expect(fill.energyWidth).toBe(RESOURCE_BAR_GEOMETRY.width);
+    expect(fill.energyColor).toBe(RESOURCE_BAR_COLORS.energyReady);
   });
 
   it("changes the playback HP pool at transform and uses it for later damage and final HP", () => {

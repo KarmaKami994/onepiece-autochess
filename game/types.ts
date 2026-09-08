@@ -259,7 +259,33 @@ export type ItemBehavior =
   | {
       kind: "on-basic-attack-received-retaliate-wound";
       woundMs: number;
-    };
+    }
+  | {
+      kind: "on-special-damage-burn-resistance";
+      burnDurationMs: number;
+      specialDefenseDelta: number;
+    }
+  | {
+      kind: "low-health-protect-energy";
+      healthThresholdPercent: number;
+      energy: number;
+      protectMs: number;
+    }
+  | { kind: "battle-random-items"; rolls: number }
+  | {
+      kind: "low-health-smoke-escape";
+      healthThresholdPercent: number;
+      statusMs: number;
+      shield: number;
+    }
+  | { kind: "resurrect-once"; delayMs: number }
+  | { kind: "combat-stat-delta-amplifier"; percent: number }
+  | { kind: "enemy-debuff-inversion" }
+  | { kind: "start-base-attack-self-burn"; burnDurationMs: number }
+  | { kind: "shield-depletion-explosion"; percent: number }
+  | { kind: "lethal-cover" }
+  | { kind: "cannot-cast-energy-attacks"; attackConversionPercent: number }
+  | { kind: "start-horizontal-max-energy"; percent: number };
 
 export type ItemKind = "component" | "completed";
 
@@ -596,6 +622,7 @@ export type BattleUnitState =
   | "attack-recovery"
   | "cast"
   | "stunned"
+  | "resurrecting"
   | "dead";
 
 export interface BattleUnitSnapshot {
@@ -611,6 +638,7 @@ export interface BattleUnitSnapshot {
   maxHp: number;
   shield: number;
   energy: number;
+  maxEnergy: number;
   attack: number;
   defense: number;
   range: number;
@@ -637,7 +665,7 @@ export type BattleEvent =
       sourceId: string;
       unitId: string;
       abilityId: string;
-      movementKind: "lunge" | "knockback" | "pull";
+      movementKind: "lunge" | "knockback" | "pull" | "escape";
       from: Position;
       to: Position;
     }
@@ -691,7 +719,7 @@ export type BattleEvent =
       type: "energy";
       tick: number;
       unitId: string;
-      /** Effective signed delta after applying the 0-100 energy cap. */
+      /** Effective signed delta after applying the battle-local Max Energy cap. */
       amount: number;
       /** Energy after this event has been applied. */
       value: number;
@@ -737,8 +765,19 @@ export type BattleEvent =
         | "burn"
         | "wound"
         | "resistance-reduction"
+        | "protect"
+        | "blind"
+        | "paralysis"
         | "emergency-shield";
       durationTicks: number;
+    }
+  | {
+      type: "unit-resurrect";
+      tick: number;
+      unitId: string;
+      hp: number;
+      maxHp: number;
+      formId?: string;
     }
   | {
       type: "death";

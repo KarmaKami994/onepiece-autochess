@@ -23,10 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-P4B6 Defense / Control / Retaliation Pack is implemented on `feat/p4b6-defense-control-items` from exact base `cd1fa3381b7abfe5a00e1fc2db9f11cea1648384`. Exactly the 12 approved Barrier Bubble through Spiked Armament identities are active through narrow battle-local support, status, mitigation, critical and retaliation primitives. GameContent is `1.21.0`; schema remains 6. Acquisition, Gear 4, saves, economy and bots remain stable. Remaining item families and P4C are deferred.
+P4B7 Final Core Non-Trait Items is implemented on `feat/p4b7-final-core-items` from exact base `ce91e9f9eb695c32406596e7b832cc98ffa3b50f`. The final 12 approved non-trait identities are active through narrow deterministic battle-local primitives, completing 45/45 non-trait recipe outputs; the 10 trait-grant outputs and P4C remain deferred. GameContent is `1.22.0`; schema remains 6. Acquisition, Gear 4, saves, economy and bots remain stable.
 
 ## Last Completed Work
 
+- 2026-09-08 — P4B7 final core non-trait item pack: implemented Flame-Flame Grimoire, Miracle Talisman, Mystery Treasure Chest, Smoke-Star Escape, Phoenix Feather, Banquet Belt, Reversal Band, Mera Mera Ember, Bombardier Band, Bodyguard Band, Nullification Bandanna and Efficient Bandanna. Added only the required battle-local Protect/Blind/Paralysis/resurrection/Max-Energy, threshold-consumption, generated-item, escape/interception and ordered stat-delta primitives. All 45 non-trait completed outputs now have mechanics; 10 trait grants remain deferred. GameContent is `1.22.0`; schema remains 6. Material files: `game/types.ts`, `game/content.ts`, `game/combat.ts`, snapshot/presentation consumers, production-audit compatibility, focused/version regressions, `docs/P4_ITEM_SYSTEM_AUDIT.md`, `PROJECT_STATE.md`.
 - 2026-09-08 — PR #45 review correction: sequential abilities retain one shared Ability Crit roll per cast while each strike now selects normal- or Crit-weighted damage from its current target's Iron Pirate Helm state after deterministic retargeting. Both normal→Helmet and Helmet→normal directions are covered without adding an RNG roll. Material files: `game/combat.ts`, focused P4B6 tests, `PROJECT_STATE.md`.
 - 2026-09-08 — P4B6 defense/control/retaliation item pack: implemented Ability Shield, Gracidea Flower, Heavy-Duty Boots, X-Ray Vision, Safety Goggles, Razor Fang, Protective Pads, Rocky Helmet, Assault Vest, Poké Doll, Power Lens and Sticky Barb under the approved One Piece IDs. Added deterministic horizontal start support, battle-local Rune Protect/Wound/resistance reduction, forced-movement immunity, cannot-miss adaptation, ordered shield/non-True mitigation, target-specific Crit-bonus negation and bounded non-recursive retaliation. Sea Prism Stone intentionally changes to +40 Special Defense/Burn mitigation while retaining its stable acquisition ID. GameContent is `1.21.0`; schema remains 6. Material files: `game/types.ts`, `game/content.ts`, `game/combat.ts`, focused/version regressions, `docs/P4_ITEM_SYSTEM_AUDIT.md`, `PROJECT_STATE.md`. Publication SHA/PR is reported in the task handoff.
 - 2026-09-07 — P4B5 advanced combat item pack: implemented the seven approved periodic, critical-shield, max-HP attack, chain, bounce, damage-received stack and True-damage conversion identities. Basic attacks now resolve a narrow raw Physical/Special/True bundle; item family order is deterministic and private counters are battle-only. Armament Wraps and Den Den Mushi intentionally replace their temporary legacy combat values while retaining stable IDs/acquisition positions and Gear 4. Material files: `game/types.ts`, `game/content.ts`, `game/combat.ts`, focused/version regressions, `docs/P4_ITEM_SYSTEM_AUDIT.md`, `PROJECT_STATE.md`. Publication SHA/PR is reported in the task handoff.
@@ -73,6 +74,16 @@ P4B6 Defense / Control / Retaliation Pack is implemented on `feat/p4b6-defense-c
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+P4B7 final core non-trait item pack:
+
+- PASS — focused `tests/game/p4b7-final-core-items.test.ts`: 1 file / 37 tests covering all 12 identities, cross-item ordering/interactions, generated battle items, resurrection, acquisition, Gear 4, saves, version and determinism.
+- PASS — P4A–P4B6 focused group: 7 files / 173 tests; affected combat/form/acquisition/save group: 19 files / 210 tests.
+- PASS — `npm run typecheck`, `npm run lint`, and `npm test`: 50 files / 596 tests.
+- PASS — `npm run assets:validate`: 41 animation atlases, maps, Carousel assets and provenance files validated.
+- PASS — `npm run test:production-smoke`: 50/50 completed, zero crashes; regression evidence only, no tuning.
+- PASS — `npm run build`; only the existing chunk-size and route-classification advisories were reported.
+- NOT RUN — Browser E2E (CI may run it) and the 1,000-seed production soak/new baseline.
 
 P4B6 defense/control/retaliation item pack:
 
@@ -537,6 +548,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- P4B7 completes the remaining 12 non-trait core identities. Grimoire adds per-Special-hit Burn/Special-Defense reduction; Miracle provides one post-Shield Protect threshold; Chest resolves up to two deterministic battle-only non-trait items; Smoke adds one low-health Blind/Paralysis/shield escape; Phoenix provides one delayed baseline resurrection; Banquet/Reversal transform supported combat stat deltas; Mera doubles star-scaled base Attack through that helper and self-Burns; Bombardier explodes from runtime Shield gained; Bodyguard intercepts adjacent lethal damage; Nullification blocks casting and converts AP/Energy to attacks; Efficient applies horizontal multiplicative Max-Energy reduction. All 45 non-trait completed outputs now have mechanics; GameContent is `1.22.0` and schema remains 6.
 - P4B6 adds the 12 locked defense/control/retaliation identities. Rune Protect blocks only Stun, Burn application, Wound and timed resistance reduction; Razor halves current Defense/Special Defense before its successful hit; Pads double post-reduction damage entering Shield with HP overflow and suppress retaliation; Helmet preserves Crit identity but removes bonus damage per target; Doll adds post-resistance non-True reduction and nearest-tie basic priority; Lens reflects only resistance-blocked Special damage; Barb retaliates against adjacent attempts and Wounds. Sea Prism Stone is now exactly +40 Special Defense with half Burn ticks. GameContent is `1.21.0`; schema remains 6.
 - P4B5: Healing Bubble heals its Chebyshev-adjacent living team area every 2 seconds and converts adapted overheal to Energy; Armament Sash grants a raw-primary-damage Crit shield; Impact Dial adds dodge-surviving target-Max-HP Physical damage; Den Den Mushi chains every third attempt; Ricochet Dial performs one Luck-adjusted component bounce; Armament Wraps stacks Attack/Defense/dynamic attack speed every second positive damage event; Advanced Armament Orb converts 25% of normal attack damage to True before Impact Dial. Armament Wraps and Den Den Mushi intentionally adopt their PAC stat identities. GameContent is `1.20.0`; schema remains 6.
 - P4B4: Cola Reservoir restores 22 Energy after the first cast, 24 after the second, up to 90; Star Shield Dial grants 50 post-cast Shield. Observation Haki Mantle enables Ability Crit and grants +50 Crit Power only for a natively critical battle-start ability. Healing Dial heals rounded-up 33% of actual damage to others per application, including shield damage and attributed burn.
@@ -580,6 +592,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- None for P4B7. No trait-grant mechanic, new trait, generic status/event/lifecycle framework, component acquisition, item UI/bot/P4C work, tuning, schema change, baseline or 1,000-seed soak was added. Browser E2E is left to CI as scoped.
 - None for P4B6. No generic status/lifecycle/event/retaliation framework, unavailable Sleep/Locked/Poison/board-effect system, additional item family, acquisition/UI/bot work, P4C, tuning, schema change or 1,000-seed soak was added. Browser E2E is left to CI as scoped.
 - None for P4B5. No additional item identity, generic event/status framework, acquisition/UI/bot work, P4C, tuning, schema change or 1,000-seed soak was added.
 - None for P4B4. No additional item family, acquisition/UI/bot policy, P4C, tuning or soak work.
@@ -623,7 +636,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
-- After P4B6, remaining P4B work is limited to the deferred Flame-Flame Grimoire, Mera Mera Ember, Phoenix Feather, Smoke-Star Escape, Miracle Talisman, Bombardier Band, Efficient Bandanna, Reversal Band, Banquet Belt, Bodyguard Band, Nullification Bandanna, Mystery Treasure Chest and trait-granting families. Their threshold/consume/resurrection/interception/transform rules and P4C remain separate; these gaps do not authorize a generic framework or balance tuning.
+- After P4B7, the only behaviorless completed recipe outputs are the 10 trait-grant identities. Their mappings and all acquisition/UI/bot work remain P4C concerns requiring separate approval. The new conditional effects are intentionally not valued by existing static-only bot scoring.
 - Existing decision support and bots still score static item effects only. Clima-Tact's dynamic-only identity therefore scores zero, while P4B5's two acquirable changed IDs are valued only by their new static effects and not their chain/stack behaviors. Dynamic behavior scoring remains a P4C concern rather than part of P4B implementation.
 - Existing all-player-elimination behavior still leaves `winnerId` null when no survivor remains. The new deterministic batch ranking applies, but winner semantics remain a separate edge-case watch and were intentionally not redesigned here.
 - Full star-copy sell refund (`cost × 1/3/9`) makes 2-star/3-star units fully liquid, lowers pivot commitment and can move battle-time sales into interest thresholds; classify WATCH / NEEDS MEASUREMENT, not a defect. Constant per-unit pools preserve absolute copies while four-character expansions grow cost-band totals and dilute each specific definition's conditional roll share. Realized gold, levels, streaks, high-cost access, rerolls and star timing are P3-coupled and not currently observable at sufficient grain.
@@ -655,6 +668,7 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
+- P4B7 keeps generated Chest items, one-shot consumption, statuses, Max Energy, Shield-gain meters and resurrection state private to deterministic combat. Chest consumes two seeded draws from stable non-trait candidates and freezes resolved battle item IDs in snapshots without persistent mutation. Combat stat deltas resolve Reversal inversion, Banquet amplification, then Nullification AP→Attack conversion at local ×3 scaling. PAC dish, stolen-buff and Flame-Orb Freeze clauses remain non-applicable because no host systems exist. All stable IDs, acquisition order, Gear 4 catalysts and schema 6 remain unchanged.
 - P4B6 keeps all new state private to battle ticks. Horizontal start support is resolved after individual static items/traits and before dynamic-Speed baseline capture. Rune Protect is intentionally narrow; Razor is a timed non-mutating dual-resistance reduction; Lens uses the existing local mitigation curve; Helmet's Ability Crit negation is target-specific without rerolls; Sticky Barb scales the complete PAC retaliation result ×3. Sleep, Locked, Poison and board-effect clauses remain non-applicable. Sea Prism Stone intentionally replaces its temporary legacy stats with final Assault Vest identity.
 - P4B5 adds flat HP-scale item damage at PAC ×3, while Green Orb overheal converts at 10% after local HP scaling. Basic attacks use one private Physical/Special/True bundle and fixed family order; item damage is non-recursive through `applyDamage`, Loaded Dice uses the existing seeded Luck formula, and only Blue Orb/Muscle Band receive private non-persisted counters. Armament Wraps keeps only Defense, not Special Defense, under its final PAC identity.
 - P4B4 counts only resolved casts and applies item bonuses after complete ability resolution. Native Crit Power is battle-start-only. Shell Bell uses shield plus health damage, separately from unchanged health-only omnivamp; local Energy stays capped at 100.
@@ -692,7 +706,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-Review P4B6. Do not start another P4B pack, P4C, P1B, captain damage, economy tuning or balance work without separate approval.
+Review P4B7. Do not start P4C, trait-grant mechanics, P1B, captain damage, economy tuning or balance work without separate approval.
 
 ## Codex Update Contract
 

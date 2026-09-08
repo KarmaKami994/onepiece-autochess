@@ -23,6 +23,8 @@ import {
 } from "../../game";
 
 const PRODUCTION_COMBAT_HASH =
+  "833c275701ccd05c81d77c57e0796dc769b7edd17d3b19e7ee758f29e4b5afdb";
+const PRE_MAX_ENERGY_PRODUCTION_COMBAT_HASH =
   "eb0ceb385e0c2c497238507a26067bd6c82572b2a2491b6611849d6a13d6486a";
 
 function stats(overrides: Partial<UnitStats> = {}): UnitStats {
@@ -872,10 +874,29 @@ describe("P4B1 compatibility locks", () => {
     expect(
       createHash("sha256").update(JSON.stringify(result)).digest("hex"),
     ).toBe(PRODUCTION_COMBAT_HASH);
+    const stripMaxEnergy = (
+      unit: BattleResult["initialUnits"][number],
+    ): Partial<BattleResult["initialUnits"][number]> => {
+      const snapshot: Partial<BattleResult["initialUnits"][number]> = {
+        ...unit,
+      };
+      delete snapshot.maxEnergy;
+      return snapshot;
+    };
+    const withoutMaxEnergy = {
+      ...result,
+      initialUnits: result.initialUnits.map(stripMaxEnergy),
+      finalUnits: result.finalUnits.map(stripMaxEnergy),
+    };
+    expect(
+      createHash("sha256")
+        .update(JSON.stringify(withoutMaxEnergy))
+        .digest("hex"),
+    ).toBe(PRE_MAX_ENERGY_PRODUCTION_COMBAT_HASH);
   });
 
   it("keeps the current GameContent version", () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.21.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.22.0");
   });
 
   it("keeps save schema 6", () => {
