@@ -282,27 +282,52 @@ Basic attacks use a private three-component Physical/Special/True bundle and a f
 
 Armament Wraps and Den Den Mushi intentionally replace their temporary legacy combat values while retaining stable IDs, exact acquisition positions and the Boundman catalyst contract. The other completed P4B1–P4B4 identities, all 55 recipes, acquisition RNG, crafting, saves, economy and bots are unchanged.
 
+### P4B6 implementation status
+
+P4B6 implements exactly twelve defensive, control and retaliation identities on GameContent `1.21.0`; save schema remains 6:
+
+| PAC identity | One Piece item | Local identity |
+| --- | --- | --- |
+| Ability Shield | Barrier Bubble | +10 AP; holder and horizontal allies start with 20% of their own final Max HP as Shield and 5 seconds of Rune Protect |
+| Gracidea Flower | Rush Flag | Holder and horizontal allies add +20% attack speed to their battle-start dynamic baseline |
+| Heavy-Duty Boots | Sea-Prism Boots | +50 AP/+12 Defense; immune to enemy knockback and pull |
+| X-Ray Vision | Observation Goggles | +50% attack speed; the existing dodge decision is made, then a rolled dodge is forced to hit |
+| Safety Goggles | Gas Mask | +10% Crit/+3 Defense; 60 seconds of Rune Protect |
+| Razor Fang | Armor-Piercing Scope | +10% attack speed/+10% Crit/+50% Crit Power; a successful basic attack halves both current resistances for 2 seconds before that hit resolves |
+| Protective Pads | Impact-Proof Gauntlets | +180 Shield/+18 Attack; doubles post-reduction damage entering Shield resolution with overflow to HP and suppresses item retaliation |
+| Rocky Helmet | Iron Pirate Helm | +25 Defense; preserves incoming Crit identity while removing its bonus multiplier per target, including targets within one shared Ability-Crit cast |
+| Assault Vest | Sea Prism Stone | Exactly +40 Special Defense; Burn raw tick damage is halved before Special mitigation |
+| Poké Doll | Guard Point Dummy | +3 Defense/+3 Special Defense; 30% post-resistance non-True reduction and priority only among tied nearest basic-attack targets |
+| Power Lens | Reflect Dial | +10 Special Defense/+10 AP; reflects the rounded Special damage prevented by current effective Special Defense through the central damage authority |
+| Sticky Barb | Spiked Armament | +6 Defense/+45 HP; adjacent attackers receive `round(3 × (3 + 0.15 × holder Defense))` True retaliation and 3 seconds of Wound |
+
+Rune Protect is a private battle-local expiry that blocks only Stun, Burn application, Wound and Razor resistance reduction. Wound makes the existing heal authority return zero heal and zero overheal. Resistance reduction uses `round(resistance / 2)` without mutating persistent stats. All durations use deterministic combat ticks, and the new state is neither serialized nor presented through a new framework.
+
+The central damage order is current effective resistance and local mitigation, Reflect Dial's resistance-blocked calculation, Guard Point Dummy reduction, Impact-Proof Gauntlets' Shield multiplier, Shield, HP, existing damage reactions, then eligible non-recursive reflection. This is an ADAPTED PORT of PAC's mitigation-trigger identities using the established local curve. The same target-specific Iron Pirate Helm rule keeps a single cast Crit roll while allowing normal and Helmet targets in one AoE to receive different raw damage. Spiked Armament scales the complete PAC retaliation result by three to preserve impact under the local HP scale.
+
+PAC clauses without a local host system remain deliberately non-applicable: Observation Goggles does not add Sleep because Sleep does not exist; Sea-Prism Boots does not add Locked or board-effect systems; Sea Prism Stone does not add Poison. The Boots still allow their holder's own Lunge and ordinary movement. No generic status, lifecycle, retaliation or event framework was introduced.
+
+Sea Prism Stone intentionally replaces its temporary +120 HP/+25 Defense/+25 Special Defense identity while preserving its stable ID and acquisition position. All other P4B1–P4B5 identities, the ten components, 55 recipes, Gear 4 catalysts, acquisition order/RNG, saves, economy and bots remain unchanged.
+
 ## 9. Missing Primitive Audit
 
 ### Present and reusable
 
-The local combat has deterministic Physical/Special/True damage, separate Defense and Special Defense, basic and opt-in ability critical hits, mutable Crit Power and Luck, dodge, shields, healing, omnivamp, Energy gain/drain, burn, stun, knockback/pull, defense pierce, line/adjacent/global targeting, sequential strikes, immutable battle events and explicit RNG. Trait effects can add starting Energy, shield, dodge, crit chance, Ability Power and range. P4B3 adds bounded periodic AP/Energy/attack-speed and post-basic-attack Speed/Energy/critical-transfer behavior; P4B5 adds narrow multi-component attacks, adjacent healing, chain/bounce item damage and capped damage-received stacking.
+The local combat has deterministic Physical/Special/True damage, separate Defense and Special Defense, basic and opt-in ability critical hits, mutable Crit Power and Luck, dodge, shields, healing, omnivamp, Energy gain/drain, burn, stun, knockback/pull, defense pierce, line/adjacent/global targeting, sequential strikes, immutable battle events and explicit RNG. Trait effects can add starting Energy, shield, dodge, crit chance, Ability Power and range. P4B3 adds bounded periodic AP/Energy/attack-speed and post-basic-attack Speed/Energy/critical-transfer behavior; P4B5 adds narrow multi-component attacks, adjacent healing, chain/bounce item damage and capped damage-received stacking. P4B6 adds the narrow battle-local Rune Protect, Wound and resistance-reduction expiries, cross-unit horizontal start support, forced-movement immunity, cannot-miss adaptation, target-specific Crit-bonus negation, nearest-tie target priority and non-recursive retaliation paths.
 
-### Remaining missing or insufficient after P4B5
+### Remaining missing or insufficient after P4B6
 
 - **PP/max-PP semantics:** local Energy stays capped at 100; starting Energy and bounded post-cast restoration exist, but max-Energy reduction and next-attack conversion do not.
-- **Remaining triggered behaviors:** other reactive/on-cast effects, threshold/consume, shield-depleted and item-consumption behaviors remain absent. P4B5 deliberately adds no generic lifecycle.
-- **Immunity/Safeguard:** no general status immunity, Sleep/Blind/Paralysis/Freeze/Locked statuses, board-effect immunity or forced-displacement immunity.
-- **Wound:** no healing-reduction status.
+- **Remaining triggered behaviors:** threshold/consume, shield-depleted, resurrection, lethal interception and item-consumption behaviors remain absent. P4B6 deliberately adds no generic lifecycle.
+- **Remaining status/system families:** Sleep, Blind, Paralysis, Freeze, Locked, Poison and board effects remain absent; P4B6 adds only the locked local status and movement clauses above.
 - **Resurrection:** no prevent-KO/resurrect state or event.
 - **Trait-granting equipment:** effective battle traits resolve from unit definitions/forms only; items cannot add a trait.
-- **Retaliation item damage:** items can now schedule bounded Special damage and split/bounce attack components, but cannot reflect mitigation or mark recoil/retaliation immunity.
-- **Armor Break / Special Defense shred:** defense pierce selects the active resistance per ability; there is no timed resistance-reduction status.
-- **Accuracy and miss immunity:** dodge exists, but attacks have no separate accuracy/miss rule or cannot-miss flag.
-- **Target-priority and lethal interception:** no item-driven taunt weight or adjacent bodyguard routing.
+- **Target-priority and lethal interception:** nearest-tie basic priority exists only for Guard Point Dummy; adjacent bodyguard routing remains absent.
 - **Stat-rule transforms:** no buff amplification, debuff inversion, buff-theft protection, AP-to-Attack conversion or resource-to-next-hit conversion.
 - **Dynamic/temporary item replacement:** no battle-local Wonder Box expansion with deterministic item identity in snapshots/events.
 - **Consumable one-shot equipment:** equipped IDs are static for the battle snapshot; no item-consumed event/presentation path.
+
+The remaining P4 item families are Flame-Flame Grimoire/Pokemonomicon; Mera Mera Ember/Flame Orb; Phoenix Feather/Max Revive; Smoke-Star Escape/Smoke Ball; Miracle Talisman/Shiny Charm; Bombardier Band/Explosive Band; Efficient Bandanna; Reversal Band/Twist Band; Banquet Belt/Big Eater Belt; Bodyguard Band/Cover Band; Nullification Bandanna; Mystery Treasure Chest/Wonder Box; and all trait-granting equipment. P4C acquisition, UI and bot integration also remains separate.
 
 These are capability gaps, not permission to build a generic status framework. Each later implementation must add only the smallest reusable primitive required by the locked 55 behaviors.
 
@@ -367,7 +392,7 @@ Local carousels already align at rounds 4/12/17, use explicit RNG, offer 5–9 c
 - Wonder Box choices and item consumption must be frozen in battle output so save/resume and spectating do not reroll or reconstruct them.
 - Current battle-economy immutability stays intact: purchases/merges/equips cannot rebuild an active deployed combat timeline.
 - Schema remains 6. Existing stable IDs resolve through the eight mapped outputs; any additional legacy alias is explicit and bounded, never inferred from display names.
-- GameContent is `1.20.0` after P4B5; schema remains 6 and all serialized item IDs stay stable.
+- GameContent is `1.21.0` after P4B6; schema remains 6 and all serialized item IDs stay stable.
 
 ## 13. Risks and Review Gates
 

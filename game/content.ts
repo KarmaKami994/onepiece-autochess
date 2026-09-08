@@ -1294,14 +1294,11 @@ const LEGACY_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
   {
     id: "sea-prism-stone",
     name: "Sea Prism Stone",
-    description: "Dense protection against physical pressure.",
+    description: "Grants 40 Special Defense and halves Burn tick damage.",
     icon: "◆",
     kind: "completed",
-    effects: [
-      { kind: "defense-flat", value: 25 },
-      { kind: "special-defense-flat", value: 25 },
-      { kind: "health-flat", value: 120 },
-    ],
+    effects: [{ kind: "special-defense-flat", value: 40 }],
+    behaviors: [{ kind: "burn-damage-reduction-percent", percent: 50 }],
   },
   {
     id: "armament-wraps",
@@ -1391,10 +1388,38 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
     "Grants 10% ability power and 20% critical chance; abilities can crit. Natively critical abilities grant 50% Crit Power at battle start.",
     [{ kind: "native-ability-crit-power", criticalPowerPercent: 50 }],
   ),
-  completedItem("barrier-bubble", "Barrier Bubble"),
-  completedItem("reflect-dial", "Reflect Dial"),
+  completedItem(
+    "barrier-bubble",
+    "Barrier Bubble",
+    [{ kind: "ability-power-percent", value: 10 }],
+    "Grants 10% ability power. At battle start, the holder and horizontal allies gain Shield equal to 20% of their own final Max HP and Rune Protect for 5 seconds.",
+    [{
+      kind: "start-horizontal-shield-rune-protect",
+      shieldMaxHealthPercent: 20,
+      runeProtectMs: 5_000,
+    }],
+  ),
+  completedItem(
+    "reflect-dial",
+    "Reflect Dial",
+    [
+      { kind: "special-defense-flat", value: 10 },
+      { kind: "ability-power-percent", value: 10 },
+    ],
+    "Grants 10 Special Defense and 10% ability power. Reflects Special damage prevented by resistance.",
+    [{ kind: "reflect-special-resistance-blocked" }],
+  ),
   completedItem("flame-flame-grimoire", "Flame-Flame Grimoire"),
-  completedItem("sea-prism-boots", "Sea-Prism Boots"),
+  completedItem(
+    "sea-prism-boots",
+    "Sea-Prism Boots",
+    [
+      { kind: "ability-power-percent", value: 50 },
+      { kind: "defense-flat", value: 12 },
+    ],
+    "Grants 50% ability power and 12 Defense. Enemy knockback and pull cannot move the holder.",
+    [{ kind: "forced-movement-immunity" }],
+  ),
   completedItem(
     "lucky-pirate-ribbon",
     "Lucky Pirate Ribbon",
@@ -1468,9 +1493,31 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
   ),
   completedItem("miracle-talisman", "Miracle Talisman"),
   completedItem("efficient-bandanna", "Efficient Bandanna"),
-  completedItem("observation-goggles", "Observation Goggles"),
-  completedItem("armor-piercing-scope", "Armor-Piercing Scope"),
-  completedItem("rush-flag", "Rush Flag"),
+  completedItem(
+    "observation-goggles",
+    "Observation Goggles",
+    [{ kind: "attack-speed-percent", value: 50 }],
+    "Grants 50% attack speed and makes basic attacks impossible to dodge.",
+    [{ kind: "basic-attacks-cannot-miss" }],
+  ),
+  completedItem(
+    "armor-piercing-scope",
+    "Armor-Piercing Scope",
+    [
+      { kind: "attack-speed-percent", value: 10 },
+      { kind: "critical-chance-percent", value: 10 },
+      { kind: "critical-power-percent", value: 50 },
+    ],
+    "Grants 10% attack speed, 10% critical chance, and 50% Crit Power. Successful basic attacks halve both resistances for 2 seconds before dealing damage.",
+    [{ kind: "on-basic-attack-resistance-reduction", durationMs: 2_000 }],
+  ),
+  completedItem(
+    "rush-flag",
+    "Rush Flag",
+    [],
+    "At battle start, the holder and horizontal allies gain 20% attack speed as part of their dynamic baseline.",
+    [{ kind: "start-horizontal-attack-speed", attackSpeedPercent: 20 }],
+  ),
   completedItem(
     "ricochet-dial",
     "Ricochet Dial",
@@ -1510,7 +1557,16 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
   ),
   completedItem("mystery-treasure-chest", "Mystery Treasure Chest"),
   completedItem("smoke-star-escape", "Smoke-Star Escape"),
-  completedItem("gas-mask", "Gas Mask"),
+  completedItem(
+    "gas-mask",
+    "Gas Mask",
+    [
+      { kind: "critical-chance-percent", value: 10 },
+      { kind: "defense-flat", value: 3 },
+    ],
+    "Grants 10% critical chance and 3 Defense, plus Rune Protect for 60 seconds at battle start.",
+    [{ kind: "starting-rune-protect", durationMs: 60_000 }],
+  ),
   completedItem(
     "armament-sash",
     "Armament Sash",
@@ -1521,8 +1577,30 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
     "Grants 45 Shield and 30% critical chance. Critical basic attacks grant Shield equal to 33% of the complete raw primary damage, rounded up.",
     [{ kind: "on-critical-basic-attack-shield-damage-percent", percent: 33 }],
   ),
-  completedItem("spiked-armament", "Spiked Armament"),
-  completedItem("impact-proof-gauntlets", "Impact-Proof Gauntlets"),
+  completedItem(
+    "spiked-armament",
+    "Spiked Armament",
+    [
+      { kind: "defense-flat", value: 6 },
+      { kind: "health-flat", value: 45 },
+    ],
+    "Grants 6 Defense and 45 Max HP. Adjacent basic attackers take Defense-scaled True retaliation damage and Wound for 3 seconds.",
+    [{ kind: "on-basic-attack-received-retaliate-wound", woundMs: 3_000 }],
+  ),
+  completedItem(
+    "impact-proof-gauntlets",
+    "Impact-Proof Gauntlets",
+    [
+      { kind: "shield-flat", value: 180 },
+      { kind: "attack-flat", value: 18 },
+    ],
+    "Grants 180 Shield and 18 Attack. Damage entering an enemy Shield is doubled, and retaliation is suppressed.",
+    [{
+      kind: "shield-damage-multiplier",
+      multiplierPercent: 200,
+      suppressRetaliation: true,
+    }],
+  ),
   completedItem("phoenix-feather", "Phoenix Feather"),
   completedItem("banquet-belt", "Banquet Belt"),
   completedItem(
@@ -1535,7 +1613,20 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
     "Grants 15 Attack and 5 Special Defense; heals for 33% of damage dealt to others, including shield damage, rounded up.",
     [{ kind: "on-damage-dealt-heal-percent", percent: 33 }],
   ),
-  completedItem("guard-point-dummy", "Guard Point Dummy"),
+  completedItem(
+    "guard-point-dummy",
+    "Guard Point Dummy",
+    [
+      { kind: "defense-flat", value: 3 },
+      { kind: "special-defense-flat", value: 3 },
+    ],
+    "Grants 3 Defense and 3 Special Defense, reduces incoming non-True damage by 30%, and wins tied nearest basic-attack targeting.",
+    [{
+      kind: "incoming-nontrue-damage-reduction-percent",
+      percent: 30,
+      basicAttackTargetPriority: true,
+    }],
+  ),
   completedItem("reversal-band", "Reversal Band"),
   completedItem(
     "advanced-armament-orb",
@@ -1546,7 +1637,13 @@ const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
   ),
   completedItem("mera-mera-ember", "Mera Mera Ember"),
   completedItem("bombardier-band", "Bombardier Band"),
-  completedItem("iron-pirate-helm", "Iron Pirate Helm"),
+  completedItem(
+    "iron-pirate-helm",
+    "Iron Pirate Helm",
+    [{ kind: "defense-flat", value: 25 }],
+    "Grants 25 Defense and negates incoming critical bonus damage while preserving critical-hit identity.",
+    [{ kind: "incoming-critical-bonus-negation" }],
+  ),
   completedItem("bodyguard-band", "Bodyguard Band"),
   completedItem("nullification-bandanna", "Nullification Bandanna"),
 ];
@@ -1935,7 +2032,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.20.0",
+  version: "1.21.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,

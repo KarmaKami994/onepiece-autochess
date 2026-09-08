@@ -299,11 +299,9 @@ describe("P4B2 component and simple item content", () => {
     ]);
   });
 
-  it("preserves Sea Prism Stone and applies the two P4B5 legacy-ID identities", () => {
+  it("uses finalized Sea Prism Stone and preserves the two P4B5 legacy-ID identities", () => {
     expect(productionItem("sea-prism-stone").effects).toEqual([
-      { kind: "defense-flat", value: 25 },
-      { kind: "special-defense-flat", value: 25 },
-      { kind: "health-flat", value: 120 },
+      { kind: "special-defense-flat", value: 40 },
     ]);
     expect(productionItem("armament-wraps").effects).toEqual([
       { kind: "attack-speed-percent", value: 10 },
@@ -362,10 +360,10 @@ describe("P4B2 component and simple item content", () => {
     if (!player) throw new Error("Missing player-1.");
     player.inventory = [...LEGACY_ITEM_IDS];
     const restored = deserializeMatch(serializeMatch(state));
-    expect(DEFAULT_CONTENT.version).toBe("1.20.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.21.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(restored.schemaVersion).toBe(6);
-    expect(restored.contentVersion).toBe("1.20.0");
+    expect(restored.contentVersion).toBe("1.21.0");
     expect(
       restored.players.find((candidate) => candidate.id === "player-1")?.inventory,
     ).toEqual(LEGACY_ITEM_IDS);

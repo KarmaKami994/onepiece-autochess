@@ -561,15 +561,15 @@ describe("P4B1 critical power, Luck, and item primitives", () => {
     expect(damageEvents(special, "caster", "ability")[0].amount).toBe(50);
   });
 
-  it("preserves Sea Prism Stone as +25 to both resistances", () => {
+  it("uses Sea Prism Stone's finalized Special Defense-only identity", () => {
     const seaPrismStone = productionItem("sea-prism-stone");
     const physical = castFixture({
       ability: { damageType: "physical" },
       targetItems: [seaPrismStone],
     });
     const special = castFixture({ targetItems: [seaPrismStone] });
-    expect(damageEvents(physical, "caster", "ability")[0].amount).toBe(80);
-    expect(damageEvents(special, "caster", "ability")[0].amount).toBe(80);
+    expect(damageEvents(physical, "caster", "ability")[0].amount).toBe(100);
+    expect(damageEvents(special, "caster", "ability")[0].amount).toBe(71);
   });
 
   it("applies the P4B5 Armament Wraps Defense without Special Defense", () => {
@@ -875,7 +875,7 @@ describe("P4B1 compatibility locks", () => {
   });
 
   it("keeps the current GameContent version", () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.20.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.21.0");
   });
 
   it("keeps save schema 6", () => {

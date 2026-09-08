@@ -226,6 +226,39 @@ export type ItemBehavior =
   | {
       kind: "basic-attack-true-damage-percent";
       percent: number;
+    }
+  | {
+      kind: "start-horizontal-shield-rune-protect";
+      shieldMaxHealthPercent: number;
+      runeProtectMs: number;
+    }
+  | {
+      kind: "start-horizontal-attack-speed";
+      attackSpeedPercent: number;
+    }
+  | { kind: "forced-movement-immunity" }
+  | { kind: "basic-attacks-cannot-miss" }
+  | { kind: "starting-rune-protect"; durationMs: number }
+  | {
+      kind: "on-basic-attack-resistance-reduction";
+      durationMs: number;
+    }
+  | {
+      kind: "shield-damage-multiplier";
+      multiplierPercent: number;
+      suppressRetaliation: boolean;
+    }
+  | { kind: "incoming-critical-bonus-negation" }
+  | { kind: "burn-damage-reduction-percent"; percent: number }
+  | {
+      kind: "incoming-nontrue-damage-reduction-percent";
+      percent: number;
+      basicAttackTargetPriority: boolean;
+    }
+  | { kind: "reflect-special-resistance-blocked" }
+  | {
+      kind: "on-basic-attack-received-retaliate-wound";
+      woundMs: number;
     };
 
 export type ItemKind = "component" | "completed";
@@ -699,7 +732,12 @@ export type BattleEvent =
       tick: number;
       sourceId: string;
       targetId: string;
-      status: "stun" | "burn" | "emergency-shield";
+      status:
+        | "stun"
+        | "burn"
+        | "wound"
+        | "resistance-reduction"
+        | "emergency-shield";
       durationTicks: number;
     }
   | {
