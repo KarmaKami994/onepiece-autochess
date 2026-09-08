@@ -81,6 +81,7 @@ export type BoardUnit = {
   maxHp: number;
   shield?: number;
   energy?: number;
+  maxEnergy?: number;
   finalHp?: number;
   finalShield?: number;
   finalEnergy?: number;
@@ -103,6 +104,7 @@ export type CombatFxEvent = {
     | "move"
     | "displace"
     | "transform"
+    | "resurrect"
     | "attack"
     | "cast"
     | "ability-hit"
@@ -324,6 +326,7 @@ export default function PhaserBoard({
               graphics: Phaser.GameObjects.Graphics;
               team: BoardUnit["team"];
               maxHp: number;
+              maxEnergy: number;
               display: { hp: number; shield: number; energy: number };
               layout: ReturnType<typeof resourceBarLayout>;
             }
@@ -1234,6 +1237,7 @@ export default function PhaserBoard({
             const fill = resourceBarFill({
               ...bar.display,
               maxHp: bar.maxHp,
+              maxEnergy: bar.maxEnergy,
               team: bar.team,
             });
             const width = RESOURCE_BAR_GEOMETRY.width;
@@ -1479,12 +1483,14 @@ export default function PhaserBoard({
               idleVisualTopPx: animationDefinition?.idleVisualTopPx,
             });
             const initialShield = Math.max(0, unit.shield ?? 0);
-            const initialEnergy = clamp(unit.energy ?? 0, 0, 100);
+            const maxEnergy = Math.max(1, unit.maxEnergy ?? 100);
+            const initialEnergy = clamp(unit.energy ?? 0, 0, maxEnergy);
             const resourceBar = this.add.graphics();
             this.resourceBars.set(unit.id, {
               graphics: resourceBar,
               team: unit.team,
               maxHp: Math.max(1, unit.maxHp),
+              maxEnergy,
               display: {
                 hp: clamp(unit.hp, 0, Math.max(1, unit.maxHp)),
                 shield: initialShield,
@@ -1735,7 +1741,8 @@ export default function PhaserBoard({
               nextEnergy: number,
               immediate = false,
             ) => {
-              const energy = clamp(nextEnergy, 0, 100);
+              const maxEnergy = this.resourceBars.get(unitId)?.maxEnergy ?? 100;
+              const energy = clamp(nextEnergy, 0, maxEnergy);
               this.energyState.set(unitId, energy);
               this.transitionResourceBar(
                 unitId,
@@ -1906,6 +1913,31 @@ export default function PhaserBoard({
                       duration: Math.round(180 / speed),
                     });
                   }
+                  return;
+                }
+
+                if (event.kind === "resurrect" && target) {
+                  const unitId = event.unitId ?? event.targetId ?? "";
+                  if (
+                    unitId &&
+                    event.hp !== undefined &&
+                    event.maxHp !== undefined
+                  ) {
+                    const health = resourceHealthAfterTransform(
+                      event.hp,
+                      event.maxHp,
+                    );
+                    this.hpState.set(unitId, health);
+                    const resourceBar = this.resourceBars.get(unitId);
+                    if (resourceBar) resourceBar.maxHp = health.max;
+                    setShield(unitId, 0, true);
+                    setEnergy(unitId, 0, true);
+                    this.statusExpiries.get(unitId)?.clear();
+                    refreshStatuses(unitId, event.tick);
+                    target.setAlpha(1).setScale(1);
+                    this.transitionResourceBar(unitId, speed, true);
+                  }
+                  showFloater(target, "REVIVE", "#ffd45a", true);
                   return;
                 }
 

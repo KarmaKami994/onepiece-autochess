@@ -585,6 +585,7 @@ function buildBoardUnits(
         maxHp,
         shield: 0,
         energy: 0,
+        maxEnergy: 100,
         portrait: view.token,
       });
     }
@@ -635,6 +636,7 @@ function buildBoardUnits(
         maxHp: snapshot.maxHp,
         shield: snapshot.shield,
         energy: snapshot.energy,
+        maxEnergy: snapshot.maxEnergy,
         portrait: enriched.token,
       });
       continue;
@@ -657,6 +659,7 @@ function buildBoardUnits(
       maxHp: snapshot.maxHp,
       shield: snapshot.shield,
       energy: snapshot.energy,
+      maxEnergy: snapshot.maxEnergy,
       portrait: enriched.token,
     });
   }
@@ -877,6 +880,21 @@ function combatEvents(
         hp: event.hp,
         maxHp: event.maxHp,
         label: form?.name ?? titleCase(event.toFormId),
+      }];
+    }
+    if (event.type === "unit-resurrect") {
+      formIdByUnit.set(event.unitId, event.formId);
+      return [{
+        id,
+        tick: event.tick,
+        kind: "resurrect",
+        sourceId: event.unitId,
+        targetId: event.unitId,
+        unitId: event.unitId,
+        hp: event.hp,
+        maxHp: event.maxHp,
+        ...(event.formId ? { toFormId: event.formId } : {}),
+        label: "Phoenix Feather",
       }];
     }
     if (event.type === "attack") {

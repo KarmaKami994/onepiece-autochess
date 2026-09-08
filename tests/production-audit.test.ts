@@ -33,6 +33,7 @@ function snapshot(
     maxHp: 100,
     shield: 0,
     energy: 0,
+    maxEnergy: 100,
     attack: 10,
     defense: 10,
     range: 1,

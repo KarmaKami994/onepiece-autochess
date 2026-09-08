@@ -37,6 +37,7 @@ export type ResourceBarFillInput = {
   maxHp: number;
   shield: number;
   energy: number;
+  maxEnergy: number;
   team: ResourceBarTeam;
 };
 
@@ -122,7 +123,8 @@ export function resourceBarFill(input: ResourceBarFillInput) {
   const maxHp = Math.max(1, input.maxHp);
   const hp = clamp(input.hp, 0, maxHp);
   const shield = Math.max(0, input.shield);
-  const energy = clamp(input.energy, 0, 100);
+  const maxEnergy = Math.max(1, input.maxEnergy);
+  const energy = clamp(input.energy, 0, maxEnergy);
   const combinedScale = Math.max(maxHp, hp + shield);
   const width = RESOURCE_BAR_GEOMETRY.width;
 
@@ -132,13 +134,13 @@ export function resourceBarFill(input: ResourceBarFillInput) {
     energy,
     healthWidth: width * (hp / combinedScale),
     shieldWidth: width * (shield / combinedScale),
-    energyWidth: width * (energy / 100),
+    energyWidth: width * (energy / maxEnergy),
     healthColor:
       input.team === "player"
         ? RESOURCE_BAR_COLORS.playerHealth
         : RESOURCE_BAR_COLORS.enemyHealth,
     energyColor:
-      energy >= 100
+      energy >= maxEnergy
         ? RESOURCE_BAR_COLORS.energyReady
         : RESOURCE_BAR_COLORS.energy,
     segmentXs: Array.from(

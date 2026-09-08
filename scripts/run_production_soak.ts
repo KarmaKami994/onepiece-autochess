@@ -535,7 +535,9 @@ function recordCharacterEvent(
       }
       break;
     case "unit-displace":
-      expression.displacements[event.movementKind] += 1;
+      if (event.movementKind !== "escape") {
+        expression.displacements[event.movementKind] += 1;
+      }
       break;
     case "heal":
       expression.heals.events += 1;
@@ -744,7 +746,9 @@ function recordPvpResult(
         }
         break;
       case "unit-displace":
-        readability.displacements[event.movementKind] += 1;
+        if (event.movementKind !== "escape") {
+          readability.displacements[event.movementKind] += 1;
+        }
         break;
       case "energy":
         if (event.reason === "ability-drain" && event.amount < 0) {

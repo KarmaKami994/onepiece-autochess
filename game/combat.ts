@@ -57,6 +57,25 @@ interface ItemRuntimeCounters {
   damageReceivedEvents: number;
 }
 
+interface ResurrectionBaseline {
+  formId?: string;
+  ability: AbilityDefinition | null;
+  maxHp: number;
+  attack: number;
+  defense: number;
+  specialDefense: number;
+  range: number;
+  attackIntervalTicks: number;
+  dynamicAttackSpeedBaseTicks: number;
+  abilityPowerPercent: number;
+  criticalChancePercent: number;
+  criticalPowerPercent: number;
+  luck: number;
+  dodgePercent: number;
+  omnivampPercent: number;
+  maxEnergy: number;
+}
+
 interface HealResult {
   healed: number;
   overheal: number;
@@ -75,7 +94,9 @@ interface MutableBattleUnit {
   maxHp: number;
   shield: number;
   energy: number;
+  maxEnergy: number;
   attack: number;
+  starScaledBaseAttack: number;
   defense: number;
   specialDefense: number;
   range: number;
@@ -96,6 +117,9 @@ interface MutableBattleUnit {
   emergencyShieldUsed: boolean;
   stunUntilTick: number;
   runeProtectUntilTick: number;
+  protectUntilTick: number;
+  blindedUntilTick: number;
+  paralyzedUntilTick: number;
   resistanceReductionUntilTick: number;
   woundUntilTick: number;
   burnUntilTick: number;
@@ -109,6 +133,11 @@ interface MutableBattleUnit {
   abilityCastCount: number;
   itemRuntimeCounters: ItemRuntimeCounters;
   periodicItemBehaviors: PeriodicItemBehaviorRuntime[];
+  consumedItemBehaviorKinds: ItemBehavior["kind"][];
+  totalShieldGained: number;
+  resurrectionAvailable: boolean;
+  resurrectAtTick: number;
+  resurrectionBaseline: ResurrectionBaseline | null;
 }
 
 interface AttackIntent {
@@ -134,6 +163,26 @@ type CombatIntent = AttackIntent | CastIntent | MoveIntent;
 
 const MONSTER_POINT_FORM_ID = "chopper-monster-point";
 const MONSTER_POINT_DELAY_MS = 8_000;
+const TRAIT_GRANT_ITEM_IDS = new Set([
+  "emperors-jolly-roger",
+  "specialists-log-pose",
+  "marine-justice-coat",
+  "marksmans-thunder-dial",
+  "captains-logbook",
+  "brawlers-rumble-emblem",
+  "guardians-sea-prism-crest",
+  "revolutionary-flame",
+  "straw-hat-token",
+  "swordsmans-knot",
+]);
+
+type CombatStat =
+  | "attack"
+  | "defense"
+  | "special-defense"
+  | "ability-power"
+  | "dynamic-attack-speed";
+type StatDeltaRelationship = "self" | "friendly" | "enemy" | "environment";
 
 export function adjustedChancePercent(
   basePercent: number,
@@ -207,7 +256,7 @@ function applyTraitEffect(
       unit.omnivampPercent += effect.value;
       break;
     case "starting-energy":
-      unit.energy = Math.min(100, unit.energy + effect.value);
+      unit.energy = Math.min(unit.maxEnergy, unit.energy + effect.value);
       break;
     case "attack-percent":
       unit.attack = Math.floor((unit.attack * (100 + effect.value)) / 100);
@@ -225,7 +274,13 @@ function applyTraitEffect(
       unit.criticalChancePercent += effect.value;
       break;
     case "ability-power-percent":
-      unit.abilityPowerPercent += effect.value;
+      applyCombatStatDelta(
+        unit,
+        "ability-power",
+        effect.value,
+        "friendly",
+        false,
+      );
       break;
     case "range-flat":
       unit.range += effect.value;
@@ -236,9 +291,49 @@ function applyTraitEffect(
   }
 }
 
+function resolveBattleItemIds(
+  persistentItemIds: readonly string[],
+  content: GameContent,
+  drawIndex: (length: number) => number,
+): string[] {
+  if (!persistentItemIds.includes("mystery-treasure-chest")) {
+    return [...persistentItemIds];
+  }
+  const resolved = persistentItemIds.filter(
+    (itemId) => itemId !== "mystery-treasure-chest",
+  );
+  const craftableIds = [...new Set(Object.values(content.itemRecipes))]
+    .filter((itemId) => {
+      const item = getItemDefinition(itemId, content);
+      return Boolean(
+        item?.kind === "completed" &&
+        itemId !== "mystery-treasure-chest" &&
+        !TRAIT_GRANT_ITEM_IDS.has(itemId) &&
+        !persistentItemIds.includes(itemId),
+      );
+    })
+    .sort((left, right) => left.localeCompare(right));
+  const rolledIds: string[] = [];
+  for (let rollIndex = 0; rollIndex < 2; rollIndex += 1) {
+    const candidates = craftableIds.filter(
+      (itemId) => !rolledIds.includes(itemId),
+    );
+    if (candidates.length === 0) {
+      break;
+    }
+    const itemId = candidates[drawIndex(candidates.length)];
+    rolledIds.push(itemId);
+    if (resolved.length < 3) {
+      resolved.push(itemId);
+    }
+  }
+  return resolved;
+}
+
 function createMutableUnits(
   team: BattleTeam,
   content: GameContent,
+  drawIndex: (length: number) => number,
 ): MutableBattleUnit[] {
   const tickMs = content.config.combatTickMs;
   const traitEffects = getActiveTraitEffects(
@@ -263,23 +358,31 @@ function createMutableUnits(
       1,
       Math.floor((definition.stats.health * statMultiplier) / 10_000),
     );
+    const starScaledBaseAttack = Math.max(
+      1,
+      Math.floor((definition.stats.attack * statMultiplier) / 10_000),
+    );
+    const resolvedItemIds = resolveBattleItemIds(
+      setup.items,
+      content,
+      drawIndex,
+    );
     const unit: MutableBattleUnit = {
       id: setup.id,
       definitionId: setup.definitionId,
       ...(definition.formId ? { formId: definition.formId } : {}),
       teamId: team.id,
       star: setup.star,
-      items: [...setup.items],
+      items: resolvedItemIds,
       x: setup.position.x,
       y: setup.position.y,
       hp: maxHp,
       maxHp,
       shield: 0,
       energy: 0,
-      attack: Math.max(
-        1,
-        Math.floor((definition.stats.attack * statMultiplier) / 10_000),
-      ),
+      maxEnergy: 100,
+      attack: starScaledBaseAttack,
+      starScaledBaseAttack,
       defense: Math.max(
         0,
         Math.floor((definition.stats.defense * statMultiplier) / 10_000),
@@ -316,6 +419,9 @@ function createMutableUnits(
       emergencyShieldUsed: false,
       stunUntilTick: 0,
       runeProtectUntilTick: 0,
+      protectUntilTick: 0,
+      blindedUntilTick: 0,
+      paralyzedUntilTick: 0,
       resistanceReductionUntilTick: 0,
       woundUntilTick: 0,
       burnUntilTick: 0,
@@ -332,14 +438,25 @@ function createMutableUnits(
         damageReceivedEvents: 0,
       },
       periodicItemBehaviors: [],
+      consumedItemBehaviorKinds: [],
+      totalShieldGained: 0,
+      resurrectionAvailable: false,
+      resurrectAtTick: 0,
+      resurrectionBaseline: null,
     };
     let startingShieldMaxHealthPercent = 0;
-
-    for (const itemId of setup.items) {
+    const itemDefinitions = resolvedItemIds.flatMap((itemId) => {
       const item = getItemDefinition(itemId, content);
-      if (!item) {
-        continue;
+      return item ? [item] : [];
+    });
+    for (const item of itemDefinitions) {
+      for (const behavior of item.behaviors ?? []) {
+        unit.itemBehaviors.push({ ...behavior });
       }
+    }
+    unit.resurrectionAvailable = hasItemBehavior(unit, "resurrect-once");
+
+    for (const item of itemDefinitions) {
       for (const effect of item.effects) {
         switch (effect.kind) {
           case "health-flat":
@@ -382,10 +499,16 @@ function createMutableUnits(
             unit.abilityCrit = true;
             break;
           case "ability-power-percent":
-            unit.abilityPowerPercent += effect.value;
+            applyCombatStatDelta(
+              unit,
+              "ability-power",
+              effect.value,
+              "self",
+              false,
+            );
             break;
           case "starting-energy":
-            unit.energy = Math.min(100, unit.energy + effect.value);
+            unit.energy = Math.min(unit.maxEnergy, unit.energy + effect.value);
             break;
           case "starting-shield-max-health-percent":
             startingShieldMaxHealthPercent += effect.value;
@@ -399,7 +522,6 @@ function createMutableUnits(
         }
       }
       for (const behavior of item.behaviors ?? []) {
-        unit.itemBehaviors.push({ ...behavior });
         if (
           behavior.kind === "native-ability-crit-power" &&
           unit.ability?.canCritByDefault === true
@@ -428,6 +550,7 @@ function createMutableUnits(
     if (startingShield > 0) {
       unit.shield += startingShield;
     }
+    unit.dynamicAttackSpeedBaseTicks = unit.attackIntervalTicks;
     result.push(unit);
   }
   return result;
@@ -440,13 +563,31 @@ function hasItemBehavior(
   return unit.itemBehaviors.some((behavior) => behavior.kind === kind);
 }
 
+function hasAvailableItemBehavior(
+  unit: MutableBattleUnit,
+  kind: ItemBehavior["kind"],
+): boolean {
+  return (
+    hasItemBehavior(unit, kind) &&
+    !unit.consumedItemBehaviorKinds.includes(kind)
+  );
+}
+
+function consumeItemBehavior(
+  unit: MutableBattleUnit,
+  kind: ItemBehavior["kind"],
+): void {
+  if (!unit.consumedItemBehaviorKinds.includes(kind)) {
+    unit.consumedItemBehaviorKinds.push(kind);
+  }
+}
+
 function applyStartOfBattleItemSupport(
   units: MutableBattleUnit[],
   tickMs: number,
 ): void {
   const shieldByUnitId = new Map<string, number>();
   const runeProtectByUnitId = new Map<string, number>();
-  const attackSpeedByUnitId = new Map<string, number>();
 
   for (const source of units) {
     for (const behavior of source.itemBehaviors) {
@@ -461,9 +602,19 @@ function applyStartOfBattleItemSupport(
         );
         continue;
       }
+      if (behavior.kind === "start-base-attack-self-burn") {
+        applyCombatStatDelta(
+          source,
+          "attack",
+          source.starScaledBaseAttack,
+          "self",
+        );
+        continue;
+      }
       if (
         behavior.kind !== "start-horizontal-shield-rune-protect" &&
-        behavior.kind !== "start-horizontal-attack-speed"
+        behavior.kind !== "start-horizontal-attack-speed" &&
+        behavior.kind !== "start-horizontal-max-energy"
       ) {
         continue;
       }
@@ -493,11 +644,17 @@ function applyStartOfBattleItemSupport(
               durationTicks,
             ),
           );
+        } else if (behavior.kind === "start-horizontal-attack-speed") {
+          applyCombatStatDelta(
+            recipient,
+            "dynamic-attack-speed",
+            behavior.attackSpeedPercent,
+            recipient.id === source.id ? "self" : "friendly",
+          );
         } else {
-          attackSpeedByUnitId.set(
-            recipient.id,
-            (attackSpeedByUnitId.get(recipient.id) ?? 0) +
-              behavior.attackSpeedPercent,
+          recipient.maxEnergy = Math.max(
+            1,
+            Math.round((recipient.maxEnergy * behavior.percent) / 100),
           );
         }
       }
@@ -510,16 +667,9 @@ function applyStartOfBattleItemSupport(
       unit.runeProtectUntilTick,
       runeProtectByUnitId.get(unit.id) ?? 0,
     );
-    const attackSpeedPercent = attackSpeedByUnitId.get(unit.id) ?? 0;
-    if (attackSpeedPercent !== 0) {
-      unit.attackIntervalTicks = Math.max(
-        1,
-        Math.round(
-          (unit.attackIntervalTicks * 100) / (100 + attackSpeedPercent),
-        ),
-      );
-    }
+    unit.energy = Math.min(unit.energy, unit.maxEnergy);
     unit.dynamicAttackSpeedBaseTicks = unit.attackIntervalTicks;
+    unit.dynamicAttackSpeedPercent = 0;
   }
 }
 
@@ -535,6 +685,72 @@ function addDynamicAttackSpeed(
         (100 + unit.dynamicAttackSpeedPercent),
     ),
   );
+}
+
+function applyCombatStatDelta(
+  unit: MutableBattleUnit,
+  stat: CombatStat,
+  value: number,
+  sourceRelationship: StatDeltaRelationship,
+  amplify = true,
+): number {
+  let effectiveValue = value;
+  if (
+    effectiveValue < 0 &&
+    (sourceRelationship === "enemy" || sourceRelationship === "environment") &&
+    hasItemBehavior(unit, "enemy-debuff-inversion")
+  ) {
+    effectiveValue = -effectiveValue;
+  }
+  const amplifier = unit.itemBehaviors.find(
+    (behavior) => behavior.kind === "combat-stat-delta-amplifier",
+  );
+  if (
+    amplify &&
+    amplifier?.kind === "combat-stat-delta-amplifier" &&
+    (effectiveValue > 0 ||
+      (effectiveValue < 0 &&
+        (sourceRelationship === "self" || sourceRelationship === "friendly")))
+  ) {
+    effectiveValue =
+      Math.sign(effectiveValue) *
+      Math.floor(
+        (Math.abs(effectiveValue) * (100 + amplifier.percent)) / 100,
+      );
+  }
+  if (
+    stat === "ability-power" &&
+    hasItemBehavior(unit, "cannot-cast-energy-attacks")
+  ) {
+    const conversion = unit.itemBehaviors.find(
+      (behavior) => behavior.kind === "cannot-cast-energy-attacks",
+    );
+    if (conversion?.kind === "cannot-cast-energy-attacks") {
+      const attackDelta = Math.round(
+        (effectiveValue * conversion.attackConversionPercent) / 100,
+      );
+      unit.attack = Math.max(1, unit.attack + attackDelta);
+      return attackDelta;
+    }
+  }
+  switch (stat) {
+    case "attack":
+      unit.attack = Math.max(1, unit.attack + effectiveValue);
+      break;
+    case "defense":
+      unit.defense = Math.max(0, unit.defense + effectiveValue);
+      break;
+    case "special-defense":
+      unit.specialDefense = Math.max(0, unit.specialDefense + effectiveValue);
+      break;
+    case "ability-power":
+      unit.abilityPowerPercent += effectiveValue;
+      break;
+    case "dynamic-attack-speed":
+      addDynamicAttackSpeed(unit, effectiveValue);
+      break;
+  }
+  return effectiveValue;
 }
 
 function transformBattleUnit(
@@ -591,6 +807,14 @@ function distance(left: MutableBattleUnit, right: MutableBattleUnit): number {
 
 function alive(unit: MutableBattleUnit): boolean {
   return unit.state !== "dead" && unit.hp > 0;
+}
+
+function occupiesBoardCell(unit: MutableBattleUnit): boolean {
+  return alive(unit) || unit.state === "resurrecting";
+}
+
+function battleActive(unit: MutableBattleUnit): boolean {
+  return alive(unit) || unit.resurrectAtTick > 0;
 }
 
 function chooseTarget(
@@ -826,7 +1050,7 @@ function chooseStep(
   }
   const occupied = new Set(
     units
-      .filter((unit) => alive(unit) && unit.id !== source.id)
+      .filter((unit) => occupiesBoardCell(unit) && unit.id !== source.id)
       .map((unit) => positionKey(unit.x, unit.y)),
   );
 
@@ -957,7 +1181,9 @@ function chooseKnockbackDestination(
       candidate.y < content.config.boardHeight &&
       !units.some(
         (unit) =>
-          alive(unit) && unit.x === candidate.x && unit.y === candidate.y,
+          occupiesBoardCell(unit) &&
+          unit.x === candidate.x &&
+          unit.y === candidate.y,
       )
     ) {
       return candidate;
@@ -999,7 +1225,9 @@ function choosePullDestination(
       candidate.y < content.config.boardHeight &&
       !units.some(
         (unit) =>
-          alive(unit) && unit.x === candidate.x && unit.y === candidate.y,
+          occupiesBoardCell(unit) &&
+          unit.x === candidate.x &&
+          unit.y === candidate.y,
       )
     ) {
       return candidate;
@@ -1016,7 +1244,7 @@ function firstLungeDestination(
 ): Position | null {
   const occupied = new Set(
     units
-      .filter((unit) => alive(unit))
+      .filter(occupiesBoardCell)
       .map((unit) => positionKey(unit.x, unit.y)),
   );
   for (let y = target.y - 1; y <= target.y + 1; y += 1) {
@@ -1072,6 +1300,7 @@ function toSnapshot(unit: MutableBattleUnit): BattleUnitSnapshot {
     maxHp: unit.maxHp,
     shield: Math.max(0, unit.shield),
     energy: unit.energy,
+    maxEnergy: unit.maxEnergy,
     attack: unit.attack,
     defense: unit.defense,
     range: unit.range,
@@ -1086,6 +1315,13 @@ export function simulateBattle(
   content: GameContent = DEFAULT_CONTENT,
 ): BattleResult {
   let rngState = hashSeed(options.seed);
+  const nextBattleRandom = (): number => {
+    const random = nextRandom(rngState);
+    rngState = random.state;
+    return random.value;
+  };
+  const drawIndex = (length: number): number =>
+    Math.min(length - 1, Math.floor(nextBattleRandom() * length));
   const maxTicks = options.maxTicks ?? content.config.combatMaxTicks;
   const recordEvents = options.recordEvents ?? true;
   const events: BattleEvent[] = [];
@@ -1095,11 +1331,10 @@ export function simulateBattle(
     }
   };
   const units = [
-    ...createMutableUnits(teamA, content),
-    ...createMutableUnits(teamB, content),
+    ...createMutableUnits(teamA, content, drawIndex),
+    ...createMutableUnits(teamB, content, drawIndex),
   ].sort((left, right) => left.id.localeCompare(right.id));
   applyStartOfBattleItemSupport(units, content.config.combatTickMs);
-  const initialUnits = units.map(toSnapshot);
   const monsterPointTriggerTick = Math.ceil(
     MONSTER_POINT_DELAY_MS / Math.max(1, content.config.combatTickMs),
   );
@@ -1120,7 +1355,14 @@ export function simulateBattle(
     reason: "attack" | "damaged" | "cast-reset" | "ability-drain" | "item",
   ): void => {
     const previous = unit.energy;
-    unit.energy = Math.max(0, Math.min(100, unit.energy + requestedAmount));
+    const effectiveAmount =
+      requestedAmount > 0 && tick < unit.protectUntilTick
+        ? 0
+        : requestedAmount;
+    unit.energy = Math.max(
+      0,
+      Math.min(unit.maxEnergy, unit.energy + effectiveAmount),
+    );
     emit({
       type: "energy",
       tick,
@@ -1138,9 +1380,7 @@ export function simulateBattle(
     if (percent >= 100) {
       return true;
     }
-    const random = nextRandom(rngState);
-    rngState = random.state;
-    return random.value * 100 < percent;
+    return nextBattleRandom() * 100 < percent;
   };
 
   const hasRuneProtect = (
@@ -1181,8 +1421,12 @@ export function simulateBattle(
     target: MutableBattleUnit,
     power: number,
     durationMs: number,
+    options: { bypassRuneProtect?: boolean } = {},
   ): void => {
-    if (!alive(target) || hasRuneProtect(target, tick)) {
+    if (
+      !alive(target) ||
+      (!options.bypassRuneProtect && hasRuneProtect(target, tick))
+    ) {
       return;
     }
     const durationTicks = Math.max(
@@ -1261,13 +1505,71 @@ export function simulateBattle(
     });
   };
 
+  const applyBlind = (
+    tick: number,
+    source: MutableBattleUnit,
+    target: MutableBattleUnit,
+    durationMs: number,
+  ): void => {
+    if (!alive(target) || hasRuneProtect(target, tick)) {
+      return;
+    }
+    const durationTicks = Math.max(
+      1,
+      Math.ceil(durationMs / content.config.combatTickMs),
+    );
+    target.blindedUntilTick = Math.max(
+      target.blindedUntilTick,
+      tick + durationTicks,
+    );
+    emit({
+      type: "status",
+      tick,
+      sourceId: source.id,
+      targetId: target.id,
+      status: "blind",
+      durationTicks,
+    });
+  };
+
+  const applyParalysis = (
+    tick: number,
+    source: MutableBattleUnit,
+    target: MutableBattleUnit,
+    durationMs: number,
+  ): void => {
+    if (!alive(target) || hasRuneProtect(target, tick)) {
+      return;
+    }
+    const durationTicks = Math.max(
+      1,
+      Math.ceil(durationMs / content.config.combatTickMs),
+    );
+    target.paralyzedUntilTick = Math.max(
+      target.paralyzedUntilTick,
+      tick + durationTicks,
+    );
+    emit({
+      type: "status",
+      tick,
+      sourceId: source.id,
+      targetId: target.id,
+      status: "paralysis",
+      durationTicks,
+    });
+  };
+
   const applyHeal = (
     tick: number,
     source: MutableBattleUnit,
     target: MutableBattleUnit,
     rawAmount: number,
   ): HealResult => {
-    if (!alive(target) || tick < target.woundUntilTick) {
+    if (
+      !alive(target) ||
+      tick < target.woundUntilTick ||
+      tick < target.protectUntilTick
+    ) {
       return { healed: 0, overheal: 0 };
     }
     const requested = Math.max(0, rawAmount);
@@ -1297,12 +1599,131 @@ export function simulateBattle(
       return;
     }
     target.shield += amount;
+    if (hasItemBehavior(target, "shield-depletion-explosion")) {
+      target.totalShieldGained += amount;
+    }
     emit({
       type: "shield",
       tick,
       sourceId: source.id,
       targetId: target.id,
       amount,
+    });
+  };
+
+  const chooseEscapeDestination = (
+    holder: MutableBattleUnit,
+  ): Position | null => {
+    const enemies = units.filter(
+      (candidate) => alive(candidate) && candidate.teamId !== holder.teamId,
+    );
+    const occupied = new Set(
+      units
+        .filter(occupiesBoardCell)
+        .map((candidate) => positionKey(candidate.x, candidate.y)),
+    );
+    const emptyCells: Position[] = [];
+    for (let y = 0; y < content.config.boardHeight; y += 1) {
+      for (let x = 0; x < content.config.boardWidth; x += 1) {
+        if (!occupied.has(positionKey(x, y))) {
+          emptyCells.push({ x, y });
+        }
+      }
+    }
+    if (emptyCells.length === 0) {
+      return null;
+    }
+    const from = { x: holder.x, y: holder.y };
+    const fromDistance = (cell: Position): number =>
+      Math.abs(cell.x - from.x) + Math.abs(cell.y - from.y);
+    const attackersAt = (cell: Position): number =>
+      enemies.filter(
+        (enemy) =>
+          Math.abs(enemy.x - cell.x) + Math.abs(enemy.y - cell.y) <= enemy.range,
+      ).length;
+    const preferred = emptyCells.filter(
+      (cell) =>
+        fromDistance(cell) > holder.range &&
+        enemies.some(
+          (enemy) =>
+            Math.abs(enemy.x - cell.x) + Math.abs(enemy.y - cell.y) <=
+            holder.range,
+        ),
+    );
+    if (preferred.length > 0) {
+      const safestCount = Math.min(...preferred.map(attackersAt));
+      const safest = preferred.filter((cell) => attackersAt(cell) === safestCount);
+      const farthestDistance = Math.max(...safest.map(fromDistance));
+      const finalists = safest
+        .filter((cell) => fromDistance(cell) === farthestDistance)
+        .sort((left, right) => left.y - right.y || left.x - right.x);
+      return finalists[drawIndex(finalists.length)] ?? null;
+    }
+    const minimumEnemyDistance = (cell: Position): number =>
+      enemies.length === 0
+        ? 0
+        : Math.min(
+            ...enemies.map(
+              (enemy) => Math.abs(enemy.x - cell.x) + Math.abs(enemy.y - cell.y),
+            ),
+          );
+    const safestDistance = Math.max(...emptyCells.map(minimumEnemyDistance));
+    return (
+      emptyCells
+        .filter((cell) => minimumEnemyDistance(cell) === safestDistance)
+        .sort((left, right) => left.y - right.y || left.x - right.x)[0] ?? null
+    );
+  };
+
+  const triggerSmokeEscape = (
+    tick: number,
+    holder: MutableBattleUnit,
+  ): void => {
+    const behavior = holder.itemBehaviors.find(
+      (candidate) => candidate.kind === "low-health-smoke-escape",
+    );
+    if (
+      behavior?.kind !== "low-health-smoke-escape" ||
+      !hasAvailableItemBehavior(holder, behavior.kind) ||
+      holder.hp <= 0 ||
+      holder.hp * 100 >= holder.maxHp * behavior.healthThresholdPercent
+    ) {
+      return;
+    }
+    consumeItemBehavior(holder, behavior.kind);
+    const adjacentEnemies = units
+      .filter(
+        (candidate) =>
+          alive(candidate) &&
+          candidate.teamId !== holder.teamId &&
+          Math.max(
+            Math.abs(candidate.x - holder.x),
+            Math.abs(candidate.y - holder.y),
+          ) <= 1,
+      )
+      .sort((left, right) => left.id.localeCompare(right.id));
+    for (const enemy of adjacentEnemies) {
+      applyParalysis(tick, holder, enemy, behavior.statusMs);
+      applyBlind(tick, holder, enemy, behavior.statusMs);
+    }
+    applyShield(tick, holder, holder, behavior.shield);
+    const destination = chooseEscapeDestination(holder);
+    if (!destination) {
+      return;
+    }
+    const from = { x: holder.x, y: holder.y };
+    holder.x = destination.x;
+    holder.y = destination.y;
+    holder.nextActionTick = tick + 1;
+    emit({
+      type: "unit-displace",
+      tick,
+      sourceId: holder.id,
+      unitId: holder.id,
+      abilityId: "smoke-star-escape",
+      movementKind: "escape",
+      from,
+      to: destination,
     });
   };
 
@@ -1314,9 +1735,13 @@ export function simulateBattle(
     damageKind: "attack" | "ability" | "burn" | "item",
     damageType: DamageType,
     defensePiercePercent = 0,
-    options: { isRetaliation?: boolean } = {},
+    options: {
+      isRetaliation?: boolean;
+      preventCover?: boolean;
+      suppressBombardier?: boolean;
+    } = {},
   ): number => {
-    if (!alive(target)) {
+    if (!alive(target) || tick < target.protectUntilTick) {
       return 0;
     }
     const burnReductionPercent =
@@ -1396,12 +1821,123 @@ export function simulateBattle(
         }
       }
     }
-    const shieldDamage = Math.min(target.shield, damageBeforeShield);
+    const shieldBefore = target.shield;
+    const shieldDamage = Math.min(shieldBefore, damageBeforeShield);
     target.shield -= shieldDamage;
-    const healthDamage = Math.min(
-      target.hp,
-      damageBeforeShield - shieldDamage,
+    if (
+      !options.suppressBombardier &&
+      shieldBefore > 0 &&
+      target.shield === 0 &&
+      hasAvailableItemBehavior(target, "shield-depletion-explosion")
+    ) {
+      const explosionBehavior = target.itemBehaviors.find(
+        (behavior) => behavior.kind === "shield-depletion-explosion",
+      );
+      consumeItemBehavior(target, "shield-depletion-explosion");
+      if (explosionBehavior?.kind === "shield-depletion-explosion") {
+        const explosion = Math.round(
+          (target.totalShieldGained * explosionBehavior.percent) / 100,
+        );
+        if (explosion > 0) {
+          const adjacentEnemies = units
+            .filter(
+              (candidate) =>
+                alive(candidate) &&
+                candidate.teamId !== target.teamId &&
+                Math.max(
+                  Math.abs(candidate.x - target.x),
+                  Math.abs(candidate.y - target.y),
+                ) <= 1,
+            )
+            .sort((left, right) => left.id.localeCompare(right.id));
+          for (const enemy of adjacentEnemies) {
+            applyDamage(
+              tick,
+              target,
+              enemy,
+              explosion,
+              "item",
+              "special",
+              0,
+              { suppressBombardier: true },
+            );
+          }
+        }
+      }
+    }
+    const prospectiveHealthDamage = damageBeforeShield - shieldDamage;
+    let healthDamageCancelled = false;
+    const miracleBehavior = target.itemBehaviors.find(
+      (behavior) => behavior.kind === "low-health-protect-energy",
     );
+    if (
+      prospectiveHealthDamage > 0 &&
+      miracleBehavior?.kind === "low-health-protect-energy" &&
+      hasAvailableItemBehavior(target, miracleBehavior.kind) &&
+      (target.hp - prospectiveHealthDamage) * 100 <
+        target.maxHp * miracleBehavior.healthThresholdPercent
+    ) {
+      consumeItemBehavior(target, miracleBehavior.kind);
+      healthDamageCancelled = true;
+      changeEnergy(tick, target, miracleBehavior.energy, "item");
+      const durationTicks = Math.max(
+        1,
+        Math.ceil(miracleBehavior.protectMs / content.config.combatTickMs),
+      );
+      target.protectUntilTick = Math.max(
+        target.protectUntilTick,
+        tick + durationTicks,
+      );
+      emit({
+        type: "status",
+        tick,
+        sourceId: target.id,
+        targetId: target.id,
+        status: "protect",
+        durationTicks,
+      });
+    }
+    if (
+      !healthDamageCancelled &&
+      !options.preventCover &&
+      prospectiveHealthDamage >= target.hp &&
+      !hasItemBehavior(target, "lethal-cover")
+    ) {
+      const cover = units
+        .filter(
+          (candidate) =>
+            alive(candidate) &&
+            candidate.teamId === target.teamId &&
+            candidate.id !== target.id &&
+            hasItemBehavior(candidate, "lethal-cover") &&
+            Math.max(
+              Math.abs(candidate.x - target.x),
+              Math.abs(candidate.y - target.y),
+            ) <= 1,
+        )
+        .sort(
+          (left, right) =>
+            left.y - right.y ||
+            left.x - right.x ||
+            left.id.localeCompare(right.id),
+        )[0];
+      if (cover) {
+        healthDamageCancelled = true;
+        applyDamage(
+          tick,
+          source,
+          cover,
+          rawAmount,
+          damageKind,
+          damageType,
+          defensePiercePercent,
+          { ...options, preventCover: true },
+        );
+      }
+    }
+    const healthDamage = healthDamageCancelled
+      ? 0
+      : Math.min(target.hp, prospectiveHealthDamage);
     target.hp -= healthDamage;
     const dealt = shieldDamage + healthDamage;
     if (source) {
@@ -1433,9 +1969,49 @@ export function simulateBattle(
             behavior.eventsPerProc ===
             0
         ) {
-          target.attack += behavior.attack;
-          target.defense += behavior.defense;
-          addDynamicAttackSpeed(target, behavior.attackSpeedPercent);
+          applyCombatStatDelta(
+            target,
+            "attack",
+            behavior.attack,
+            "self",
+          );
+          applyCombatStatDelta(
+            target,
+            "defense",
+            behavior.defense,
+            "self",
+          );
+          applyCombatStatDelta(
+            target,
+            "dynamic-attack-speed",
+            behavior.attackSpeedPercent,
+            "self",
+          );
+        }
+      }
+      if (
+        source &&
+        damageType === "special" &&
+        damageKind !== "burn" &&
+        !options.isRetaliation
+      ) {
+        for (const behavior of source.itemBehaviors) {
+          if (behavior.kind !== "on-special-damage-burn-resistance") {
+            continue;
+          }
+          applyCombatStatDelta(
+            target,
+            "special-defense",
+            behavior.specialDefenseDelta,
+            source.teamId === target.teamId ? "friendly" : "enemy",
+          );
+          applyBurn(
+            tick,
+            source,
+            target,
+            Math.round(target.maxHp * 0.05),
+            behavior.burnDurationMs,
+          );
         }
       }
     }
@@ -1481,6 +2057,9 @@ export function simulateBattle(
         status: "emergency-shield",
         durationTicks: 0,
       });
+    }
+    if (dealt > 0) {
+      triggerSmokeEscape(tick, target);
     }
     const reflectionEligible =
       damageType === "special" &&
@@ -1539,7 +2118,12 @@ export function simulateBattle(
     let attackSpeedChanged = false;
     for (const behavior of source.itemBehaviors) {
       if (behavior.kind === "on-basic-attack-attack-speed") {
-        addDynamicAttackSpeed(source, behavior.attackSpeedPercent);
+        applyCombatStatDelta(
+          source,
+          "dynamic-attack-speed",
+          behavior.attackSpeedPercent,
+          "self",
+        );
         attackSpeedChanged = true;
       }
     }
@@ -1757,10 +2341,159 @@ export function simulateBattle(
     return true;
   };
 
+  const captureResurrectionBaseline = (unit: MutableBattleUnit): void => {
+    if (!unit.resurrectionAvailable) {
+      return;
+    }
+    unit.resurrectionBaseline = {
+      ...(unit.formId ? { formId: unit.formId } : {}),
+      ability: unit.ability ? structuredClone(unit.ability) : null,
+      maxHp: unit.maxHp,
+      attack: unit.attack,
+      defense: unit.defense,
+      specialDefense: unit.specialDefense,
+      range: unit.range,
+      attackIntervalTicks: unit.attackIntervalTicks,
+      dynamicAttackSpeedBaseTicks: unit.dynamicAttackSpeedBaseTicks,
+      abilityPowerPercent: unit.abilityPowerPercent,
+      criticalChancePercent: unit.criticalChancePercent,
+      criticalPowerPercent: unit.criticalPowerPercent,
+      luck: unit.luck,
+      dodgePercent: unit.dodgePercent,
+      omnivampPercent: unit.omnivampPercent,
+      maxEnergy: unit.maxEnergy,
+    };
+  };
+
+  const applyResurrectionStartIdentities = (
+    tick: number,
+    unit: MutableBattleUnit,
+    includeRuneProtect: boolean,
+  ): void => {
+    for (const behavior of unit.itemBehaviors) {
+      if (behavior.kind === "start-base-attack-self-burn") {
+        applyBurn(
+          tick,
+          unit,
+          unit,
+          Math.round(unit.maxHp * 0.05),
+          behavior.burnDurationMs,
+          { bypassRuneProtect: true },
+        );
+      } else if (includeRuneProtect && behavior.kind === "starting-rune-protect") {
+        unit.runeProtectUntilTick = Math.max(
+          unit.runeProtectUntilTick,
+          tick +
+            Math.max(
+              1,
+              Math.ceil(behavior.durationMs / content.config.combatTickMs),
+            ),
+        );
+      }
+    }
+  };
+
+  const processResurrections = (tick: number): void => {
+    for (const unit of units) {
+      if (
+        unit.state !== "resurrecting" ||
+        unit.resurrectAtTick <= 0 ||
+        tick < unit.resurrectAtTick ||
+        !unit.resurrectionBaseline
+      ) {
+        continue;
+      }
+      const baseline = unit.resurrectionBaseline;
+      if (baseline.formId) {
+        unit.formId = baseline.formId;
+      } else {
+        delete unit.formId;
+      }
+      unit.ability = baseline.ability ? structuredClone(baseline.ability) : null;
+      unit.maxHp = baseline.maxHp;
+      unit.hp = baseline.maxHp;
+      unit.shield = 0;
+      unit.energy = 0;
+      unit.maxEnergy = baseline.maxEnergy;
+      unit.attack = baseline.attack;
+      unit.defense = baseline.defense;
+      unit.specialDefense = baseline.specialDefense;
+      unit.range = baseline.range;
+      unit.attackIntervalTicks = baseline.attackIntervalTicks;
+      unit.dynamicAttackSpeedBaseTicks = baseline.dynamicAttackSpeedBaseTicks;
+      unit.dynamicAttackSpeedPercent = 0;
+      unit.abilityPowerPercent = baseline.abilityPowerPercent;
+      unit.criticalChancePercent = baseline.criticalChancePercent;
+      unit.criticalPowerPercent = baseline.criticalPowerPercent;
+      unit.luck = baseline.luck;
+      unit.dodgePercent = baseline.dodgePercent;
+      unit.omnivampPercent = baseline.omnivampPercent;
+      unit.abilityCastCount = 0;
+      unit.itemRuntimeCounters = {
+        basicAttackAttempts: 0,
+        damageReceivedEvents: 0,
+      };
+      unit.totalShieldGained = 0;
+      unit.emergencyShieldUsed = false;
+      unit.stunUntilTick = 0;
+      unit.runeProtectUntilTick = 0;
+      unit.protectUntilTick = 0;
+      unit.blindedUntilTick = 0;
+      unit.paralyzedUntilTick = 0;
+      unit.resistanceReductionUntilTick = 0;
+      unit.woundUntilTick = 0;
+      unit.burnUntilTick = 0;
+      unit.burnNextTick = 0;
+      unit.burnPower = 0;
+      unit.burnSourceId = null;
+      unit.lastDamagerId = null;
+      unit.resurrectAtTick = 0;
+      unit.state = "seek";
+      unit.nextActionTick = tick + 1;
+      unit.periodicItemBehaviors = unit.periodicItemBehaviors.map((runtime) => ({
+        ...runtime,
+        nextTick: tick + runtime.intervalTicks,
+      }));
+      applyResurrectionStartIdentities(tick, unit, true);
+      emit({
+        type: "unit-resurrect",
+        tick,
+        unitId: unit.id,
+        hp: unit.hp,
+        maxHp: unit.maxHp,
+        ...(unit.formId ? { formId: unit.formId } : {}),
+      });
+    }
+  };
+
   const processDeaths = (tick: number): void => {
     for (const unit of units) {
-      if (unit.state === "dead" || unit.hp > 0) {
+      if (
+        unit.state === "dead" ||
+        unit.state === "resurrecting" ||
+        unit.hp > 0
+      ) {
         continue;
+      }
+      if (
+        unit.resurrectionAvailable &&
+        unit.resurrectionBaseline
+      ) {
+        const behavior = unit.itemBehaviors.find(
+          (candidate) => candidate.kind === "resurrect-once",
+        );
+        if (behavior?.kind === "resurrect-once") {
+          unit.resurrectionAvailable = false;
+          unit.hp = 0;
+          unit.state = "resurrecting";
+          unit.resurrectAtTick =
+            tick +
+            Math.max(
+              1,
+              Math.ceil(behavior.delayMs / content.config.combatTickMs),
+            );
+          continue;
+        }
       }
       unit.state = "dead";
       unit.hp = 0;
@@ -1775,11 +2508,17 @@ export function simulateBattle(
       );
       if (killer && killer.stackingAttackPercent > 0) {
         const previousAttack = killer.attack;
-        killer.attack = Math.max(
-          killer.attack + 1,
+        const requestedAttack = Math.max(
+          1,
           Math.floor(
-            (killer.attack * (100 + killer.stackingAttackPercent)) / 100,
+            (killer.attack * killer.stackingAttackPercent) / 100,
           ),
+        );
+        applyCombatStatDelta(
+          killer,
+          "attack",
+          requestedAttack,
+          "self",
         );
         emit({
           type: "buff",
@@ -1802,10 +2541,17 @@ export function simulateBattle(
     teamBId: teamB.id,
   });
 
+  for (const unit of units) {
+    captureResurrectionBaseline(unit);
+    applyResurrectionStartIdentities(0, unit, false);
+  }
+  const initialUnits = units.map(toSnapshot);
+
   let endTick = 0;
   let timedOut = false;
   for (let tick = 1; tick <= maxTicks; tick += 1) {
     endTick = tick;
+    processResurrections(tick);
     for (const unit of units) {
       if (!alive(unit)) {
         continue;
@@ -1815,10 +2561,20 @@ export function simulateBattle(
           continue;
         }
         if (runtime.behavior.kind === "periodic-ability-power-energy") {
-          unit.abilityPowerPercent += runtime.behavior.abilityPowerPercent;
+          applyCombatStatDelta(
+            unit,
+            "ability-power",
+            runtime.behavior.abilityPowerPercent,
+            "self",
+          );
           changeEnergy(tick, unit, runtime.behavior.energy, "item");
         } else if (runtime.behavior.kind === "periodic-attack-speed") {
-          addDynamicAttackSpeed(unit, runtime.behavior.attackSpeedPercent);
+          applyCombatStatDelta(
+            unit,
+            "dynamic-attack-speed",
+            runtime.behavior.attackSpeedPercent,
+            "self",
+          );
         } else {
           const adjacentAllies = units.filter(
             (candidate) =>
@@ -1884,10 +2640,10 @@ export function simulateBattle(
     }
 
     const livingA = units.some(
-      (unit) => alive(unit) && unit.teamId === teamA.id,
+      (unit) => battleActive(unit) && unit.teamId === teamA.id,
     );
     const livingB = units.some(
-      (unit) => alive(unit) && unit.teamId === teamB.id,
+      (unit) => battleActive(unit) && unit.teamId === teamB.id,
     );
     if (!livingA || !livingB) {
       break;
@@ -1906,7 +2662,11 @@ export function simulateBattle(
         continue;
       }
       source.state = "seek";
-      if (source.ability && source.energy >= 100) {
+      if (
+        source.ability &&
+        source.energy >= source.maxEnergy &&
+        !hasItemBehavior(source, "cannot-cast-energy-attacks")
+      ) {
         const targets = abilityTargets(source, units, content);
         if (targets.length > 0) {
           source.state = "cast";
@@ -2257,9 +3017,14 @@ export function simulateBattle(
       source.nextActionTick = tick + source.attackIntervalTicks;
       source.state = "attack-recovery";
       const rolledDodge = roll(
-        adjustedChancePercent(target.dodgePercent, target.luck),
+        adjustedChancePercent(
+          target.dodgePercent + (tick < source.blindedUntilTick ? 50 : 0),
+          target.luck,
+        ),
       );
-      const dodged = hasItemBehavior(source, "basic-attacks-cannot-miss")
+      const dodged =
+        hasItemBehavior(source, "basic-attacks-cannot-miss") ||
+        tick < target.paralyzedUntilTick
         ? false
         : rolledDodge;
       const critical = dodged
@@ -2277,6 +3042,15 @@ export function simulateBattle(
         targetId: target.id,
         critical,
       });
+      const energyAttackPower = hasItemBehavior(
+        source,
+        "cannot-cast-energy-attacks",
+      )
+        ? source.energy
+        : 0;
+      if (energyAttackPower > 0) {
+        changeEnergy(tick, source, -energyAttackPower, "item");
+      }
       changeEnergy(tick, source, 10, "attack");
       if (dodged) {
         emit({
@@ -2316,7 +3090,7 @@ export function simulateBattle(
           (impactBehavior
             ? Math.round((target.maxHp * impactBehavior.percent) / 100)
             : 0),
-        special: 0,
+        special: energyAttackPower,
         true: trueDamage,
       };
       if (!dodged) {
@@ -2339,7 +3113,7 @@ export function simulateBattle(
         target,
         primaryDamage,
         critical,
-        aliveBefore && !alive(target),
+        aliveBefore && !alive(target) && !target.resurrectionAvailable,
       );
       for (const behavior of target.itemBehaviors) {
         if (
@@ -2373,7 +3147,9 @@ export function simulateBattle(
     processDeaths(tick);
 
     const reserved = new Set(
-      units.filter(alive).map((unit) => `${unit.x},${unit.y}`),
+      units
+        .filter(occupiesBoardCell)
+        .map((unit) => `${unit.x},${unit.y}`),
     );
     for (const intent of intents.filter(
       (candidate): candidate is MoveIntent => candidate.kind === "move",
@@ -2403,10 +3179,10 @@ export function simulateBattle(
   }
 
   const survivingA = units.filter(
-    (unit) => alive(unit) && unit.teamId === teamA.id,
+    (unit) => battleActive(unit) && unit.teamId === teamA.id,
   );
   const survivingB = units.filter(
-    (unit) => alive(unit) && unit.teamId === teamB.id,
+    (unit) => battleActive(unit) && unit.teamId === teamB.id,
   );
   let winner: BattleResult["winner"] = "draw";
   let winnerId: string | null = null;
