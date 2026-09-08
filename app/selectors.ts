@@ -2,8 +2,11 @@ import {
   DEFAULT_CONTENT,
   getActiveTraits,
   getActiveTraitsForUnits,
+  getEffectiveUnitTraits,
   getStageDefinition,
   getUnitFormDefinition,
+  isComponentItem,
+  resolveItemRecipe,
   resolvePersistentFormId,
   resolveUnitDefinition,
 } from "@/game";
@@ -12,6 +15,7 @@ import type {
   BattleUnitSnapshot,
   GameContent,
   ItemEffect,
+  ItemKind,
   MatchBattleResult,
   MatchState,
   PlayerState,
@@ -161,6 +165,15 @@ export type ChoiceView = {
   portrait?: string;
   color: string;
   effects: ItemEffectView[];
+  kind?: ItemKind;
+  grantedTrait?: { id: string; name: string };
+  recipeComponents?: Array<{ id: string; name: string }>;
+  recipeResults?: Array<{
+    componentId: string;
+    componentName: string;
+    resultId: string;
+    resultName: string;
+  }>;
   decision?: AvailableItemDecisionPreview & { recommended: boolean };
   takenByPlayerId?: string | null;
   orbitIndex?: number;
@@ -308,6 +321,34 @@ export function createItemView(
   content: GameContent = DEFAULT_CONTENT,
 ): ChoiceView {
   const item = content.items.find((candidate) => candidate.id === itemId);
+  const grantedTrait = item?.grantedTraitId
+    ? content.traits.find((trait) => trait.id === item.grantedTraitId)
+    : undefined;
+  const recipeEntry = item?.kind === "completed"
+    ? Object.entries(content.itemRecipes).find(([, resultId]) => resultId === item.id)
+    : undefined;
+  const recipeComponents = recipeEntry?.[0].split("::").flatMap((componentId) => {
+    const component = content.items.find((candidate) => candidate.id === componentId);
+    return component ? [{ id: component.id, name: component.name }] : [];
+  });
+  const recipeResults = item?.kind === "component"
+    ? content.items
+        .filter((candidate) => candidate.kind === "component")
+        .flatMap((component) => {
+          const resultId = resolveItemRecipe(item.id, component.id, content);
+          const result = resultId
+            ? content.items.find((candidate) => candidate.id === resultId)
+            : undefined;
+          return result
+            ? [{
+                componentId: component.id,
+                componentName: component.name,
+                resultId: result.id,
+                resultName: result.name,
+              }]
+            : [];
+        })
+    : undefined;
   return {
     id: itemId,
     contentId: itemId,
@@ -317,6 +358,79 @@ export function createItemView(
     icon: item?.icon ?? "✦",
     color: cssColor(itemId),
     effects: item?.effects.map(effectView) ?? [],
+    ...(item ? { kind: item.kind } : {}),
+    ...(grantedTrait
+      ? { grantedTrait: { id: grantedTrait.id, name: grantedTrait.name } }
+      : {}),
+    ...(recipeComponents ? { recipeComponents } : {}),
+    ...(recipeResults ? { recipeResults } : {}),
+  };
+}
+
+export type ItemEquipPreviewView = {
+  eligible: boolean;
+  kind: "direct" | "craft";
+  resultId: string;
+  resultName: string;
+  heldComponentName?: string;
+  returnsToInventory: boolean;
+  message: string;
+};
+
+export function createItemEquipPreview(
+  unit: Pick<UnitInstance, "definitionId" | "formId" | "items">,
+  incomingItemId: string,
+  content: GameContent = DEFAULT_CONTENT,
+): ItemEquipPreviewView | null {
+  const incoming = content.items.find((item) => item.id === incomingItemId);
+  if (!incoming) return null;
+  const heldComponent = isComponentItem(incoming)
+    ? unit.items
+        .map((itemId) => content.items.find((item) => item.id === itemId))
+        .find(isComponentItem)
+    : undefined;
+  const resultId = heldComponent
+    ? resolveItemRecipe(heldComponent.id, incoming.id, content)
+    : null;
+  const result = resultId
+    ? content.items.find((item) => item.id === resultId)
+    : incoming;
+  if (!result) return null;
+  const effectiveTraits = getEffectiveUnitTraits(unit, content);
+  const returnsToInventory = Boolean(
+    heldComponent &&
+    (unit.items.includes(result.id) ||
+      (result.grantedTraitId && effectiveTraits.includes(result.grantedTraitId))),
+  );
+  const duplicateDirect = !heldComponent && unit.items.includes(result.id);
+  const redundantDirect = Boolean(
+    !heldComponent &&
+    result.grantedTraitId &&
+    effectiveTraits.includes(result.grantedTraitId),
+  );
+  const eligible = heldComponent
+    ? true
+    : !duplicateDirect && !redundantDirect && unit.items.length < content.config.itemCap;
+  const kind = heldComponent ? "craft" as const : "direct" as const;
+  const message = heldComponent
+    ? returnsToInventory
+      ? `${heldComponent.name} + ${incoming.name} crafts ${result.name}; the redundant result moves to inventory.`
+      : `${heldComponent.name} + ${incoming.name} crafts and equips ${result.name}.`
+    : duplicateDirect
+      ? `${result.name} cannot be equipped twice on the same unit.`
+    : redundantDirect
+      ? `${result.name} cannot be equipped because this unit already has ${result.grantedTraitId}.`
+      : eligible
+        ? `${result.name} equips directly.`
+        : `This unit already holds the maximum number of items.`;
+  return {
+    eligible,
+    kind,
+    resultId: result.id,
+    resultName: result.name,
+    ...(heldComponent ? { heldComponentName: heldComponent.name } : {}),
+    returnsToInventory,
+    message,
   };
 }
 

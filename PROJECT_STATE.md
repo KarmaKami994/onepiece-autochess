@@ -23,10 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-P4B7 Final Core Non-Trait Items and its Phoenix spatial-occupancy review correction are implemented on `feat/p4b7-final-core-items` from exact base `ce91e9f9eb695c32406596e7b832cc98ffa3b50f`. The final 12 approved non-trait identities are active through narrow deterministic battle-local primitives, completing 45/45 non-trait recipe outputs; the 10 trait-grant outputs and P4C remain deferred. GameContent is `1.22.0`; schema remains 6. Acquisition, Gear 4, saves, economy and bots remain stable.
+P4C Complete Item Integration is implemented on `feat/p4c-complete-item-integration` from exact base `e88ed002cc27fcfe1a05909cba6b6e45cece8e67`. All 55 completed recipes now have their approved identity; normal rewards use the ten components, recipe-aware crafting/bots and accessible generic presentation complete the production loop. P4 is COMPLETE. GameContent is `1.23.0`; schema remains 6. Final authored item art remains deferred until after P6.
 
 ## Last Completed Work
 
+- 2026-09-08 — P4C complete item integration: added the ten approved trait-grant identities with exact locked stats, deployed-only effective-trait resolution across persistent forms/items, redundant direct/craft/merge handling, component-only PvE/carousel acquisition, canonical recipe/grant selector data, keyboard-focus tooltips and craft previews, generic non-sheet bounty rendering, tutorial updates and recipe-aware bot equipping. P4 is complete; GameContent is `1.23.0`, schema remains 6, and no trait tier, P4B behavior, Gear 4 catalyst, cadence or save ID changed. Material files: item/trait/roster/engine/scoring domain modules, selectors/decision support/screens/Carousel presentation, focused/affected tests, README, `docs/P4_ITEM_SYSTEM_AUDIT.md`, `PROJECT_STATE.md`.
 - 2026-09-08 — PR #46 review correction: resurrecting Phoenix Feather units now reserve their board coordinate for movement, Lunge, Knockback, Pull, Smoke-Star Escape and end-of-tick movement resolution while remaining untargetable and otherwise inactive. Focused regressions cover the full two-second delay, all affected spatial paths, continued team activity and unique coordinates after resurrection. Material files: `game/combat.ts`, `tests/game/p4b7-final-core-items.test.ts`, `PROJECT_STATE.md`.
 - 2026-09-08 — P4B7 final core non-trait item pack: implemented Flame-Flame Grimoire, Miracle Talisman, Mystery Treasure Chest, Smoke-Star Escape, Phoenix Feather, Banquet Belt, Reversal Band, Mera Mera Ember, Bombardier Band, Bodyguard Band, Nullification Bandanna and Efficient Bandanna. Added only the required battle-local Protect/Blind/Paralysis/resurrection/Max-Energy, threshold-consumption, generated-item, escape/interception and ordered stat-delta primitives. All 45 non-trait completed outputs now have mechanics; 10 trait grants remain deferred. GameContent is `1.22.0`; schema remains 6. Material files: `game/types.ts`, `game/content.ts`, `game/combat.ts`, snapshot/presentation consumers, production-audit compatibility, focused/version regressions, `docs/P4_ITEM_SYSTEM_AUDIT.md`, `PROJECT_STATE.md`.
 - 2026-09-08 — PR #45 review correction: sequential abilities retain one shared Ability Crit roll per cast while each strike now selects normal- or Crit-weighted damage from its current target's Iron Pirate Helm state after deterministic retargeting. Both normal→Helmet and Helmet→normal directions are covered without adding an RNG roll. Material files: `game/combat.ts`, focused P4B6 tests, `PROJECT_STATE.md`.
@@ -75,6 +76,16 @@ P4B7 Final Core Non-Trait Items and its Phoenix spatial-occupancy review correct
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+P4C complete item integration:
+
+- PASS — focused P4C/P4A–P4B7/form/save/decision/Carousel group: 14 files / 269 tests.
+- PASS — `npm run typecheck`, `npm run lint`, and `npm test`: 51 files / 613 tests.
+- PASS — `npm run assets:validate`: 41 animation atlases, maps, Carousel assets and provenance files validated.
+- PASS — `npm run test:production-smoke`: 50/50 completed matches, zero crashes; regression evidence only, no tuning.
+- PASS — `npm run build`; only existing chunk-size and route-classification advisories were reported.
+- PASS — Browser E2E: 17 passed / 3 expected project-matrix skips across the configured desktop viewports.
+- NOT RUN — `npm run test:production-soak`; no 1,000-seed report or baseline was generated.
 
 PR #46 Phoenix spatial-occupancy review correction:
 
@@ -559,6 +570,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- P4C adds ten typed trait-grant completed items. Effective traits combine the resolved persistent form/native traits with equipped grants, dedupe within a unit and still count distinct base definitions only; bench holders do not contribute. Direct redundant grants fail with `ITEM_TRAIT_DUPLICATE`, while redundant craft/merge results return to inventory without deletion or auto-crafting. Normal PvE/carousel rewards now use the stable ten-component pool; bots craft recipes at cap and reject redundant direct grants. Recipe/grant metadata, selected-holder previews, ten distinct component glyphs and generic non-sheet bounty presentation complete the accessible production flow. P4 is complete; GameContent is `1.23.0`, schema remains 6.
 - Resurrecting Phoenix Feather units now count as occupied only for board-space reservation. Ordinary movement, Lunge, Knockback, Pull, Smoke-Star Escape and simultaneous end-of-tick movement cannot enter their coordinate during the two-second delay; targeting, damage, healing and action eligibility remain `alive()`-based and unchanged.
 - P4B7 completes the remaining 12 non-trait core identities. Grimoire adds per-Special-hit Burn/Special-Defense reduction; Miracle provides one post-Shield Protect threshold; Chest resolves up to two deterministic battle-only non-trait items; Smoke adds one low-health Blind/Paralysis/shield escape; Phoenix provides one delayed baseline resurrection; Banquet/Reversal transform supported combat stat deltas; Mera doubles star-scaled base Attack through that helper and self-Burns; Bombardier explodes from runtime Shield gained; Bodyguard intercepts adjacent lethal damage; Nullification blocks casting and converts AP/Energy to attacks; Efficient applies horizontal multiplicative Max-Energy reduction. All 45 non-trait completed outputs now have mechanics; GameContent is `1.22.0` and schema remains 6.
 - P4B6 adds the 12 locked defense/control/retaliation identities. Rune Protect blocks only Stun, Burn application, Wound and timed resistance reduction; Razor halves current Defense/Special Defense before its successful hit; Pads double post-reduction damage entering Shield with HP overflow and suppress retaliation; Helmet preserves Crit identity but removes bonus damage per target; Doll adds post-resistance non-True reduction and nearest-tie basic priority; Lens reflects only resistance-blocked Special damage; Barb retaliates against adjacent attempts and Wounds. Sea Prism Stone is now exactly +40 Special Defense with half Burn ticks. GameContent is `1.21.0`; schema remains 6.
@@ -604,6 +616,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- None for P4C. No P4B item behavior/value, trait tier, gameplay cadence, Gear 4 catalyst, save schema/ID, metric, tuning, new dependency, authored final-art pack, production baseline or 1,000-seed soak was changed or added.
 - None for the PR #46 review correction. No item value/contract, `alive()`/`battleActive()` semantics, targeting, RNG, content, schema, acquisition, P4C, tuning or 1,000-seed soak changed.
 - None for P4B7. No trait-grant mechanic, new trait, generic status/event/lifecycle framework, component acquisition, item UI/bot/P4C work, tuning, schema change, baseline or 1,000-seed soak was added. Browser E2E is left to CI as scoped.
 - None for P4B6. No generic status/lifecycle/event/retaliation framework, unavailable Sleep/Locked/Poison/board-effect system, additional item family, acquisition/UI/bot work, P4C, tuning, schema change or 1,000-seed soak was added. Browser E2E is left to CI as scoped.
@@ -649,8 +662,8 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
-- After P4B7, the only behaviorless completed recipe outputs are the 10 trait-grant identities. Their mappings and all acquisition/UI/bot work remain P4C concerns requiring separate approval. The new conditional effects are intentionally not valued by existing static-only bot scoring.
-- Existing decision support and bots still score static item effects only. Clima-Tact's dynamic-only identity therefore scores zero, while P4B5's two acquirable changed IDs are valued only by their new static effects and not their chain/stack behaviors. Dynamic behavior scoring remains a P4C concern rather than part of P4B implementation.
+- P4 is complete with no blocking integration defect found. Bots now understand recipes, cap legality and trait redundancy, but conditional combat identities remain valued only through existing static/structural signals; no tuning was authorized. Final authored item art remains scheduled after P6.
+- Decision support and bots remain intentionally structural: recipes, cap legality, resolved traits and static item effects are understood, while delayed/conditional combat triggers are not assigned new tuning weights. That is a future measurement/tuning concern, not an incomplete P4 production rule.
 - Existing all-player-elimination behavior still leaves `winnerId` null when no survivor remains. The new deterministic batch ranking applies, but winner semantics remain a separate edge-case watch and were intentionally not redesigned here.
 - Full star-copy sell refund (`cost × 1/3/9`) makes 2-star/3-star units fully liquid, lowers pivot commitment and can move battle-time sales into interest thresholds; classify WATCH / NEEDS MEASUREMENT, not a defect. Constant per-unit pools preserve absolute copies while four-character expansions grow cost-band totals and dilute each specific definition's conditional roll share. Realized gold, levels, streaks, high-cost access, rerolls and star timing are P3-coupled and not currently observable at sufficient grain.
 - The normalized baseline completed 1,000/1,000 matches without crashes and exposes no systemic blocker. Full-clock average duration remains above the 20–30 minute target at 33.740 minutes while paced duration is 24.064 minutes; this remains a pacing watch, not a development blocker. Gear 4 appeared on only two of 130 deployed three-star Luffy final boards and remains accessibility context for future P4 research, not a balance conclusion. Historical results remain valid exact-historical-harness evidence and are not reinterpreted as normalized measurements.
@@ -681,6 +694,7 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
+- P4C treats `grantedTraitId` as typed item content and derives effective traits from resolved form/native traits plus held grants. Distinct-definition counting and deployed-only activation remain authoritative. Redundant direct grants are illegal; redundant crafted/merged outputs are preserved in inventory. Normal early acquisition is the stable ten-component pool, while legacy completed IDs remain valid for recipes, saves and Gear 4. Unknown/non-sheet bounties use generic icon/color presentation rather than an arbitrary legacy column. GameContent is `1.23.0`, schema remains 6, P4 is complete and final authored item art waits until after P6.
 - Board-cell reservation uses a private combat-only predicate that includes living and resurrecting units; all ordinary target and action eligibility continues to use `alive()`, preserving Phoenix untargetability and inactivity during its delay.
 - P4B7 keeps generated Chest items, one-shot consumption, statuses, Max Energy, Shield-gain meters and resurrection state private to deterministic combat. Chest consumes two seeded draws from stable non-trait candidates and freezes resolved battle item IDs in snapshots without persistent mutation. Combat stat deltas resolve Reversal inversion, Banquet amplification, then Nullification AP→Attack conversion at local ×3 scaling. PAC dish, stolen-buff and Flame-Orb Freeze clauses remain non-applicable because no host systems exist. All stable IDs, acquisition order, Gear 4 catalysts and schema 6 remain unchanged.
 - P4B6 keeps all new state private to battle ticks. Horizontal start support is resolved after individual static items/traits and before dynamic-Speed baseline capture. Rune Protect is intentionally narrow; Razor is a timed non-mutating dual-resistance reduction; Lens uses the existing local mitigation curve; Helmet's Ability Crit negation is target-specific without rerolls; Sticky Barb scales the complete PAC retaliation result ×3. Sleep, Locked, Poison and board-effect clauses remain non-applicable. Sea Prism Stone intentionally replaces its temporary legacy stats with final Assault Vest identity.
@@ -720,7 +734,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-Review P4B7. Do not start P4C, trait-grant mechanics, P1B, captain damage, economy tuning or balance work without separate approval.
+Review P4C. Do not start P5/P6, final item art, P1B, captain damage, economy tuning, balance work or a 1,000-seed baseline without separate approval.
 
 ## Codex Update Contract
 

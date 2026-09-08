@@ -313,24 +313,25 @@ describe("P4B2 component and simple item content", () => {
     ]);
   });
 
-  it("keeps acquisition order and representative fixed-seed selections unchanged", () => {
-    expect(ACQUIRABLE_ITEM_IDS).toEqual(LEGACY_ITEM_IDS);
-    expect(DEFAULT_CONTENT.acquirableItemIds).toEqual(LEGACY_ITEM_IDS);
+  it("uses the P4C component acquisition order and deterministic selections", () => {
+    const componentIds = Object.keys(COMPONENT_EFFECTS);
+    expect(ACQUIRABLE_ITEM_IDS).toEqual(componentIds);
+    expect(DEFAULT_CONTENT.acquirableItemIds).toEqual(componentIds);
     expect(winningPvEReward("p4a-reward-1")).toEqual([
-      "clima-tact",
-      "cola-engine",
-      "den-den-mushi",
+      "jet-dial",
+      "sniper-lens",
+      "devil-fruit-essence",
     ]);
     expect(carouselItems("p4a-carousel-1")).toEqual([
-      "sea-prism-stone",
-      "den-den-mushi",
-      "black-blade",
-      "black-blade",
-      "meat-platter",
-      "cola-engine",
-      "den-den-mushi",
-      "meat-platter",
-      "sniper-goggles",
+      "armament-plate",
+      "devil-fruit-essence",
+      "black-blade-shard",
+      "jolly-roger-fragment",
+      "black-blade-shard",
+      "sniper-lens",
+      "jolly-roger-fragment",
+      "devil-fruit-essence",
+      "cola-canister",
     ]);
   });
 
@@ -360,10 +361,10 @@ describe("P4B2 component and simple item content", () => {
     if (!player) throw new Error("Missing player-1.");
     player.inventory = [...LEGACY_ITEM_IDS];
     const restored = deserializeMatch(serializeMatch(state));
-    expect(DEFAULT_CONTENT.version).toBe("1.22.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.23.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(restored.schemaVersion).toBe(6);
-    expect(restored.contentVersion).toBe("1.22.0");
+    expect(restored.contentVersion).toBe("1.23.0");
     expect(
       restored.players.find((candidate) => candidate.id === "player-1")?.inventory,
     ).toEqual(LEGACY_ITEM_IDS);

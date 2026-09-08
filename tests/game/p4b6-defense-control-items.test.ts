@@ -712,16 +712,17 @@ describe("P4B6 Burn and retaliation", () => {
 describe("P4B6 contracts", () => {
   it("preserves acquisition, catalog, recipes, Gear 4 IDs, schema saves, version, and determinism", () => {
     expect(ACQUIRABLE_ITEM_IDS).toEqual([
-      "black-blade", "meat-platter", "clima-tact", "sniper-goggles",
-      "sea-prism-stone", "armament-wraps", "den-den-mushi", "cola-engine",
+      "jolly-roger-fragment", "devil-fruit-essence", "cola-canister",
+      "jet-dial", "sniper-lens", "sea-king-meat", "sea-prism-shard",
+      "black-blade-shard", "armament-plate", "captains-sash",
     ]);
     expect(DEFAULT_CONTENT.items).toHaveLength(65);
     expect(Object.keys(DEFAULT_CONTENT.itemRecipes)).toHaveLength(55);
-    expect(winningPvEReward("p4a-reward-1")).toEqual(["clima-tact", "cola-engine", "den-den-mushi"]);
+    expect(winningPvEReward("p4a-reward-1")).toEqual(["jet-dial", "sniper-lens", "devil-fruit-essence"]);
     expect(carouselItems("p4a-carousel-1")).toEqual([
-      "sea-prism-stone", "den-den-mushi", "black-blade", "black-blade",
-      "meat-platter", "cola-engine", "den-den-mushi", "meat-platter",
-      "sniper-goggles",
+      "armament-plate", "devil-fruit-essence", "black-blade-shard",
+      "jolly-roger-fragment", "black-blade-shard", "sniper-lens",
+      "jolly-roger-fragment", "devil-fruit-essence", "cola-canister",
     ]);
     const formFor = (itemId: string): string | undefined => {
       const luffy: UnitInstance = {
@@ -736,14 +737,14 @@ describe("P4B6 contracts", () => {
     };
     expect(formFor("armament-wraps")).toBe("luffy-gear-4-boundman");
     expect(formFor("sniper-goggles")).toBe("luffy-gear-4-snakeman");
-    expect(DEFAULT_CONTENT.version).toBe("1.22.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.23.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
 
     const state = createMatch("p4b6-save");
     state.players[0].inventory = DEFAULT_CONTENT.items.map((item) => item.id);
     const restored = deserializeMatch(serializeMatch(state));
     expect(restored.schemaVersion).toBe(6);
-    expect(restored.contentVersion).toBe("1.22.0");
+    expect(restored.contentVersion).toBe("1.23.0");
     expect(restored.players[0].inventory).toEqual(state.players[0].inventory);
 
     const combatants: Combatant[] = [

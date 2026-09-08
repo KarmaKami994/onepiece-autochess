@@ -63,7 +63,7 @@ can be rebuilt reproducibly with `npm run assets:carousel`.
   Amber cells swap occupants; red cells explain illegal capacity moves.
 - `1`–`6`: buy the matching shop offer. Hover or keyboard-focus a poster for
   its ability, stats, merge progress, and projected bond impact.
-- `1`–`3` on treasure reward screens: choose the matching reward.
+- `1`–`3` on component reward screens: choose the matching component.
 - During the Bounty Regatta, left-click the ocean to steer your boat. A bounty
   is claimed only when the boat touches it; the gold marker shows the same
   deterministic best-fit choice used by timeout auto-pick.
@@ -75,7 +75,9 @@ can be rebuilt reproducibly with `npm run assets:carousel`.
   sounds.
 
 The first-voyage guide pauses preparation while teaching recruitment,
-deployment, battle, treasure choice, and equipping. It can be skipped or
+deployment, battle, component choice, equipping, and two-component crafting.
+Hover or keyboard-focus an inventory component to see its canonical recipe
+results and the selected holder's craft preview. The guide can be skipped or
 reopened from Settings. Starting a new voyage while a save exists requires
 explicit confirmation.
 

@@ -1,4 +1,8 @@
-import { DEFAULT_CONTENT, getTraitDefinition } from "./content";
+import {
+  DEFAULT_CONTENT,
+  getItemDefinition,
+  getTraitDefinition,
+} from "./content";
 import { resolvePersistentFormId, resolveUnitDefinition } from "./forms";
 import type {
   ActiveTrait,
@@ -8,19 +12,41 @@ import type {
   TraitEffect,
 } from "./types";
 
+type TraitBearingUnit = {
+  definitionId: string;
+  formId?: string;
+  items?: readonly string[];
+};
+
+export function getEffectiveUnitTraits(
+  unit: TraitBearingUnit,
+  content: GameContent = DEFAULT_CONTENT,
+): string[] {
+  const definition = resolveUnitDefinition(
+    unit.definitionId,
+    unit.formId,
+    content,
+  );
+  if (!definition) return [];
+  const traitIds = new Set(definition.traits);
+  for (const itemId of unit.items ?? []) {
+    const grantedTraitId = getItemDefinition(itemId, content)?.grantedTraitId;
+    if (grantedTraitId) traitIds.add(grantedTraitId);
+  }
+  return [...traitIds];
+}
+
 export function getActiveTraitsForUnits(
-  units: readonly Pick<BattleSetupUnit, "definitionId" | "formId">[],
+  units: readonly (
+    Pick<BattleSetupUnit, "definitionId" | "formId"> & {
+      items?: readonly string[];
+    }
+  )[],
   content: GameContent = DEFAULT_CONTENT,
 ): ActiveTrait[] {
   const contributorsByTrait = new Map<string, Set<string>>();
   for (const unit of units) {
-    const definition = resolveUnitDefinition(
-      unit.definitionId,
-      unit.formId,
-      content,
-    );
-    if (!definition) continue;
-    for (const traitId of definition.traits) {
+    for (const traitId of getEffectiveUnitTraits(unit, content)) {
       const contributors = contributorsByTrait.get(traitId) ?? new Set<string>();
       contributors.add(unit.definitionId);
       contributorsByTrait.set(traitId, contributors);
@@ -50,7 +76,7 @@ export function getActiveTraits(
     const instance = player.units[unitId];
     if (!instance) return [];
     const formId = resolvePersistentFormId(instance, content) ?? undefined;
-    return [{ definitionId: instance.definitionId, formId }];
+    return [{ definitionId: instance.definitionId, formId, items: instance.items }];
   });
   return getActiveTraitsForUnits(units, content);
 }

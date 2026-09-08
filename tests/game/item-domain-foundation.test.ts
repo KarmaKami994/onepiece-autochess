@@ -30,6 +30,18 @@ const LEGACY_ITEM_IDS = [
   "den-den-mushi",
   "cola-engine",
 ];
+const COMPONENT_ITEM_IDS = [
+  "jolly-roger-fragment",
+  "devil-fruit-essence",
+  "cola-canister",
+  "jet-dial",
+  "sniper-lens",
+  "sea-king-meat",
+  "sea-prism-shard",
+  "black-blade-shard",
+  "armament-plate",
+  "captains-sash",
+];
 
 function human(state: MatchState): PlayerState {
   const player = state.players.find((candidate) => candidate.id === "player-1");
@@ -159,46 +171,46 @@ describe("P4A item catalog and recipes", () => {
       .toBe("armament-wraps");
   });
 
-  it("keeps acquisition on the legacy eight-item pool in its original order", () => {
-    expect(ACQUIRABLE_ITEM_IDS).toEqual(LEGACY_ITEM_IDS);
-    expect(DEFAULT_CONTENT.acquirableItemIds).toEqual(LEGACY_ITEM_IDS);
+  it("uses the ten components as the stable production acquisition pool", () => {
+    expect(ACQUIRABLE_ITEM_IDS).toEqual(COMPONENT_ITEM_IDS);
+    expect(DEFAULT_CONTENT.acquirableItemIds).toEqual(COMPONENT_ITEM_IDS);
   });
 
   it("preserves deterministic PvE rewards for representative pre-P4A seeds", () => {
     expect(winningPvEReward("p4a-reward-1")).toEqual([
-      "clima-tact",
-      "cola-engine",
-      "den-den-mushi",
+      "jet-dial",
+      "sniper-lens",
+      "devil-fruit-essence",
     ]);
     expect(winningPvEReward("p4a-reward-2")).toEqual([
-      "black-blade",
-      "den-den-mushi",
-      "sniper-goggles",
+      "sea-king-meat",
+      "sniper-lens",
+      "jolly-roger-fragment",
     ]);
   });
 
   it("preserves deterministic carousel items for representative pre-P4A seeds", () => {
     expect(carouselItems("p4a-carousel-1")).toEqual([
-      "sea-prism-stone",
-      "den-den-mushi",
-      "black-blade",
-      "black-blade",
-      "meat-platter",
-      "cola-engine",
-      "den-den-mushi",
-      "meat-platter",
-      "sniper-goggles",
+      "armament-plate",
+      "devil-fruit-essence",
+      "black-blade-shard",
+      "jolly-roger-fragment",
+      "black-blade-shard",
+      "sniper-lens",
+      "jolly-roger-fragment",
+      "devil-fruit-essence",
+      "cola-canister",
     ]);
     expect(carouselItems("p4a-carousel-2")).toEqual([
-      "clima-tact",
-      "den-den-mushi",
-      "black-blade",
-      "cola-engine",
-      "sea-prism-stone",
-      "meat-platter",
-      "black-blade",
-      "meat-platter",
-      "sea-prism-stone",
+      "sea-prism-shard",
+      "jolly-roger-fragment",
+      "sniper-lens",
+      "devil-fruit-essence",
+      "sea-prism-shard",
+      "captains-sash",
+      "devil-fruit-essence",
+      "armament-plate",
+      "armament-plate",
     ]);
   });
 });
@@ -496,6 +508,6 @@ describe("P4A form and save compatibility", () => {
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(restored.schemaVersion).toBe(6);
     expect(human(restored).inventory).toEqual(LEGACY_ITEM_IDS);
-    expect(restored.contentVersion).toBe("1.22.0");
+    expect(restored.contentVersion).toBe("1.23.0");
   });
 });

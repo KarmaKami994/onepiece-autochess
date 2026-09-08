@@ -1,7 +1,11 @@
 import { parseCell } from "./state";
-import { reconcileProductionFormProgression } from "./forms";
+import {
+  reconcileProductionFormProgression,
+  resolvePersistentFormId,
+} from "./forms";
 import { getItemDefinition } from "./content";
 import { isComponentItem } from "./items";
+import { getEffectiveUnitTraits } from "./traits";
 import type {
   GameContent,
   MatchState,
@@ -136,8 +140,26 @@ function mergeUnits(
       anchor.star = (star + 1) as StarLevel;
       const mergedItems = resolveMergedItems(combinedItems, content);
       anchor.items = mergedItems.retained;
-      player.inventory.push(...mergedItems.returned);
       reconcileProductionFormProgression(anchor, content);
+      const nativeTraits = new Set(getEffectiveUnitTraits({
+        ...anchor,
+        formId: resolvePersistentFormId(anchor, content) ?? undefined,
+        items: [],
+      }, content));
+      const retainedTraits = new Set(nativeTraits);
+      const retainedItems: string[] = [];
+      const redundantGrantItems: string[] = [];
+      for (const itemId of anchor.items) {
+        const grantedTraitId = getItemDefinition(itemId, content)?.grantedTraitId;
+        if (grantedTraitId && retainedTraits.has(grantedTraitId)) {
+          redundantGrantItems.push(itemId);
+          continue;
+        }
+        retainedItems.push(itemId);
+        if (grantedTraitId) retainedTraits.add(grantedTraitId);
+      }
+      anchor.items = retainedItems;
+      player.inventory.push(...mergedItems.returned, ...redundantGrantItems);
       const safeLocation =
         anchorLocation.zone === "bench" && anchorLocation.slot < 0
           ? { zone: "bench" as const, slot: firstEmptyBench(player) }

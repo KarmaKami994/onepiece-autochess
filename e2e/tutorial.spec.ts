@@ -50,7 +50,7 @@ test("first voyage tutorial teaches the real PvE reward and equip flow", async (
   await page.getByRole("button", { name: /^SKIP ANIMATION\b/i }).click();
 
   await expect(
-    page.getByRole("heading", { name: "CLAIM ONE REWARD" }),
+    page.getByRole("heading", { name: "CLAIM ONE COMPONENT" }),
   ).toBeVisible();
   const rewardChoice = page
     .getByRole("button", { name: /TAKE TREASURE/i })

@@ -36,14 +36,9 @@ const P4B5_IDS = [
 ] as const;
 
 const ACQUISITION_IDS = [
-  "black-blade",
-  "meat-platter",
-  "clima-tact",
-  "sniper-goggles",
-  "sea-prism-stone",
-  "armament-wraps",
-  "den-den-mushi",
-  "cola-engine",
+  "jolly-roger-fragment", "devil-fruit-essence", "cola-canister",
+  "jet-dial", "sniper-lens", "sea-king-meat", "sea-prism-shard",
+  "black-blade-shard", "armament-plate", "captains-sash",
 ];
 
 function productionItem(id: string): ItemDefinition {
@@ -666,12 +661,12 @@ describe("P4B5 ordering and contracts", () => {
     expect(ACQUIRABLE_ITEM_IDS).toEqual(ACQUISITION_IDS);
     expect(DEFAULT_CONTENT.acquirableItemIds).toEqual(ACQUISITION_IDS);
     expect(winningPvEReward("p4a-reward-1")).toEqual([
-      "clima-tact", "cola-engine", "den-den-mushi",
+      "jet-dial", "sniper-lens", "devil-fruit-essence",
     ]);
     expect(carouselItems("p4a-carousel-1")).toEqual([
-      "sea-prism-stone", "den-den-mushi", "black-blade", "black-blade",
-      "meat-platter", "cola-engine", "den-den-mushi", "meat-platter",
-      "sniper-goggles",
+      "armament-plate", "devil-fruit-essence", "black-blade-shard",
+      "jolly-roger-fragment", "black-blade-shard", "sniper-lens",
+      "jolly-roger-fragment", "devil-fruit-essence", "cola-canister",
     ]);
     expect(DEFAULT_CONTENT.items).toHaveLength(65);
     expect(Object.keys(DEFAULT_CONTENT.itemRecipes)).toHaveLength(55);
@@ -681,8 +676,8 @@ describe("P4B5 ordering and contracts", () => {
     state.players[0].inventory = DEFAULT_CONTENT.items.map((item) => item.id);
     const restored = deserializeMatch(serializeMatch(state));
     expect(restored.players[0].inventory).toEqual(state.players[0].inventory);
-    expect(DEFAULT_CONTENT.version).toBe("1.22.0");
-    expect(restored.contentVersion).toBe("1.22.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.23.0");
+    expect(restored.contentVersion).toBe("1.23.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(restored.schemaVersion).toBe(6);
 

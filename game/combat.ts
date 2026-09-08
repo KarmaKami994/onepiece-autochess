@@ -163,19 +163,6 @@ type CombatIntent = AttackIntent | CastIntent | MoveIntent;
 
 const MONSTER_POINT_FORM_ID = "chopper-monster-point";
 const MONSTER_POINT_DELAY_MS = 8_000;
-const TRAIT_GRANT_ITEM_IDS = new Set([
-  "emperors-jolly-roger",
-  "specialists-log-pose",
-  "marine-justice-coat",
-  "marksmans-thunder-dial",
-  "captains-logbook",
-  "brawlers-rumble-emblem",
-  "guardians-sea-prism-crest",
-  "revolutionary-flame",
-  "straw-hat-token",
-  "swordsmans-knot",
-]);
-
 type CombatStat =
   | "attack"
   | "defense"
@@ -308,7 +295,7 @@ function resolveBattleItemIds(
       return Boolean(
         item?.kind === "completed" &&
         itemId !== "mystery-treasure-chest" &&
-        !TRAIT_GRANT_ITEM_IDS.has(itemId) &&
+        !item?.grantedTraitId &&
         !persistentItemIds.includes(itemId),
       );
     })
