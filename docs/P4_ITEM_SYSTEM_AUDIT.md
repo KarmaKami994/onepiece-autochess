@@ -228,6 +228,7 @@ P4B2 activates all ten component identities and five bounded completed items on 
 | HP | `health-flat` | flat value ×3 |
 | Attack | `attack-flat` | flat value ×3 |
 | Shield | `shield-flat` | flat value ×3 |
+| Flat HP-scale item damage | behavior metadata | flat value ×3 |
 
 Accordingly, the components are Jolly Roger Fragment with no stat; Devil Fruit Essence with +10 AP; Cola Canister with +15 starting Energy; Jet Dial with +10% attack speed; Sniper Lens with +10% Crit Chance; Sea King Meat with +45 HP; Sea-Prism Shard with +3 Special Defense; Black Blade Shard with +9 Attack; Armament Plate with +3 Defense; and Captain's Sash with +45 starting Shield. Components remain ordinary held battle items until a second component crafts, and normal PvE/carousel acquisition remains on the unchanged legacy eight-item pool.
 
@@ -261,21 +262,41 @@ The four additional serializable behavior shapes use private cast count and exis
 
 GameContent is `1.19.0`; schema stays 6. P4B1–P4B3 definitions, acquisition order/RNG, Gear 4 catalysts and bot policy are unchanged. P4C and further item families remain deferred.
 
+### P4B5 implementation status
+
+P4B5 implements exactly seven additional PAC identities on GameContent `1.20.0`; save schema remains 6:
+
+| PAC identity | One Piece item | Static effects | Dynamic behavior |
+| --- | --- | --- | --- |
+| Green Orb | Healing Bubble | +45 HP | Every 2000ms, the living holder and Chebyshev-adjacent allies heal 5% of their own Max HP; 10% of local-scale overheal becomes Energy |
+| Black Belt | Armament Sash | +45 Shield, +30% Crit Chance | A critical basic attack grants `ceil(33% × complete raw primary damage)` Shield |
+| Punching Glove | Impact Dial | +10% attack speed, +9 Attack | Adds 8% target Max HP Physical damage after the normal attack calculation, including on dodge |
+| Blue Orb | Den Den Mushi | +15 starting Energy, +10% attack speed | Every third basic-attack attempt chains 30 Special damage and drains 15 Energy from up to two nearest enemies |
+| Loaded Dice | Ricochet Dial | +10% attack speed, +3 Special Defense, +20 Luck | One Luck-adjusted 50% roll may bounce 75% of every raw primary component to one adjacent lowest-HP enemy |
+| Muscle Band | Armament Wraps | +10% attack speed, +3 Defense | Every second positive damage application, up to 20 events, grants +3 Attack, +2 Defense and +5% dynamic attack speed |
+| Red Orb | Advanced Armament Orb | +30 Attack | Converts 25% of normal basic-attack damage to True damage before Impact Dial adds its Physical bonus |
+
+The new flat item-damage rule applies the established local HP scale, so PAC Blue Orb's flat 10 becomes 30 local Special damage. Green Orb instead converts 10% of local overheal to Energy, which is equivalent to PAC's 30% after the ×3 HP scale. Punching Glove directly preserves the pinned dodge ordering: the normal contribution becomes zero but the 8%-Max-HP component remains. Red Orb splits the already critical-scaled normal attack while preserving its raw total, then Impact Dial adds unconverted, non-critical Physical damage.
+
+Basic attacks use a private three-component Physical/Special/True bundle and a fixed behavior-family order independent of equipped-item array order. Den Den Mushi and Ricochet Dial route non-recursive item damage through `applyDamage`; Armament Wraps observes actual shield plus health damage there. Loaded Dice uses the existing seeded PAC Luck formula and exactly one roll when raw primary damage is positive. Only private battle counters are added, and dynamic Speed does not rewrite an already scheduled cooldown. This remains deterministic, JSON-content-driven, server-portable and free of a generic event/status framework.
+
+Armament Wraps and Den Den Mushi intentionally replace their temporary legacy combat values while retaining stable IDs, exact acquisition positions and the Boundman catalyst contract. The other completed P4B1–P4B4 identities, all 55 recipes, acquisition RNG, crafting, saves, economy and bots are unchanged.
+
 ## 9. Missing Primitive Audit
 
 ### Present and reusable
 
-The local combat has deterministic Physical/Special/True damage, separate Defense and Special Defense, basic and opt-in ability critical hits, mutable Crit Power and Luck, dodge, shields, healing, omnivamp, Energy gain/drain, burn, stun, knockback/pull, defense pierce, line/adjacent/global targeting, sequential strikes, immutable battle events and explicit RNG. Trait effects can add starting Energy, shield, dodge, crit chance, Ability Power and range. P4B3 adds bounded periodic AP/Energy/attack-speed and post-basic-attack Speed/Energy/critical-transfer behavior. Matching Special Defense on Sea Prism Stone and Armament Wraps remains compatibility data, not implementation of their future PAC matrix behaviors.
+The local combat has deterministic Physical/Special/True damage, separate Defense and Special Defense, basic and opt-in ability critical hits, mutable Crit Power and Luck, dodge, shields, healing, omnivamp, Energy gain/drain, burn, stun, knockback/pull, defense pierce, line/adjacent/global targeting, sequential strikes, immutable battle events and explicit RNG. Trait effects can add starting Energy, shield, dodge, crit chance, Ability Power and range. P4B3 adds bounded periodic AP/Energy/attack-speed and post-basic-attack Speed/Energy/critical-transfer behavior; P4B5 adds narrow multi-component attacks, adjacent healing, chain/bounce item damage and capped damage-received stacking.
 
-### Remaining missing or insufficient after P4B4
+### Remaining missing or insufficient after P4B5
 
 - **PP/max-PP semantics:** local Energy stays capped at 100; starting Energy and bounded post-cast restoration exist, but max-Energy reduction and next-attack conversion do not.
-- **Remaining triggered behaviors:** Green Orb healing periodic, Blue Orb chain attacks, Loaded Dice bounce, Muscle Band, other reactive/on-cast effects, threshold/consume, shield-depleted and item-consumption behaviors remain absent. P4B4 deliberately adds no generic lifecycle.
+- **Remaining triggered behaviors:** other reactive/on-cast effects, threshold/consume, shield-depleted and item-consumption behaviors remain absent. P4B5 deliberately adds no generic lifecycle.
 - **Immunity/Safeguard:** no general status immunity, Sleep/Blind/Paralysis/Freeze/Locked statuses, board-effect immunity or forced-displacement immunity.
 - **Wound:** no healing-reduction status.
 - **Resurrection:** no prevent-KO/resurrect state or event.
 - **Trait-granting equipment:** effective battle traits resolve from unit definitions/forms only; items cannot add a trait.
-- **Special/True/retaliation item damage:** the damage-type pipeline exists, but items cannot currently schedule damage, split attack damage to True, reflect mitigation or mark recoil/retaliation immunity.
+- **Retaliation item damage:** items can now schedule bounded Special damage and split/bounce attack components, but cannot reflect mitigation or mark recoil/retaliation immunity.
 - **Armor Break / Special Defense shred:** defense pierce selects the active resistance per ability; there is no timed resistance-reduction status.
 - **Accuracy and miss immunity:** dodge exists, but attacks have no separate accuracy/miss rule or cannot-miss flag.
 - **Target-priority and lethal interception:** no item-driven taunt weight or adjacent bodyguard routing.
@@ -346,7 +367,7 @@ Local carousels already align at rounds 4/12/17, use explicit RNG, offer 5–9 c
 - Wonder Box choices and item consumption must be frozen in battle output so save/resume and spectating do not reroll or reconstruct them.
 - Current battle-economy immutability stays intact: purchases/merges/equips cannot rebuild an active deployed combat timeline.
 - Schema remains 6. Existing stable IDs resolve through the eight mapped outputs; any additional legacy alias is explicit and bounded, never inferred from display names.
-- GameContent is `1.19.0` after P4B4; schema remains 6 and all serialized item IDs stay stable.
+- GameContent is `1.20.0` after P4B5; schema remains 6 and all serialized item IDs stay stable.
 
 ## 13. Risks and Review Gates
 

@@ -334,7 +334,7 @@ describe("P4B3 item content", () => {
     ).toEqual(P4B3_ITEM_IDS);
   });
 
-  it("keeps P4B2 components, bounded statics, and P4B1 compatibility items exact", () => {
+  it("keeps P4B2 components and applies the P4B5 Armament Wraps identity", () => {
     expect(productionItem("devil-fruit-essence").effects).toEqual([
       { kind: "ability-power-percent", value: 10 },
     ]);
@@ -352,9 +352,8 @@ describe("P4B3 item content", () => {
       { kind: "health-flat", value: 120 },
     ]);
     expect(productionItem("armament-wraps").effects).toEqual([
-      { kind: "attack-flat", value: 14 },
-      { kind: "defense-flat", value: 14 },
-      { kind: "special-defense-flat", value: 14 },
+      { kind: "attack-speed-percent", value: 10 },
+      { kind: "defense-flat", value: 3 },
     ]);
   });
 });
@@ -777,10 +776,10 @@ describe("P4B3 regressions", () => {
     if (!player) throw new Error("Missing player-1.");
     player.inventory = [...LEGACY_ITEM_IDS, "jet-sash", "shark-tooth-charm", "energy-siphon-scope"];
     const restored = deserializeMatch(serializeMatch(state));
-    expect(DEFAULT_CONTENT.version).toBe("1.19.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.20.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(restored.schemaVersion).toBe(6);
-    expect(restored.contentVersion).toBe("1.19.0");
+    expect(restored.contentVersion).toBe("1.20.0");
     expect(restored.players.find((candidate) => candidate.id === "player-1")?.inventory).toEqual(
       player.inventory,
     );

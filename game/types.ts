@@ -188,6 +188,44 @@ export type ItemBehavior =
   | {
       kind: "on-critical-basic-attack-energy-steal";
       amount: number;
+    }
+  | {
+      kind: "periodic-adjacent-heal-overheal-energy";
+      intervalMs: number;
+      healMaxHealthPercent: number;
+      overhealEnergyPercent: number;
+    }
+  | {
+      kind: "on-critical-basic-attack-shield-damage-percent";
+      percent: number;
+    }
+  | {
+      kind: "on-basic-attack-target-max-health-physical";
+      percent: number;
+    }
+  | {
+      kind: "every-n-basic-attacks-chain";
+      every: number;
+      targets: number;
+      specialDamage: number;
+      energyDrain: number;
+    }
+  | {
+      kind: "on-basic-attack-bounce";
+      chancePercent: number;
+      damagePercent: number;
+    }
+  | {
+      kind: "on-damage-received-stack";
+      maxEvents: number;
+      eventsPerProc: number;
+      attack: number;
+      defense: number;
+      attackSpeedPercent: number;
+    }
+  | {
+      kind: "basic-attack-true-damage-percent";
+      percent: number;
     };
 
 export type ItemKind = "component" | "completed";
@@ -614,7 +652,7 @@ export type BattleEvent =
       amount: number;
       healthDamage: number;
       shieldDamage: number;
-      damageKind: "attack" | "ability" | "burn";
+      damageKind: "attack" | "ability" | "burn" | "item";
     }
   | {
       type: "energy";
