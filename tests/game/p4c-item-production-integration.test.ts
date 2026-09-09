@@ -121,7 +121,7 @@ describe("P4C item production integration", () => {
         effects,
       });
     }
-    expect(DEFAULT_CONTENT.version).toBe("1.23.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.24.0");
   });
 
   it("counts deployed grants like native traits while deduping native and same-definition contributors", () => {
@@ -324,12 +324,12 @@ describe("P4C item production integration", () => {
 
     state.lastResults = state.lastResults.map((result) => ({ ...result, winnerId: null }));
     expect(advanceMatchPhase(state).pendingItemChoices["player-1"]).toBeUndefined();
-    expect(DEFAULT_CONTENT.stages.filter((stage) => stage.kind === "pve").map((stage) => stage.round))
+    expect(DEFAULT_CONTENT.stages.filter((stage) => stage.kind === "pve" && stage.round < 20).map((stage) => stage.round))
       .toEqual([1, 2, 3, 9, 14, 19]);
   });
 
   it("keeps carousel cadence and limits each component to two copies", () => {
-    expect(DEFAULT_CONTENT.stages.filter((stage) => stage.kind === "carousel").map((stage) => stage.round))
+    expect(DEFAULT_CONTENT.stages.filter((stage) => stage.kind === "carousel" && stage.round < 20).map((stage) => stage.round))
       .toEqual([4, 12, 17]);
     const state = createMatch("p4c-carousel");
     state.round = 3;

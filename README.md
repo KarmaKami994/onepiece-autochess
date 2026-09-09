@@ -63,7 +63,7 @@ can be rebuilt reproducibly with `npm run assets:carousel`.
   Amber cells swap occupants; red cells explain illegal capacity moves.
 - `1`–`6`: buy the matching shop offer. Hover or keyboard-focus a poster for
   its ability, stats, merge progress, and projected bond impact.
-- `1`–`3` on component reward screens: choose the matching component.
+- `1`–`3` on item reward screens: choose the matching item.
 - During the Bounty Regatta, left-click the ocean to steer your boat. A bounty
   is claimed only when the boat touches it; the gold marker shows the same
   deterministic best-fit choice used by timeout auto-pick.

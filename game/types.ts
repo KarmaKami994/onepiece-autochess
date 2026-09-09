@@ -322,6 +322,7 @@ export interface StageDefinition {
   battleSeconds: number;
   enemyWave?: PvEWaveEntry[];
   itemChoices?: number;
+  rewardItemKind?: ItemKind;
 }
 
 export interface BotPersonality {
