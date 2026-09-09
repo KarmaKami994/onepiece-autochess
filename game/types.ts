@@ -297,6 +297,7 @@ export interface ItemDefinition {
   kind: ItemKind;
   effects: ItemEffect[];
   behaviors?: ItemBehavior[];
+  grantedTraitId?: string;
 }
 
 export interface PvEEnemyDefinition {
@@ -574,6 +575,7 @@ export type CommandErrorCode =
   | "INVALID_SHOP_SLOT"
   | "ITEM_CAP"
   | "ITEM_DUPLICATE"
+  | "ITEM_TRAIT_DUPLICATE"
   | "ITEM_NOT_FOUND"
   | "ITEM_RECIPE_NOT_FOUND"
   | "MAX_LEVEL"

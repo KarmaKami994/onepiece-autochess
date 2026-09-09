@@ -51,14 +51,9 @@ const TRAIT_GRANT_IDS = new Set([
 ]);
 
 const ACQUISITION_IDS = [
-  "black-blade",
-  "meat-platter",
-  "clima-tact",
-  "sniper-goggles",
-  "sea-prism-stone",
-  "armament-wraps",
-  "den-den-mushi",
-  "cola-engine",
+  "jolly-roger-fragment", "devil-fruit-essence", "cola-canister",
+  "jet-dial", "sniper-lens", "sea-king-meat", "sea-prism-shard",
+  "black-blade-shard", "armament-plate", "captains-sash",
 ];
 
 function productionItem(id: string): ItemDefinition {
@@ -317,7 +312,7 @@ describe("P4B7 production content", () => {
     });
   });
 
-  it("completes all 45 non-trait recipes while preserving the 10 deferred trait outputs", () => {
+  it("completes all 45 non-trait recipes alongside the 10 P4C trait outputs", () => {
     const outputs = [...new Set(Object.values(DEFAULT_CONTENT.itemRecipes))];
     const nonTraitIds = outputs.filter((itemId) => !TRAIT_GRANT_IDS.has(itemId));
     expect(DEFAULT_CONTENT.items).toHaveLength(65);
@@ -333,7 +328,7 @@ describe("P4B7 production content", () => {
     expect(
       [...TRAIT_GRANT_IDS].every((itemId) => {
         const item = productionItem(itemId);
-        return item.effects.length === 0 && (item.behaviors?.length ?? 0) === 0;
+        return Boolean(item.grantedTraitId);
       }),
     ).toBe(true);
     expect(P4B7_IDS).toHaveLength(12);
@@ -1171,8 +1166,8 @@ describe("P4B7 compatibility contracts", () => {
     state.players[0].inventory = [...P4B7_IDS];
     const restored = deserializeMatch(serializeMatch(state));
     expect(restored.players[0].inventory).toEqual([...P4B7_IDS]);
-    expect(DEFAULT_CONTENT.version).toBe("1.22.0");
-    expect(restored.contentVersion).toBe("1.22.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.23.0");
+    expect(restored.contentVersion).toBe("1.23.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(restored.schemaVersion).toBe(6);
 

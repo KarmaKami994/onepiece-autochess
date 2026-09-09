@@ -1184,11 +1184,12 @@ const componentItem = (
   id: string,
   name: string,
   effects: ItemDefinition["effects"] = [],
+  icon = "◇",
 ): ItemDefinition => ({
   id,
   name,
   description: "A core crafting component.",
-  icon: "◇",
+  icon,
   kind: "component",
   effects,
 });
@@ -1199,6 +1200,7 @@ const completedItem = (
   effects: ItemDefinition["effects"] = [],
   description = "A completed core item; its combat identity is reserved for P4B.",
   behaviors?: ItemDefinition["behaviors"],
+  grantedTraitId?: string,
 ): ItemDefinition => ({
   id,
   name,
@@ -1207,37 +1209,38 @@ const completedItem = (
   kind: "completed",
   effects,
   ...(behaviors ? { behaviors } : {}),
+  ...(grantedTraitId ? { grantedTraitId } : {}),
 });
 
 export const COMPONENT_ITEM_DEFINITIONS: ItemDefinition[] = [
-  componentItem("jolly-roger-fragment", "Jolly Roger Fragment"),
+  componentItem("jolly-roger-fragment", "Jolly Roger Fragment", [], "☠"),
   componentItem("devil-fruit-essence", "Devil Fruit Essence", [
     { kind: "ability-power-percent", value: 10 },
-  ]),
+  ], "✦"),
   componentItem("cola-canister", "Cola Canister", [
     { kind: "starting-energy", value: 15 },
-  ]),
+  ], "◉"),
   componentItem("jet-dial", "Jet Dial", [
     { kind: "attack-speed-percent", value: 10 },
-  ]),
+  ], "ϟ"),
   componentItem("sniper-lens", "Sniper Lens", [
     { kind: "critical-chance-percent", value: 10 },
-  ]),
+  ], "◎"),
   componentItem("sea-king-meat", "Sea King Meat", [
     { kind: "health-flat", value: 45 },
-  ]),
+  ], "♥"),
   componentItem("sea-prism-shard", "Sea-Prism Shard", [
     { kind: "special-defense-flat", value: 3 },
-  ]),
+  ], "⛓"),
   componentItem("black-blade-shard", "Black Blade Shard", [
     { kind: "attack-flat", value: 9 },
-  ]),
+  ], "†"),
   componentItem("armament-plate", "Armament Plate", [
     { kind: "defense-flat", value: 3 },
-  ]),
+  ], "⛨"),
   componentItem("captains-sash", "Captain's Sash", [
     { kind: "shield-flat", value: 45 },
-  ]),
+  ], "◆"),
 ];
 
 const LEGACY_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
@@ -1361,16 +1364,16 @@ const LEGACY_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
 ];
 
 const NEW_COMPLETED_ITEM_DEFINITIONS: ItemDefinition[] = [
-  completedItem("emperors-jolly-roger", "Emperor's Jolly Roger"),
-  completedItem("specialists-log-pose", "Specialist's Log Pose"),
-  completedItem("marine-justice-coat", "Marine Justice Coat"),
-  completedItem("marksmans-thunder-dial", "Marksman's Thunder Dial"),
-  completedItem("captains-logbook", "Captain's Logbook"),
-  completedItem("brawlers-rumble-emblem", "Brawler's Rumble Emblem"),
-  completedItem("guardians-sea-prism-crest", "Guardian's Sea-Prism Crest"),
-  completedItem("revolutionary-flame", "Revolutionary Flame"),
-  completedItem("straw-hat-token", "Straw Hat Token"),
-  completedItem("swordsmans-knot", "Swordsman's Knot"),
+  completedItem("emperors-jolly-roger", "Emperor's Jolly Roger", [], "Grants Emperor.", undefined, "emperor"),
+  completedItem("specialists-log-pose", "Specialist's Log Pose", [{ kind: "ability-power-percent", value: 20 }], "Grants Specialist and 20% ability power.", undefined, "specialist"),
+  completedItem("marine-justice-coat", "Marine Justice Coat", [{ kind: "starting-energy", value: 30 }], "Grants Navy and 30 starting Energy.", undefined, "navy"),
+  completedItem("marksmans-thunder-dial", "Marksman's Thunder Dial", [{ kind: "attack-speed-percent", value: 20 }], "Grants Marksman and 20% attack speed.", undefined, "marksman"),
+  completedItem("captains-logbook", "Captain's Logbook", [{ kind: "critical-chance-percent", value: 20 }], "Grants Captain and 20% critical chance.", undefined, "captain"),
+  completedItem("brawlers-rumble-emblem", "Brawler's Rumble Emblem", [{ kind: "health-flat", value: 90 }], "Grants Brawler and 90 Health.", undefined, "brawler"),
+  completedItem("guardians-sea-prism-crest", "Guardian's Sea-Prism Crest", [{ kind: "special-defense-flat", value: 6 }], "Grants Guardian and 6 Special Defense.", undefined, "guardian"),
+  completedItem("revolutionary-flame", "Revolutionary Flame", [{ kind: "attack-flat", value: 18 }], "Grants Revolutionary and 18 Attack.", undefined, "revolutionary"),
+  completedItem("straw-hat-token", "Straw Hat Token", [{ kind: "defense-flat", value: 6 }], "Grants Straw Hat and 6 Defense.", undefined, "straw-hat"),
+  completedItem("swordsmans-knot", "Swordsman's Knot", [{ kind: "shield-flat", value: 90 }], "Grants Swordsman and 90 Shield.", undefined, "swordsman"),
   completedItem(
     "devil-fruit-codex",
     "Devil Fruit Codex",
@@ -1827,14 +1830,16 @@ export const ITEM_RECIPES: Record<string, string> = Object.fromEntries(
 );
 
 export const ACQUIRABLE_ITEM_IDS = [
-  "black-blade",
-  "meat-platter",
-  "clima-tact",
-  "sniper-goggles",
-  "sea-prism-stone",
-  "armament-wraps",
-  "den-den-mushi",
-  "cola-engine",
+  "jolly-roger-fragment",
+  "devil-fruit-essence",
+  "cola-canister",
+  "jet-dial",
+  "sniper-lens",
+  "sea-king-meat",
+  "sea-prism-shard",
+  "black-blade-shard",
+  "armament-plate",
+  "captains-sash",
 ];
 
 const basicEnemyAbility = (
@@ -2139,7 +2144,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.22.0",
+  version: "1.23.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,

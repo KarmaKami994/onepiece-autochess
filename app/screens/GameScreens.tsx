@@ -14,10 +14,11 @@ import PhaserCarousel, {
   type CarouselPresentationSnapshot,
   type CarouselTokenView,
 } from "@/components/PhaserCarousel";
-import { DEFAULT_BOUNTY_ITEM_ORDER } from "@/components/carouselGeometry";
 import { BOARD_MAP_LIST, type BoardSkin } from "@/components/boardMapManifest";
 import type { TutorialStep } from "../useTutorial";
 import {
+  activateItemEquip,
+  createItemEquipPreview,
   createItemView,
   cssColor,
   slugify,
@@ -250,7 +251,7 @@ export function TutorialCoach({
     welcome: {
       eyebrow: "FIRST VOYAGE · 1 MINUTE",
       title: "WELCOME ABOARD, CAPTAIN",
-      copy: "Learn the dock, deck, and treasure flow before the clock begins.",
+      copy: "Learn the dock, deck, component, and crafting flow before the clock begins.",
       hint: "Preparation pauses while a guide card is open.",
     },
     recruit: {
@@ -281,7 +282,7 @@ export function TutorialCoach({
       eyebrow: "STEP 5 OF 6 · COMBAT",
       title: "WATCH THE PLAN UNFOLD",
       copy: "Your crew now moves, attacks, and casts abilities automatically.",
-      hint: "The first Marine wave rewards a treasure when defeated.",
+      hint: "The first Marine wave rewards a choice of three components when defeated.",
       legend: [
         { icon: "♥", text: "Health" },
         { icon: "◆", text: "Energy — casts at 100" },
@@ -292,15 +293,15 @@ export function TutorialCoach({
     },
     treasure: {
       eyebrow: "STEP 5 OF 6 · TREASURE",
-      title: "CLAIM ONE REWARD",
-      copy: "Choose the treasure that best supports the crew you are building.",
-      hint: "Every item has a complete effect description.",
+      title: "CLAIM ONE COMPONENT",
+      copy: "Choose a component. Equip two components on the same crewmate to craft their completed item.",
+      hint: "Hover or focus a component to inspect all ten recipe results.",
     },
     equip: {
       eyebrow: "STEP 6 OF 6 · EQUIP",
       title: "ARM YOUR CREW",
-      copy: "Select a crew member, then click the new treasure in the left rail.",
-      hint: "Each unit can carry up to three items. Selling returns all equipped items.",
+      copy: "Select a crew member, then click the component in the left rail. A held component combines automatically.",
+      hint: "Crafting works at the three-slot cap. Redundant trait grants return to inventory; selling returns equipped items.",
     },
   };
   const lesson = lessons[step];
@@ -816,20 +817,15 @@ export function MatchScreen({
               items={view.inventory}
               units={view.boardUnits.filter((unit) => unit.team === "player")}
               selectedId={selectedUnit?.id ?? null}
+              selectedUnit={selectedUnit ?? null}
               selectedName={selectedDefinition?.name}
-              disabled={
-                !planning ||
-                !selectedUnit ||
-                selectedUnit.items.length >= 3
-              }
+              disabled={!planning || !selectedUnit}
               help={
                 !planning
                   ? "Treasure can be equipped during preparation."
                   : !selectedUnit
                     ? "Select a crew member, then click an item."
-                    : selectedUnit.items.length >= 3
-                      ? `${selectedDefinition?.name ?? "This unit"} already carries 3 items.`
-                      : "Click an item to equip it. Max 3 per unit."
+                    : "Click a component to equip it or combine it with the held component. Max 3 slots."
               }
               highlighted={tutorialStep === "equip"}
               onSelect={onSelectUnit}
@@ -1510,10 +1506,11 @@ function ShopDecisionPreview({ unit }: { unit: ShopUnitView }) {
   );
 }
 
-function InventoryTray({
+export function InventoryTray({
   items,
   units,
   selectedId,
+  selectedUnit,
   selectedName,
   disabled,
   help,
@@ -1524,6 +1521,7 @@ function InventoryTray({
   items: ChoiceView[];
   units: BoardUnit[];
   selectedId: string | null;
+  selectedUnit: BoardUnit | null;
   selectedName?: string;
   disabled: boolean;
   help: string;
@@ -1531,6 +1529,16 @@ function InventoryTray({
   onSelect: (unitId: string | null) => void;
   onEquip: (itemId: string) => void;
 }) {
+  const previewFor = (item: ChoiceView) => selectedUnit
+    ? createItemEquipPreview(
+        {
+          definitionId: selectedUnit.contentId,
+          formId: selectedUnit.formId,
+          items: selectedUnit.items,
+        },
+        item.id,
+      )
+    : null;
   return (
     <aside
       className={`inventory-tray panel-inventory ${
@@ -1571,6 +1579,10 @@ function InventoryTray({
       >
         {Array.from({ length: Math.max(8, items.length) }, (_, index) => {
           const item = items[index];
+          const preview = item ? previewFor(item) : null;
+          const recipeSummary = item?.recipeResults
+            ?.map((result) => `+ ${result.componentName} → ${result.resultName}`)
+            .join(" · ");
           return (
             <button
               type="button"
@@ -1582,7 +1594,14 @@ function InventoryTray({
                   : undefined
               }
               disabled={!item || disabled}
-              onClick={() => item && onEquip(item.id)}
+              aria-disabled={preview?.eligible === false}
+              aria-describedby={item ? `inventory-item-details-${index}` : undefined}
+              onClick={() => item && activateItemEquip(
+                item.id,
+                preview,
+                disabled,
+                onEquip,
+              )}
               aria-label={
                 item
                   ? `Equip ${item.name}${selectedName ? ` to ${selectedName}` : ""}`
@@ -1590,11 +1609,11 @@ function InventoryTray({
               }
               data-tooltip={
                 item
-                  ? `${item.name}: ${item.description}${
+                  ? `${item.kind === "component" ? "Component" : "Completed item"} · ${item.name}: ${item.description}${
                       item.effects.length
                         ? ` · ${item.effects.map((effect) => effect.label).join(" · ")}`
                         : ""
-                    }${disabled ? " · Select an eligible unit" : ""}`
+                    }${item.grantedTrait ? ` · Grants ${item.grantedTrait.name}` : ""}${item.recipeComponents ? ` · Recipe: ${item.recipeComponents.map((part) => part.name).join(" + ")}` : ""}${recipeSummary ? ` · Recipes: ${recipeSummary}` : ""}${preview ? ` · ${preview.message}` : ""}${disabled ? " · Select an eligible unit" : ""}`
                   : "Empty treasure slot"
               }
               title={
@@ -1607,6 +1626,45 @@ function InventoryTray({
             </button>
           );
         })}
+      </div>
+      <div className="sr-only">
+        {items.map((item, index) => (
+          <section
+            id={`inventory-item-details-${index}`}
+            key={`${item.id}-${index}`}
+          >
+            <p>
+              {item.kind === "component" ? "COMPONENT" : "COMPLETED ITEM"}.
+              {` ${item.description}`}
+            </p>
+            <p>
+              Static effects: {item.effects.length
+                ? item.effects.map((effect) => effect.label).join(", ")
+                : "None"}.
+            </p>
+            {item.kind === "component" && item.recipeResults && (
+              <>
+                <p>Canonical pair results:</p>
+                <ul>
+                  {item.recipeResults.map((result) => (
+                    <li key={result.componentId}>
+                      {item.name} + {result.componentName} = {result.resultName}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+            {item.kind === "completed" && item.recipeComponents && (
+              <p>
+                Recipe components: {item.recipeComponents
+                  .map((component) => component.name)
+                  .join(" + ")}.
+              </p>
+            )}
+            {item.grantedTrait && <p>Grants: {item.grantedTrait.name}.</p>}
+            {previewFor(item) && <p>{previewFor(item)?.message}</p>}
+          </section>
+        ))}
       </div>
       <p className="inventory-help">
         {help}
@@ -1847,12 +1905,6 @@ export function CarouselScreen({
     : releaseSeconds > 0
       ? `ANCHOR LOCKED · ${releaseSeconds}`
       : "SAIL NOW";
-  const itemColumns: Map<string, number> = new Map(
-    DEFAULT_BOUNTY_ITEM_ORDER.map((itemId, index) => [
-      itemId,
-      index,
-    ]),
-  );
   const tokens: CarouselTokenView[] = choices.map((choice, index) => ({
     id: choice.id,
     itemId: choice.contentId,
@@ -1864,7 +1916,6 @@ export function CarouselScreen({
     orbitIndex: choice.orbitIndex ?? index,
     claimedAtTick: choice.claimedAtTick ?? null,
     takenByPlayerId: choice.takenByPlayerId ?? null,
-    itemColumn: itemColumns.get(choice.contentId) ?? index % 8,
   } satisfies CarouselTokenView));
   const snapshot: CarouselPresentationSnapshot | null = session
     ? {
@@ -1974,8 +2025,8 @@ export function RewardScreen({
       <div className="reward-rays" aria-hidden="true" />
       <header className="choice-heading">
         <span className="eyebrow">PVE ENCOUNTER CLEARED</span>
-        <h2>CLAIM YOUR TREASURE</h2>
-        <p>The defeated crew left three prizes behind. Take one for the voyage.</p>
+        <h2>CLAIM A COMPONENT</h2>
+        <p>Choose one of three distinct components. Pair it on a crewmate to craft a completed item.</p>
       </header>
       <div className="reward-cards">
         {choices.map((choice, index) => (
@@ -1992,6 +2043,8 @@ export function RewardScreen({
             <span className="treasure-icon">{choice.icon}</span>
             <strong>{choice.name}</strong>
             <p>{choice.description}</p>
+            <small>{choice.kind === "component" ? "CRAFTING COMPONENT" : "COMPLETED ITEM"}</small>
+            {choice.grantedTrait && <small>GRANTS {choice.grantedTrait.name.toUpperCase()}</small>}
             {choice.effects.length > 0 && (
               <small className="reward-effects">
                 {choice.effects.map((effect) => effect.label).join(" · ")}

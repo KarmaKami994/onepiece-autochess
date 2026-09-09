@@ -197,15 +197,19 @@ describe("P4B4 cast and sustain items", () => {
   });
 
   it("keeps acquisition, deterministic output and schema-6 item saves", () => {
-    expect(ACQUIRABLE_ITEM_IDS).toEqual(["black-blade", "meat-platter", "clima-tact", "sniper-goggles", "sea-prism-stone", "armament-wraps", "den-den-mushi", "cola-engine"]);
+    expect(ACQUIRABLE_ITEM_IDS).toEqual([
+      "jolly-roger-fragment", "devil-fruit-essence", "cola-canister",
+      "jet-dial", "sniper-lens", "sea-king-meat", "sea-prism-shard",
+      "black-blade-shard", "armament-plate", "captains-sash",
+    ]);
     expect(run({ items: ids, ticks: 30 })).toEqual(run({ items: ids, ticks: 30 }));
     const state = createMatch("p4b4-save");
     state.contentVersion = "1.18.0";
     state.players[0].inventory = [...ids, ...ACQUIRABLE_ITEM_IDS];
     const restored = deserializeMatch(serializeMatch(state));
     expect(restored.players[0].inventory).toEqual(state.players[0].inventory);
-    expect(DEFAULT_CONTENT.version).toBe("1.22.0");
-    expect(restored.contentVersion).toBe("1.22.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.23.0");
+    expect(restored.contentVersion).toBe("1.23.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(restored.schemaVersion).toBe(6);
   });

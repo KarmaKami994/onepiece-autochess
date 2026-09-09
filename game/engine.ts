@@ -15,7 +15,7 @@ import {
   resolvePersistentFormId,
 } from "./forms";
 import { hashSeed, randomInt, shuffleDeterministic } from "./rng";
-import { getActiveTraits } from "./traits";
+import { getActiveTraits, getEffectiveUnitTraits } from "./traits";
 import { CURRENT_SAVE_SCHEMA_VERSION } from "./schema";
 import { createPairings } from "./pairing";
 import { cellKey, cloneMatch, copiesForStar, findPlayer, parseCell } from "./state";
@@ -1752,26 +1752,68 @@ function botItemCompatibilityScore(
   personality: BotPersonality,
   content: GameContent,
 ): number {
-  const item = getItemDefinition(itemId, content);
+  const incomingItem = getItemDefinition(itemId, content);
   const definition = getUnitDefinition(unit.definitionId, content);
-  if (!item || !definition || unit.items.length >= content.config.itemCap) {
+  if (!incomingItem || !definition) {
     return Number.NEGATIVE_INFINITY;
   }
-  const compatibility = scoreItemForUnit(
-    itemId,
-    unit,
-    definition,
-    content,
+  const heldComponentIndex = isComponentItem(incomingItem)
+    ? unit.items.findIndex((heldItemId) =>
+        isComponentItem(getItemDefinition(heldItemId, content)))
+    : -1;
+  const resultId = heldComponentIndex >= 0
+    ? resolveItemRecipe(unit.items[heldComponentIndex], incomingItem.id, content)
+    : null;
+  const item = resultId ? getItemDefinition(resultId, content) : incomingItem;
+  const isCraft = Boolean(resultId);
+  const directDuplicate = Boolean(
+    !isCraft && item?.kind === "completed" && unit.items.includes(item.id),
   );
+  if (
+    !item ||
+    directDuplicate ||
+    (!isCraft && unit.items.length >= content.config.itemCap) ||
+    (!isCraft && item.grantedTraitId && unitHasEffectiveTrait(unit, item.grantedTraitId, content))
+  ) {
+    return Number.NEGATIVE_INFINITY;
+  }
+  const craftReturnsToInventory = Boolean(
+    isCraft &&
+    (unit.items.includes(item.id) ||
+      (item.grantedTraitId && unitHasEffectiveTrait(unit, item.grantedTraitId, content))),
+  );
+  const scoringUnit = isCraft
+    ? { ...unit, items: unit.items.filter((_, index) => index !== heldComponentIndex) }
+    : unit;
+  const compatibility = craftReturnsToInventory
+    ? 0
+    : scoreItemForUnit(
+        item.id,
+        scoringUnit,
+        definition,
+        content,
+      );
   const deployedBonus = locateUnit(player, unit.id)?.zone === "board" ? 40 : 0;
-  const duplicatePenalty = unit.items.includes(itemId) ? 20 : 0;
   return (
     compatibility * 1_000 +
     itemScore(itemId, player, content) * 10 +
     botInstanceScore(unit, player, personality, content) +
-    deployedBonus -
-    duplicatePenalty
+    deployedBonus
   );
+}
+
+function unitHasEffectiveTrait(
+  unit: UnitInstance,
+  traitId: string,
+  content: GameContent,
+): boolean {
+  return getEffectiveUnitTraits(
+    {
+      ...unit,
+      formId: resolvePersistentFormId(unit, content) ?? undefined,
+    },
+    content,
+  ).includes(traitId);
 }
 
 function equipBotInventory(
@@ -2177,7 +2219,11 @@ export function applyCommand(
             );
           }
           player.inventory.splice(inventoryIndex, 1);
-          if (unit.items.includes(result.id)) {
+          if (
+            unit.items.includes(result.id) ||
+            (result.grantedTraitId &&
+              unitHasEffectiveTrait(unit, result.grantedTraitId, content))
+          ) {
             unit.items.splice(heldComponentIndex, 1);
             player.inventory.push(result.id);
             return { ok: true, state: next };
@@ -2191,6 +2237,15 @@ export function applyCommand(
           state,
           "ITEM_DUPLICATE",
           "That completed item is already equipped on this unit.",
+        );
+      } else if (
+        incomingItem.grantedTraitId &&
+        unitHasEffectiveTrait(unit, incomingItem.grantedTraitId, content)
+      ) {
+        return commandFailure(
+          state,
+          "ITEM_TRAIT_DUPLICATE",
+          "That unit already has the trait granted by this item.",
         );
       }
       if (unit.items.length >= content.config.itemCap) {

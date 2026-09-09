@@ -37,7 +37,7 @@ export type CarouselTokenView = Readonly<{
   description?: string;
   icon?: string;
   color?: number | string;
-  itemColumn?: number;
+  itemColumn?: number | null;
   orbitIndex: number;
   position?: CarouselPoint;
   takenByPlayerId: string | null;
@@ -177,14 +177,14 @@ export function carouselBountyFrame(itemColumn: number, animationFrame: number) 
   );
 }
 
-function itemColumn(choice: CarouselTokenView) {
+export function carouselBountyColumn(choice: CarouselTokenView): number | null {
   if (Number.isFinite(choice.itemColumn)) {
     return Math.max(0, Math.min(7, Math.floor(choice.itemColumn ?? 0)));
   }
   const knownIndex = DEFAULT_BOUNTY_ITEM_ORDER.indexOf(
     choice.itemId as (typeof DEFAULT_BOUNTY_ITEM_ORDER)[number],
   );
-  return knownIndex >= 0 ? knownIndex : 0;
+  return knownIndex >= 0 ? knownIndex : null;
 }
 
 function eventKey(event: CarouselPresentationEvent, index: number) {
@@ -616,8 +616,8 @@ export default function PhaserCarousel({
               0x6e9fa4, 0xcf965e, 0x76ad71, 0x8c9fb5,
             ];
             const body = this.add.graphics();
-            const column = itemColumn(choice);
-            const accent = colorNumber(choice.color, colors[column]);
+            const column = carouselBountyColumn(choice);
+            const accent = colorNumber(choice.color, colors[column ?? 0]);
             body
               .fillStyle(0x4a2a19, 1)
               .fillRoundedRect(-28, -23, 56, 49, 7)
@@ -639,12 +639,13 @@ export default function PhaserCarousel({
               .strokeCircle(0, 0, 39)
               .fillStyle(0xffd85c, 1)
               .fillTriangle(-8, -48, 8, -48, 0, -38);
-            const body = this.textureAvailable(BOUNTY_SHEET_KEY)
+            const column = carouselBountyColumn(choice);
+            const body = this.textureAvailable(BOUNTY_SHEET_KEY) && column !== null
               ? this.add.sprite(
                   0,
                   0,
                   BOUNTY_SHEET_KEY,
-                  carouselBountyFrame(itemColumn(choice), 0),
+                  carouselBountyFrame(column, 0),
                 )
               : this.fallbackBounty(choice);
             const icon = this.add.text(0, 0, choice.icon ?? "◆", {
@@ -707,12 +708,13 @@ export default function PhaserCarousel({
           private ensureTow(display: BoatDisplay, choice: CarouselTokenView) {
             if (display.towChoiceId === choice.id && display.tow) return;
             display.tow?.destroy();
-            display.tow = this.textureAvailable(BOUNTY_SHEET_KEY)
+            const column = carouselBountyColumn(choice);
+            display.tow = this.textureAvailable(BOUNTY_SHEET_KEY) && column !== null
               ? this.add.sprite(
                   0,
                   0,
                   BOUNTY_SHEET_KEY,
-                  carouselBountyFrame(itemColumn(choice), 0),
+                  carouselBountyFrame(column, 0),
                 ).setScale(0.72)
               : this.fallbackBounty(choice).setScale(0.72);
             display.towChoiceId = choice.id;
@@ -1014,9 +1016,11 @@ export default function PhaserCarousel({
                   (candidate) => candidate.id === display.towChoiceId,
                 );
                 if (choice) {
+                  const column = carouselBountyColumn(choice);
+                  if (column === null) continue;
                   display.tow.setFrame(
                     carouselBountyFrame(
-                      itemColumn(choice),
+                      column,
                       reducedMotion ? 0 : Math.floor(time / 160) % 4,
                     ),
                   );
@@ -1025,9 +1029,11 @@ export default function PhaserCarousel({
             }
             for (const display of this.bounties.values()) {
               if (display.body instanceof Phaser.GameObjects.Sprite) {
+                const column = carouselBountyColumn(display.choice);
+                if (column === null) continue;
                 display.body.setFrame(
                   carouselBountyFrame(
-                    itemColumn(display.choice),
+                    column,
                     reducedMotion ? 0 : Math.floor(time / 160) % 4,
                   ),
                 );

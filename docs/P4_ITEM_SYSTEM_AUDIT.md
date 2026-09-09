@@ -334,19 +334,27 @@ Mystery Treasure Chest consumes exactly two seeded draws from a stable recipe-ou
 
 All 45 non-trait completed items now have active effects or behavior. The ten trait-granting recipe outputs remain intentionally behaviorless pending their separately approved trait mappings and P4C acquisition/UI/bot work. PAC dish, stolen-buff protection and Freeze clauses have no local host system and remain non-applicable. No generic lifecycle, status, trigger or persistence framework was added.
 
+### P4C implementation status
+
+P4C completes the production item loop on GameContent `1.23.0`; save schema remains 6. The ten approved completed outputs now grant Emperor, Specialist, Navy, Marksman, Revolutionary, Straw Hat, Captain, Brawler, Guardian or Swordsman through one typed `grantedTraitId`. Effective traits resolve the persistent form plus equipped grants, dedupe per unit and retain the existing distinct-base-definition contributor rule. Only deployed holders contribute.
+
+Normal PvE victories at rounds 1/2/3/9/14/19 and carousels at 4/12/17 now draw from all ten components in stable order. PvE still offers three distinct choices; carousel construction still caps each component at two copies. The eight legacy completed IDs remain valid for saves, recipes and Gear 4, but are no longer normal rewards.
+
+Directly equipping a redundant trait grant fails without inventory mutation. Crafting the same result remains successful: both components are consumed and the completed result moves to inventory. Star merges likewise return grants made redundant by the merged unit's resolved native/form traits without crafting or deletion. Bots use the same recipe and redundancy rules, including crafting at the three-slot cap.
+
+Selectors expose component/completed kind, granted trait, completed recipe components and all ten canonical pair outcomes for a component. Keyboard focus and hover reveal semantic recipe details and a selected-holder craft preview. The legacy eight-column bounty sheet is used only for its known IDs; all other items use the deterministic icon/color fallback without aliasing to column zero. P4 is complete; final authored item art remains deferred until after P6.
+
 ## 9. Missing Primitive Audit
 
 ### Present and reusable
 
 The local combat has deterministic Physical/Special/True damage, separate Defense and Special Defense, basic and opt-in ability critical hits, mutable Crit Power and Luck, dodge, shields, healing, omnivamp, Energy gain/drain, burn, stun, knockback/pull, defense pierce, line/adjacent/global targeting, sequential strikes, immutable battle events and explicit RNG. Trait effects can add starting Energy, shield, dodge, crit chance, Ability Power and range. P4B3 adds bounded periodic AP/Energy/attack-speed and post-basic-attack Speed/Energy/critical-transfer behavior; P4B5 adds narrow multi-component attacks, adjacent healing, chain/bounce item damage and capped damage-received stacking. P4B6 adds narrow battle-local Rune Protect, Wound and resistance-reduction expiries, cross-unit horizontal start support, forced-movement immunity, cannot-miss adaptation, target-specific Crit-bonus negation, nearest-tie target priority and non-recursive retaliation paths. P4B7 adds Protect, Blind, Paralysis, delayed one-shot resurrection, battle-local Max Energy, deterministic escape, lethal interception, threshold consumption, runtime-shield depletion, battle-local generated items and ordered combat-stat-delta adaptation.
 
-### Remaining missing or insufficient after P4B7
+### Remaining missing or insufficient after P4C
 
-- **Trait-granting equipment:** effective battle traits resolve from unit definitions/forms only; items cannot add a trait.
 - **Unhosted PAC systems:** Sleep, Freeze, Locked, Poison, dishes, stolen-buff protection and board effects remain absent and are not implied by the bounded local identities.
-- **P4C integration:** component acquisition, recipe/tooltips/assets, accessibility and bot valuation remain separately deferred.
 
-The only remaining behaviorless recipe outputs are the ten trait-granting equipment identities. Their mappings require separate approval. P4C acquisition, UI and bot integration also remains separate.
+All 55 recipe outputs now have their approved production identity. Conditional-item bot valuation remains intentionally structural rather than balance-tuned.
 
 These are capability gaps, not permission to build a generic status framework. Each later implementation must add only the smallest reusable primitive required by the locked 55 behaviors.
 
@@ -356,12 +364,12 @@ These are capability gaps, not permission to build a generic status framework. E
 
 | Round | PAC pinned behavior after a win | Current local behavior | Locked recommendation |
 | ---: | --- | --- | --- |
-| 1 | One random regular component; records it | Choose one of three completed treasures | Keep three-choice flow; offer components |
-| 2 | Choose one of three regular components excluding previously random-granted components | Same generic completed pool | Keep three-choice flow; offer components |
-| 3 | One random regular component excluding prior random grants | Same generic completed pool | Keep three-choice flow; offer components |
-| 9 | One random regular component | Same generic completed pool | Keep three-choice flow; offer components |
-| 14 | Three propositions from eight regular components plus Fossil Stone; shiny branch is separate | Same generic completed pool | Keep three-choice flow; offer components; no shiny branch |
-| 19 | Two random regular components, each unseen component weighted 2× | Same generic completed pool | Keep three-choice flow; offer components |
+| 1 | One random regular component; records it | Choose one of three distinct components after victory | Implemented adapted flow |
+| 2 | Choose one of three regular components excluding previously random-granted components | Same component-choice flow | Implemented adapted flow |
+| 3 | One random regular component excluding prior random grants | Same component-choice flow | Implemented adapted flow |
+| 9 | One random regular component | Same component-choice flow | Implemented adapted flow |
+| 14 | Three propositions from eight regular components plus Fossil Stone; shiny branch is separate | Same component-choice flow | Implemented; no shiny branch |
+| 19 | Two random regular components, each unseen component weighted 2× | Same component-choice flow | Implemented adapted flow |
 
 PAC computes the rewards before combat and awards them only after a PvE win. Local behavior is also win-gated and deterministic, but uses one uniform three-choice flow. Preserve that simpler UI and command architecture. Use all ten components in the local deterministic pool so Jolly Roger Fragment and Captain's Sash remain obtainable without importing excluded PAC town/shiny systems. This is an ADAPTED distribution, not a claim of PAC parity.
 
@@ -369,7 +377,7 @@ PAC computes the rewards before combat and awards them only after a PvE win. Loc
 
 PAC carousels occur at 4/12/17/22/27/34. Before stage 20, the default pool is the eight regular components, with up to two copies per item and executable 80% logic for one extra Fossil Stone; Silk Scarf comes through a special encounter. At/after 20, PAC moves to completed items and other encounter overrides.
 
-Local carousels already align at rounds 4/12/17, use explicit RNG, offer 5–9 choices, allow two copies per item, and grant the selected ID to inventory. Change only their pool from eight completed treasures to the ten components. Do not add the PAC 22/27/34 carousels, post-20 completed-item escalation, town overrides or special item families.
+Local carousels align at rounds 4/12/17, use explicit RNG, offer 5–9 choices, allow two copies per item, grant the selected ID to inventory and now use the ten-component pool. PAC 22/27/34 carousels, post-20 completed-item escalation, town overrides and special item families remain excluded.
 
 ## 11. Port Classification
 
@@ -411,26 +419,26 @@ Local carousels already align at rounds 4/12/17, use explicit RNG, offer 5–9 c
 - Mystery Treasure Chest choices are resolved into the immutable battle snapshot from explicit battle RNG; they never mutate persistent equipment or reroll during presentation, save/resume or spectating.
 - Current battle-economy immutability stays intact: purchases/merges/equips cannot rebuild an active deployed combat timeline.
 - Schema remains 6. Existing stable IDs resolve through the eight mapped outputs; any additional legacy alias is explicit and bounded, never inferred from display names.
-- GameContent is `1.22.0` after P4B7; schema remains 6 and all serialized item IDs stay stable.
+- GameContent is `1.23.0` after P4C; schema remains 6 and all serialized item IDs stay stable.
 
 ## 13. Risks and Review Gates
 
 - The matrix is architecture-complete, but 55 items create a large balance surface. Implement behavior first with locked values per bounded task; do not tune from a smoke run.
-- Trait-granting candidates can change synergy reachability sharply. The proposed ten-trait mapping requires ChatGPT approval before implementation.
+- Trait-granting equipment can change synergy reachability sharply; the approved mappings are implemented without changing trait tiers or balance values.
 - Pre-P4A merge overflow already returned to inventory; P4A must preserve that behavior while enforcing completed-item uniqueness and the one-component merge invariant.
 - Trigger ordering must be explicit when death, resurrection, shield depletion, on-damage and on-kill occur in one tick.
 - Special Defense adds a second mitigation axis and therefore needs a narrow formula decision, not a copy of PAC's entire damage model.
-- Current bot scoring cannot value delayed, conditional, trait-granting or risk/reward effects. Every implemented effect requires deterministic scoring coverage.
-- Fixed eight-item carousel art and static effect labels cannot represent 65 production definitions without an asset/presentation update.
+- Bot item handling is recipe-aware and trait-aware but does not add speculative tuning for delayed or conditional effects.
+- Generic procedural bounty presentation covers non-sheet IDs; final authored item art remains deferred until after P6.
 - Smoker remains frozen/watch. P4 does not authorize bot, economy, captain-damage or unit balance changes.
 
 ## 14. Bounded Implementation Decomposition
 
-This is decomposition only; it does not select or start four future PRs.
+All four bounded P4 steps are complete.
 
 1. **Component / recipe / domain foundation:** typed component and completed definitions, all 55 recipe keys, auto-craft/uniqueness/cap rules, merge-overflow preservation, stable legacy IDs, sell/save/form-catalyst regressions.
 2. **Missing combat primitives and item effects:** P4B1 supplies the bounded damage/stat foundation only. Trigger seams, statuses and the 55 locked identities remain separately reviewable groups with numeric values explicitly approved before code.
-3. **Acquisition / carousel / PvE / UI / bot integration:** switch early sources to components, add recipe/tooltips/icon lookup and deterministic component/completed scoring without changing cadence or later stages.
-4. **Accessibility / treasure / form and regression hardening:** keyboard/screen-reader/reduced-motion presentation, fixed-eight-asset removal, Gear 4 catalyst checks, schema-6/load/spectator/save-resume coverage, production smoke and E2E as appropriate.
+3. **Acquisition / carousel / PvE / UI / bot integration:** complete in P4C with component-only normal sources, canonical recipe metadata and deterministic recipe-aware bot handling.
+4. **Accessibility / treasure / form and regression hardening:** complete in P4C with semantic keyboard-focus details, generic non-sheet bounty presentation and schema/form regressions.
 
-Do not begin implementation, a production soak, balance analysis or any adjacent roadmap item from this audit alone.
+P4 is complete. Do not begin a production soak, balance analysis or adjacent roadmap item from this record alone.

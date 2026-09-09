@@ -1,5 +1,5 @@
 import { getItemDefinition, getUnitDefinition } from "./content";
-import { getActiveTraits } from "./traits";
+import { getActiveTraits, getEffectiveUnitTraits } from "./traits";
 import type {
   BotPersonality,
   GameContent,
@@ -175,7 +175,7 @@ export function scoreItemForUnit(
   itemId: string,
   unit: UnitInstance,
   definition: UnitDefinition,
-  content: Pick<GameContent, "items" | "config">,
+  content: GameContent,
 ): number {
   const item = getItemDefinition(itemId, content);
   if (!item || unit.items.length >= content.config.itemCap) {
@@ -185,7 +185,8 @@ export function scoreItemForUnit(
     (score, effect) =>
       score +
       scoreItemEffect(effect, {
-        hasTrait: (traitId) => definition.traits.includes(traitId),
+        hasTrait: (traitId) =>
+          getEffectiveUnitTraits(unit, content).includes(traitId),
         hasRanged: definition.stats.range >= 4,
       }).score,
     0,

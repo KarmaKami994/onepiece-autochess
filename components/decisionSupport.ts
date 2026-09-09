@@ -16,11 +16,10 @@ import {
   scoreItemEffect,
   scoreItemForPlayer,
 } from "../game/scoring";
+import { getEffectiveUnitTraits } from "../game/traits";
+import { isComponentItem, resolveItemRecipe } from "../game/items";
 
-export type DecisionSupportContent = Pick<
-  GameContent,
-  "units" | "traits" | "items" | "config"
->;
+export type DecisionSupportContent = GameContent;
 
 export type ShopDisabledReason = Readonly<{
   code: "EMPTY_SHOP_SLOT" | "NOT_ENOUGH_GOLD" | "BENCH_FULL";
@@ -101,7 +100,10 @@ export type UnitItemFit = Readonly<{
   deployed: boolean;
   eligible: boolean;
   score: number | null;
-  disabledReason: "ITEM_SLOTS_FULL" | null;
+  disabledReason:
+    | "ITEM_SLOTS_FULL"
+    | "ITEM_TRAIT_DUPLICATE"
+    | null;
   reasons: readonly ItemFitReason[];
   explanation: string;
 }>;
@@ -412,12 +414,30 @@ function buildUnitItemFit(
   definition: UnitDefinition,
   player: PlayerState,
   traitsById: ReadonlyMap<string, TraitDefinition>,
-  itemCap: number,
+  content: DecisionSupportContent,
 ): UnitItemFit {
-  const eligible = instance.items.length < itemCap;
-  const reasons = item.effects.map((effect) => {
+  const heldComponent = isComponentItem(item)
+    ? instance.items
+        .map((itemId) => content.items.find((candidate) => candidate.id === itemId))
+        .find(isComponentItem)
+    : undefined;
+  const resultId = heldComponent
+    ? resolveItemRecipe(heldComponent.id, item.id, content)
+    : null;
+  const effectiveItem = resultId
+    ? content.items.find((candidate) => candidate.id === resultId) ?? item
+    : item;
+  const effectiveTraits = getEffectiveUnitTraits(instance, content);
+  const redundantTrait = Boolean(
+    !heldComponent &&
+    effectiveItem.grantedTraitId &&
+    effectiveTraits.includes(effectiveItem.grantedTraitId),
+  );
+  const eligible = Boolean(heldComponent) ||
+    (!redundantTrait && instance.items.length < content.config.itemCap);
+  const reasons = effectiveItem.effects.map((effect) => {
     const scored = scoreItemEffect(effect, {
-      hasTrait: (traitId) => definition.traits.includes(traitId),
+      hasTrait: (traitId) => effectiveTraits.includes(traitId),
       hasRanged: definition.stats.range >= 4,
     });
     const affinityText = scored.affinities
@@ -447,11 +467,19 @@ function buildUnitItemFit(
     deployed: unitIsDeployed(player, instance.id),
     eligible,
     score,
-    disabledReason: eligible ? null : "ITEM_SLOTS_FULL",
+    disabledReason: eligible
+      ? null
+      : redundantTrait
+        ? "ITEM_TRAIT_DUPLICATE"
+        : "ITEM_SLOTS_FULL",
     reasons,
     explanation: eligible
-      ? `${item.name} fits ${definition.name}: ${strongest?.explanation ?? item.description}.`
-      : `${definition.name} already holds the maximum of ${itemCap} items.`,
+      ? heldComponent
+        ? `${heldComponent.name} + ${item.name} crafts ${effectiveItem.name} for ${definition.name}: ${strongest?.explanation ?? effectiveItem.description}.`
+        : `${effectiveItem.name} fits ${definition.name}: ${strongest?.explanation ?? effectiveItem.description}.`
+      : redundantTrait
+        ? `${definition.name} already has ${effectiveItem.grantedTraitId}.`
+        : `${definition.name} already holds the maximum of ${content.config.itemCap} items.`,
   };
 }
 
@@ -485,7 +513,7 @@ export function buildItemDecisionPreview(
             definition,
             player,
             traitsById,
-            content.config.itemCap,
+            content,
           ),
         ]
       : [];

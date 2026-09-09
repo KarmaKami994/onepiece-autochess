@@ -1,7 +1,11 @@
 import { parseCell } from "./state";
-import { reconcileProductionFormProgression } from "./forms";
+import {
+  reconcileProductionFormProgression,
+  resolvePersistentFormId,
+} from "./forms";
 import { getItemDefinition } from "./content";
 import { isComponentItem } from "./items";
+import { getEffectiveUnitTraits } from "./traits";
 import type {
   GameContent,
   MatchState,
@@ -70,15 +74,23 @@ function unitMergePriority(
 function resolveMergedItems(
   itemIds: string[],
   content: GameContent,
+  nativeTraitIds: ReadonlySet<string> = new Set(),
 ): { retained: string[]; returned: string[] } {
   const retained: string[] = [];
   const returned: string[] = [];
+  const redundantGrantItems: string[] = [];
   const completedIds = new Set<string>();
+  const retainedTraits = new Set(nativeTraitIds);
   const components: string[] = [];
 
   for (const itemId of itemIds) {
     if (isComponentItem(getItemDefinition(itemId, content))) {
       components.push(itemId);
+      continue;
+    }
+    const grantedTraitId = getItemDefinition(itemId, content)?.grantedTraitId;
+    if (grantedTraitId && retainedTraits.has(grantedTraitId)) {
+      redundantGrantItems.push(itemId);
       continue;
     }
     if (
@@ -90,6 +102,7 @@ function resolveMergedItems(
     }
     retained.push(itemId);
     completedIds.add(itemId);
+    if (grantedTraitId) retainedTraits.add(grantedTraitId);
   }
 
   for (const componentId of components) {
@@ -104,7 +117,12 @@ function resolveMergedItems(
       returned.push(componentId);
     }
   }
-  return { retained, returned };
+  return { retained, returned: [...returned, ...redundantGrantItems] };
+}
+
+function sameItems(left: string[], right: string[]): boolean {
+  return left.length === right.length &&
+    left.every((itemId, index) => itemId === right[index]);
 }
 
 function mergeUnits(
@@ -134,10 +152,31 @@ function mergeUnits(
         if (unit.id !== anchor.id) delete player.units[unit.id];
       }
       anchor.star = (star + 1) as StarLevel;
-      const mergedItems = resolveMergedItems(combinedItems, content);
+      let mergedItems = resolveMergedItems(combinedItems, content);
+      anchor.items = mergedItems.retained;
+      reconcileProductionFormProgression(anchor, content);
+
+      for (let pass = 0; pass < 2; pass += 1) {
+        const nativeTraits = new Set(getEffectiveUnitTraits({
+          ...anchor,
+          formId: resolvePersistentFormId(anchor, content) ?? undefined,
+          items: [],
+        }, content));
+        const resolvedItems = resolveMergedItems(
+          combinedItems,
+          content,
+          nativeTraits,
+        );
+        if (sameItems(resolvedItems.retained, mergedItems.retained)) {
+          mergedItems = resolvedItems;
+          break;
+        }
+        mergedItems = resolvedItems;
+        anchor.items = mergedItems.retained;
+        reconcileProductionFormProgression(anchor, content);
+      }
       anchor.items = mergedItems.retained;
       player.inventory.push(...mergedItems.returned);
-      reconcileProductionFormProgression(anchor, content);
       const safeLocation =
         anchorLocation.zone === "bench" && anchorLocation.slot < 0
           ? { zone: "bench" as const, slot: firstEmptyBench(player) }
