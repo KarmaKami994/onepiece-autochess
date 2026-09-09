@@ -1,3 +1,5 @@
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import {
   ACQUIRABLE_ITEM_IDS,
@@ -17,9 +19,12 @@ import {
   type UnitInstance,
 } from "../../game";
 import {
+  activateItemEquip,
   createItemEquipPreview,
   createItemView,
 } from "../../app/selectors";
+import { InventoryTray } from "../../app/screens/GameScreens";
+import type { BoardUnit } from "../../components/PhaserBoard";
 import { carouselBountyColumn } from "../../components/PhaserCarousel";
 
 const PLAYER_CONTEXT = { actorPlayerId: "player-1" };
@@ -84,6 +89,25 @@ function equip(state: MatchState, unitId: string, itemId: string) {
     PLAYER_CONTEXT,
     DEFAULT_CONTENT,
   );
+}
+
+function selectedBoardUnit(items: string[]): BoardUnit {
+  return {
+    id: "selected-unit",
+    contentId: "zoro",
+    name: "Roronoa Zoro",
+    shortName: "Zoro",
+    color: 0,
+    team: "player",
+    zone: "board",
+    x: 0,
+    y: 3,
+    slot: 0,
+    star: 1,
+    items,
+    hp: 750,
+    maxHp: 750,
+  };
 }
 
 describe("P4C item production integration", () => {
@@ -177,6 +201,36 @@ describe("P4C item production integration", () => {
     expect(player.inventory).toEqual(["swordsmans-knot"]);
   });
 
+  it("backfills all three completed slots after returning a native-trait grant", () => {
+    const state = createMatch("p4c-completed-backfill");
+    const player = human(state);
+    resetRoster(player);
+    const first = addUnit(state, "zoro");
+    first.items = ["swordsmans-knot", "black-blade", "meat-platter"];
+    const second = addUnit(state, "zoro");
+    second.items = ["clima-tact"];
+    addUnit(state, "zoro");
+
+    const merged = Object.values(player.units)[0];
+    expect(merged.items).toEqual(["black-blade", "meat-platter", "clima-tact"]);
+    expect(player.inventory).toEqual(["swordsmans-knot"]);
+  });
+
+  it("backfills a component after returning a native-trait grant", () => {
+    const state = createMatch("p4c-component-backfill");
+    const player = human(state);
+    resetRoster(player);
+    const first = addUnit(state, "zoro");
+    first.items = ["swordsmans-knot", "black-blade", "meat-platter"];
+    const second = addUnit(state, "zoro");
+    second.items = ["jet-dial"];
+    addUnit(state, "zoro");
+
+    const merged = Object.values(player.units)[0];
+    expect(merged.items).toEqual(["black-blade", "meat-platter", "jet-dial"]);
+    expect(player.inventory).toEqual(["swordsmans-knot"]);
+  });
+
   it("returns a grant made redundant by the merged unit's resolved persistent form", () => {
     const content: GameContent = {
       ...DEFAULT_CONTENT,
@@ -202,6 +256,46 @@ describe("P4C item production integration", () => {
       star: 3,
       formId: "robin-demonio-fleur",
       items: [],
+    });
+    expect(player.inventory).toEqual(["emperors-jolly-roger"]);
+  });
+
+  it("backfills after a persistent form makes a retained grant redundant", () => {
+    const content: GameContent = {
+      ...DEFAULT_CONTENT,
+      forms: DEFAULT_CONTENT.forms.map((form) =>
+        form.id === "robin-demonio-fleur"
+          ? { ...form, traits: ["emperor"] }
+          : form),
+    };
+    const state = createMatch("p4c-form-backfill", content);
+    const player = human(state);
+    resetRoster(player);
+    for (let index = 0; index < 6; index += 1) {
+      if (!addUnitToPlayer(state, player, "robin", content)) {
+        throw new Error(`Could not add Robin fixture ${index}.`);
+      }
+    }
+    const twoStars = Object.values(player.units)
+      .filter((unit) => unit.star === 2)
+      .sort((left, right) => left.acquiredOrder - right.acquiredOrder);
+    twoStars[0].items = [
+      "emperors-jolly-roger",
+      "black-blade",
+      "meat-platter",
+    ];
+    twoStars[1].items = ["clima-tact"];
+    for (let index = 6; index < 9; index += 1) {
+      if (!addUnitToPlayer(state, player, "robin", content)) {
+        throw new Error(`Could not add Robin fixture ${index}.`);
+      }
+    }
+
+    const merged = Object.values(player.units)[0];
+    expect(merged).toMatchObject({
+      star: 3,
+      formId: "robin-demonio-fleur",
+      items: ["black-blade", "meat-platter", "clima-tact"],
     });
     expect(player.inventory).toEqual(["emperors-jolly-roger"]);
   });
@@ -270,6 +364,60 @@ describe("P4C item production integration", () => {
     });
   });
 
+  it("renders semantic recipe details and keeps aria-disabled items focusable", () => {
+    const component = createItemView("jolly-roger-fragment");
+    const completedGrant = createItemView("swordsmans-knot");
+    const unit = selectedBoardUnit([
+      "black-blade",
+      "meat-platter",
+      "clima-tact",
+    ]);
+    const markup = renderToStaticMarkup(createElement(InventoryTray, {
+      items: [component, completedGrant],
+      units: [unit],
+      selectedId: unit.id,
+      selectedUnit: unit,
+      selectedName: unit.name,
+      disabled: false,
+      help: "Choose an item.",
+      highlighted: false,
+      onSelect: () => undefined,
+      onEquip: () => undefined,
+    }));
+
+    expect(markup.match(/aria-disabled="true"/g)).toHaveLength(2);
+    expect(markup).not.toMatch(/<button[^>]*class="has-item"[^>]*disabled=""/);
+    expect(markup).toContain('aria-describedby="inventory-item-details-0"');
+    expect(markup).toContain("COMPONENT");
+    expect(markup.match(/<li>/g)).toHaveLength(10);
+    expect(markup).toContain("COMPLETED ITEM");
+    expect(markup).toContain("Recipe components: Captain&#x27;s Sash + Jolly Roger Fragment.");
+    expect(markup).toContain("Grants: Swordsman.");
+  });
+
+  it("suppresses aria-disabled activation while preserving valid activation", () => {
+    const blockedPreview = createItemEquipPreview({
+      definitionId: "zoro",
+      items: [],
+    }, "swordsmans-knot");
+    const validPreview = createItemEquipPreview({
+      definitionId: "luffy",
+      items: [],
+    }, "black-blade");
+    const equipped: string[] = [];
+
+    activateItemEquip("swordsmans-knot", blockedPreview, false, (itemId) => {
+      equipped.push(itemId);
+    });
+    activateItemEquip("black-blade", validPreview, false, (itemId) => {
+      equipped.push(itemId);
+    });
+
+    expect(blockedPreview?.eligible).toBe(false);
+    expect(validPreview?.eligible).toBe(true);
+    expect(equipped).toEqual(["black-blade"]);
+  });
+
   it("uses legacy bounty frames only for the original eight sheet IDs", () => {
     expect(carouselBountyColumn({
       id: "legacy",
@@ -304,6 +452,78 @@ describe("P4C item production integration", () => {
     expect(updated.items).toContain("specialists-log-pose");
     expect(updated.items).not.toContain("swordsmans-knot");
     expect(human(next).inventory).toContain("swordsmans-knot");
+  });
+
+  it("routes a duplicate craft result to a legal recipient and keeps processing", () => {
+    const setup = () => {
+      const state = createMatch("p4c-bot-duplicate-result");
+      const player = human(state);
+      resetRoster(player);
+      const first = addUnit(state, "zoro", 0);
+      first.items = ["black-blade", "sniper-lens"];
+      const second = addUnit(state, "nami", 1);
+      player.inventory = ["black-blade-shard", "meat-platter"];
+      player.gold = 0;
+      player.shop = player.shop.map(() => null);
+      player.isBot = true;
+      player.personalityId = "balanced";
+      const crafted = equip(state, first.id, "black-blade-shard");
+      if (!crafted.ok) throw new Error(crafted.error.message);
+      return { state: crafted.state, firstId: first.id, secondId: second.id };
+    };
+    const firstRun = setup();
+    const secondRun = setup();
+    const firstResult = runBotTurn(firstRun.state, "player-1");
+    const secondResult = runBotTurn(secondRun.state, "player-1");
+    const player = human(firstResult);
+
+    expect(firstResult).toEqual(secondResult);
+    expect(player.inventory).toEqual([]);
+    expect(player.units[firstRun.firstId].items.filter((id) => id === "black-blade"))
+      .toHaveLength(1);
+    expect(player.units[firstRun.secondId].items).toContain("black-blade");
+    expect(Object.values(player.units).some((unit) => unit.items.includes("meat-platter")))
+      .toBe(true);
+  });
+
+  it("skips a direct duplicate instead of stopping later legal item processing", () => {
+    const state = createMatch("p4c-bot-direct-duplicate");
+    const player = human(state);
+    resetRoster(player);
+    const zoro = addUnit(state, "zoro", 0);
+    zoro.items = ["black-blade"];
+    player.inventory = ["black-blade", "jolly-roger-fragment"];
+    player.gold = 0;
+    player.shop = player.shop.map(() => null);
+    player.isBot = true;
+    player.personalityId = "balanced";
+
+    const next = runBotTurn(state, player.id);
+    expect(human(next).units[zoro.id].items).toEqual([
+      "black-blade",
+      "jolly-roger-fragment",
+    ]);
+    expect(human(next).inventory).toEqual(["black-blade"]);
+  });
+
+  it("keeps duplicate-result component crafting legal at the item cap", () => {
+    const state = createMatch("p4c-bot-craft-at-cap");
+    const player = human(state);
+    resetRoster(player);
+    const zoro = addUnit(state, "zoro", 0);
+    zoro.items = ["black-blade", "meat-platter", "sniper-lens"];
+    player.inventory = ["black-blade-shard"];
+    player.gold = 0;
+    player.shop = player.shop.map(() => null);
+    player.isBot = true;
+    player.personalityId = "balanced";
+
+    const next = runBotTurn(state, player.id);
+    expect(human(next).units[zoro.id].items).toEqual([
+      "black-blade",
+      "meat-platter",
+    ]);
+    expect(human(next).inventory).toEqual(["black-blade"]);
   });
 
   it("keeps all ten trait grants out of Mystery Treasure Chest battle rolls", () => {

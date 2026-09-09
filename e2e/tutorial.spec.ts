@@ -70,6 +70,11 @@ test("first voyage tutorial teaches the real PvE reward and equip flow", async (
   await crewOrder.selectOption({ index: 1 });
   const equip = inventory.getByRole("button", { name: /^Equip / }).first();
   await expect(equip).toBeEnabled();
+  const detailsId = await equip.getAttribute("aria-describedby");
+  expect(detailsId).toBeTruthy();
+  const details = page.locator(`#${detailsId}`);
+  await expect(details).toContainText("COMPONENT");
+  await expect(details.locator("li")).toHaveCount(10);
   await equip.click();
 
   await expect(page.getByText("GUIDE COMPLETE", { exact: true })).toBeVisible();

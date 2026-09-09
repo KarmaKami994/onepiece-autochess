@@ -434,6 +434,16 @@ export function createItemEquipPreview(
   };
 }
 
+export function activateItemEquip(
+  itemId: string,
+  preview: ItemEquipPreviewView | null,
+  disabled: boolean,
+  onEquip: (itemId: string) => void,
+): void {
+  if (disabled || preview?.eligible === false) return;
+  onEquip(itemId);
+}
+
 function rarityForCost(cost: number): string {
   return ["Common", "Common", "Rare", "Epic", "Legendary", "Mythic"][cost] ?? "Common";
 }

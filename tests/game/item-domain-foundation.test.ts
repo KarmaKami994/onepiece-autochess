@@ -112,7 +112,7 @@ function mergeThree(
   seed: string,
   firstItems: string[],
   secondItems: string[],
-  thirdItem: string,
+  thirdItem: string | null,
 ): MatchState {
   const state = createMatch(seed);
   const player = human(state);

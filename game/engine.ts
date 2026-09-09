@@ -1766,30 +1766,39 @@ function botItemCompatibilityScore(
     : null;
   const item = resultId ? getItemDefinition(resultId, content) : incomingItem;
   const isCraft = Boolean(resultId);
+  const directDuplicate = Boolean(
+    !isCraft && item?.kind === "completed" && unit.items.includes(item.id),
+  );
   if (
     !item ||
+    directDuplicate ||
     (!isCraft && unit.items.length >= content.config.itemCap) ||
     (!isCraft && item.grantedTraitId && unitHasEffectiveTrait(unit, item.grantedTraitId, content))
   ) {
     return Number.NEGATIVE_INFINITY;
   }
+  const craftReturnsToInventory = Boolean(
+    isCraft &&
+    (unit.items.includes(item.id) ||
+      (item.grantedTraitId && unitHasEffectiveTrait(unit, item.grantedTraitId, content))),
+  );
   const scoringUnit = isCraft
     ? { ...unit, items: unit.items.filter((_, index) => index !== heldComponentIndex) }
     : unit;
-  const compatibility = scoreItemForUnit(
-    item.id,
-    scoringUnit,
-    definition,
-    content,
-  );
+  const compatibility = craftReturnsToInventory
+    ? 0
+    : scoreItemForUnit(
+        item.id,
+        scoringUnit,
+        definition,
+        content,
+      );
   const deployedBonus = locateUnit(player, unit.id)?.zone === "board" ? 40 : 0;
-  const duplicatePenalty = unit.items.includes(itemId) ? 20 : 0;
   return (
     compatibility * 1_000 +
     itemScore(itemId, player, content) * 10 +
     botInstanceScore(unit, player, personality, content) +
-    deployedBonus -
-    duplicatePenalty
+    deployedBonus
   );
 }
 

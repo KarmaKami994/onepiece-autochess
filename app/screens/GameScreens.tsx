@@ -17,6 +17,7 @@ import PhaserCarousel, {
 import { BOARD_MAP_LIST, type BoardSkin } from "@/components/boardMapManifest";
 import type { TutorialStep } from "../useTutorial";
 import {
+  activateItemEquip,
   createItemEquipPreview,
   createItemView,
   cssColor,
@@ -1505,7 +1506,7 @@ function ShopDecisionPreview({ unit }: { unit: ShopUnitView }) {
   );
 }
 
-function InventoryTray({
+export function InventoryTray({
   items,
   units,
   selectedId,
@@ -1594,7 +1595,13 @@ function InventoryTray({
               }
               disabled={!item || disabled}
               aria-disabled={preview?.eligible === false}
-              onClick={() => item && onEquip(item.id)}
+              aria-describedby={item ? `inventory-item-details-${index}` : undefined}
+              onClick={() => item && activateItemEquip(
+                item.id,
+                preview,
+                disabled,
+                onEquip,
+              )}
               aria-label={
                 item
                   ? `Equip ${item.name}${selectedName ? ` to ${selectedName}` : ""}`
@@ -1619,6 +1626,45 @@ function InventoryTray({
             </button>
           );
         })}
+      </div>
+      <div className="sr-only">
+        {items.map((item, index) => (
+          <section
+            id={`inventory-item-details-${index}`}
+            key={`${item.id}-${index}`}
+          >
+            <p>
+              {item.kind === "component" ? "COMPONENT" : "COMPLETED ITEM"}.
+              {` ${item.description}`}
+            </p>
+            <p>
+              Static effects: {item.effects.length
+                ? item.effects.map((effect) => effect.label).join(", ")
+                : "None"}.
+            </p>
+            {item.kind === "component" && item.recipeResults && (
+              <>
+                <p>Canonical pair results:</p>
+                <ul>
+                  {item.recipeResults.map((result) => (
+                    <li key={result.componentId}>
+                      {item.name} + {result.componentName} = {result.resultName}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+            {item.kind === "completed" && item.recipeComponents && (
+              <p>
+                Recipe components: {item.recipeComponents
+                  .map((component) => component.name)
+                  .join(" + ")}.
+              </p>
+            )}
+            {item.grantedTrait && <p>Grants: {item.grantedTrait.name}.</p>}
+            {previewFor(item) && <p>{previewFor(item)?.message}</p>}
+          </section>
+        ))}
       </div>
       <p className="inventory-help">
         {help}
