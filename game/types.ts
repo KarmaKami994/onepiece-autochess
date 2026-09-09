@@ -116,16 +116,60 @@ export type TraitEffect =
   | { kind: "starting-energy"; value: number }
   | { kind: "attack-percent"; value: number }
   | { kind: "stacking-attack-percent"; value: number }
+  | { kind: "stacking-ability-power-percent"; value: number }
   | { kind: "emergency-shield-percent"; value: number }
   | { kind: "dodge-percent"; value: number }
   | { kind: "critical-chance-percent"; value: number }
+  | { kind: "critical-power-percent"; value: number }
   | { kind: "ability-power-percent"; value: number }
   | { kind: "range-flat"; value: number }
   | { kind: "shield-flat"; value: number };
 
+export type TraitEffectScope = "team" | "holders";
+
+export type TraitBehavior =
+  | { kind: "first-straw-hat-cast-rally"; energy: number }
+  | {
+      kind: "start-navy-formation-shield";
+      shieldPerAdjacentHolder: number;
+      adjacentHolderCap: number;
+    }
+  | {
+      kind: "on-warlord-kill-sustain";
+      healMaxHealthPercent: number;
+      energy: number;
+    }
+  | {
+      kind: "on-brotherhood-holder-death-rally";
+      healMaxHealthPercent: number;
+      attackSpeedPercent: number;
+    }
+  | { kind: "on-revolutionary-basic-dodge-energy"; energy: number }
+  | { kind: "start-emperor-star-shield"; shieldPerStar: number }
+  | { kind: "first-captain-cast-command"; energy: number }
+  | {
+      kind: "every-n-direct-damage-counter";
+      every: number;
+      attackDamagePercent: number;
+    }
+  | {
+      kind: "every-n-successful-basic-volley";
+      every: number;
+      shots: number;
+      attackDamagePercent: number;
+    }
+  | { kind: "post-specialist-cast-energy"; energy: number }
+  | {
+      kind: "first-direct-hit-guard-point";
+      shield: number;
+      runeProtectMs: number;
+    };
+
 export interface TraitTier {
   required: number;
   effects: TraitEffect[];
+  effectScope?: TraitEffectScope;
+  behaviors?: TraitBehavior[];
   label: string;
 }
 
@@ -726,7 +770,13 @@ export type BattleEvent =
       amount: number;
       /** Energy after this event has been applied. */
       value: number;
-      reason: "attack" | "damaged" | "cast-reset" | "ability-drain" | "item";
+      reason:
+        | "attack"
+        | "damaged"
+        | "cast-reset"
+        | "ability-drain"
+        | "item"
+        | "trait";
     }
   | {
       type: "dodge";
@@ -769,6 +819,7 @@ export type BattleEvent =
         | "wound"
         | "resistance-reduction"
         | "protect"
+        | "rune-protect"
         | "blind"
         | "paralysis"
         | "emergency-shield";

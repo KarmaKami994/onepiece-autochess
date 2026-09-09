@@ -332,7 +332,7 @@ describe("Roster Expansion Pack F content", () => {
       ),
     ).toEqual([6, 7, 6, 7, 4]);
     expect(DEFAULT_CONTENT.traits).toHaveLength(13);
-    expect(DEFAULT_CONTENT.version).toBe("1.24.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.25.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
 
     const state = createMatch("pack-f-pool", DEFAULT_CONTENT);
@@ -351,7 +351,7 @@ describe("Roster Expansion Pack F content", () => {
 });
 
 describe("Emperor origin", () => {
-  it("uses exact highest tiers for unique Emperor definitions and leaves Captain unchanged", () => {
+  it("uses exact highest tiers for unique Emperor definitions and preserves Captain static values", () => {
     const shanks = deployedTraits("shanks");
     const blackbeard = deployedTraits("blackbeard");
     const pair = deployedTraits("shanks", "blackbeard");
@@ -361,11 +361,12 @@ describe("Emperor origin", () => {
     expect(DEFAULT_CONTENT.traits.find((trait) => trait.id === "emperor"))
       .toMatchObject({
         description:
-          "Emperors embolden the entire crew, with a stronger bonus when multiple Emperors unite.",
+          "Conqueror Star Aura emboldens the crew and converts deployed Emperor stars into Shield.",
         tiers: [
           {
             required: 1,
-            label: "+4% health and attack",
+            label:
+              "Crew-wide: +4% Max HP and Attack; +20 Shield per deployed Emperor star",
             effects: [
               { kind: "max-health-percent", value: 4 },
               { kind: "attack-percent", value: 4 },
@@ -373,7 +374,8 @@ describe("Emperor origin", () => {
           },
           {
             required: 2,
-            label: "+8% health and attack",
+            label:
+              "Crew-wide: +8% Max HP and Attack; +35 Shield per deployed Emperor star",
             effects: [
               { kind: "max-health-percent", value: 8 },
               { kind: "attack-percent", value: 8 },
@@ -400,7 +402,8 @@ describe("Emperor origin", () => {
       tierIndex: 1,
       tier: {
         required: 2,
-        label: "+8% health and attack",
+        label:
+          "Crew-wide: +8% Max HP and Attack; +35 Shield per deployed Emperor star",
         effects: [
           { kind: "max-health-percent", value: 8 },
           { kind: "attack-percent", value: 8 },
@@ -440,12 +443,18 @@ describe("Emperor origin", () => {
         {
           required: 2,
           effects: [{ kind: "shield-flat", value: 100 }],
-          label: "100 starting shield",
+          effectScope: "team",
+          behaviors: [{ kind: "first-captain-cast-command", energy: 5 }],
+          label:
+            "Crew-wide: 100 starting Shield; first Captain cast grants all allies 5 Energy",
         },
         {
           required: 3,
           effects: [{ kind: "shield-flat", value: 225 }],
-          label: "225 starting shield",
+          effectScope: "team",
+          behaviors: [{ kind: "first-captain-cast-command", energy: 10 }],
+          label:
+            "Crew-wide: 225 starting Shield; first Captain cast grants all allies 10 Energy",
         },
       ]);
   });
