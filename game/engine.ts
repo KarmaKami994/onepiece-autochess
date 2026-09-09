@@ -90,6 +90,8 @@ import type {
   CommandResult,
   GameCommand,
   GameContent,
+  ItemDefinition,
+  ItemKind,
   MatchPhase,
   MatchState,
   PlayerState,
@@ -107,6 +109,15 @@ const CAROUSEL_SPAWN_RADIUS_Y = 330;
 const CAROUSEL_BOAT_SPEED_PER_TICK = 8;
 const CAROUSEL_PICKUP_HOLD_TICKS = 800 / CAROUSEL_TICK_MS;
 const CAROUSEL_EVENT_LOG_LIMIT = 256;
+
+function getItemsByKind(
+  content: GameContent,
+  kind: ItemKind,
+): ItemDefinition[] {
+  return content.items
+    .filter((item) => item.kind === kind)
+    .sort((left, right) => left.id.localeCompare(right.id));
+}
 
 function commandFailure(
   state: MatchState,
@@ -706,6 +717,26 @@ function prepareItemChoices(
         result.winnerId === candidate.id,
     );
   })) {
+    if (stage.rewardItemKind === "completed") {
+      const completedItems = getItemsByKind(content, "completed");
+      const nonTraitShuffle = shuffleDeterministic(
+        completedItems.filter((item) => !item.grantedTraitId),
+        state.rngState,
+      );
+      state.rngState = nonTraitShuffle.state;
+      const firstChoices = nonTraitShuffle.values.slice(0, 2);
+      const selectedIds = new Set(firstChoices.map((item) => item.id));
+      const finalShuffle = shuffleDeterministic(
+        completedItems.filter((item) => !selectedIds.has(item.id)),
+        state.rngState,
+      );
+      state.rngState = finalShuffle.state;
+      state.pendingItemChoices[player.id] = [
+        ...firstChoices,
+        ...finalShuffle.values.slice(0, 1),
+      ].map((item) => item.id);
+      continue;
+    }
     const shuffled = shuffleDeterministic(
       getAcquirableItems(content),
       state.rngState,
@@ -746,6 +777,38 @@ function createCarouselChoices(
   content: GameContent,
 ): CarouselChoice[] {
   const livingPlayers = state.players.filter((player) => player.alive).length;
+  const stage = getStageDefinition(state.round, content);
+  if (stage.rewardItemKind === "completed") {
+    const desiredCount = Math.min(10, Math.max(6, livingPlayers + 4));
+    const itemPool = getItemsByKind(content, "completed");
+    const itemShuffle = shuffleDeterministic(itemPool, state.rngState);
+    state.rngState = itemShuffle.state;
+    let traitGrantCount = 0;
+    const selectedItems: ItemDefinition[] = [];
+    for (const item of itemShuffle.values) {
+      if (item.grantedTraitId) {
+        if (traitGrantCount >= 4) {
+          continue;
+        }
+        traitGrantCount += 1;
+      }
+      selectedItems.push(item);
+      if (selectedItems.length >= desiredCount) {
+        break;
+      }
+    }
+    return selectedItems.map((item, orbitIndex) => {
+      const choice: CarouselChoice = {
+        id: `choice-${state.nextChoiceSerial}`,
+        itemId: item.id,
+        takenByPlayerId: null,
+        orbitIndex,
+        claimedAtTick: null,
+      };
+      state.nextChoiceSerial += 1;
+      return choice;
+    });
+  }
   const desiredCount = Math.min(9, Math.max(5, livingPlayers + 3));
   const itemDeck = getAcquirableItems(content).flatMap((item) => [item, item]);
   const itemShuffle = shuffleDeterministic(itemDeck, state.rngState);

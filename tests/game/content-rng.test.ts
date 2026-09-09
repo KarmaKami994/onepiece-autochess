@@ -51,25 +51,27 @@ describe("canonical game content", () => {
     ]);
     expect(DEFAULT_CONTENT.traits).toHaveLength(13);
     expect(DEFAULT_CONTENT.items).toHaveLength(65);
-    expect(DEFAULT_CONTENT.enemies).toHaveLength(5);
+    expect(DEFAULT_CONTENT.enemies).toHaveLength(8);
     expect(
       DEFAULT_CONTENT.stages
         .filter((stage) => stage.kind === "pve")
         .map((stage) => stage.round),
-    ).toEqual([1, 2, 3, 9, 14, 19]);
+    ).toEqual([1, 2, 3, 9, 14, 19, 24, 28, 32, 36]);
     expect(
       DEFAULT_CONTENT.stages
         .filter((stage) => stage.kind === "carousel")
         .map((stage) => stage.round),
-    ).toEqual([4, 12, 17]);
+    ).toEqual([4, 12, 17, 22, 27, 34]);
     expect(
       DEFAULT_CONTENT.units.every((unit) =>
         unit.assetPath.startsWith("/assets/characters/"),
       ),
     ).toBe(true);
     expect(
-      DEFAULT_CONTENT.enemies.every((enemy) =>
-        enemy.assetPath.startsWith("/assets/enemies/"),
+      DEFAULT_CONTENT.enemies.every(
+        (enemy) =>
+          enemy.assetPath.startsWith("/assets/enemies/") ||
+          enemy.assetPath === "/assets/characters/placeholder.svg",
       ),
     ).toBe(true);
   });
