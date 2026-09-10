@@ -150,6 +150,11 @@ interface MutableBattleUnit {
   resurrectionBaseline: ResurrectionBaseline | null;
 }
 
+type BasicDirectReactionCollector = Map<
+  string,
+  { target: MutableBattleUnit; dealt: number }
+>;
+
 interface AttackIntent {
   kind: "attack";
   sourceId: string;
@@ -1643,12 +1648,16 @@ export function simulateBattle(
     source: MutableBattleUnit,
     target: MutableBattleUnit,
     amount: number,
+    options: { trackRuntimeShield?: boolean } = {},
   ): void => {
     if (!alive(target) || amount <= 0) {
       return;
     }
     target.shield += amount;
-    if (hasItemBehavior(target, "shield-depletion-explosion")) {
+    if (
+      options.trackRuntimeShield !== false &&
+      hasItemBehavior(target, "shield-depletion-explosion")
+    ) {
       target.totalShieldGained += amount;
     }
     emit({
@@ -1693,6 +1702,7 @@ export function simulateBattle(
             holder,
             holder,
             adjacentCount * navyBehavior.shieldPerAdjacentHolder,
+            { trackRuntimeShield: false },
           );
         }
       }
@@ -1725,6 +1735,7 @@ export function simulateBattle(
               source,
               ally,
               starSum * emperorBehavior.shieldPerStar,
+              { trackRuntimeShield: false },
             );
           }
         }
@@ -1867,7 +1878,8 @@ export function simulateBattle(
       isRetaliation?: boolean;
       preventCover?: boolean;
       suppressBombardier?: boolean;
-      suppressDirectTraitReactions?: boolean;
+      suppressDamagedEnergy?: boolean;
+      basicDirectReactionCollector?: BasicDirectReactionCollector;
     } = {},
   ): number => {
     if (!alive(target) || tick < target.protectUntilTick) {
@@ -2063,7 +2075,6 @@ export function simulateBattle(
           {
             ...options,
             preventCover: true,
-            suppressDirectTraitReactions: false,
           },
         );
       }
@@ -2087,7 +2098,9 @@ export function simulateBattle(
         shieldDamage,
         damageKind,
       });
-      changeEnergy(tick, target, 5, "damaged");
+      if (!options.suppressDamagedEnergy) {
+        changeEnergy(tick, target, 5, "damaged");
+      }
       for (const behavior of target.itemBehaviors) {
         if (
           behavior.kind !== "on-damage-received-stack" ||
@@ -2195,13 +2208,20 @@ export function simulateBattle(
       triggerSmokeEscape(tick, target);
     }
     if (
-      !options.suppressDirectTraitReactions &&
       source &&
       source.teamId !== target.teamId &&
       (damageKind === "attack" || damageKind === "ability") &&
       dealt > 0
     ) {
-      applyDirectTraitReactions(tick, source, target, dealt);
+      if (damageKind === "attack" && options.basicDirectReactionCollector) {
+        const previous = options.basicDirectReactionCollector.get(target.id);
+        options.basicDirectReactionCollector.set(target.id, {
+          target,
+          dealt: (previous?.dealt ?? 0) + dealt,
+        });
+      } else {
+        applyDirectTraitReactions(tick, source, target, dealt);
+      }
     }
     const reflectionEligible =
       damageType === "special" &&
@@ -2239,7 +2259,11 @@ export function simulateBattle(
     damageKind: "attack" | "item",
   ): number => {
     let dealt = 0;
-    const suppressDirectTraitReactions = damageKind === "attack";
+    const basicDirectReactionCollector: BasicDirectReactionCollector | null =
+      damageKind === "attack" ? new Map() : null;
+    const damageOptions = basicDirectReactionCollector
+      ? { basicDirectReactionCollector }
+      : {};
     if (damage.physical > 0) {
       dealt += applyDamage(
         tick,
@@ -2249,7 +2273,7 @@ export function simulateBattle(
         damageKind,
         "physical",
         0,
-        { suppressDirectTraitReactions },
+        damageOptions,
       );
     }
     if (damage.special > 0) {
@@ -2261,7 +2285,7 @@ export function simulateBattle(
         damageKind,
         "special",
         0,
-        { suppressDirectTraitReactions },
+        damageOptions,
       );
     }
     if (damage.true > 0) {
@@ -2273,11 +2297,22 @@ export function simulateBattle(
         damageKind,
         "true",
         0,
-        { suppressDirectTraitReactions },
+        damageOptions,
       );
     }
-    if (damageKind === "attack" && dealt > 0) {
-      applyDirectTraitReactions(tick, source, target, dealt);
+    if (basicDirectReactionCollector) {
+      const reactions = [...basicDirectReactionCollector.values()].sort(
+        (left, right) => left.target.id.localeCompare(right.target.id),
+      );
+      for (const reaction of reactions) {
+        applyDirectTraitReactions(
+          tick,
+          source,
+          reaction.target,
+          reaction.dealt,
+        );
+      }
+      return reactions.reduce((total, reaction) => total + reaction.dealt, 0);
     }
     return dealt;
   };
@@ -2359,7 +2394,7 @@ export function simulateBattle(
       "item",
       "physical",
       0,
-      { isRetaliation: true },
+      { isRetaliation: true, suppressDamagedEnergy: true },
     );
     if (
       !alive(source) ||
@@ -2641,6 +2676,8 @@ export function simulateBattle(
         rawDamage,
         "item",
         "physical",
+        0,
+        { suppressDamagedEnergy: true },
       );
     }
   };

@@ -356,6 +356,44 @@ describe("P6 trait content and scope", () => {
       staticEffects: ["+18% Critical Chance", "+25% Critical Power"],
     });
   });
+
+  it("announces current, active, next, and maximum trait thresholds", () => {
+    const strawHat = DEFAULT_CONTENT.traits.find(
+      (trait) => trait.id === "straw-hat",
+    );
+    if (!strawHat) throw new Error("Missing Straw Hat trait fixture.");
+    const views = createTraitViews([
+      {
+        traitId: "straw-hat",
+        count: 1,
+        tierIndex: -1,
+        tier: null,
+      },
+      {
+        traitId: "straw-hat",
+        count: 2,
+        tierIndex: 0,
+        tier: strawHat.tiers[0],
+      },
+      {
+        traitId: "straw-hat",
+        count: 6,
+        tierIndex: 2,
+        tier: strawHat.tiers[2],
+      },
+    ], DEFAULT_CONTENT);
+    expect(views.map((view) => view.semanticDescription)).toEqual([
+      expect.stringContaining(
+        "Current count: 6. Active threshold: 6. Maximum tier reached.",
+      ),
+      expect.stringContaining(
+        "Current count: 2. Active threshold: 2. Next threshold: 4.",
+      ),
+      expect.stringContaining(
+        "Current count: 1. Inactive. Next threshold: 2.",
+      ),
+    ]);
+  });
 });
 
 describe("P6 start and cast ordering", () => {
@@ -476,7 +514,7 @@ describe("P6 reactive combat identities", () => {
   it("fires tier-two Marksman volley after the fourth successful primary without item/basic recursion", () => {
     const result = run([
       { id: "marksman", teamId: "a", x: 0, y: 0, traits: ["marksman"], items: [NO_CRIT.id], stats: { attackIntervalMs: 100 } },
-      { id: "second", teamId: "a", x: 7, y: 0, traits: ["marksman"], items: [NO_CRIT.id], stats: { attack: 1, attackIntervalMs: 60_000 } },
+      { id: "second", teamId: "a", x: 7, y: 0, traits: ["marksman"], items: [NO_CRIT.id], stats: { attack: 1, range: 0, attackIntervalMs: 60_000 } },
       { id: "target", teamId: "b", x: 0, y: 1, stats: { health: 10_000, attackIntervalMs: 60_000 } },
     ], { maxTicks: 4 });
     const primary = events(result, "damage").filter(
@@ -489,6 +527,8 @@ describe("P6 reactive combat identities", () => {
     expect(volley.map((event) => event.amount)).toEqual([50, 50]);
     expect(events(result, "energy").filter((event) => event.unitId === "marksman" && event.reason === "attack"))
       .toHaveLength(4);
+    expect(events(result, "energy").filter((event) => event.unitId === "target" && event.reason === "damaged"))
+      .toMatchObject([{ amount: 5 }, { amount: 5 }, { amount: 5 }, { amount: 5 }]);
   });
 
   it("does not advance Marksman volley on a dodged primary", () => {
@@ -535,8 +575,8 @@ describe("P6 reactive combat identities", () => {
 
   it("counters exactly the tenth adjacent direct hit with Physical damage and existing Knockback", () => {
     const result = run([
-      { id: "brawler", teamId: "a", x: 0, y: 0, traits: ["brawler"], items: [NO_CRIT.id], stats: { health: 10_000, attack: 100, attackIntervalMs: 60_000 } },
-      { id: "second", teamId: "a", x: 7, y: 0, traits: ["brawler"], stats: { attackIntervalMs: 60_000 } },
+      { id: "brawler", teamId: "a", x: 0, y: 0, traits: ["brawler"], items: [NO_CRIT.id], stats: { health: 10_000, attack: 100, range: 0, attackIntervalMs: 60_000 } },
+      { id: "second", teamId: "a", x: 7, y: 0, traits: ["brawler"], stats: { range: 0, attackIntervalMs: 60_000 } },
       { id: "attacker", teamId: "b", x: 0, y: 1, items: [NO_CRIT.id], stats: { health: 10_000, attack: 1, attackIntervalMs: 100 } },
     ], { maxTicks: 10 });
     const counters = events(result, "damage").filter(
@@ -545,6 +585,106 @@ describe("P6 reactive combat identities", () => {
     expect(counters.map((event) => event.amount)).toEqual([50]);
     expect(events(result, "unit-displace").filter((event) => event.abilityId === "brawler-counterstrike"))
       .toHaveLength(1);
+    expect(events(result, "energy").filter((event) => event.unitId === "attacker" && event.reason === "damaged"))
+      .toEqual([]);
+    expect(events(result, "energy").filter((event) => event.unitId === "brawler" && event.reason === "damaged"))
+      .toHaveLength(10);
+    expect(events(result, "energy").filter((event) => event.unitId === "attacker" && event.reason === "attack"))
+      .toHaveLength(10);
+  });
+
+  it("aggregates split covered basics once per recipient while preserving Guard and Brawler cadence", () => {
+    const fixtures: FixtureUnit[] = [
+      { id: "attacker", teamId: "a", x: 0, y: 0, items: ["advanced-armament-orb", NO_CRIT.id], stats: { attack: 10, attackIntervalMs: 100 } },
+      { id: "protected", teamId: "b", x: 0, y: 1, stats: { health: 1, range: 0, attackIntervalMs: 60_000 } },
+      { id: "cover", teamId: "b", x: 1, y: 1, traits: ["brawler", "guardian"], items: ["bodyguard-band", NO_CRIT.id], stats: { health: 10_000, attack: 100, range: 0, attackIntervalMs: 60_000 } },
+      { id: "second", teamId: "b", x: 7, y: 0, traits: ["brawler", "guardian"], stats: { range: 0, attackIntervalMs: 60_000 } },
+    ];
+    const beforeTenth = run(fixtures, { maxTicks: 5 });
+    expect(events(beforeTenth, "damage").filter(
+      (event) => event.sourceId === "cover" && event.damageKind === "item",
+    )).toEqual([]);
+
+    const result = run(fixtures, { seed: "split-cover", maxTicks: 10 });
+    expect(result).toEqual(run(fixtures, { seed: "split-cover", maxTicks: 10 }));
+    expect(events(result, "damage").filter(
+      (event) =>
+        event.sourceId === "attacker" &&
+        event.targetId === "cover" &&
+        event.damageKind === "attack",
+    )).toHaveLength(20);
+    expect(events(result, "shield").filter(
+      (event) => event.sourceId === "cover" && event.amount === 60,
+    )).toHaveLength(1);
+    expect(events(result, "damage").filter(
+      (event) => event.sourceId === "cover" && event.damageKind === "item",
+    ).map((event) => event.amount)).toEqual([50]);
+    expect(events(result, "energy").filter(
+      (event) => event.unitId === "cover" && event.reason !== "damaged",
+    )).toEqual([]);
+  });
+
+  it("keeps ability multi-hits as one Brawler reaction per actual hit", () => {
+    const result = run([
+      { id: "caster", teamId: "a", x: 0, y: 0, items: [START_100.id], stats: { attackIntervalMs: 60_000 }, ability: { hits: 10, power: 1, damageType: "true" } },
+      { id: "brawler", teamId: "b", x: 0, y: 1, traits: ["brawler"], items: [NO_CRIT.id], stats: { health: 10_000, attack: 100, attackIntervalMs: 60_000 } },
+      { id: "second", teamId: "b", x: 7, y: 0, traits: ["brawler"], stats: { attackIntervalMs: 60_000 } },
+    ]);
+    expect(events(result, "damage").filter(
+      (event) => event.sourceId === "caster" && event.damageKind === "ability",
+    )).toHaveLength(10);
+    expect(events(result, "damage").filter(
+      (event) => event.sourceId === "brawler" && event.damageKind === "item",
+    ).map((event) => event.amount)).toEqual([50]);
+  });
+
+  it("advances covered Marksman primaries once and volleys into the original target", () => {
+    const result = run([
+      { id: "marksman", teamId: "a", x: 0, y: 0, traits: ["marksman"], items: [NO_CRIT.id], stats: { attackIntervalMs: 100 } },
+      { id: "second", teamId: "a", x: 7, y: 0, traits: ["marksman"], stats: { range: 0, attackIntervalMs: 60_000 } },
+      { id: "primary-target", teamId: "b", x: 0, y: 1, stats: { health: 75, range: 0, attackIntervalMs: 60_000 } },
+      { id: "z-cover", teamId: "b", x: 1, y: 1, items: ["bodyguard-band"], stats: { health: 200, range: 0, attackIntervalMs: 60_000 } },
+    ], { maxTicks: 4 });
+    expect(events(result, "damage").filter(
+      (event) => event.sourceId === "marksman" && event.damageKind === "attack",
+    ).map((event) => event.targetId)).toEqual([
+      "z-cover",
+      "z-cover",
+      "z-cover",
+      "z-cover",
+    ]);
+    expect(events(result, "damage").filter(
+      (event) => event.sourceId === "marksman" && event.damageKind === "item",
+    ).map((event) => event.targetId)).toEqual([
+      "primary-target",
+      "primary-target",
+    ]);
+  });
+
+  it("excludes P6 start Shields from Bombardier while counting runtime Guard Point Shield", () => {
+    const startShield = run([
+      { id: "holder", teamId: "a", x: 0, y: 0, traits: ["navy", "emperor"], items: ["bombardier-band", "star-shield-dial", START_100.id], stats: { attackIntervalMs: 60_000 } },
+      { id: "navy", teamId: "a", x: 1, y: 0, traits: ["navy"], stats: { attackIntervalMs: 60_000 } },
+      { id: "enemy", teamId: "b", x: 0, y: 1, items: [NO_CRIT.id], stats: { attack: 1_000, specialDefense: 100, attackIntervalMs: 60_000 } },
+    ]);
+    expect(events(startShield, "shield").filter(
+      (event) => event.targetId === "holder",
+    ).map((event) => event.amount)).toEqual([40, 20, 50]);
+    expect(events(startShield, "damage").filter(
+      (event) => event.sourceId === "holder" && event.damageKind === "item",
+    ).map((event) => event.amount)).toEqual([12]);
+
+    const guardPoint = run([
+      { id: "holder", teamId: "a", x: 0, y: 0, traits: ["guardian"], items: ["bombardier-band"], stats: { health: 10_000, attackIntervalMs: 60_000 } },
+      { id: "guardian", teamId: "a", x: 7, y: 0, traits: ["guardian"], stats: { attackIntervalMs: 60_000 } },
+      { id: "enemy", teamId: "b", x: 0, y: 1, items: [NO_CRIT.id], stats: { health: 10_000, attack: 100, specialDefense: 0, attackIntervalMs: 100 } },
+    ], { maxTicks: 4 });
+    expect(events(guardPoint, "shield").filter(
+      (event) => event.sourceId === "holder" && event.amount === 60,
+    )).toHaveLength(1);
+    expect(events(guardPoint, "damage").filter(
+      (event) => event.sourceId === "holder" && event.damageKind === "item",
+    ).map((event) => event.amount)).toEqual([30]);
   });
 
   it("lets existing retaliation suppression and forced-movement immunity govern Brawler counters", () => {

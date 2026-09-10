@@ -836,6 +836,11 @@ export function createTraitViews(
         : nextTier
           ? `Next at ${nextTier.required}: ${nextTier.label}`
           : "No active tier";
+      const thresholdDescription = active.tier
+        ? nextTier
+          ? `Current count: ${active.count}. Active threshold: ${active.tier.required}. Next threshold: ${nextTier.required}.`
+          : `Current count: ${active.count}. Active threshold: ${active.tier.required}. Maximum tier reached.`
+        : `Current count: ${active.count}. Inactive. Next threshold: ${nextTier?.required ?? "none"}.`;
       const name = definition?.name ?? titleCase(active.traitId);
       const description =
         definition?.description ??
@@ -858,10 +863,7 @@ export function createTraitViews(
         behaviorDescriptions,
         semanticDescription: [
           `${name}, ${category}.`,
-          `Count ${active.count}.`,
-          active.tier
-            ? `Active threshold ${active.tier.required}.`
-            : `Inactive; next threshold ${nextTier?.required ?? "none"}.`,
+          thresholdDescription,
           `${scopeLabel}.`,
           staticEffects.join(", "),
           behaviorDescriptions.join(" "),
