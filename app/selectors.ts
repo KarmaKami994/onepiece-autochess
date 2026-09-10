@@ -1,5 +1,7 @@
 import {
   DEFAULT_CONTENT,
+  describeTraitBehavior,
+  describeTraitEffect,
   getActiveTraits,
   getActiveTraitsForUnits,
   getEffectiveUnitTraits,
@@ -74,6 +76,12 @@ export type TraitView = {
   next: number | null;
   tier: number;
   description: string;
+  category: "Origin" | "Role";
+  tierLabel: string;
+  scopeLabel: "Crew-wide" | "Trait holders only";
+  staticEffects: string[];
+  behaviorDescriptions: string[];
+  semanticDescription: string;
   color: string;
 };
 
@@ -798,7 +806,7 @@ function buildBoardUnits(
   return { units, views };
 }
 
-function activeTraitViews(
+export function createTraitViews(
   activeTraits: readonly ActiveTrait[],
   content: GameContent,
 ): TraitView[] {
@@ -811,18 +819,55 @@ function activeTraitViews(
         icon: "◆",
         color: cssColor(active.traitId),
       };
+      const nextTier = definition?.tiers.find(
+        (tier) => tier.required > active.count,
+      );
+      const presentationTier = active.tier ?? nextTier ?? null;
+      const scopeLabel =
+        (presentationTier?.effectScope ?? "team") === "team"
+          ? "Crew-wide" as const
+          : "Trait holders only" as const;
+      const staticEffects =
+        presentationTier?.effects.map(describeTraitEffect) ?? [];
+      const behaviorDescriptions =
+        presentationTier?.behaviors?.map(describeTraitBehavior) ?? [];
+      const tierLabel = active.tier
+        ? active.tier.label
+        : nextTier
+          ? `Next at ${nextTier.required}: ${nextTier.label}`
+          : "No active tier";
+      const thresholdDescription = active.tier
+        ? nextTier
+          ? `Current count: ${active.count}. Active threshold: ${active.tier.required}. Next threshold: ${nextTier.required}.`
+          : `Current count: ${active.count}. Active threshold: ${active.tier.required}. Maximum tier reached.`
+        : `Current count: ${active.count}. Inactive. Next threshold: ${nextTier?.required ?? "none"}.`;
+      const name = definition?.name ?? titleCase(active.traitId);
+      const description =
+        definition?.description ??
+        "Field more crew with this bond to strengthen its effect.";
+      const category = definition?.category === "role"
+        ? "Role" as const
+        : "Origin" as const;
       return {
         id: active.traitId,
-        name: definition?.name ?? titleCase(active.traitId),
+        name,
         icon: meta.icon,
         count: active.count,
-        next:
-          definition?.tiers.find((tier) => tier.required > active.count)
-            ?.required ?? null,
+        next: nextTier?.required ?? null,
         tier: active.tierIndex + 1,
-        description:
-          definition?.description ??
-          "Field more crew with this bond to strengthen its effect.",
+        description,
+        category,
+        tierLabel,
+        scopeLabel,
+        staticEffects,
+        behaviorDescriptions,
+        semanticDescription: [
+          `${name}, ${category}.`,
+          thresholdDescription,
+          `${scopeLabel}.`,
+          staticEffects.join(", "),
+          behaviorDescriptions.join(" "),
+        ].filter(Boolean).join(" "),
         color: meta.color,
       };
     })
@@ -836,7 +881,7 @@ function traitViews(
   player: PlayerState,
   content: GameContent,
 ): TraitView[] {
-  return activeTraitViews(getActiveTraits(player, content), content);
+  return createTraitViews(getActiveTraits(player, content), content);
 }
 
 function recentBattleViews(
@@ -1228,7 +1273,7 @@ export function selectBattlePresentation(
       : opponentPlayer?.name ?? stage.name,
     isGhost,
     boardUnits: board.units,
-    traits: activeTraitViews(frozenTraits, content),
+    traits: createTraitViews(frozenTraits, content),
     selectedDefinitionByUnit: board.views,
     events: combat.events,
     eventSequence: combat.sequence,

@@ -4,7 +4,11 @@ import {
 } from "./content";
 import { getUnitFormDefinition, resolveUnitDefinition } from "./forms";
 import { hashSeed, nextRandom } from "./rng";
-import { getActiveTraitEffects } from "./traits";
+import {
+  getActiveTraitBehaviorGrants,
+  getActiveTraitEffectGrants,
+  getEffectiveUnitTraits,
+} from "./traits";
 import type {
   AbilityDefinition,
   BattleEvent,
@@ -19,6 +23,7 @@ import type {
   Position,
   SequentialStrikeDefinition,
   SignatureMechanic,
+  TraitBehavior,
   TraitEffect,
   UnitStats,
 } from "./types";
@@ -114,6 +119,11 @@ interface MutableBattleUnit {
   omnivampPercent: number;
   emergencyShieldPercent: number;
   stackingAttackPercent: number;
+  stackingAbilityPowerPercent: number;
+  effectiveTraitIds: string[];
+  brawlerDirectDamageEvents: number;
+  marksmanSuccessfulBasicAttacks: number;
+  guardianGuardAvailable: boolean;
   emergencyShieldUsed: boolean;
   stunUntilTick: number;
   runeProtectUntilTick: number;
@@ -139,6 +149,11 @@ interface MutableBattleUnit {
   resurrectAtTick: number;
   resurrectionBaseline: ResurrectionBaseline | null;
 }
+
+type BasicDirectReactionCollector = Map<
+  string,
+  { target: MutableBattleUnit; dealt: number }
+>;
 
 interface AttackIntent {
   kind: "attack";
@@ -251,6 +266,9 @@ function applyTraitEffect(
     case "stacking-attack-percent":
       unit.stackingAttackPercent += effect.value;
       break;
+    case "stacking-ability-power-percent":
+      unit.stackingAbilityPowerPercent += effect.value;
+      break;
     case "emergency-shield-percent":
       unit.emergencyShieldPercent += effect.value;
       break;
@@ -259,6 +277,9 @@ function applyTraitEffect(
       break;
     case "critical-chance-percent":
       unit.criticalChancePercent += effect.value;
+      break;
+    case "critical-power-percent":
+      unit.criticalPowerPercent += effect.value;
       break;
     case "ability-power-percent":
       applyCombatStatDelta(
@@ -323,7 +344,7 @@ function createMutableUnits(
   drawIndex: (length: number) => number,
 ): MutableBattleUnit[] {
   const tickMs = content.config.combatTickMs;
-  const traitEffects = getActiveTraitEffects(
+  const traitEffectGrants = getActiveTraitEffectGrants(
     team.activeTraits ?? [],
     content,
   );
@@ -353,6 +374,10 @@ function createMutableUnits(
       setup.items,
       content,
       drawIndex,
+    );
+    const effectiveTraitIds = getEffectiveUnitTraits(
+      { ...setup, items: resolvedItemIds },
+      content,
     );
     const unit: MutableBattleUnit = {
       id: setup.id,
@@ -403,6 +428,11 @@ function createMutableUnits(
       omnivampPercent: 0,
       emergencyShieldPercent: 0,
       stackingAttackPercent: 0,
+      stackingAbilityPowerPercent: 0,
+      effectiveTraitIds,
+      brawlerDirectDamageEvents: 0,
+      marksmanSuccessfulBasicAttacks: 0,
+      guardianGuardAvailable: true,
       emergencyShieldUsed: false,
       stunUntilTick: 0,
       runeProtectUntilTick: 0,
@@ -517,8 +547,13 @@ function createMutableUnits(
         }
       }
     }
-    for (const effect of traitEffects) {
-      applyTraitEffect(unit, effect);
+    for (const grant of traitEffectGrants) {
+      if (
+        grant.scope === "team" ||
+        unit.effectiveTraitIds.includes(grant.traitId)
+      ) {
+        applyTraitEffect(unit, grant.effect);
+      }
     }
     unit.periodicItemBehaviors = unit.itemBehaviors.flatMap((behavior) => {
       if (
@@ -1334,12 +1369,44 @@ export function simulateBattle(
       )
       .map((team) => team.id),
   );
+  const traitBehaviorsByTeamId = new Map(
+    [teamA, teamB].map((team) => [
+      team.id,
+      getActiveTraitBehaviorGrants(team.activeTraits ?? [], content),
+    ]),
+  );
+  const teamTraitRuntime = new Map(
+    [teamA.id, teamB.id].map((teamId) => [
+      teamId,
+      { strawHatRallyUsed: false, captainCommandUsed: false },
+    ]),
+  );
+  const hasEffectiveTrait = (
+    unit: MutableBattleUnit,
+    traitId: string,
+  ): boolean => unit.effectiveTraitIds.includes(traitId);
+  const traitBehavior = (
+    teamId: string,
+    traitId: string,
+    kind: TraitBehavior["kind"],
+  ): TraitBehavior | null =>
+    traitBehaviorsByTeamId
+      .get(teamId)
+      ?.find(
+        (grant) => grant.traitId === traitId && grant.behavior.kind === kind,
+      )?.behavior ?? null;
 
   const changeEnergy = (
     tick: number,
     unit: MutableBattleUnit,
     requestedAmount: number,
-    reason: "attack" | "damaged" | "cast-reset" | "ability-drain" | "item",
+    reason:
+      | "attack"
+      | "damaged"
+      | "cast-reset"
+      | "ability-drain"
+      | "item"
+      | "trait",
   ): void => {
     const previous = unit.energy;
     const effectiveAmount =
@@ -1581,12 +1648,16 @@ export function simulateBattle(
     source: MutableBattleUnit,
     target: MutableBattleUnit,
     amount: number,
+    options: { trackRuntimeShield?: boolean } = {},
   ): void => {
     if (!alive(target) || amount <= 0) {
       return;
     }
     target.shield += amount;
-    if (hasItemBehavior(target, "shield-depletion-explosion")) {
+    if (
+      options.trackRuntimeShield !== false &&
+      hasItemBehavior(target, "shield-depletion-explosion")
+    ) {
       target.totalShieldGained += amount;
     }
     emit({
@@ -1596,6 +1667,80 @@ export function simulateBattle(
       targetId: target.id,
       amount,
     });
+  };
+
+  const applyStartOfBattleTraitBehaviors = (): void => {
+    for (const teamId of [teamA.id, teamB.id]) {
+      const navyBehavior = traitBehavior(
+        teamId,
+        "navy",
+        "start-navy-formation-shield",
+      );
+      if (navyBehavior?.kind === "start-navy-formation-shield") {
+        const navyHolders = units
+          .filter(
+            (unit) =>
+              alive(unit) &&
+              unit.teamId === teamId &&
+              hasEffectiveTrait(unit, "navy"),
+          )
+          .sort((left, right) => left.id.localeCompare(right.id));
+        for (const holder of navyHolders) {
+          const adjacentCount = Math.min(
+            navyBehavior.adjacentHolderCap,
+            navyHolders.filter(
+              (candidate) =>
+                candidate.id !== holder.id &&
+                Math.max(
+                  Math.abs(candidate.x - holder.x),
+                  Math.abs(candidate.y - holder.y),
+                ) <= 1,
+            ).length,
+          );
+          applyShield(
+            0,
+            holder,
+            holder,
+            adjacentCount * navyBehavior.shieldPerAdjacentHolder,
+            { trackRuntimeShield: false },
+          );
+        }
+      }
+
+      const emperorBehavior = traitBehavior(
+        teamId,
+        "emperor",
+        "start-emperor-star-shield",
+      );
+      if (emperorBehavior?.kind === "start-emperor-star-shield") {
+        const emperorHolders = units
+          .filter(
+            (unit) =>
+              alive(unit) &&
+              unit.teamId === teamId &&
+              hasEffectiveTrait(unit, "emperor"),
+          )
+          .sort((left, right) => left.id.localeCompare(right.id));
+        const starSum = emperorHolders.reduce(
+          (sum, holder) => sum + holder.star,
+          0,
+        );
+        const source = emperorHolders[0];
+        if (source && starSum > 0) {
+          for (const ally of units
+            .filter((unit) => alive(unit) && unit.teamId === teamId)
+            .sort((left, right) => left.id.localeCompare(right.id))) {
+            applyShield(
+              0,
+              source,
+              ally,
+              starSum * emperorBehavior.shieldPerStar,
+              { trackRuntimeShield: false },
+            );
+          }
+        }
+      }
+    }
   };
 
   const chooseEscapeDestination = (
@@ -1714,6 +1859,13 @@ export function simulateBattle(
     });
   };
 
+  let applyDirectTraitReactions: (
+    tick: number,
+    source: MutableBattleUnit,
+    target: MutableBattleUnit,
+    dealt: number,
+  ) => void = () => undefined;
+
   const applyDamage = (
     tick: number,
     source: MutableBattleUnit | null,
@@ -1726,6 +1878,8 @@ export function simulateBattle(
       isRetaliation?: boolean;
       preventCover?: boolean;
       suppressBombardier?: boolean;
+      suppressDamagedEnergy?: boolean;
+      basicDirectReactionCollector?: BasicDirectReactionCollector;
     } = {},
   ): number => {
     if (!alive(target) || tick < target.protectUntilTick) {
@@ -1918,7 +2072,10 @@ export function simulateBattle(
           damageKind,
           damageType,
           defensePiercePercent,
-          { ...options, preventCover: true },
+          {
+            ...options,
+            preventCover: true,
+          },
         );
       }
     }
@@ -1941,7 +2098,9 @@ export function simulateBattle(
         shieldDamage,
         damageKind,
       });
-      changeEnergy(tick, target, 5, "damaged");
+      if (!options.suppressDamagedEnergy) {
+        changeEnergy(tick, target, 5, "damaged");
+      }
       for (const behavior of target.itemBehaviors) {
         if (
           behavior.kind !== "on-damage-received-stack" ||
@@ -2048,6 +2207,22 @@ export function simulateBattle(
     if (dealt > 0) {
       triggerSmokeEscape(tick, target);
     }
+    if (
+      source &&
+      source.teamId !== target.teamId &&
+      (damageKind === "attack" || damageKind === "ability") &&
+      dealt > 0
+    ) {
+      if (damageKind === "attack" && options.basicDirectReactionCollector) {
+        const previous = options.basicDirectReactionCollector.get(target.id);
+        options.basicDirectReactionCollector.set(target.id, {
+          target,
+          dealt: (previous?.dealt ?? 0) + dealt,
+        });
+      } else {
+        applyDirectTraitReactions(tick, source, target, dealt);
+      }
+    }
     const reflectionEligible =
       damageType === "special" &&
       damageKind !== "burn" &&
@@ -2073,7 +2248,7 @@ export function simulateBattle(
         { isRetaliation: true },
       );
     }
-    return healthDamage;
+    return dealt;
   };
 
   const resolveDamageBundle = (
@@ -2082,16 +2257,173 @@ export function simulateBattle(
     target: MutableBattleUnit,
     damage: BasicAttackDamage,
     damageKind: "attack" | "item",
-  ): void => {
+  ): number => {
+    let dealt = 0;
+    const basicDirectReactionCollector: BasicDirectReactionCollector | null =
+      damageKind === "attack" ? new Map() : null;
+    const damageOptions = basicDirectReactionCollector
+      ? { basicDirectReactionCollector }
+      : {};
     if (damage.physical > 0) {
-      applyDamage(tick, source, target, damage.physical, damageKind, "physical");
+      dealt += applyDamage(
+        tick,
+        source,
+        target,
+        damage.physical,
+        damageKind,
+        "physical",
+        0,
+        damageOptions,
+      );
     }
     if (damage.special > 0) {
-      applyDamage(tick, source, target, damage.special, damageKind, "special");
+      dealt += applyDamage(
+        tick,
+        source,
+        target,
+        damage.special,
+        damageKind,
+        "special",
+        0,
+        damageOptions,
+      );
     }
     if (damage.true > 0) {
-      applyDamage(tick, source, target, damage.true, damageKind, "true");
+      dealt += applyDamage(
+        tick,
+        source,
+        target,
+        damage.true,
+        damageKind,
+        "true",
+        0,
+        damageOptions,
+      );
     }
+    if (basicDirectReactionCollector) {
+      const reactions = [...basicDirectReactionCollector.values()].sort(
+        (left, right) => left.target.id.localeCompare(right.target.id),
+      );
+      for (const reaction of reactions) {
+        applyDirectTraitReactions(
+          tick,
+          source,
+          reaction.target,
+          reaction.dealt,
+        );
+      }
+      return reactions.reduce((total, reaction) => total + reaction.dealt, 0);
+    }
+    return dealt;
+  };
+
+  applyDirectTraitReactions = (
+    tick: number,
+    source: MutableBattleUnit,
+    target: MutableBattleUnit,
+    dealt: number,
+  ): void => {
+    if (dealt <= 0 || source.teamId === target.teamId) {
+      return;
+    }
+
+    const guardPoint = traitBehavior(
+      target.teamId,
+      "guardian",
+      "first-direct-hit-guard-point",
+    );
+    if (
+      guardPoint?.kind === "first-direct-hit-guard-point" &&
+      target.guardianGuardAvailable &&
+      alive(target) &&
+      hasEffectiveTrait(target, "guardian")
+    ) {
+      target.guardianGuardAvailable = false;
+      applyShield(tick, target, target, guardPoint.shield);
+      const durationTicks = Math.max(
+        1,
+        Math.ceil(guardPoint.runeProtectMs / content.config.combatTickMs),
+      );
+      target.runeProtectUntilTick = Math.max(
+        target.runeProtectUntilTick,
+        tick + durationTicks,
+      );
+      emit({
+        type: "status",
+        tick,
+        sourceId: target.id,
+        targetId: target.id,
+        status: "rune-protect",
+        durationTicks,
+      });
+    }
+
+    const counter = traitBehavior(
+      target.teamId,
+      "brawler",
+      "every-n-direct-damage-counter",
+    );
+    if (
+      counter?.kind !== "every-n-direct-damage-counter" ||
+      !hasEffectiveTrait(target, "brawler")
+    ) {
+      return;
+    }
+    target.brawlerDirectDamageEvents += 1;
+    if (
+      target.brawlerDirectDamageEvents % Math.max(1, counter.every) !== 0 ||
+      !alive(target) ||
+      !alive(source) ||
+      Math.max(
+        Math.abs(source.x - target.x),
+        Math.abs(source.y - target.y),
+      ) !== 1 ||
+      source.itemBehaviors.some(
+        (behavior) =>
+          behavior.kind === "shield-damage-multiplier" &&
+          behavior.suppressRetaliation,
+      )
+    ) {
+      return;
+    }
+    applyDamage(
+      tick,
+      target,
+      source,
+      Math.round((target.attack * counter.attackDamagePercent) / 100),
+      "item",
+      "physical",
+      0,
+      { isRetaliation: true, suppressDamagedEnergy: true },
+    );
+    if (
+      !alive(source) ||
+      hasItemBehavior(source, "forced-movement-immunity")
+    ) {
+      return;
+    }
+    const destination = chooseKnockbackDestination(
+      target,
+      source,
+      units,
+      content,
+    );
+    if (!destination) {
+      return;
+    }
+    const from = { x: source.x, y: source.y };
+    source.x = destination.x;
+    source.y = destination.y;
+    emit({
+      type: "unit-displace",
+      tick,
+      sourceId: target.id,
+      unitId: source.id,
+      abilityId: "brawler-counterstrike",
+      movementKind: "knockback",
+      from,
+      to: destination,
+    });
   };
 
   const applyBasicAttackItemBehaviors = (
@@ -2240,6 +2572,113 @@ export function simulateBattle(
           "item",
         );
       }
+    }
+  };
+
+  const applyPostCastTraitBehaviors = (
+    tick: number,
+    source: MutableBattleUnit,
+  ): void => {
+    if (!alive(source)) {
+      return;
+    }
+    const specialist = traitBehavior(
+      source.teamId,
+      "specialist",
+      "post-specialist-cast-energy",
+    );
+    if (
+      specialist?.kind === "post-specialist-cast-energy" &&
+      hasEffectiveTrait(source, "specialist")
+    ) {
+      changeEnergy(tick, source, specialist.energy, "trait");
+    }
+
+    const runtime = teamTraitRuntime.get(source.teamId);
+    const strawHat = traitBehavior(
+      source.teamId,
+      "straw-hat",
+      "first-straw-hat-cast-rally",
+    );
+    if (
+      runtime &&
+      !runtime.strawHatRallyUsed &&
+      strawHat?.kind === "first-straw-hat-cast-rally" &&
+      hasEffectiveTrait(source, "straw-hat")
+    ) {
+      runtime.strawHatRallyUsed = true;
+      for (const holder of units
+        .filter(
+          (unit) =>
+            alive(unit) &&
+            unit.teamId === source.teamId &&
+            hasEffectiveTrait(unit, "straw-hat"),
+        )
+        .sort((left, right) => left.id.localeCompare(right.id))) {
+        changeEnergy(tick, holder, strawHat.energy, "trait");
+      }
+    }
+
+    const captain = traitBehavior(
+      source.teamId,
+      "captain",
+      "first-captain-cast-command",
+    );
+    if (
+      runtime &&
+      !runtime.captainCommandUsed &&
+      captain?.kind === "first-captain-cast-command" &&
+      hasEffectiveTrait(source, "captain")
+    ) {
+      runtime.captainCommandUsed = true;
+      for (const ally of units
+        .filter((unit) => alive(unit) && unit.teamId === source.teamId)
+        .sort((left, right) => left.id.localeCompare(right.id))) {
+        changeEnergy(tick, ally, captain.energy, "trait");
+      }
+    }
+  };
+
+  const applyMarksmanVolley = (
+    tick: number,
+    source: MutableBattleUnit,
+    target: MutableBattleUnit,
+    primaryDealt: number,
+  ): void => {
+    const volley = traitBehavior(
+      source.teamId,
+      "marksman",
+      "every-n-successful-basic-volley",
+    );
+    if (
+      volley?.kind !== "every-n-successful-basic-volley" ||
+      !hasEffectiveTrait(source, "marksman") ||
+      primaryDealt <= 0
+    ) {
+      return;
+    }
+    source.marksmanSuccessfulBasicAttacks += 1;
+    if (
+      source.marksmanSuccessfulBasicAttacks % Math.max(1, volley.every) !== 0 ||
+      !alive(source) ||
+      !alive(target)
+    ) {
+      return;
+    }
+    const rawDamage = Math.round(
+      (source.attack * volley.attackDamagePercent) / 100,
+    );
+    for (let shot = 0; shot < volley.shots && alive(target); shot += 1) {
+      applyDamage(
+        tick,
+        source,
+        target,
+        rawDamage,
+        "item",
+        "physical",
+        0,
+        { suppressDamagedEnergy: true },
+      );
     }
   };
 
@@ -2420,6 +2859,9 @@ export function simulateBattle(
         basicAttackAttempts: 0,
         damageReceivedEvents: 0,
       };
+      unit.brawlerDirectDamageEvents = 0;
+      unit.marksmanSuccessfulBasicAttacks = 0;
+      unit.guardianGuardAvailable = true;
       unit.totalShieldGained = 0;
       unit.emergencyShieldUsed = false;
       unit.stunUntilTick = 0;
@@ -2493,7 +2935,33 @@ export function simulateBattle(
       const killer = units.find(
         (candidate) => candidate.id === unit.lastDamagerId,
       );
-      if (killer && killer.stackingAttackPercent > 0) {
+      const warlordSustain = killer
+        ? traitBehavior(
+            killer.teamId,
+            "warlord",
+            "on-warlord-kill-sustain",
+          )
+        : null;
+      if (
+        killer &&
+        alive(killer) &&
+        hasEffectiveTrait(killer, "warlord") &&
+        warlordSustain?.kind === "on-warlord-kill-sustain"
+      ) {
+        applyHeal(
+          tick,
+          killer,
+          killer,
+          Math.round(
+            (killer.maxHp * warlordSustain.healMaxHealthPercent) / 100,
+          ),
+        );
+        changeEnergy(tick, killer, warlordSustain.energy, "trait");
+      }
+      if (
+        killer &&
+        killer.stackingAttackPercent > 0
+      ) {
         const previousAttack = killer.attack;
         const requestedAttack = Math.max(
           1,
@@ -2518,6 +2986,52 @@ export function simulateBattle(
           reason: "stacking-attack",
         });
       }
+      if (
+        killer &&
+        alive(killer) &&
+        killer.stackingAbilityPowerPercent > 0
+      ) {
+        applyCombatStatDelta(
+          killer,
+          "ability-power",
+          killer.stackingAbilityPowerPercent,
+          "self",
+        );
+      }
+      const brotherhoodRally = traitBehavior(
+        unit.teamId,
+        "brotherhood",
+        "on-brotherhood-holder-death-rally",
+      );
+      if (
+        brotherhoodRally?.kind === "on-brotherhood-holder-death-rally" &&
+        hasEffectiveTrait(unit, "brotherhood")
+      ) {
+        for (const brother of units
+          .filter(
+            (candidate) =>
+              alive(candidate) &&
+              candidate.teamId === unit.teamId &&
+              candidate.id !== unit.id &&
+              hasEffectiveTrait(candidate, "brotherhood"),
+          )
+          .sort((left, right) => left.id.localeCompare(right.id))) {
+          applyHeal(
+            tick,
+            unit,
+            brother,
+            Math.round(
+              (brother.maxHp * brotherhoodRally.healMaxHealthPercent) / 100,
+            ),
+          );
+          applyCombatStatDelta(
+            brother,
+            "dynamic-attack-speed",
+            brotherhoodRally.attackSpeedPercent,
+            "friendly",
+          );
+        }
+      }
     }
   };
 
@@ -2532,6 +3046,7 @@ export function simulateBattle(
     captureResurrectionBaseline(unit);
     applyResurrectionStartIdentities(0, unit, false);
   }
+  applyStartOfBattleTraitBehaviors();
   const initialUnits = units.map(toSnapshot);
 
   let endTick = 0;
@@ -2991,6 +3506,7 @@ export function simulateBattle(
           applyShield(tick, source, source, behavior.shield);
         }
       }
+      applyPostCastTraitBehaviors(tick, source);
     }
 
     for (const intent of intents.filter(
@@ -3046,6 +3562,17 @@ export function simulateBattle(
           sourceId: source.id,
           targetId: target.id,
         });
+        const revolutionary = traitBehavior(
+          target.teamId,
+          "revolutionary",
+          "on-revolutionary-basic-dodge-energy",
+        );
+        if (
+          revolutionary?.kind === "on-revolutionary-basic-dodge-energy" &&
+          hasEffectiveTrait(target, "revolutionary")
+        ) {
+          changeEnergy(tick, target, revolutionary.energy, "trait");
+        }
       }
       const baseAttackDamage = dodged
         ? 0
@@ -3093,7 +3620,13 @@ export function simulateBattle(
         }
       }
       const aliveBefore = alive(target);
-      resolveDamageBundle(tick, source, target, primaryDamage, "attack");
+      const primaryDealt = resolveDamageBundle(
+        tick,
+        source,
+        target,
+        primaryDamage,
+        "attack",
+      );
       applyBasicAttackItemBehaviors(
         tick,
         source,
@@ -3129,6 +3662,12 @@ export function simulateBattle(
         );
         applyWound(tick, target, source, behavior.woundMs);
       }
+      applyMarksmanVolley(
+        tick,
+        source,
+        target,
+        dodged ? 0 : primaryDealt,
+      );
     }
 
     processDeaths(tick);

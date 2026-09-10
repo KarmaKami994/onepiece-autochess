@@ -1089,7 +1089,8 @@ function TraitsPanel({ traits }: { traits: TraitView[] }) {
       className={`trait-row ${trait.tier > 0 ? "active" : ""}`}
       style={{ "--trait-color": trait.color } as CSSProperties}
       tabIndex={0}
-      title={trait.description}
+      title={trait.semanticDescription}
+      aria-label={trait.semanticDescription}
     >
       <span className="trait-icon">{trait.icon}</span>
       <span className="trait-copy">
@@ -1097,6 +1098,14 @@ function TraitsPanel({ traits }: { traits: TraitView[] }) {
         <small>
           {trait.next ? `${trait.count} / ${trait.next}` : `${trait.count} · MAX`}
         </small>
+        <span className="trait-mechanics">
+          <small>{trait.category} · {trait.scopeLabel}</small>
+          <small>{trait.tier > 0 ? `Tier ${trait.tier}: ${trait.tierLabel}` : trait.tierLabel}</small>
+          <small>{trait.staticEffects.join(", ")}</small>
+          {trait.behaviorDescriptions.map((description) => (
+            <small key={description}>{description}</small>
+          ))}
+        </span>
       </span>
       <span className="trait-pips">
         {Array.from(

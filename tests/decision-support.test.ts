@@ -86,7 +86,11 @@ describe("shop decision support", () => {
       projectionRequiresFielding: true,
       nextThreshold: 2,
       activatesTier: true,
-      afterPurchaseTier: { required: 2, label: "+10% health" },
+      afterPurchaseTier: {
+        required: 2,
+        label:
+          "Crew-wide: +10% Max HP; first Straw Hat cast grants holders 8 Energy",
+      },
     });
     expect(preview.traits).toHaveLength(5);
     expect(JSON.stringify(current)).toBe(before);

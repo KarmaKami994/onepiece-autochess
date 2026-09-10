@@ -23,10 +23,12 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-P5 Late-Game Voyage is implemented on `feat/p5-late-game-voyage` from exact base `25140eada26de06220bc47a31ddc781b6c718b35`. Completed-item carousels now occur at 22/27/34 and escalating PvE encounters with completed-item victory choices occur at 24/28/32/36. Early P4 rewards and carousel behavior remain exact. GameContent is `1.24.0`; schema remains 6. P6 has not started, and final authored PvE/item art remains deferred until after P6.
+P6 Trait Identity & Depth and its bounded review correction are implemented on `feat/p6-trait-identity-depth` from exact base `53111697330c1e2ab3e65c2cc58b74fc2e57718c`. All 13 production traits have explicit team/holder scope and deterministic static/dynamic identities integrated with effective form/item-granted membership, P4 combat authorities, Phoenix resets and accessible content-derived presentation. Secondary trait damage Energy, basic-bundle reactions, battle-start Shield accounting and semantic thresholds now follow their locked contracts. GameContent is `1.25.0`; schema remains 6. P7 Major Asset Production is next and has not started.
 
 ## Last Completed Work
 
+- 2026-09-10 — PR #49 review correction: Brawler Counterstrike and Marksman bonus shots suppress only victim damaged-Energy; split basic bundles, including Bodyguard cover, resolve Guardian/Brawler once per actual recipient in stable ID order and preserve covered Marksman success; P6 Navy/Emperor start Shields remain visible without entering Bombardier's runtime meter; active trait semantics now state current, active and next thresholds or maximum tier. GameContent remains `1.25.0`; schema remains 6. Material files: `game/combat.ts`, `app/selectors.ts`, focused P6 regressions, `PROJECT_STATE.md`.
+- 2026-09-09 — P6 Trait Identity & Depth: added explicit tier scope, typed battle-local behaviors and final deterministic identities for all 13 existing traits; integrated trait-grant holders, persistent forms, P4 damage/status/item authorities and Phoenix per-unit/team reset semantics; expanded semantic keyboard-reachable trait presentation without bot tuning. GameContent is `1.25.0`; schema remains 6. Material files: trait/content/combat/type modules, selectors/screens/styles, focused and affected regressions, `docs/P6_TRAIT_IDENTITY_AND_DEPTH.md`, `PROJECT_STATE.md`.
 - 2026-09-09 — P5 Late-Game Voyage: added completed-item carousels at rounds 22/27/34, completed-item PvE stages at 24/28/32/36, Vice Admiral/Cipher Pol Agent/Seraphim placeholder archetypes, stable seeded late reward generation and focused topology/reward/bot/save regressions. Early component acquisition, carousel sessions, PvE placement, bots, combat, economy and schema 6 remain unchanged; GameContent is `1.24.0`. Material files: `game/types.ts`, `game/content.ts`, `game/engine.ts`, focused/affected tests, README, `docs/P5_LATE_GAME_VOYAGE.md`, `PROJECT_STATE.md`.
 - 2026-09-09 — PR #47 review correction: merge retention now excludes native/form-redundant trait grants before final cap allocation and deterministically backfills later valid completed items or one component; bots reject direct completed duplicates during candidate scoring while duplicate/redundant craft results remain legal and use structural scoring only; inventory items expose associated semantic kind/effect/recipe/grant details, and focusable `aria-disabled` items suppress activation. GameContent remains `1.23.0`, schema remains 6. Material files: `game/roster.ts`, `game/engine.ts`, `app/selectors.ts`, `app/screens/GameScreens.tsx`, focused P4C/P4A and tutorial E2E tests, `PROJECT_STATE.md`.
 - 2026-09-08 — P4C complete item integration: added the ten approved trait-grant identities with exact locked stats, deployed-only effective-trait resolution across persistent forms/items, redundant direct/craft/merge handling, component-only PvE/carousel acquisition, canonical recipe/grant selector data, keyboard-focus tooltips and craft previews, generic non-sheet bounty rendering, tutorial updates and recipe-aware bot equipping. P4 is complete; GameContent is `1.23.0`, schema remains 6, and no trait tier, P4B behavior, Gear 4 catalyst, cadence or save ID changed. Material files: item/trait/roster/engine/scoring domain modules, selectors/decision support/screens/Carousel presentation, focused/affected tests, README, `docs/P4_ITEM_SYSTEM_AUDIT.md`, `PROJECT_STATE.md`.
@@ -78,6 +80,27 @@ P5 Late-Game Voyage is implemented on `feat/p5-late-game-voyage` from exact base
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+PR #49 P6 review correction:
+
+- PASS — focused P6: 1 file / 30 tests; affected P4B5/P4B6/P4B7, P4C, P5, selectors, forms and save regressions: 12 files / 231 tests.
+- PASS — TypeScript typecheck, ESLint and `git diff --check` through the installed project binaries.
+- PASS — full test suite: 53 files / 684 tests.
+- PASS — asset validation: 41 animation atlases, maps, Carousel assets and provenance files validated.
+- PASS — production smoke: 50/50 completed matches, zero crashes, round range 31–56; regression evidence only, no tuning conclusion.
+- PASS — production build; only existing chunk-size and route-classification advisories were reported.
+- PASS — Browser E2E: 17 passed / 3 expected project-matrix skips.
+- NOT RUN — `npm run test:production-soak`; no 1,000-seed report or baseline was generated.
+
+P6 Trait Identity & Depth:
+
+- PASS — focused P6: 1 file / 25 tests; affected P4/P5, combat, forms, bot, save, pairing and match-flow group: 29 files / 483 tests.
+- PASS — `npm run typecheck`, `npm run lint`, `npm test` (53 files / 679 tests) and `git diff --check`.
+- PASS — `npm run assets:validate`: 41 animation atlases, maps, Carousel assets and provenance files validated.
+- PASS — `npm run test:production-smoke`: 50/50 completed matches, zero crashes, round range 30–50; all 13 traits were observed. Regression evidence only; no tuning conclusion.
+- PASS — `npm run build`; only existing chunk-size and route-classification advisories were reported.
+- PASS — Browser E2E: 17 passed / 3 expected project-matrix skips.
+- NOT RUN — `npm run test:production-soak`; no 1,000-seed report or baseline was generated.
 
 P5 Late-Game Voyage:
 
@@ -582,6 +605,8 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- P6 secondary Counterstrike/Volley damage no longer grants victim damaged-Energy. One primary basic now aggregates direct Guardian/Brawler reactions once per actual damaged recipient, including Bodyguard cover, in stable ID order; covered damage still advances Marksman while its volley retains the original selected target. Navy/Emperor tick-zero Shields emit normally but do not inflate Bombardier's runtime-Shield meter; Guard Point and other in-combat Shields still count. Trait semantics explicitly announce current, active and next thresholds or maximum tier.
+- P6 replaces production traits' implicit all-team stat application with explicit tier scope: Straw Hat, Emperor and Captain remain crew-wide; Navy, Warlord, Supernova, Brotherhood, Revolutionary, Brawler, Swordsman, Marksman, Specialist and Guardian affect holders only. All 13 traits now expose their approved deterministic start/cast/dodge/direct-hit/kill/death/attack identities through existing combat authorities. Effective persistent form and trait-grant-item membership applies identically; Phoenix resets per-unit P6 runtime without replaying start effects or team-consumed triggers. Trait details now state threshold, scope, static effects and dynamic behavior semantically. GameContent is `1.25.0`; schema remains 6.
 - P5 adds completed-item carousels at 22/27/34 with distinct seeded choices, late count `min(10, max(6, living + 4))` and at most four trait grants. PvE rounds 24/28/32/36 field the new Vice Admiral, Cipher Pol Agent and Seraphim archetypes and award victorious players two guaranteed non-trait completed choices plus one distinct completed choice. Early component rewards/carousels, row-major PvE placement, match flow and `acquirableItemIds` remain unchanged. GameContent is `1.24.0`; schema remains 6.
 - P4C adds ten typed trait-grant completed items. Effective traits combine the resolved persistent form/native traits with equipped grants, dedupe within a unit and still count distinct base definitions only; bench holders do not contribute. Direct redundant grants fail with `ITEM_TRAIT_DUPLICATE`, while redundant craft/merge results return to inventory without deletion or auto-crafting. Merge retention excludes form/native-redundant grants before final cap allocation and backfills the first remaining valid completed items, then at most one component. Normal PvE/carousel rewards use the stable ten-component pool; bots craft recipes at cap, reject illegal direct duplicates/redundant grants during scoring and continue processing legal inventory. Recipe/grant metadata, selected-holder previews, semantic associated recipe details, focusable non-activating `aria-disabled` items, ten component glyphs and generic non-sheet bounty presentation complete the accessible production flow. P4 is complete; GameContent is `1.23.0`, schema remains 6.
 - Resurrecting Phoenix Feather units now count as occupied only for board-space reservation. Ordinary movement, Lunge, Knockback, Pull, Smoke-Star Escape and simultaneous end-of-tick movement cannot enter their coordinate during the two-second delay; targeting, damage, healing and action eligibility remain `alive()`-based and unchanged.
@@ -629,6 +654,8 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- None for the PR #49 review correction. No trait values/scopes, item values, P5 content, unit data, bot/economy/captain-damage behavior, version, schema, RNG, dependency, P7/P8, tuning, baseline or 1,000-seed soak changed.
+- None for P6. No threshold, unit trait, item value/acquisition, stage, economy, captain damage, bot weight, unit balance, schema, dependency, P7/P8 work, baseline or 1,000-seed soak was changed or added.
 - None for P5. No stage 40, extra item-pick round, portal/town/gift system, P6 work, new item/mechanic, bot tuning, economy/captain-damage/unit balance, final art, schema migration, baseline or 1,000-seed soak was added.
 - None for the PR #47 review correction. No item mapping/value, trait tier, acquisition/cadence, P4B mechanic, Gear 4 catalyst, form identity, schema, tuning, dependency, P5/P6, final art, baseline or 1,000-seed soak changed.
 - None for P4C. No P4B item behavior/value, trait tier, gameplay cadence, Gear 4 catalyst, save schema/ID, metric, tuning, new dependency, authored final-art pack, production baseline or 1,000-seed soak was changed or added.
@@ -677,6 +704,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- No blocking P6 issue found. Dynamic behavior remains intentionally absent from bot valuation; bots continue using existing structural affinity and active-trait counts. The 50-match smoke is regression evidence only and must not be used for tuning.
 - No blocking P5 issue found. The three new PvE archetypes intentionally share the existing placeholder until the post-P6 asset pass. The 50-match smoke is regression evidence only and must not be used as balance evidence.
 - P4 is complete with no blocking integration defect found. Bots now understand recipes, cap legality and trait redundancy, but conditional combat identities remain valued only through existing static/structural signals; no tuning was authorized. Final authored item art remains scheduled after P6.
 - Decision support and bots remain intentionally structural: recipes, cap legality, resolved traits and static item effects are understood, while delayed/conditional combat triggers are not assigned new tuning weights. That is a future measurement/tuning concern, not an incomplete P4 production rule.
@@ -710,6 +738,8 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
+- Primary-basic direct reactions use a private per-bundle recipient collector shared through Bodyguard recursion, then resolve once per recipient in ID order; ability hits remain immediate per hit. Damage and Shield options narrowly suppress secondary-trait damaged-Energy and tick-zero P6 Shield metering without changing central formulas or defaults.
+- P6 keeps `getActiveTraitEffects(...)` compatible and adds serializable scoped effect/behavior grants. Production tiers explicitly select `team` or `holders`; holder authority is `getEffectiveUnitTraits(...)`. Typed content contains data only, while narrow combat switches attach behaviors to existing start, dodge, damage, cast, kill and death authorities in explicit order. Runtime and counters are battle-local, add no P6 RNG draws and never enter `MatchState`; schema remains 6.
 - P5 uses optional serializable `StageDefinition.rewardItemKind`, defaulting to components. Late PvE derives completed rewards directly from typed item content with exactly two seeded shuffles per rewarded player; late carousel uses one seeded shuffle of stable distinct completed IDs and skips trait grants after four. Existing carousel sessions, PvE placement, bot scoring, P4 component acquisition and schema 6 remain authoritative. PAC stage 40, portals, towns and additional picks remain intentionally omitted.
 - P4C treats `grantedTraitId` as typed item content and derives effective traits from resolved form/native traits plus held grants. Distinct-definition counting and deployed-only activation remain authoritative. Redundant direct grants are illegal; redundant crafted/merged outputs are preserved in inventory, and merge cap allocation backfills from later valid candidates after form/native redundancy is known. Bot direct candidates must be command-legal, while duplicate/redundant craft results remain legal without holder-level behavior valuation. Focusable `aria-disabled` inventory items expose the reason and cannot dispatch equip; selector-derived item kind/effects/recipes/grants are associated semantic descriptions. Normal early acquisition is the stable ten-component pool, while legacy completed IDs remain valid for recipes, saves and Gear 4. Unknown/non-sheet bounties use generic icon/color presentation rather than an arbitrary legacy column. GameContent is `1.23.0`, schema remains 6, P4 is complete and final authored item art waits until after P6.
 - Board-cell reservation uses a private combat-only predicate that includes living and resurrecting units; all ordinary target and action eligibility continues to use `alive()`, preserving Phoenix untargetability and inactivity during its delay.
@@ -751,7 +781,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-Review P5. Do not start P6, final item/PvE art, P1B, captain damage, economy tuning, balance work or a 1,000-seed baseline without separate approval.
+P7 Major Asset Production is next. Do not start it, P8, P1B, captain damage, economy tuning, balance work or a 1,000-seed baseline without separate approval.
 
 ## Codex Update Contract
 
