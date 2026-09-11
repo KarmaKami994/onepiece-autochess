@@ -17,6 +17,8 @@
     "assets:roster": "node scripts/build_character_animation.mjs --roster",
     "assets:v2": "node scripts/build_v2_assets.mjs --skip-editable",
     "assets:v2:editable": "node scripts/build_v2_assets.mjs",
+    "assets:ui": "node scripts/assets/build_ui_icons.mjs",
+    "assets:all": "node scripts/assets/build_ui_icons.mjs --sources-only && node scripts/build_v2_assets.mjs --skip-editable && node scripts/assets/build_ui_icons.mjs",
     "dev": "vinext dev",
     "build": "vinext build",
     "start": "vinext start",

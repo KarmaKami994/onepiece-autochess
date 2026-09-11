@@ -1086,6 +1086,13 @@ kbd {
   font-size: 17px;
 }
 
+.trait-icon img,
+.results-traits img {
+  width: 27px;
+  height: 27px;
+  object-fit: contain;
+}
+
 .trait-copy {
   min-width: 0;
 }
@@ -1493,6 +1500,13 @@ details.trait-building {
   cursor: pointer;
 }
 
+.inventory-slots button img,
+.scout-item-list img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
 .inventory-slots button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -1784,6 +1798,14 @@ details.trait-building {
   color: #819d9a;
   font-size: 10px;
   white-space: normal;
+}
+
+.equipped-item-icon,
+.equipped-item-icon img {
+  display: block;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
 }
 
 .empty-item {
@@ -3508,6 +3530,12 @@ details.trait-building {
   background: #6d2c31;
   box-shadow: 0 6px 0 #301a19;
   font-size: 42px;
+}
+
+.treasure-icon img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
 }
 
 .reward-card strong {

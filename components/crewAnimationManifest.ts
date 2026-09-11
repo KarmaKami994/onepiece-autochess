@@ -72,11 +72,26 @@ const V2_IDLE_VISUAL_TOP_PX: Record<string, number> = {
   doflamingo: 34,
   garp: 36,
   mihawk: 41,
+  koby: 50,
+  koala: 4,
+  franky: 33,
+  brook: 24,
+  ivankov: 25,
+  jinbe: 36,
+  kuma: 23,
+  kizaru: 34,
+  kuzan: 34,
+  akainu: 34,
+  shanks: 20,
+  blackbeard: 6,
   "marine-recruit": 8,
   "rifle-marine": 9,
   "pirate-raider": 8,
   pacifista: 4,
   "sea-king": 15,
+  "vice-admiral": 4,
+  "cipher-pol-agent": 4,
+  seraphim: 5,
 };
 
 function standardDefinition(
@@ -205,6 +220,18 @@ export const CREW_V2_ANIMATIONS = {
   doflamingo: crewV2Definition("doflamingo"),
   garp: crewV2Definition("garp"),
   mihawk: crewV2Definition("mihawk"),
+  koby: crewV2Definition("koby"),
+  koala: crewV2Definition("koala"),
+  franky: crewV2Definition("franky"),
+  brook: crewV2Definition("brook"),
+  ivankov: crewV2Definition("ivankov"),
+  jinbe: crewV2Definition("jinbe"),
+  kuma: crewV2Definition("kuma"),
+  kizaru: crewV2Definition("kizaru"),
+  kuzan: crewV2Definition("kuzan"),
+  akainu: crewV2Definition("akainu"),
+  shanks: crewV2Definition("shanks"),
+  blackbeard: crewV2Definition("blackbeard"),
 } as const satisfies Record<string, CrewAnimationDefinition>;
 
 function pveV2Definition(
@@ -238,16 +265,19 @@ export const PVE_ANIMATION_MANIFEST = {
   "pirate-raider": pveV2Definition("pirate-raider", 82),
   pacifista: pveV2Definition("pacifista", 88, 9),
   "sea-king": pveV2Definition("sea-king", 90, 10),
+  "vice-admiral": pveV2Definition("vice-admiral", 88, 9),
+  "cipher-pol-agent": pveV2Definition("cipher-pol-agent", 82, 8),
+  seraphim: pveV2Definition("seraphim", 92, 10),
 } as const satisfies Record<string, CrewAnimationDefinition>;
 
 export const ANIMATION_CONTENT_MANIFEST = {
   ...CREW_ANIMATION_MANIFEST,
+  ...CREW_V2_ANIMATIONS,
+  luffy: LUFFY_V2_ANIMATION,
   ...PVE_ANIMATION_MANIFEST,
 } as const satisfies Record<string, CrewAnimationDefinition>;
 
-const CREW_VARIANT_OVERRIDES: Partial<
-  Record<keyof typeof CREW_ANIMATION_MANIFEST, CrewAnimationDefinition[]>
-> = {
+const CREW_VARIANT_OVERRIDES: Partial<Record<string, CrewAnimationDefinition[]>> = {
   luffy: [LUFFY_V2_ANIMATION],
   nami: [CREW_V2_ANIMATIONS.nami],
   usopp: [CREW_V2_ANIMATIONS.usopp],
@@ -266,7 +296,28 @@ const CREW_VARIANT_OVERRIDES: Partial<
   doflamingo: [CREW_V2_ANIMATIONS.doflamingo],
   garp: [CREW_V2_ANIMATIONS.garp],
   mihawk: [CREW_V2_ANIMATIONS.mihawk],
+  koby: [CREW_V2_ANIMATIONS.koby],
+  koala: [CREW_V2_ANIMATIONS.koala],
+  franky: [CREW_V2_ANIMATIONS.franky],
+  brook: [CREW_V2_ANIMATIONS.brook],
+  ivankov: [CREW_V2_ANIMATIONS.ivankov],
+  jinbe: [CREW_V2_ANIMATIONS.jinbe],
+  kuma: [CREW_V2_ANIMATIONS.kuma],
+  kizaru: [CREW_V2_ANIMATIONS.kizaru],
+  kuzan: [CREW_V2_ANIMATIONS.kuzan],
+  akainu: [CREW_V2_ANIMATIONS.akainu],
+  shanks: [CREW_V2_ANIMATIONS.shanks],
+  blackbeard: [CREW_V2_ANIMATIONS.blackbeard],
 };
+
+export function resolveAnimationCandidates(
+  base: CrewAnimationDefinition | undefined,
+  variants: readonly CrewAnimationDefinition[],
+  pve?: CrewAnimationDefinition,
+): CrewAnimationDefinition[] {
+  if (pve) return [pve];
+  return [...(base ? [base] : []), ...variants];
+}
 
 export function getCrewAnimationDefinitions(contentId: string) {
   const base = CREW_ANIMATION_MANIFEST[
@@ -275,18 +326,21 @@ export function getCrewAnimationDefinitions(contentId: string) {
   const pve = PVE_ANIMATION_MANIFEST[
     contentId as keyof typeof PVE_ANIMATION_MANIFEST
   ] as CrewAnimationDefinition | undefined;
-  if (!base) return pve ? [pve] : [];
-  const variants = CREW_VARIANT_OVERRIDES[
-    contentId as keyof typeof CREW_ANIMATION_MANIFEST
-  ];
-  return [base, ...(variants ?? [])];
+  return resolveAnimationCandidates(
+    base,
+    CREW_VARIANT_OVERRIDES[contentId] ?? [],
+    pve,
+  );
 }
 
-export const ALL_CREW_ANIMATION_DEFINITIONS = Object.values(
-  ANIMATION_CONTENT_MANIFEST,
-).flatMap((definition) =>
-  getCrewAnimationDefinitions(definition.contentId),
-);
+export const ALL_CREW_ANIMATION_DEFINITIONS = [
+  ...new Set([
+    ...Object.keys(CREW_ANIMATION_MANIFEST),
+    ...Object.keys(CREW_V2_ANIMATIONS),
+    "luffy",
+    ...Object.keys(PVE_ANIMATION_MANIFEST),
+  ]),
+].flatMap(getCrewAnimationDefinitions);
 
 export const ALL_UNIT_ANIMATION_DEFINITIONS =
   ALL_CREW_ANIMATION_DEFINITIONS;

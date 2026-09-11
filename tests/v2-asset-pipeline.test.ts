@@ -18,6 +18,47 @@ const matrixPath = path.join(
 );
 const crewIds = [
   "ace",
+  "akainu",
+  "blackbeard",
+  "brook",
+  "chopper",
+  "crocodile",
+  "doflamingo",
+  "franky",
+  "garp",
+  "hancock",
+  "ivankov",
+  "jinbe",
+  "kid",
+  "kizaru",
+  "koala",
+  "koby",
+  "kuma",
+  "kuzan",
+  "law",
+  "mihawk",
+  "nami",
+  "robin",
+  "sabo",
+  "sanji",
+  "shanks",
+  "smoker",
+  "tashigi",
+  "usopp",
+  "zoro",
+];
+const pveIds = [
+  "cipher-pol-agent",
+  "marine-recruit",
+  "pacifista",
+  "pirate-raider",
+  "rifle-marine",
+  "sea-king",
+  "seraphim",
+  "vice-admiral",
+];
+const v1CrewIds = new Set([
+  "ace",
   "chopper",
   "crocodile",
   "doflamingo",
@@ -34,14 +75,7 @@ const crewIds = [
   "tashigi",
   "usopp",
   "zoro",
-];
-const pveIds = [
-  "marine-recruit",
-  "pacifista",
-  "pirate-raider",
-  "rifle-marine",
-  "sea-king",
-];
+]);
 
 type SourceEntry = {
   id: string;
@@ -63,6 +97,7 @@ type SourceEntry = {
   };
   pivot: { x: number; y: number };
   processing: string[];
+  recipe?: { minimumCandidateCount?: number };
   permission: { status: string; note: string };
 };
 
@@ -181,7 +216,7 @@ const expectedFrameStates = [
 ];
 
 describe("animation v2 asset pipeline", () => {
-  it("documents 17 confirmed crew imports and five project-owned PvE sources", async () => {
+  it("documents 29 confirmed crew imports and eight project-owned PvE sources", async () => {
     const matrix = await sourceMatrix();
     expect(matrix.schemaVersion).toBe(1);
     expect(matrix.standard).toMatchObject({
@@ -249,7 +284,9 @@ describe("animation v2 asset pipeline", () => {
         frame: { destinationPivot: { x: 64, y: 116 } },
       });
       expect(metadata.sourceDimensions).toEqual(entry.source.dimensions);
-      expect(metadata.detection?.characterCandidateCount).toBeGreaterThanOrEqual(6);
+      expect(metadata.detection?.characterCandidateCount).toBeGreaterThanOrEqual(
+        entry.recipe?.minimumCandidateCount ?? 6,
+      );
       expect(metadata.frames.map((frame) => frame.index)).toEqual(
         Array.from({ length: 46 }, (_, index) => index),
       );
@@ -324,10 +361,9 @@ describe("animation v2 asset pipeline", () => {
     expect(Object.keys(PVE_ANIMATION_MANIFEST).sort()).toEqual(pveIds);
     for (const contentId of crewIds) {
       const definitions = getCrewAnimationDefinitions(contentId);
-      expect(definitions.map((definition) => definition.version)).toEqual([
-        "v1",
-        "v2",
-      ]);
+      expect(definitions.map((definition) => definition.version)).toEqual(
+        v1CrewIds.has(contentId) ? ["v1", "v2"] : ["v2"],
+      );
       expect(definitions.at(-1)).toMatchObject({
         contentId,
         assetKey: `${contentId}-v2`,

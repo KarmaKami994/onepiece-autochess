@@ -160,7 +160,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
         signatureMechanics: [{ kind: "lunge" }],
       },
     ),
-    assetPath: "/assets/characters/placeholder.svg",
+    assetPath: "/assets/characters/koby.png",
   },
   {
     id: "koala",
@@ -184,7 +184,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
       "adjacent",
       { stunMs: 300 },
     ),
-    assetPath: "/assets/characters/placeholder.svg",
+    assetPath: "/assets/characters/koala.png",
   },
   {
     id: "sanji",
@@ -308,7 +308,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
       "adjacent",
       { signatureMechanics: [{ kind: "knockback" }] },
     ),
-    assetPath: "/assets/characters/placeholder.svg",
+    assetPath: "/assets/characters/franky.png",
   },
   {
     id: "brook",
@@ -332,7 +332,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
       "line",
       { stunMs: 400 },
     ),
-    assetPath: "/assets/characters/placeholder.svg",
+    assetPath: "/assets/characters/brook.png",
   },
   {
     id: "ivankov",
@@ -360,7 +360,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
       requiresTarget: false,
       conditionalShield: { healthThresholdPercent: 50, power: 120 },
     },
-    assetPath: "/assets/characters/placeholder.svg",
+    assetPath: "/assets/characters/ivankov.png",
   },
   {
     id: "luffy",
@@ -495,7 +495,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
       "adjacent",
       { signatureMechanics: [{ kind: "knockback" }] },
     ),
-    assetPath: "/assets/characters/placeholder.svg",
+    assetPath: "/assets/characters/jinbe.png",
   },
   {
     id: "kuma",
@@ -522,7 +522,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
         signatureMechanics: [{ kind: "knockback" }],
       },
     ),
-    assetPath: "/assets/characters/placeholder.svg",
+    assetPath: "/assets/characters/kuma.png",
   },
   {
     id: "law",
@@ -646,7 +646,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
       "line",
       { castAnimationMs: 600, defensePiercePercent: 40 },
     ),
-    assetPath: "/assets/characters/placeholder.svg",
+    assetPath: "/assets/characters/kizaru.png",
   },
   {
     id: "kuzan",
@@ -670,7 +670,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
       "all-enemies",
       { stunMs: 700, castAnimationMs: 650 },
     ),
-    assetPath: "/assets/characters/placeholder.svg",
+    assetPath: "/assets/characters/kuzan.png",
   },
   {
     id: "akainu",
@@ -694,7 +694,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
       "adjacent",
       { burnPower: 32, burnDurationMs: 4_000, castAnimationMs: 650 },
     ),
-    assetPath: "/assets/characters/placeholder.svg",
+    assetPath: "/assets/characters/akainu.png",
   },
   {
     id: "garp",
@@ -769,7 +769,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
       "adjacent",
       { defensePiercePercent: 35, castAnimationMs: 700 },
     ),
-    assetPath: "/assets/characters/placeholder.svg",
+    assetPath: "/assets/characters/shanks.png",
   },
   {
     id: "blackbeard",
@@ -797,7 +797,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
         signatureMechanics: [{ kind: "pull" }],
       },
     ),
-    assetPath: "/assets/characters/placeholder.svg",
+    assetPath: "/assets/characters/blackbeard.png",
   },
 ];
 
@@ -807,6 +807,10 @@ export const FORM_DEFINITIONS: UnitFormDefinition[] = [
     baseDefinitionId: "robin",
     name: "Robin — Demonio Fleur",
     lifecycle: "persistent",
+    presentation: {
+      portrait: "/assets/forms/robin-demonio-fleur/portrait.svg",
+      token: "/assets/forms/robin-demonio-fleur/token.svg",
+    },
     ability: ability(
       "demonio-fleur",
       "Demonio Fleur",
@@ -822,6 +826,10 @@ export const FORM_DEFINITIONS: UnitFormDefinition[] = [
     baseDefinitionId: "luffy",
     name: "Luffy — Gear 4: Boundman",
     lifecycle: "persistent",
+    presentation: {
+      portrait: "/assets/forms/luffy-gear-4-boundman/portrait.svg",
+      token: "/assets/forms/luffy-gear-4-boundman/token.svg",
+    },
     stats: {
       health: 990,
       attack: 86,
@@ -844,6 +852,10 @@ export const FORM_DEFINITIONS: UnitFormDefinition[] = [
     baseDefinitionId: "luffy",
     name: "Luffy — Gear 4: Snakeman",
     lifecycle: "persistent",
+    presentation: {
+      portrait: "/assets/forms/luffy-gear-4-snakeman/portrait.svg",
+      token: "/assets/forms/luffy-gear-4-snakeman/token.svg",
+    },
     stats: {
       health: 850,
       attack: 78,
@@ -871,6 +883,10 @@ export const FORM_DEFINITIONS: UnitFormDefinition[] = [
     baseDefinitionId: "chopper",
     name: "Chopper — Monster Point",
     lifecycle: "battle-temporary",
+    presentation: {
+      portrait: "/assets/forms/chopper-monster-point/portrait.svg",
+      token: "/assets/forms/chopper-monster-point/token.svg",
+    },
     stats: {
       health: 800,
       attack: 60,
@@ -2005,7 +2021,7 @@ export const PVE_ENEMY_DEFINITIONS: PvEEnemyDefinition[] = [
       "adjacent",
       { damageType: "physical", stunMs: 500 },
     ),
-    assetPath: "/assets/characters/placeholder.svg",
+    assetPath: "/assets/enemies/vice-admiral.png",
   },
   {
     id: "cipher-pol-agent",
@@ -2033,7 +2049,7 @@ export const PVE_ENEMY_DEFINITIONS: PvEEnemyDefinition[] = [
         signatureMechanics: [{ kind: "lunge" }],
       },
     ),
-    assetPath: "/assets/characters/placeholder.svg",
+    assetPath: "/assets/enemies/cipher-pol-agent.png",
   },
   {
     id: "seraphim",
@@ -2060,7 +2076,7 @@ export const PVE_ENEMY_DEFINITIONS: PvEEnemyDefinition[] = [
         burnDurationMs: 3_000,
       },
     ),
-    assetPath: "/assets/characters/placeholder.svg",
+    assetPath: "/assets/enemies/seraphim.png",
   },
 ];
 
@@ -2355,7 +2371,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.25.0",
+  version: "1.26.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,

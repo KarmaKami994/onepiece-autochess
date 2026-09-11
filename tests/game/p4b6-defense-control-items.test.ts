@@ -737,14 +737,14 @@ describe("P4B6 contracts", () => {
     };
     expect(formFor("armament-wraps")).toBe("luffy-gear-4-boundman");
     expect(formFor("sniper-goggles")).toBe("luffy-gear-4-snakeman");
-    expect(DEFAULT_CONTENT.version).toBe("1.25.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.26.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
 
     const state = createMatch("p4b6-save");
     state.players[0].inventory = DEFAULT_CONTENT.items.map((item) => item.id);
     const restored = deserializeMatch(serializeMatch(state));
     expect(restored.schemaVersion).toBe(6);
-    expect(restored.contentVersion).toBe("1.25.0");
+    expect(restored.contentVersion).toBe("1.26.0");
     expect(restored.players[0].inventory).toEqual(state.players[0].inventory);
 
     const combatants: Combatant[] = [

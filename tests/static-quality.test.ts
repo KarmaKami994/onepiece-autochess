@@ -10,7 +10,7 @@ import {
 } from "../components/crewAnimationManifest";
 
 const projectRoot = path.resolve(import.meta.dirname, "..");
-const characterSlugs = [
+const v1CharacterSlugs = [
   "ace",
   "chopper",
   "crocodile",
@@ -30,12 +30,30 @@ const characterSlugs = [
   "usopp",
   "zoro",
 ];
+const characterSlugs = [
+  ...v1CharacterSlugs,
+  "akainu",
+  "blackbeard",
+  "brook",
+  "franky",
+  "ivankov",
+  "jinbe",
+  "kizaru",
+  "koala",
+  "koby",
+  "kuma",
+  "kuzan",
+  "shanks",
+].sort();
 const enemySlugs = [
+  "cipher-pol-agent",
   "marine-recruit",
   "pacifista",
   "pirate-raider",
   "rifle-marine",
   "sea-king",
+  "seraphim",
+  "vice-admiral",
 ];
 const allSpriteSlugs = [...characterSlugs, ...enemySlugs].sort();
 
@@ -54,7 +72,7 @@ async function sourceFiles(directory: string): Promise<string[]> {
 
 describe("local-only product boundary", () => {
   it("keeps crew animation manifests complete and within their sheets", () => {
-    expect(Object.keys(CREW_ANIMATION_MANIFEST).sort()).toEqual(characterSlugs);
+    expect(Object.keys(CREW_ANIMATION_MANIFEST).sort()).toEqual(v1CharacterSlugs);
     for (const definition of Object.values(CREW_ANIMATION_MANIFEST)) {
       expect(Object.keys(definition.clips).sort()).toEqual([
         "attack",

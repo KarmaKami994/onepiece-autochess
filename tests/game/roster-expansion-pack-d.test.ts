@@ -168,7 +168,7 @@ describe("Roster Expansion Pack D content", () => {
         requiresTarget: false,
         signatureMechanics: [{ kind: "lunge" }],
       },
-      assetPath: "/assets/characters/placeholder.svg",
+      assetPath: "/assets/characters/koby.png",
     });
     expect(definition(DEFAULT_CONTENT, "koala")).toMatchObject({
       name: "Koala",
@@ -190,7 +190,7 @@ describe("Roster Expansion Pack D content", () => {
         pattern: "adjacent",
         stunMs: 300,
       },
-      assetPath: "/assets/characters/placeholder.svg",
+      assetPath: "/assets/characters/koala.png",
     });
     expect(definition(DEFAULT_CONTENT, "franky")).toMatchObject({
       name: "Franky",
@@ -212,7 +212,7 @@ describe("Roster Expansion Pack D content", () => {
         pattern: "adjacent",
         signatureMechanics: [{ kind: "knockback" }],
       },
-      assetPath: "/assets/characters/placeholder.svg",
+      assetPath: "/assets/characters/franky.png",
     });
     expect(definition(DEFAULT_CONTENT, "brook")).toMatchObject({
       name: "Brook",
@@ -234,7 +234,7 @@ describe("Roster Expansion Pack D content", () => {
         pattern: "line",
         stunMs: 400,
       },
-      assetPath: "/assets/characters/placeholder.svg",
+      assetPath: "/assets/characters/brook.png",
     });
 
     expect(definition(DEFAULT_CONTENT, "koby").ability.stunMs).toBeUndefined();
@@ -261,7 +261,7 @@ describe("Roster Expansion Pack D content", () => {
         (cost) => DEFAULT_CONTENT.units.filter((unit) => unit.cost === cost).length,
       ),
     ).toEqual([6, 7, 6, 7, 4]);
-    expect(DEFAULT_CONTENT.version).toBe("1.25.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.26.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
 
     const state = createMatch("pack-d-pool", DEFAULT_CONTENT);

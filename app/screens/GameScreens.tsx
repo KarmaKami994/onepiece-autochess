@@ -43,6 +43,28 @@ export type Settings = {
   boardSkin: BoardSkin;
 };
 
+function VisualIcon({
+  imagePath,
+  fallback,
+  className,
+}: {
+  imagePath?: string;
+  fallback: string;
+  className?: string;
+}) {
+  const [failed, setFailed] = useState(false);
+  if (!imagePath || failed) {
+    return <span className={className} aria-hidden="true">{fallback}</span>;
+  }
+  return (
+    <span className={className} aria-hidden="true">
+      {/* Runtime SVGs intentionally retain the existing glyph fallback. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={imagePath} alt="" onError={() => setFailed(true)} />
+    </span>
+  );
+}
+
 export type ToastView = {
   id: number;
   kind: "success" | "error" | "info";
@@ -1092,7 +1114,7 @@ function TraitsPanel({ traits }: { traits: TraitView[] }) {
       title={trait.semanticDescription}
       aria-label={trait.semanticDescription}
     >
-      <span className="trait-icon">{trait.icon}</span>
+      <VisualIcon className="trait-icon" imagePath={trait.imagePath} fallback={trait.icon} />
       <span className="trait-copy">
         <strong>{trait.name}</strong>
         <small>
@@ -1201,7 +1223,7 @@ function ScoutIntelPanel({
             <ul className="scout-item-list">
               {itemRows.map(({ item, count }) => (
                 <li key={item.id} title={item.description}>
-                  <span aria-hidden="true">{item.icon}</span>
+                  <VisualIcon imagePath={item.imagePath} fallback={item.icon} />
                   <b>{item.name}</b>
                   {count > 1 && <small>×{count}</small>}
                 </li>
@@ -1631,7 +1653,7 @@ export function InventoryTray({
                   : "Empty treasure slot"
               }
             >
-              {item?.icon ?? ""}
+              {item && <VisualIcon imagePath={item.imagePath} fallback={item.icon} />}
             </button>
           );
         })}
@@ -1811,7 +1833,7 @@ function UnitInspector({
             const item = equippedItems[index];
             return item ? (
               <div className="equipped-item" key={`${item.id}-${index}`}>
-                <b aria-hidden="true">{item.icon}</b>
+                <VisualIcon className="equipped-item-icon" imagePath={item.imagePath} fallback={item.icon} />
                 <span>
                   <strong>{item.name}</strong>
                   <small>
@@ -1921,6 +1943,7 @@ export function CarouselScreen({
     name: choice.name,
     description: choice.description,
     icon: choice.icon,
+    imagePath: choice.imagePath,
     color: choice.color,
     orbitIndex: choice.orbitIndex ?? index,
     claimedAtTick: choice.claimedAtTick ?? null,
@@ -2049,7 +2072,7 @@ export function RewardScreen({
           >
             <span className="reward-number">0{index + 1}</span>
             <kbd>{index + 1}</kbd>
-            <span className="treasure-icon">{choice.icon}</span>
+            <VisualIcon className="treasure-icon" imagePath={choice.imagePath} fallback={choice.icon} />
             <strong>{choice.name}</strong>
             <p>{choice.description}</p>
             <small>{choice.kind === "component" ? "CRAFTING COMPONENT" : "COMPLETED ITEM"}</small>
@@ -2114,7 +2137,7 @@ export function ResultsScreen({
             <ul>
               {activeTraits.map((trait) => (
                 <li key={trait.id} style={{ "--trait-color": trait.color } as CSSProperties}>
-                  <i aria-hidden="true">{trait.icon}</i>
+                  <VisualIcon imagePath={trait.imagePath} fallback={trait.icon} />
                   <strong>{trait.name}</strong>
                   <small>{trait.count}</small>
                 </li>

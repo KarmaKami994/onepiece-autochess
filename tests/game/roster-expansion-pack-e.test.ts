@@ -227,7 +227,7 @@ describe("Roster Expansion Pack E content", () => {
         requiresTarget: false,
         conditionalShield: { healthThresholdPercent: 50, power: 120 },
       },
-      assetPath: "/assets/characters/placeholder.svg",
+      assetPath: "/assets/characters/ivankov.png",
     });
     expect(definition(DEFAULT_CONTENT, "jinbe")).toMatchObject({
       name: "Jinbe",
@@ -249,7 +249,7 @@ describe("Roster Expansion Pack E content", () => {
         pattern: "adjacent",
         signatureMechanics: [{ kind: "knockback" }],
       },
-      assetPath: "/assets/characters/placeholder.svg",
+      assetPath: "/assets/characters/jinbe.png",
     });
     expect(definition(DEFAULT_CONTENT, "kuma")).toMatchObject({
       name: "Kuma",
@@ -272,7 +272,7 @@ describe("Roster Expansion Pack E content", () => {
         castAnimationMs: 600,
         signatureMechanics: [{ kind: "knockback" }],
       },
-      assetPath: "/assets/characters/placeholder.svg",
+      assetPath: "/assets/characters/kuma.png",
     });
     expect(definition(DEFAULT_CONTENT, "kizaru")).toMatchObject({
       name: "Kizaru",
@@ -295,7 +295,7 @@ describe("Roster Expansion Pack E content", () => {
         defensePiercePercent: 40,
         castAnimationMs: 600,
       },
-      assetPath: "/assets/characters/placeholder.svg",
+      assetPath: "/assets/characters/kizaru.png",
     });
 
     expect(definition(DEFAULT_CONTENT, "ivankov").ability.signatureMechanics)
@@ -321,7 +321,7 @@ describe("Roster Expansion Pack E content", () => {
         (cost) => DEFAULT_CONTENT.units.filter((unit) => unit.cost === cost).length,
       ),
     ).toEqual([6, 7, 6, 7, 4]);
-    expect(DEFAULT_CONTENT.version).toBe("1.25.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.26.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
 
     const state = createMatch("pack-e-pool", DEFAULT_CONTENT);

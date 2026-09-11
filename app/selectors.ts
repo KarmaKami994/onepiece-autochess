@@ -41,6 +41,7 @@ import {
   rankItemDecisionPreviews,
   type AvailableItemDecisionPreview,
 } from "@/components/decisionSupport";
+import { itemVisual, traitVisual } from "@/components/gameVisualManifest";
 
 export const CAROUSEL_COLORS = [
   "#f4cf67",
@@ -53,25 +54,11 @@ export const CAROUSEL_COLORS = [
   "#4f78bb",
 ] as const;
 
-const TRAIT_META: Record<string, { icon: string; color: string }> = {
-  "straw-hat": { icon: "☀", color: "#e7b447" },
-  navy: { icon: "⚓", color: "#5f9fc7" },
-  warlord: { icon: "◈", color: "#8d75bb" },
-  supernova: { icon: "✦", color: "#75a6d8" },
-  brotherhood: { icon: "◆", color: "#d35645" },
-  revolutionary: { icon: "✹", color: "#b94b40" },
-  captain: { icon: "★", color: "#d9ad45" },
-  brawler: { icon: "✊", color: "#c6664a" },
-  swordsman: { icon: "⚔", color: "#9faab4" },
-  marksman: { icon: "◎", color: "#bb7d42" },
-  specialist: { icon: "⌁", color: "#43a6a1" },
-  guardian: { icon: "✚", color: "#cb6d86" },
-};
-
 export type TraitView = {
   id: string;
   name: string;
   icon: string;
+  imagePath: string;
   count: number;
   next: number | null;
   tier: number;
@@ -170,6 +157,7 @@ export type ChoiceView = {
   name: string;
   description: string;
   icon: string;
+  imagePath: string;
   portrait?: string;
   color: string;
   effects: ItemEffectView[];
@@ -329,6 +317,7 @@ export function createItemView(
   content: GameContent = DEFAULT_CONTENT,
 ): ChoiceView {
   const item = content.items.find((candidate) => candidate.id === itemId);
+  const visual = itemVisual(itemId, item?.icon ?? "✦");
   const grantedTrait = item?.grantedTraitId
     ? content.traits.find((trait) => trait.id === item.grantedTraitId)
     : undefined;
@@ -363,7 +352,8 @@ export function createItemView(
     name: item?.name ?? titleCase(itemId),
     description:
       item?.description ?? "Equip this treasure to a selected crew member.",
-    icon: item?.icon ?? "✦",
+    icon: visual.fallbackGlyph,
+    imagePath: visual.imagePath,
     color: cssColor(itemId),
     effects: item?.effects.map(effectView) ?? [],
     ...(item ? { kind: item.kind } : {}),
@@ -815,10 +805,7 @@ export function createTraitViews(
     .filter((active) => active.count > 0)
     .map((active) => {
       const definition = definitions.get(active.traitId);
-      const meta = TRAIT_META[active.traitId] ?? {
-        icon: "◆",
-        color: cssColor(active.traitId),
-      };
+      const visual = traitVisual(active.traitId);
       const nextTier = definition?.tiers.find(
         (tier) => tier.required > active.count,
       );
@@ -851,7 +838,8 @@ export function createTraitViews(
       return {
         id: active.traitId,
         name,
-        icon: meta.icon,
+        icon: visual.fallbackGlyph,
+        imagePath: visual.imagePath,
         count: active.count,
         next: nextTier?.required ?? null,
         tier: active.tierIndex + 1,
@@ -868,7 +856,7 @@ export function createTraitViews(
           staticEffects.join(", "),
           behaviorDescriptions.join(" "),
         ].filter(Boolean).join(" "),
-        color: meta.color,
+        color: visual.imagePath ? visual.color : cssColor(active.traitId),
       };
     })
     .sort(
