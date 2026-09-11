@@ -295,7 +295,7 @@ describe("P6 trait content and scope", () => {
         behaviors: tier.behaviors ?? [],
       }))).toEqual(expected.tiers);
     }
-    expect(DEFAULT_CONTENT.version).toBe("1.26.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.27.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 

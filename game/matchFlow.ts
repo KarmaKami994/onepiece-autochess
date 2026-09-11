@@ -19,6 +19,7 @@ export function compareSimultaneousEliminations(
 }
 
 export function calculateLossDamage(
+  round: number,
   winnerTeamId: string | null,
   finalUnits: BattleUnitSnapshot[],
 ): number {
@@ -27,7 +28,7 @@ export function calculateLossDamage(
     (unit) =>
       unit.teamId === winnerTeamId && unit.state !== "dead" && unit.hp > 0,
   );
-  return Math.max(1, 1 + survivors.reduce((sum, unit) => sum + unit.star, 0));
+  return Math.max(1, Math.ceil(round / 4) + survivors.length);
 }
 
 export function updateStreak(
