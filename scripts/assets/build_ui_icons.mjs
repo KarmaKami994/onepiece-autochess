@@ -13,12 +13,14 @@ const SOURCES_ONLY = process.argv.includes("--sources-only");
 const NEW_CREW = [
   "koby", "koala", "franky", "brook", "ivankov", "jinbe",
   "kuma", "kizaru", "kuzan", "akainu", "shanks", "blackbeard",
+  "killer", "buggy", "capone-bege", "whitebeard",
 ];
 const ALL_CREW = [
   "nami", "usopp", "chopper", "tashigi", "koby", "koala", "sanji", "robin",
   "smoker", "sabo", "franky", "brook", "ivankov", "luffy", "zoro", "kid",
   "crocodile", "jinbe", "kuma", "law", "ace", "hancock", "doflamingo",
   "kizaru", "kuzan", "akainu", "garp", "mihawk", "shanks", "blackbeard",
+  "killer", "buggy", "capone-bege", "whitebeard",
 ];
 const ALL_PVE = [
   "marine-recruit", "rifle-marine", "pirate-raider", "sea-king", "pacifista",

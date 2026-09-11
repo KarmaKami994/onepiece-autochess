@@ -13,6 +13,24 @@ On `2026-08-14`, the project owner explicitly attested in the project conversati
 - Purpose: generic future/custom-content fallback; no production unit or PvE definition references it after P7
 - Added: `2026-08-28`
 
+## P9 four-character expansion
+
+P9 adds four SHA-pinned Sprite Database source sheets and deterministic project-owned derivatives. The two compact support sheets (Killer and Capone Bege) use their real detected character poses plus deterministic holds, integer offsets, and local hard-pixel effects; they do not borrow poses from another character. The retained licensed-reference PNG is the editable source for these four entries, so their runtime-only rebuild does not depend on LibreSprite. Static character, portrait, and token images are deterministically derived from each v2 idle presentation. The owner-attested permission record in `art/animation-v2/source-matrix.json` applies to this private/local project and grants no downstream asset license.
+
+| Runtime asset | Exact source / contributor | Source SHA-256 | Atlas SHA-256 | Editable source |
+|---|---|---|---|---|
+| `killer-v2` | GPC [file 21141](https://spritedatabase.net/file/21141), Killer / Grim | `5c7d3ee4a50ca23638920408374a2715fecaa21dd19e09ec7c061d657f439b7e` | `8f07ce8c0a51a1517a233c9a4659f59852e2fbac6cbb4ccb3faec12cb63a1a6b` | `art/licensed-reference/great-pirate-colosseum/Killer.png` |
+| `buggy-v2` | GB1 [file 12665](https://spritedatabase.net/file/12665), Buggy / Megadoomer | `87868d7d59052ce7acb5918700fbee965a64733a21e77d9a115769e55f019488` | `b66d8758c494c81532f34820c89a3a3de2b8b3c817e91470eacdfe2b71a350b8` | `art/licensed-reference/gigant-battle/Buggy.png` |
+| `capone-bege-v2` | GB2 [file 14848](https://spritedatabase.net/file/14848), Capone Bege / Maverick PK | `47c3814a78435b17d46e7ef6707922e394af49ffb86d8434792b3baa44f03064` | `27a1def15b74907c3df9e8e952ad4dae84a57928e36ffe3ed73a61a8a203915d` | `art/licensed-reference/gigant-battle-2/CaponeBege.png` |
+| `whitebeard-v2` | GB1 [file 12234](https://spritedatabase.net/file/12234), Whitebeard / Bonzai | `ddd0a667e316a59af02078c274bfaa7484157c5b2e8cbfc08c7d0a3a04f19dce` | `9df37f2ff2fc0e5dd0361b45ed6a3a390e4ba4d066f0530c4cd73dffdd276dc3` | `art/licensed-reference/gigant-battle/Whitebeard.png` |
+
+The authoritative source matrix is `art/animation-v2/source-matrix.json`; the deterministic importers are `scripts/assets/build_v2_animation.mjs` and `scripts/build_v2_assets.mjs`. Exact runtime JSON hashes are `4ecb69f4dd0f28a9e91e538418e92789a0dd579924621071d13778478e0bee07` (Killer), `4cb952fbe90f7aee6904dc6d9dd47249bfc683cb0a9a8d6a9c6cf1af57027bd3` (Buggy), `ba0efc9badcb2adc16434da5f1b5832970c7563c5969fe8f826f759bf28b7d6b` (Capone Bege), and `1489e8d92c44e069863aae88059dc4f994f82481810e2064493102890311e9f0` (Whitebeard).
+
+- Final asset: `public/assets/characters/killer.png`
+- Final asset: `public/assets/characters/buggy.png`
+- Final asset: `public/assets/characters/capone-bege.png`
+- Final asset: `public/assets/characters/whitebeard.png`
+
 ## P7 major asset production
 
 P7 completed the current runtime presentation inventory on `2026-09-10`. The exact import authority is `art/animation-v2/source-matrix.json`; it records local source paths, dimensions, source character names, file pages, contributors, SHA-256 values, permission basis, processing operations, recipes, and derived frame-map pointers. The project owner confirmed that written authorization exists for the applicable imported One Piece material for this private/local project. This record does not infer ownership, commercial rights, sublicensing rights, or a downstream license. Runtime and build operation are offline; source acquisition was a repository-development step only.

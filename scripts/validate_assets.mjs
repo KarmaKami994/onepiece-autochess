@@ -87,7 +87,7 @@ const itemSpecs = JSON.parse(await readFile(path.join(root, "art", "ui-icons", "
 const traitSpecs = JSON.parse(await readFile(path.join(root, "art", "ui-icons", "trait-icons.json"), "utf8"));
 const statusSpecs = JSON.parse(await readFile(path.join(root, "art", "ui-icons", "status-icons.json"), "utf8"));
 
-if (DEFAULT_CONTENT.units.length !== 30) throw new Error(`Expected 30 units, found ${DEFAULT_CONTENT.units.length}`);
+if (DEFAULT_CONTENT.units.length !== 34) throw new Error(`Expected 34 units, found ${DEFAULT_CONTENT.units.length}`);
 for (const unit of DEFAULT_CONTENT.units) {
   if (unit.assetPath.endsWith("/placeholder.svg")) throw new Error(`${unit.id} still uses the production placeholder`);
   await requireFile(path.join(publicRoot, unit.assetPath.replace(/^\//, "")));

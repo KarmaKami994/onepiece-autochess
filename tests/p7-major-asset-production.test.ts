@@ -41,6 +41,10 @@ const newCrewIds = [
   "akainu",
   "shanks",
   "blackbeard",
+  "killer",
+  "buggy",
+  "capone-bege",
+  "whitebeard",
 ] as const;
 const existingCrewIds = [
   "luffy",
@@ -87,9 +91,9 @@ async function expectFile(relativePath: string): Promise<void> {
 
 describe("P7 major asset production", () => {
   it("completes real static and preferred v2 presentation for all crew", async () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.27.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.28.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
-    expect(DEFAULT_CONTENT.units).toHaveLength(30);
+    expect(DEFAULT_CONTENT.units).toHaveLength(34);
     expect(DEFAULT_CONTENT.units.some((unit) =>
       unit.assetPath.endsWith("/placeholder.svg"),
     )).toBe(false);
@@ -161,7 +165,7 @@ describe("P7 major asset production", () => {
         : value,
     );
     expect(createHash("sha256").update(normalized).digest("hex"))
-      .toBe("b49e01e1351cabb3c2e840bfc3c0b27f3e749d4c9ed882a08d1ff704df15d74a");
+      .toBe("a69a13b5fc86a061d9ecfecb6bd874bcc31a35534de6eaece0948cb89aa580be");
   });
 
   it("maps all 65 item identities and preserves recipes and glyph fallback", async () => {

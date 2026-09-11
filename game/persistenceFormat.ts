@@ -199,6 +199,11 @@ export function migrateMatchState(
   if (!isRecord(mutable.pool)) {
     throw new Error("Save is missing the shared unit pool.");
   }
+  for (const unit of content.units) {
+    if (!Object.prototype.hasOwnProperty.call(mutable.pool, unit.id)) {
+      mutable.pool[unit.id] = content.config.poolCopiesByCost[unit.cost - 1];
+    }
+  }
   mutable.carouselChoices = Array.isArray(mutable.carouselChoices)
     ? mutable.carouselChoices
     : [];
