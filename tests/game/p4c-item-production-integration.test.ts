@@ -121,7 +121,7 @@ describe("P4C item production integration", () => {
         effects,
       });
     }
-    expect(DEFAULT_CONTENT.version).toBe("1.27.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.28.0");
   });
 
   it("counts deployed grants like native traits while deduping native and same-definition contributors", () => {

@@ -21,6 +21,8 @@ const crewIds = [
   "akainu",
   "blackbeard",
   "brook",
+  "buggy",
+  "capone-bege",
   "chopper",
   "crocodile",
   "doflamingo",
@@ -30,6 +32,7 @@ const crewIds = [
   "ivankov",
   "jinbe",
   "kid",
+  "killer",
   "kizaru",
   "koala",
   "koby",
@@ -45,6 +48,7 @@ const crewIds = [
   "smoker",
   "tashigi",
   "usopp",
+  "whitebeard",
   "zoro",
 ];
 const pveIds = [
@@ -82,6 +86,7 @@ type SourceEntry = {
   kind: "crew" | "pve";
   outputAssetKey: string;
   fallbackAssetKey: string;
+  editableSource?: "licensed-reference-png";
   source: {
     strategy: "auto-frame-map" | "licensed-frame-map" | "procedural-cutout";
     localPath: string;
@@ -195,12 +200,14 @@ async function expectRuntimeBundle(entry: SourceEntry) {
   expect(transparentFrameBorders).toBe(true);
 
   const editable = await stat(
-    path.join(
-      projectRoot,
-      "art",
-      "libresprite",
-      `${entry.outputAssetKey}.aseprite`,
-    ),
+    entry.editableSource === "licensed-reference-png"
+      ? path.join(projectRoot, entry.source.localPath)
+      : path.join(
+          projectRoot,
+          "art",
+          "libresprite",
+          `${entry.outputAssetKey}.aseprite`,
+        ),
   );
   expect(editable.size).toBeGreaterThan(10_000);
   return readRuntimeMetadata(entry);
@@ -216,7 +223,7 @@ const expectedFrameStates = [
 ];
 
 describe("animation v2 asset pipeline", () => {
-  it("documents 29 confirmed crew imports and eight project-owned PvE sources", async () => {
+  it("documents 33 confirmed crew imports and eight project-owned PvE sources", async () => {
     const matrix = await sourceMatrix();
     expect(matrix.schemaVersion).toBe(1);
     expect(matrix.standard).toMatchObject({
@@ -407,7 +414,9 @@ describe("animation v2 asset pipeline", () => {
     for (const entry of matrix.entries) {
       expect(notes).toContain(`\`${entry.outputAssetKey}\``);
       expect(notes).toContain(
-        `art/libresprite/${entry.outputAssetKey}.aseprite`,
+        entry.editableSource === "licensed-reference-png"
+          ? entry.source.localPath
+          : `art/libresprite/${entry.outputAssetKey}.aseprite`,
       );
       expect(notes).toContain(entry.source.sha256);
       const atlas = await readFile(

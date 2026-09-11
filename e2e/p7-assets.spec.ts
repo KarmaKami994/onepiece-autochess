@@ -20,6 +20,11 @@ test("representative P7 assets load in-browser without breaking interaction", as
     ["form-portrait", "/assets/forms/luffy-gear-4-boundman/portrait.svg"],
     ["form-token", "/assets/forms/luffy-gear-4-boundman/token.svg"],
     ["late-completed", "/assets/items/phoenix-feather.svg"],
+    ["p9-killer-v2", "/assets/animations/killer-v2/killer-v2.png"],
+    ["p9-buggy-v2", "/assets/animations/buggy-v2/buggy-v2.png"],
+    ["p9-capone-v2", "/assets/animations/capone-bege-v2/capone-bege-v2.png"],
+    ["p9-whitebeard-v2", "/assets/animations/whitebeard-v2/whitebeard-v2.png"],
+    ["p9-whitebeard-portrait", "/assets/portraits/whitebeard.png"],
   ] as const;
 
   await page.evaluate((entries) => {

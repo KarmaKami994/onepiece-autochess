@@ -315,13 +315,13 @@ describe("Roster Expansion Pack E content", () => {
   });
 
   it("expands the generic roster and pool to the locked distribution", () => {
-    expect(DEFAULT_CONTENT.units).toHaveLength(30);
+    expect(DEFAULT_CONTENT.units).toHaveLength(34);
     expect(
       [1, 2, 3, 4, 5].map(
         (cost) => DEFAULT_CONTENT.units.filter((unit) => unit.cost === cost).length,
       ),
-    ).toEqual([6, 7, 6, 7, 4]);
-    expect(DEFAULT_CONTENT.version).toBe("1.27.0");
+    ).toEqual([6, 8, 7, 8, 5]);
+    expect(DEFAULT_CONTENT.version).toBe("1.28.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
 
     const state = createMatch("pack-e-pool", DEFAULT_CONTENT);

@@ -32,6 +32,7 @@ async function makeEditable(libreSprite, gif, editable) {
 }
 
 async function buildMatrixEntry(entry, libreSprite, skipEditable) {
+  const createsLibreSpriteEditable = entry.editableSource !== "licensed-reference-png";
   const staging = path.join(os.tmpdir(), `grand-line-v2-${entry.id}-${randomUUID()}`);
   const frames = path.join(staging, "frames");
   const sheet = path.join(staging, `${entry.outputAssetKey}.png`);
@@ -50,12 +51,14 @@ async function buildMatrixEntry(entry, libreSprite, skipEditable) {
       "--gif", gif,
     ], { cwd: PROJECT_ROOT });
     if (!(await exists(sheet))) return;
-    if (!skipEditable) await makeEditable(libreSprite, gif, editable);
+    if (!skipEditable && createsLibreSpriteEditable) {
+      await makeEditable(libreSprite, gif, editable);
+    }
     const output = path.join(PROJECT_ROOT, "public", "assets", "animations", entry.outputAssetKey);
     await mkdir(output, { recursive: true });
     await cp(sheet, path.join(output, `${entry.outputAssetKey}.png`));
     await cp(metadata, path.join(output, `${entry.outputAssetKey}.json`));
-    if (!skipEditable) {
+    if (!skipEditable && createsLibreSpriteEditable) {
       const editableRoot = path.join(PROJECT_ROOT, "art", "libresprite");
       await mkdir(editableRoot, { recursive: true });
       await cp(editable, path.join(editableRoot, `${entry.outputAssetKey}.aseprite`));
