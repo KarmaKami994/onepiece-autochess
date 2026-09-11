@@ -242,7 +242,7 @@ describe("Roster Expansion Pack F content", () => {
         stunMs: 700,
         castAnimationMs: 650,
       },
-      assetPath: "/assets/characters/placeholder.svg",
+      assetPath: "/assets/characters/kuzan.png",
     });
     expect(definition(DEFAULT_CONTENT, "akainu")).toMatchObject({
       name: "Akainu",
@@ -266,7 +266,7 @@ describe("Roster Expansion Pack F content", () => {
         burnDurationMs: 4_000,
         castAnimationMs: 650,
       },
-      assetPath: "/assets/characters/placeholder.svg",
+      assetPath: "/assets/characters/akainu.png",
     });
     expect(definition(DEFAULT_CONTENT, "shanks")).toMatchObject({
       name: "Shanks",
@@ -289,7 +289,7 @@ describe("Roster Expansion Pack F content", () => {
         defensePiercePercent: 35,
         castAnimationMs: 700,
       },
-      assetPath: "/assets/characters/placeholder.svg",
+      assetPath: "/assets/characters/shanks.png",
     });
     expect(definition(DEFAULT_CONTENT, "blackbeard")).toMatchObject({
       name: "Blackbeard",
@@ -313,7 +313,7 @@ describe("Roster Expansion Pack F content", () => {
         castAnimationMs: 700,
         signatureMechanics: [{ kind: "pull" }],
       },
-      assetPath: "/assets/characters/placeholder.svg",
+      assetPath: "/assets/characters/blackbeard.png",
     });
 
     for (const id of PACK_F_IDS) {
@@ -332,7 +332,7 @@ describe("Roster Expansion Pack F content", () => {
       ),
     ).toEqual([6, 7, 6, 7, 4]);
     expect(DEFAULT_CONTENT.traits).toHaveLength(13);
-    expect(DEFAULT_CONTENT.version).toBe("1.25.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.26.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
 
     const state = createMatch("pack-f-pool", DEFAULT_CONTENT);

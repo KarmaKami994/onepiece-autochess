@@ -36,6 +36,7 @@ export type CarouselTokenView = Readonly<{
   name: string;
   description?: string;
   icon?: string;
+  imagePath?: string;
   color?: number | string;
   itemColumn?: number | null;
   orbitIndex: number;
@@ -113,6 +114,10 @@ type SceneBridge = {
 const ARENA_KEY = "bounty-regatta-arena";
 const BOAT_SHEET_KEY = "bounty-regatta-boats";
 const BOUNTY_SHEET_KEY = "bounty-regatta-items";
+
+function itemIconTextureKey(itemId: string) {
+  return `p7-item-${itemId.replace(/[^a-z0-9_-]/gi, "-")}`;
+}
 
 const DEFAULT_CAROUSEL_ASSETS: CarouselAssetUrls = Object.freeze({
   arena: "/assets/carousel/ocean-arena.png",
@@ -333,6 +338,13 @@ export default function PhaserCarousel({
               frameWidth: 64,
               frameHeight: 64,
             });
+            for (const choice of this.payload.snapshot.choices) {
+              if (!choice.imagePath) continue;
+              this.load.svg(itemIconTextureKey(choice.itemId), choice.imagePath, {
+                width: 48,
+                height: 48,
+              });
+            }
           }
 
           create() {
@@ -648,14 +660,17 @@ export default function PhaserCarousel({
                   carouselBountyFrame(column, 0),
                 )
               : this.fallbackBounty(choice);
-            const icon = this.add.text(0, 0, choice.icon ?? "◆", {
-              color: "#fff1b8",
-              fontFamily: "monospace",
-              fontSize: "20px",
-              fontStyle: "bold",
-              stroke: "#321d13",
-              strokeThickness: 4,
-            }).setOrigin(0.5);
+            const iconKey = itemIconTextureKey(choice.itemId);
+            const icon = choice.imagePath && this.textureAvailable(iconKey)
+              ? this.add.image(0, 0, iconKey).setDisplaySize(44, 44)
+              : this.add.text(0, 0, choice.icon ?? "◆", {
+                  color: "#fff1b8",
+                  fontFamily: "monospace",
+                  fontSize: "20px",
+                  fontStyle: "bold",
+                  stroke: "#321d13",
+                  strokeThickness: 4,
+                }).setOrigin(0.5);
             const hitZone = this.add
               .zone(0, 0, 78, 78)
               .setOrigin(0.5)

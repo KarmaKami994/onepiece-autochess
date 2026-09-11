@@ -123,28 +123,28 @@ describe("P5 late-game content topology", () => {
     ]);
   });
 
-  it("defines the three approved placeholder enemies and no extra mechanics", () => {
+  it("defines the three approved late-game enemies and no extra mechanics", () => {
     expect(DEFAULT_CONTENT.enemies.filter((enemy) => ["vice-admiral", "cipher-pol-agent", "seraphim"].includes(enemy.id))).toMatchObject([
       {
         id: "vice-admiral",
         name: "Vice Admiral",
         stats: { health: 3200, attack: 130, defense: 45, specialDefense: 35, range: 1, attackIntervalMs: 1000, moveIntervalMs: 400 },
         ability: { id: "haki-shockwave", name: "Haki Shockwave", targeting: "nearest-enemy", pattern: "adjacent", effect: "damage", power: 360, castAnimationMs: 500, damageType: "physical", stunMs: 500 },
-        assetPath: "/assets/characters/placeholder.svg",
+        assetPath: "/assets/enemies/vice-admiral.png",
       },
       {
         id: "cipher-pol-agent",
         name: "Cipher Pol Agent",
         stats: { health: 2800, attack: 150, defense: 38, specialDefense: 38, range: 1, attackIntervalMs: 800, moveIntervalMs: 350 },
         ability: { id: "six-powers-assault", name: "Six Powers Assault", targeting: "nearest-enemy", pattern: "single", effect: "damage", power: 420, castAnimationMs: 500, damageType: "physical", requiresTarget: false, defensePiercePercent: 25, signatureMechanics: [{ kind: "lunge" }] },
-        assetPath: "/assets/characters/placeholder.svg",
+        assetPath: "/assets/enemies/cipher-pol-agent.png",
       },
       {
         id: "seraphim",
         name: "Seraphim",
         stats: { health: 4200, attack: 140, defense: 60, specialDefense: 55, range: 4, attackIntervalMs: 1100, moveIntervalMs: 450 },
         ability: { id: "lunarian-laser", name: "Lunarian Laser", targeting: "farthest-enemy", pattern: "line", effect: "damage", power: 400, castAnimationMs: 500, damageType: "special", burnPower: 20, burnDurationMs: 3000 },
-        assetPath: "/assets/characters/placeholder.svg",
+        assetPath: "/assets/enemies/seraphim.png",
       },
     ]);
   });
@@ -324,15 +324,15 @@ describe("P5 item, bot, and save compatibility", () => {
     human(state).inventory = ["black-blade", "jet-dial"];
     const restored = deserializeMatch(serializeMatch(state));
     expect(restored.schemaVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
-    expect(restored.contentVersion).toBe("1.25.0");
+    expect(restored.contentVersion).toBe("1.26.0");
     expect(human(restored).inventory).toEqual(["black-blade", "jet-dial"]);
     const next = advanceMatchPhase(restored);
     expect(next).toMatchObject({ round: 22, phase: "carousel", stageId: "new-world-exchange" });
     expect(next.carouselChoices.every((choice) => getItemDefinition(choice.itemId)?.kind === "completed")).toBe(true);
   });
 
-  it("keeps GameContent 1.25.0 and save schema 6", () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.25.0");
+  it("keeps GameContent 1.26.0 and save schema 6", () => {
+    expect(DEFAULT_CONTENT.version).toBe("1.26.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 });

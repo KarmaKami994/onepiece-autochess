@@ -59,6 +59,12 @@ import {
   sequentialAbilityHitDelayMs,
 } from "./boardCombatPresentation";
 import { BOARD_SCENE_KEY, createBoardGameConfig } from "./BoardScene";
+import {
+  FORM_VISUALS,
+  STATUS_VISUALS,
+  formVisualDefinition,
+  statusVisual,
+} from "./gameVisualManifest";
 
 export type BoardZone = "board" | "bench";
 export type BoardInteractionMode = "formation" | "bench-only" | "none";
@@ -226,6 +232,21 @@ const CELL_W = BOARD_GEOMETRY.cellWidth;
 const CELL_H = BOARD_GEOMETRY.cellHeight;
 const GRID_X = BOARD_GEOMETRY.gridX;
 const GRID_Y = BOARD_GEOMETRY.gridY;
+
+function formOverlayKey(formId: string) {
+  return `p7-form-${formId}`;
+}
+
+function statusTextureKey(statusId: string) {
+  return `p7-status-${statusId}`;
+}
+
+function presentedStatusId(statusId: string) {
+  if (statusId.includes("protect") || statusId === "emergency-shield") {
+    return "protect";
+  }
+  return statusId;
+}
 
 export default function PhaserBoard({
   units,
@@ -436,6 +457,18 @@ export default function PhaserBoard({
                 },
               );
             });
+            for (const [formId, visual] of Object.entries(FORM_VISUALS)) {
+              this.load.svg(formOverlayKey(formId), visual.overlay, {
+                width: 128,
+                height: 128,
+              });
+            }
+            for (const [statusId, visual] of Object.entries(STATUS_VISUALS)) {
+              this.load.svg(statusTextureKey(statusId), visual.imagePath, {
+                width: 32,
+                height: 32,
+              });
+            }
           }
 
           create() {
@@ -1562,6 +1595,20 @@ export default function PhaserBoard({
             container.add([shadow, fallbackCard, fallbackAccent]);
             if (animatedSprite) container.add(animatedSprite);
             if (portrait) container.add(portrait);
+            const formVisual = formVisualDefinition(unit.formId);
+            if (
+              formVisual &&
+              this.textures.exists(formOverlayKey(unit.formId ?? ""))
+            ) {
+              container.add(
+                this.add
+                  .image(0, -4, formOverlayKey(unit.formId ?? ""))
+                  .setDisplaySize(
+                    unit.zone === "bench" ? 48 : 64,
+                    unit.zone === "bench" ? 48 : 64,
+                  ),
+              );
+            }
             container.add([
               initial,
               name,
@@ -1779,6 +1826,22 @@ export default function PhaserBoard({
               if (!statuses) return;
               statuses.set(status, durationTicks > 0 ? tick + durationTicks : 0);
               refreshStatuses(unitId, tick);
+              const visualId = presentedStatusId(status);
+              const visual = statusVisual(visualId);
+              const key = statusTextureKey(visualId);
+              const target = this.tokenObjects.get(unitId);
+              if (visual.imagePath && target && this.textures.exists(key)) {
+                const badge = this.add.image(22, -35, key).setDisplaySize(22, 22);
+                target.add(badge);
+                this.tweens.add({
+                  targets: badge,
+                  alpha: 0,
+                  y: -45,
+                  duration: reduceMotion ? 1 : Math.max(300, Math.round(650 / speed)),
+                  hold: reduceMotion ? 250 : 150,
+                  onComplete: () => badge.destroy(),
+                });
+              }
               if (durationTicks > 0) {
                 this.time.delayedCall(
                   Math.max(1, Math.round((durationTicks * 100) / speed)),
@@ -1904,6 +1967,18 @@ export default function PhaserBoard({
                     );
                   }
                   showCastName(source, event.label ?? "Monster Point");
+                  const visual = formVisualDefinition(event.toFormId);
+                  if (
+                    visual &&
+                    event.toFormId &&
+                    this.textures.exists(formOverlayKey(event.toFormId))
+                  ) {
+                    source.add(
+                      this.add
+                        .image(0, -4, formOverlayKey(event.toFormId))
+                        .setDisplaySize(64, 64),
+                    );
+                  }
                   if (!reduceMotion) {
                     this.tweens.add({
                       targets: source,

@@ -68,10 +68,8 @@ describe("canonical game content", () => {
       ),
     ).toBe(true);
     expect(
-      DEFAULT_CONTENT.enemies.every(
-        (enemy) =>
-          enemy.assetPath.startsWith("/assets/enemies/") ||
-          enemy.assetPath === "/assets/characters/placeholder.svg",
+      DEFAULT_CONTENT.enemies.every((enemy) =>
+        enemy.assetPath.startsWith("/assets/enemies/"),
       ),
     ).toBe(true);
   });

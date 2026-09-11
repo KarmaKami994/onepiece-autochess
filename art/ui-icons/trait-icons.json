@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "traits": [
+    { "id": "straw-hat", "name": "Straw Hat", "motif": "hat", "color": "#e9bd47", "fallbackGlyph": "☀" },
+    { "id": "navy", "name": "Navy", "motif": "anchor", "color": "#74b8e8", "fallbackGlyph": "⚓" },
+    { "id": "warlord", "name": "Warlord", "motif": "crown", "color": "#b56ccf", "fallbackGlyph": "♦" },
+    { "id": "supernova", "name": "Supernova", "motif": "starburst", "color": "#f27c47", "fallbackGlyph": "✷" },
+    { "id": "brotherhood", "name": "Brotherhood", "motif": "linked-fists", "color": "#da6e5c", "fallbackGlyph": "∞" },
+    { "id": "revolutionary", "name": "Revolutionary", "motif": "flame-gear", "color": "#e85343", "fallbackGlyph": "⚙" },
+    { "id": "emperor", "name": "Emperor", "motif": "wave-crown", "color": "#9e5bd8", "fallbackGlyph": "♛" },
+    { "id": "captain", "name": "Captain", "motif": "wheel-star", "color": "#d9a649", "fallbackGlyph": "★" },
+    { "id": "brawler", "name": "Brawler", "motif": "fist", "color": "#d95b4a", "fallbackGlyph": "✊" },
+    { "id": "swordsman", "name": "Swordsman", "motif": "crossed-blades", "color": "#68b18d", "fallbackGlyph": "⚔" },
+    { "id": "marksman", "name": "Marksman", "motif": "reticle", "color": "#e2bd4d", "fallbackGlyph": "◎" },
+    { "id": "specialist", "name": "Specialist", "motif": "spiral", "color": "#62b9cf", "fallbackGlyph": "〰" },
+    { "id": "guardian", "name": "Guardian", "motif": "shield", "color": "#668dc0", "fallbackGlyph": "⛨" }
+  ]
+}

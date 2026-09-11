@@ -129,7 +129,7 @@ describe("Robin Demonio Fleur production content", () => {
     const robin = DEFAULT_CONTENT.units.find((unit) => unit.id === "robin");
     const form = getUnitFormDefinition(DEMONIO_FORM_ID);
 
-    expect(DEFAULT_CONTENT.version).toBe("1.25.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.26.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(DEFAULT_CONTENT.units).toHaveLength(30);
     expect([1, 2, 3, 4, 5].map((cost) =>
@@ -141,6 +141,10 @@ describe("Robin Demonio Fleur production content", () => {
       baseDefinitionId: "robin",
       name: "Robin — Demonio Fleur",
       lifecycle: "persistent",
+      presentation: {
+        portrait: "/assets/forms/robin-demonio-fleur/portrait.svg",
+        token: "/assets/forms/robin-demonio-fleur/token.svg",
+      },
       ability: {
         id: "demonio-fleur",
         name: "Demonio Fleur",
@@ -157,7 +161,6 @@ describe("Robin Demonio Fleur production content", () => {
     });
     expect(form).not.toHaveProperty("stats");
     expect(form).not.toHaveProperty("traits");
-    expect(form).not.toHaveProperty("presentation");
     expect(robin).toEqual({
       id: "robin",
       name: "Robin",
@@ -523,7 +526,7 @@ describe("Robin Demonio Fleur schema-6 persistence", () => {
     const restoredPlayer = human(restored);
 
     expect(restored.schemaVersion).toBe(6);
-    expect(restored.contentVersion).toBe("1.25.0");
+    expect(restored.contentVersion).toBe("1.26.0");
     expect(restoredPlayer.units[legacy.id]).toMatchObject({
       definitionId: "robin",
       star: 3,
@@ -577,13 +580,13 @@ describe("Robin Demonio Fleur selectors and presentation", () => {
         formId: DEMONIO_FORM_ID,
         name: "Robin — Demonio Fleur",
         star: 3,
-        portrait: "/assets/tokens/robin.png",
+        portrait: "/assets/forms/robin-demonio-fleur/token.svg",
       });
     expect(planning.selectedDefinitionByUnit.get(instance.id)).toMatchObject({
       id: "robin",
       name: "Robin — Demonio Fleur",
-      portrait: "/assets/portraits/robin.png",
-      token: "/assets/tokens/robin.png",
+      portrait: "/assets/forms/robin-demonio-fleur/portrait.svg",
+      token: "/assets/forms/robin-demonio-fleur/token.svg",
       traits: ["straw-hat", "revolutionary", "specialist"],
       stats: { health: 620, attack: 48, defense: 16 },
       ability: { name: "Demonio Fleur", power: 180 },
@@ -608,7 +611,7 @@ describe("Robin Demonio Fleur selectors and presentation", () => {
     )).toMatchObject({
       formId: DEMONIO_FORM_ID,
       name: "Robin — Demonio Fleur",
-      portrait: "/assets/tokens/robin.png",
+      portrait: "/assets/forms/robin-demonio-fleur/token.svg",
     });
 
     const resultState = structuredClone(state);
@@ -624,7 +627,7 @@ describe("Robin Demonio Fleur selectors and presentation", () => {
         formId: DEMONIO_FORM_ID,
         name: "Robin — Demonio Fleur",
         star: 3,
-        portrait: "/assets/tokens/robin.png",
+        portrait: "/assets/forms/robin-demonio-fleur/token.svg",
       }),
     ]);
     expect(resultView.selectedDefinitionByUnit.get(`final:${instance.id}`))

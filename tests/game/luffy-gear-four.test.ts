@@ -155,7 +155,7 @@ describe("Luffy Gear 4 production content", () => {
     const boundman = getUnitFormDefinition(BOUNDMAN_FORM_ID);
     const snakeman = getUnitFormDefinition(SNAKEMAN_FORM_ID);
 
-    expect(DEFAULT_CONTENT.version).toBe("1.25.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.26.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(DEFAULT_CONTENT.units).toHaveLength(30);
     expect(DEFAULT_CONTENT.forms).toHaveLength(4);
@@ -170,6 +170,10 @@ describe("Luffy Gear 4 production content", () => {
       baseDefinitionId: "luffy",
       name: "Luffy — Gear 4: Boundman",
       lifecycle: "persistent",
+      presentation: {
+        portrait: "/assets/forms/luffy-gear-4-boundman/portrait.svg",
+        token: "/assets/forms/luffy-gear-4-boundman/token.svg",
+      },
       stats: {
         health: 990,
         attack: 86,
@@ -196,6 +200,10 @@ describe("Luffy Gear 4 production content", () => {
       baseDefinitionId: "luffy",
       name: "Luffy — Gear 4: Snakeman",
       lifecycle: "persistent",
+      presentation: {
+        portrait: "/assets/forms/luffy-gear-4-snakeman/portrait.svg",
+        token: "/assets/forms/luffy-gear-4-snakeman/token.svg",
+      },
       stats: {
         health: 850,
         attack: 78,
@@ -221,7 +229,6 @@ describe("Luffy Gear 4 production content", () => {
     });
     for (const form of [boundman, snakeman]) {
       expect(form).not.toHaveProperty("traits");
-      expect(form).not.toHaveProperty("presentation");
       expect(form?.stats).not.toHaveProperty("moveIntervalMs");
     }
     expect(luffy).toEqual({
@@ -813,7 +820,7 @@ describe("Luffy Gear 4 schema-6 persistence", () => {
     const restoredPlayer = human(restored);
 
     expect(restored.schemaVersion).toBe(6);
-    expect(restored.contentVersion).toBe("1.25.0");
+    expect(restored.contentVersion).toBe("1.26.0");
     expect(restoredPlayer.units.bound.formId).toBe(BOUNDMAN_FORM_ID);
     expect(restoredPlayer.units.snake.formId).toBe(SNAKEMAN_FORM_ID);
     expect(restoredPlayer.units["legacy-arm"].formId).toBe(BOUNDMAN_FORM_ID);
@@ -874,21 +881,21 @@ describe("Luffy Gear 4 selectors and presentation", () => {
         contentId: "luffy",
         formId: BOUNDMAN_FORM_ID,
         name: "Luffy — Gear 4: Boundman",
-        portrait: "/assets/tokens/luffy.png",
+        portrait: "/assets/forms/luffy-gear-4-boundman/token.svg",
       }),
       expect.objectContaining({
         id: snakeman.id,
         contentId: "luffy",
         formId: SNAKEMAN_FORM_ID,
         name: "Luffy — Gear 4: Snakeman",
-        portrait: "/assets/tokens/luffy.png",
+        portrait: "/assets/forms/luffy-gear-4-snakeman/token.svg",
       }),
     ]));
     expect(planning.selectedDefinitionByUnit.get(boundman.id)).toMatchObject({
       id: "luffy",
       name: "Luffy — Gear 4: Boundman",
-      portrait: "/assets/portraits/luffy.png",
-      token: "/assets/tokens/luffy.png",
+      portrait: "/assets/forms/luffy-gear-4-boundman/portrait.svg",
+      token: "/assets/forms/luffy-gear-4-boundman/token.svg",
       traits: ["straw-hat", "supernova", "brotherhood", "captain", "brawler"],
       stats: { health: 990, attack: 86, defense: 34, range: 1 },
       ability: { name: "Kong Gun", power: 285 },

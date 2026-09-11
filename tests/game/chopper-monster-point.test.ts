@@ -167,7 +167,7 @@ describe("Chopper Monster Point production content", () => {
     const chopper = DEFAULT_CONTENT.units.find((unit) => unit.id === "chopper");
     const form = getUnitFormDefinition(MONSTER_POINT_FORM_ID);
 
-    expect(DEFAULT_CONTENT.version).toBe("1.25.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.26.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(DEFAULT_CONTENT.units).toHaveLength(30);
     expect([1, 2, 3, 4, 5].map((cost) =>
@@ -184,6 +184,10 @@ describe("Chopper Monster Point production content", () => {
       baseDefinitionId: "chopper",
       name: "Chopper — Monster Point",
       lifecycle: "battle-temporary",
+      presentation: {
+        portrait: "/assets/forms/chopper-monster-point/portrait.svg",
+        token: "/assets/forms/chopper-monster-point/token.svg",
+      },
       stats: { health: 800, attack: 60, defense: 28, range: 1 },
       ability: {
         id: "monster-point-slam",
@@ -201,7 +205,6 @@ describe("Chopper Monster Point production content", () => {
     expect(form?.stats).not.toHaveProperty("attackIntervalMs");
     expect(form?.stats).not.toHaveProperty("moveIntervalMs");
     expect(form).not.toHaveProperty("traits");
-    expect(form).not.toHaveProperty("presentation");
     expect(resolveUnitDefinition("chopper", MONSTER_POINT_FORM_ID)?.stats)
       .toEqual({
         health: 800,
@@ -738,7 +741,7 @@ describe("Monster Point persistence and economy isolation", () => {
     const restored = deserializeMatch(serializeMatch(state, "monster-roundtrip"));
     const restoredResult = restored.lastResults[0];
     expect(restored.schemaVersion).toBe(6);
-    expect(restored.contentVersion).toBe("1.25.0");
+    expect(restored.contentVersion).toBe("1.26.0");
     expect(restoredResult).toEqual(frozen[0]);
     expect(restoredResult.initialUnits.find((unit) =>
       unit.definitionId === "chopper"
@@ -871,8 +874,12 @@ describe("Monster Point presentation", () => {
     );
     expect(phaserSource).toContain('event.kind === "transform" && source');
     expect(phaserSource).toContain('showCastName(source, event.label ?? "Monster Point")');
+    expect(phaserSource).toContain(
+      "const visual = formVisualDefinition(event.toFormId)",
+    );
+    expect(phaserSource).toContain("formOverlayKey(event.toFormId)");
     expect(phaserSource).toMatch(
-      /showCastName\(source, event\.label \?\? "Monster Point"\);\s+if \(!reduceMotion\)/,
+      /showCastName\(source, event\.label \?\? "Monster Point"\);[\s\S]*?if \(!reduceMotion\)/,
     );
   });
 });

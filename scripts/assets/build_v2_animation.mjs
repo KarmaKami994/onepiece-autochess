@@ -257,7 +257,7 @@ function paletteSimilarity(left, right) {
   return intersection / (leftColors.size + rightColors.size - intersection);
 }
 
-function selectCharacterCandidates(candidates) {
+function selectCharacterCandidates(candidates, minimumCount = 6) {
   if (!candidates.length) throw new Error("No sprite candidates passed the component filter");
   let baseIndex = 0;
   for (let index = 0; index < Math.min(50, candidates.length); index += 1) {
@@ -281,7 +281,7 @@ function selectCharacterCandidates(candidates) {
       candidate.width <= Math.max(190, base.width * 2.4) &&
       candidate.width / candidate.height <= MAX_AUTO_SOURCE_ASPECT_RATIO,
   );
-  if (selected.length < 6) {
+  if (selected.length < minimumCount) {
     throw new Error(`Only ${selected.length} character-like sprite candidates were detected`);
   }
   return { baseIndex, base, selected };
@@ -343,6 +343,7 @@ async function renderAutoFrameMap(status, options) {
   const scan = await scanSpriteSheet(sourcePath, entry.scanOptions ?? {});
   const { baseIndex, selected: characterCandidates } = selectCharacterCandidates(
     scan.candidates,
+    entry.recipe?.minimumCandidateCount ?? 6,
   );
   const selectedFrames = selectAutoFrames(characterCandidates);
   if (selectedFrames.length !== TOTAL_FRAMES) {
@@ -486,7 +487,8 @@ async function renderAutoFrameMap(status, options) {
       height: 128,
       columns: 8,
       destinationPivot: entry.pivot,
-      idleVisualTopPx: await deriveIdleVisualTopPx(frames),
+      idleVisualTopPx:
+        entry.recipe?.idleVisualTopPx ?? await deriveIdleVisualTopPx(frames),
     },
     frameCount: TOTAL_FRAMES,
     clips: V2_CLIPS,
@@ -577,7 +579,8 @@ async function renderProceduralCutout(status, options) {
       height: 128,
       columns: 8,
       destinationPivot: entry.pivot,
-      idleVisualTopPx: await deriveIdleVisualTopPx(frames),
+      idleVisualTopPx:
+        entry.recipe?.idleVisualTopPx ?? await deriveIdleVisualTopPx(frames),
     },
     frameCount: TOTAL_FRAMES,
     clips: V2_CLIPS,

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "statuses": [
+    { "id": "stun", "name": "Stun", "motif": "stars", "color": "#f2cf55", "fallbackGlyph": "✦" },
+    { "id": "burn", "name": "Burn", "motif": "flame", "color": "#f0643f", "fallbackGlyph": "♦" },
+    { "id": "wound", "name": "Wound", "motif": "slash", "color": "#d84747", "fallbackGlyph": "!" },
+    { "id": "protect", "name": "Protect", "motif": "shield", "color": "#65c9c0", "fallbackGlyph": "◇" },
+    { "id": "blind", "name": "Blind", "motif": "closed-eye", "color": "#aab1c2", "fallbackGlyph": "◒" },
+    { "id": "paralysis", "name": "Paralysis", "motif": "bolt", "color": "#e9c84a", "fallbackGlyph": "ϟ" },
+    { "id": "resistance-reduction", "name": "Resistance reduced", "motif": "broken-shield", "color": "#da7455", "fallbackGlyph": "▽" },
+    { "id": "resurrecting", "name": "Resurrecting", "motif": "phoenix", "color": "#f09a4a", "fallbackGlyph": "✹" }
+  ]
+}
