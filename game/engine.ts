@@ -473,7 +473,11 @@ function simulateExistingPvpPairings(
     } else if (result.winner === "b") {
       winnerId = opponent.id;
     }
-    const damage = calculateLossDamage(result.winnerId, result.finalUnits);
+    const damage = calculateLossDamage(
+      state.round,
+      result.winnerId,
+      result.finalUnits,
+    );
     state.lastResults.push({
       playerAId: playerA.id,
       playerBId: pairing.playerBId,
@@ -511,7 +515,11 @@ function simulatePveRound(
     const won = result.winner === "a";
     const lossDamage = won
       ? 0
-      : calculateLossDamage(result.winnerId, result.finalUnits);
+      : calculateLossDamage(
+          state.round,
+          result.winnerId,
+          result.finalUnits,
+        );
     state.lastResults.push({
       playerAId: player.id,
       playerBId: null,

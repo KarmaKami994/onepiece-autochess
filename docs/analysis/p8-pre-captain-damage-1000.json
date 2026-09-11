@@ -1,0 +1,2999 @@
+{
+  "generatedAt": "2026-09-11T08:46:27.526Z",
+  "gitSha": "f4b1b40449b9d3984d2f1a1bc6aa538d810c8a72",
+  "nodeVersion": "v24.3.0",
+  "schemaVersion": 6,
+  "contentVersion": "1.26.0",
+  "contentHash": "6852a192",
+  "configHash": "977295da",
+  "seedRange": {
+    "first": "production-0",
+    "last": "production-999"
+  },
+  "seeds": 1000,
+  "completeMatches": 1000,
+  "crashes": 0,
+  "minRounds": 30,
+  "maxRounds": 56,
+  "averageRounds": 38.776,
+  "averageFullClockMinutes": 36.89493333333335,
+  "averagePacedMinutes": 26.034266666666706,
+  "battleCount": 153500,
+  "timeoutRate": 0.004201954397394137,
+  "drawRate": 0.0004299674267100977,
+  "captainDamagePacing": {
+    "damageEvents": 87707,
+    "totalDamage": 784433,
+    "averageDamage": 8.943790119374736,
+    "maxSingleLossDamage": 23,
+    "damageP50": 9,
+    "damageP90": 14,
+    "damageP95": 16,
+    "byKind": {
+      "pvp": {
+        "damageEvents": 84442,
+        "totalDamage": 748131,
+        "averageDamage": 8.85970251770446,
+        "maxSingleLossDamage": 23
+      },
+      "ghost": {
+        "damageEvents": 3265,
+        "totalDamage": 36302,
+        "averageDamage": 11.11852986217458,
+        "maxSingleLossDamage": 23
+      },
+      "pve": {
+        "damageEvents": 0,
+        "totalDamage": 0,
+        "averageDamage": 0,
+        "maxSingleLossDamage": 0
+      }
+    },
+    "byRound": {
+      "4": {
+        "damageEvents": 3992,
+        "totalDamage": 19708,
+        "averageDamage": 4.93687374749499,
+        "eliminations": 0
+      },
+      "5": {
+        "damageEvents": 3992,
+        "totalDamage": 23241,
+        "averageDamage": 5.82189378757515,
+        "eliminations": 0
+      },
+      "6": {
+        "damageEvents": 3998,
+        "totalDamage": 24121,
+        "averageDamage": 6.033266633316658,
+        "eliminations": 0
+      },
+      "7": {
+        "damageEvents": 3996,
+        "totalDamage": 24647,
+        "averageDamage": 6.167917917917918,
+        "eliminations": 0
+      },
+      "8": {
+        "damageEvents": 3994,
+        "totalDamage": 28327,
+        "averageDamage": 7.092388582874311,
+        "eliminations": 0
+      },
+      "10": {
+        "damageEvents": 4000,
+        "totalDamage": 30383,
+        "averageDamage": 7.59575,
+        "eliminations": 0
+      },
+      "11": {
+        "damageEvents": 3998,
+        "totalDamage": 31552,
+        "averageDamage": 7.891945972986493,
+        "eliminations": 0
+      },
+      "12": {
+        "damageEvents": 3996,
+        "totalDamage": 32838,
+        "averageDamage": 8.217717717717719,
+        "eliminations": 0
+      },
+      "13": {
+        "damageEvents": 4000,
+        "totalDamage": 34784,
+        "averageDamage": 8.696,
+        "eliminations": 0
+      },
+      "15": {
+        "damageEvents": 3997,
+        "totalDamage": 37129,
+        "averageDamage": 9.289216912684513,
+        "eliminations": 0
+      },
+      "16": {
+        "damageEvents": 4000,
+        "totalDamage": 37849,
+        "averageDamage": 9.46225,
+        "eliminations": 2
+      },
+      "17": {
+        "damageEvents": 3994,
+        "totalDamage": 38477,
+        "averageDamage": 9.633700550826239,
+        "eliminations": 47
+      },
+      "18": {
+        "damageEvents": 3982,
+        "totalDamage": 39321,
+        "averageDamage": 9.87468608739327,
+        "eliminations": 167
+      },
+      "20": {
+        "damageEvents": 3879,
+        "totalDamage": 39846,
+        "averageDamage": 10.272235112142305,
+        "eliminations": 351
+      },
+      "21": {
+        "damageEvents": 3723,
+        "totalDamage": 38547,
+        "averageDamage": 10.353746978243352,
+        "eliminations": 445
+      },
+      "22": {
+        "damageEvents": 3512,
+        "totalDamage": 36654,
+        "averageDamage": 10.436788154897494,
+        "eliminations": 541
+      },
+      "23": {
+        "damageEvents": 3235,
+        "totalDamage": 34466,
+        "averageDamage": 10.654095826893354,
+        "eliminations": 577
+      },
+      "25": {
+        "damageEvents": 2924,
+        "totalDamage": 31349,
+        "averageDamage": 10.721272229822162,
+        "eliminations": 516
+      },
+      "26": {
+        "damageEvents": 2690,
+        "totalDamage": 29142,
+        "averageDamage": 10.833457249070632,
+        "eliminations": 544
+      },
+      "27": {
+        "damageEvents": 2426,
+        "totalDamage": 26034,
+        "averageDamage": 10.731244847485574,
+        "eliminations": 529
+      },
+      "29": {
+        "damageEvents": 2136,
+        "totalDamage": 23420,
+        "averageDamage": 10.964419475655431,
+        "eliminations": 452
+      },
+      "30": {
+        "damageEvents": 1927,
+        "totalDamage": 21582,
+        "averageDamage": 11.199792423456149,
+        "eliminations": 448
+      },
+      "31": {
+        "damageEvents": 1685,
+        "totalDamage": 18782,
+        "averageDamage": 11.146587537091989,
+        "eliminations": 385
+      },
+      "33": {
+        "damageEvents": 1495,
+        "totalDamage": 16927,
+        "averageDamage": 11.322408026755852,
+        "eliminations": 354
+      },
+      "34": {
+        "damageEvents": 1279,
+        "totalDamage": 14458,
+        "averageDamage": 11.304143862392495,
+        "eliminations": 331
+      },
+      "35": {
+        "damageEvents": 1066,
+        "totalDamage": 11692,
+        "averageDamage": 10.968105065666041,
+        "eliminations": 266
+      },
+      "37": {
+        "damageEvents": 893,
+        "totalDamage": 9830,
+        "averageDamage": 11.007838745800672,
+        "eliminations": 239
+      },
+      "38": {
+        "damageEvents": 706,
+        "totalDamage": 7510,
+        "averageDamage": 10.637393767705383,
+        "eliminations": 170
+      },
+      "39": {
+        "damageEvents": 580,
+        "totalDamage": 5953,
+        "averageDamage": 10.263793103448275,
+        "eliminations": 151
+      },
+      "40": {
+        "damageEvents": 447,
+        "totalDamage": 4574,
+        "averageDamage": 10.232662192393736,
+        "eliminations": 103
+      },
+      "41": {
+        "damageEvents": 365,
+        "totalDamage": 3556,
+        "averageDamage": 9.742465753424657,
+        "eliminations": 113
+      },
+      "42": {
+        "damageEvents": 260,
+        "totalDamage": 2698,
+        "averageDamage": 10.376923076923077,
+        "eliminations": 84
+      },
+      "43": {
+        "damageEvents": 180,
+        "totalDamage": 1846,
+        "averageDamage": 10.255555555555556,
+        "eliminations": 64
+      },
+      "44": {
+        "damageEvents": 118,
+        "totalDamage": 1103,
+        "averageDamage": 9.347457627118644,
+        "eliminations": 43
+      },
+      "45": {
+        "damageEvents": 76,
+        "totalDamage": 727,
+        "averageDamage": 9.56578947368421,
+        "eliminations": 26
+      },
+      "46": {
+        "damageEvents": 51,
+        "totalDamage": 431,
+        "averageDamage": 8.450980392156863,
+        "eliminations": 16
+      },
+      "47": {
+        "damageEvents": 36,
+        "totalDamage": 295,
+        "averageDamage": 8.194444444444445,
+        "eliminations": 6
+      },
+      "48": {
+        "damageEvents": 30,
+        "totalDamage": 272,
+        "averageDamage": 9.066666666666666,
+        "eliminations": 13
+      },
+      "49": {
+        "damageEvents": 17,
+        "totalDamage": 137,
+        "averageDamage": 8.058823529411764,
+        "eliminations": 5
+      },
+      "50": {
+        "damageEvents": 12,
+        "totalDamage": 96,
+        "averageDamage": 8,
+        "eliminations": 5
+      },
+      "51": {
+        "damageEvents": 7,
+        "totalDamage": 49,
+        "averageDamage": 7,
+        "eliminations": 4
+      },
+      "52": {
+        "damageEvents": 3,
+        "totalDamage": 19,
+        "averageDamage": 6.333333333333333,
+        "eliminations": 0
+      },
+      "53": {
+        "damageEvents": 3,
+        "totalDamage": 19,
+        "averageDamage": 6.333333333333333,
+        "eliminations": 0
+      },
+      "54": {
+        "damageEvents": 3,
+        "totalDamage": 17,
+        "averageDamage": 5.666666666666667,
+        "eliminations": 0
+      },
+      "55": {
+        "damageEvents": 3,
+        "totalDamage": 15,
+        "averageDamage": 5,
+        "eliminations": 2
+      },
+      "56": {
+        "damageEvents": 1,
+        "totalDamage": 10,
+        "averageDamage": 10,
+        "eliminations": 1
+      }
+    },
+    "firstEliminationRound": {
+      "min": 16,
+      "max": 29,
+      "average": 20.597,
+      "median": 21
+    },
+    "eliminationsByRound": {
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "10": 0,
+      "11": 0,
+      "12": 0,
+      "13": 0,
+      "15": 0,
+      "16": 2,
+      "17": 47,
+      "18": 167,
+      "20": 351,
+      "21": 445,
+      "22": 541,
+      "23": 577,
+      "25": 516,
+      "26": 544,
+      "27": 529,
+      "29": 452,
+      "30": 448,
+      "31": 385,
+      "33": 354,
+      "34": 331,
+      "35": 266,
+      "37": 239,
+      "38": 170,
+      "39": 151,
+      "40": 103,
+      "41": 113,
+      "42": 84,
+      "43": 64,
+      "44": 43,
+      "45": 26,
+      "46": 16,
+      "47": 6,
+      "48": 13,
+      "49": 5,
+      "50": 5,
+      "51": 4,
+      "52": 0,
+      "53": 0,
+      "54": 0,
+      "55": 2,
+      "56": 1
+    },
+    "stageReach": {
+      "22": {
+        "matchesReached": 1000,
+        "rate": 1
+      },
+      "24": {
+        "matchesReached": 1000,
+        "rate": 1
+      },
+      "27": {
+        "matchesReached": 1000,
+        "rate": 1
+      },
+      "28": {
+        "matchesReached": 1000,
+        "rate": 1
+      },
+      "32": {
+        "matchesReached": 963,
+        "rate": 0.963
+      },
+      "34": {
+        "matchesReached": 911,
+        "rate": 0.911
+      },
+      "36": {
+        "matchesReached": 728,
+        "rate": 0.728
+      }
+    }
+  },
+  "characterPresence": {
+    "nami": {
+      "cost": 1,
+      "finalBoards": 3121,
+      "top4Boards": 1051,
+      "winningBoards": 200,
+      "top4Rate": 0.3367510413329061,
+      "winRate": 0.06408202499198974,
+      "averagePlacement": 5.365267542454341,
+      "winnerPresenceRate": 0.2,
+      "finalBoardPresenceRate": 0.390125,
+      "battleBoardAppearances": 53135,
+      "top4RateDeltaVsCostBand": -0.10389186127689654,
+      "winRateDeltaVsCostBand": -0.03617258990298161,
+      "averagePlacementDeltaVsCostBand": 0.5294145825561873,
+      "top4RateConfidence95": {
+        "low": 0.3203800499877797,
+        "high": 0.35352342083134924
+      },
+      "winRateConfidence95": {
+        "low": 0.056014469360573235,
+        "high": 0.07322139334683568
+      }
+    },
+    "usopp": {
+      "cost": 1,
+      "finalBoards": 2511,
+      "top4Boards": 1170,
+      "winningBoards": 268,
+      "top4Rate": 0.4659498207885305,
+      "winRate": 0.10673038630027877,
+      "averagePlacement": 4.731581043409,
+      "winnerPresenceRate": 0.268,
+      "finalBoardPresenceRate": 0.313875,
+      "battleBoardAppearances": 47998,
+      "top4RateDeltaVsCostBand": 0.025306918178727822,
+      "winRateDeltaVsCostBand": 0.006475771405307418,
+      "averagePlacementDeltaVsCostBand": -0.10427191648915368,
+      "top4RateConfidence95": {
+        "low": 0.4465050541978967,
+        "high": 0.48549861553621304
+      },
+      "winRateConfidence95": {
+        "low": 0.09524816883370647,
+        "high": 0.11941409856317452
+      }
+    },
+    "chopper": {
+      "cost": 1,
+      "finalBoards": 1813,
+      "top4Boards": 961,
+      "winningBoards": 250,
+      "top4Rate": 0.5300606729178158,
+      "winRate": 0.13789299503585217,
+      "averagePlacement": 4.368450082735797,
+      "winnerPresenceRate": 0.25,
+      "finalBoardPresenceRate": 0.226625,
+      "battleBoardAppearances": 43513,
+      "top4RateDeltaVsCostBand": 0.08941777030801312,
+      "winRateDeltaVsCostBand": 0.03763838014088082,
+      "averagePlacementDeltaVsCostBand": -0.46740287716235684,
+      "top4RateConfidence95": {
+        "low": 0.5070471008186721,
+        "high": 0.5529471221229427
+      },
+      "winRateConfidence95": {
+        "low": 0.1227857923358965,
+        "high": 0.15453150378942335
+      }
+    },
+    "tashigi": {
+      "cost": 1,
+      "finalBoards": 1881,
+      "top4Boards": 1043,
+      "winningBoards": 268,
+      "top4Rate": 0.5544922913343966,
+      "winRate": 0.14247740563530037,
+      "averagePlacement": 4.24455077086656,
+      "winnerPresenceRate": 0.268,
+      "finalBoardPresenceRate": 0.235125,
+      "battleBoardAppearances": 41709,
+      "top4RateDeltaVsCostBand": 0.11384938872459394,
+      "winRateDeltaVsCostBand": 0.042222790740329016,
+      "averagePlacementDeltaVsCostBand": -0.5913021890315937,
+      "top4RateConfidence95": {
+        "low": 0.5319424429563089,
+        "high": 0.5768200122017266
+      },
+      "winRateConfidence95": {
+        "low": 0.12740900696734928,
+        "high": 0.15900317748358814
+      }
+    },
+    "koby": {
+      "cost": 1,
+      "finalBoards": 1538,
+      "top4Boards": 683,
+      "winningBoards": 153,
+      "top4Rate": 0.44408322496749025,
+      "winRate": 0.09947984395318596,
+      "averagePlacement": 4.821196358907672,
+      "winnerPresenceRate": 0.153,
+      "finalBoardPresenceRate": 0.19225,
+      "battleBoardAppearances": 37849,
+      "top4RateDeltaVsCostBand": 0.0034403223576875974,
+      "winRateDeltaVsCostBand": -0.0007747709417853937,
+      "averagePlacementDeltaVsCostBand": -0.014656600990481827,
+      "top4RateConfidence95": {
+        "low": 0.41942092138020043,
+        "high": 0.4690241692179518
+      },
+      "winRateConfidence95": {
+        "low": 0.08550447990963865,
+        "high": 0.11545105274689364
+      }
+    },
+    "koala": {
+      "cost": 1,
+      "finalBoards": 1704,
+      "top4Boards": 630,
+      "winningBoards": 121,
+      "top4Rate": 0.36971830985915494,
+      "winRate": 0.0710093896713615,
+      "averagePlacement": 5.183098591549296,
+      "winnerPresenceRate": 0.121,
+      "finalBoardPresenceRate": 0.213,
+      "battleBoardAppearances": 37675,
+      "top4RateDeltaVsCostBand": -0.07092459275064772,
+      "winRateDeltaVsCostBand": -0.029245225223609853,
+      "averagePlacementDeltaVsCostBand": 0.3472456316511421,
+      "top4RateConfidence95": {
+        "low": 0.3471147809146332,
+        "high": 0.3929079471884883
+      },
+      "winRateConfidence95": {
+        "low": 0.059754834020379656,
+        "high": 0.08419387878764654
+      }
+    },
+    "sanji": {
+      "cost": 2,
+      "finalBoards": 2259,
+      "top4Boards": 994,
+      "winningBoards": 234,
+      "top4Rate": 0.4400177069499779,
+      "winRate": 0.10358565737051793,
+      "averagePlacement": 4.792386011509517,
+      "winnerPresenceRate": 0.234,
+      "finalBoardPresenceRate": 0.282375,
+      "battleBoardAppearances": 33771,
+      "top4RateDeltaVsCostBand": -0.03906734296787878,
+      "winRateDeltaVsCostBand": -0.007307809077099908,
+      "averagePlacementDeltaVsCostBand": 0.18724257665547928,
+      "top4RateConfidence95": {
+        "low": 0.4196665578453543,
+        "high": 0.46057251854426134
+      },
+      "winRateConfidence95": {
+        "low": 0.09168514519931645,
+        "high": 0.11683214562651953
+      }
+    },
+    "robin": {
+      "cost": 2,
+      "finalBoards": 3400,
+      "top4Boards": 1338,
+      "winningBoards": 255,
+      "top4Rate": 0.3935294117647059,
+      "winRate": 0.075,
+      "averagePlacement": 5.055294117647059,
+      "winnerPresenceRate": 0.255,
+      "finalBoardPresenceRate": 0.425,
+      "battleBoardAppearances": 43778,
+      "top4RateDeltaVsCostBand": -0.08555563815315076,
+      "winRateDeltaVsCostBand": -0.035893466447617844,
+      "averagePlacementDeltaVsCostBand": 0.45015068279302106,
+      "top4RateConfidence95": {
+        "low": 0.3772370082786986,
+        "high": 0.41006214218705767
+      },
+      "winRateConfidence95": {
+        "low": 0.06661810098229874,
+        "high": 0.08434121510338514
+      }
+    },
+    "smoker": {
+      "cost": 2,
+      "finalBoards": 1392,
+      "top4Boards": 807,
+      "winningBoards": 210,
+      "top4Rate": 0.5797413793103449,
+      "winRate": 0.15086206896551724,
+      "averagePlacement": 4.0625,
+      "winnerPresenceRate": 0.21,
+      "finalBoardPresenceRate": 0.174,
+      "battleBoardAppearances": 23406,
+      "top4RateDeltaVsCostBand": 0.1006563293924882,
+      "winRateDeltaVsCostBand": 0.039968602517899396,
+      "averagePlacementDeltaVsCostBand": -0.5426434348540381,
+      "top4RateConfidence95": {
+        "low": 0.5536261330679216,
+        "high": 0.6054177011321767
+      },
+      "winRateConfidence95": {
+        "low": 0.1330217784309721,
+        "high": 0.17062413669292167
+      }
+    },
+    "sabo": {
+      "cost": 2,
+      "finalBoards": 2163,
+      "top4Boards": 1010,
+      "winningBoards": 242,
+      "top4Rate": 0.4669440591770689,
+      "winRate": 0.11188164586222839,
+      "averagePlacement": 4.640314378178456,
+      "winnerPresenceRate": 0.242,
+      "finalBoardPresenceRate": 0.270375,
+      "battleBoardAppearances": 31834,
+      "top4RateDeltaVsCostBand": -0.012140990740787783,
+      "winRateDeltaVsCostBand": 0.000988179414610546,
+      "averagePlacementDeltaVsCostBand": 0.035170943324417614,
+      "top4RateConfidence95": {
+        "low": 0.44599571423307494,
+        "high": 0.48800961407518717
+      },
+      "winRateConfidence95": {
+        "low": 0.09927927686459195,
+        "high": 0.12586020725828997
+      }
+    },
+    "franky": {
+      "cost": 2,
+      "finalBoards": 2141,
+      "top4Boards": 1275,
+      "winningBoards": 299,
+      "top4Rate": 0.5955161139654367,
+      "winRate": 0.1396543671181691,
+      "averagePlacement": 4.0728631480616535,
+      "winnerPresenceRate": 0.299,
+      "finalBoardPresenceRate": 0.267625,
+      "battleBoardAppearances": 34795,
+      "top4RateDeltaVsCostBand": 0.11643106404758002,
+      "winRateDeltaVsCostBand": 0.028760900670551245,
+      "averagePlacementDeltaVsCostBand": -0.5322802867923846,
+      "top4RateConfidence95": {
+        "low": 0.5745734070304264,
+        "high": 0.6161166653739879
+      },
+      "winRateConfidence95": {
+        "low": 0.12561585429450514,
+        "high": 0.15498370140228854
+      }
+    },
+    "brook": {
+      "cost": 2,
+      "finalBoards": 2219,
+      "top4Boards": 1238,
+      "winningBoards": 337,
+      "top4Rate": 0.5579089680036052,
+      "winRate": 0.15187021180712032,
+      "averagePlacement": 4.184767913474538,
+      "winnerPresenceRate": 0.337,
+      "finalBoardPresenceRate": 0.277375,
+      "battleBoardAppearances": 34411,
+      "top4RateDeltaVsCostBand": 0.07882391808574857,
+      "winRateDeltaVsCostBand": 0.04097674535950248,
+      "averagePlacementDeltaVsCostBand": -0.4203755213795004,
+      "top4RateConfidence95": {
+        "low": 0.5371624826339255,
+        "high": 0.5784552923798226
+      },
+      "winRateConfidence95": {
+        "low": 0.13753972175304702,
+        "high": 0.16740400433161862
+      }
+    },
+    "ivankov": {
+      "cost": 2,
+      "finalBoards": 2252,
+      "top4Boards": 920,
+      "winningBoards": 178,
+      "top4Rate": 0.40852575488454707,
+      "winRate": 0.07904085257548846,
+      "averagePlacement": 4.959591474245116,
+      "winnerPresenceRate": 0.178,
+      "finalBoardPresenceRate": 0.2815,
+      "battleBoardAppearances": 29556,
+      "top4RateDeltaVsCostBand": -0.0705592950333096,
+      "winRateDeltaVsCostBand": -0.031852613872129384,
+      "averagePlacementDeltaVsCostBand": 0.3544480393910776,
+      "top4RateConfidence95": {
+        "low": 0.3883957279680379,
+        "high": 0.4289673351122777
+      },
+      "winRateConfidence95": {
+        "low": 0.06860076153318025,
+        "high": 0.09091469380730112
+      }
+    },
+    "luffy": {
+      "cost": 3,
+      "finalBoards": 687,
+      "top4Boards": 522,
+      "winningBoards": 179,
+      "top4Rate": 0.759825327510917,
+      "winRate": 0.26055312954876275,
+      "averagePlacement": 3.141193595342067,
+      "winnerPresenceRate": 0.179,
+      "finalBoardPresenceRate": 0.085875,
+      "battleBoardAppearances": 7514,
+      "top4RateDeltaVsCostBand": 0.13934396837925112,
+      "winRateDeltaVsCostBand": 0.09405950047844658,
+      "averagePlacementDeltaVsCostBand": -0.7316709634120624,
+      "top4RateConfidence95": {
+        "low": 0.7264920424095214,
+        "high": 0.7902689632971414
+      },
+      "winRateConfidence95": {
+        "low": 0.2291258707105573,
+        "high": 0.29464339854016525
+      }
+    },
+    "zoro": {
+      "cost": 3,
+      "finalBoards": 2377,
+      "top4Boards": 1443,
+      "winningBoards": 355,
+      "top4Rate": 0.6070677324358436,
+      "winRate": 0.14934791754312157,
+      "averagePlacement": 3.941943626419857,
+      "winnerPresenceRate": 0.355,
+      "finalBoardPresenceRate": 0.297125,
+      "battleBoardAppearances": 25078,
+      "top4RateDeltaVsCostBand": -0.013413626695822356,
+      "winRateDeltaVsCostBand": -0.0171457115271946,
+      "averagePlacementDeltaVsCostBand": 0.06907906766572758,
+      "top4RateConfidence95": {
+        "low": 0.5872756026056822,
+        "high": 0.6265143446129822
+      },
+      "winRateConfidence95": {
+        "low": 0.13558506252572333,
+        "high": 0.16424235984458474
+      }
+    },
+    "kid": {
+      "cost": 3,
+      "finalBoards": 1024,
+      "top4Boards": 669,
+      "winningBoards": 173,
+      "top4Rate": 0.6533203125,
+      "winRate": 0.1689453125,
+      "averagePlacement": 3.7177734375,
+      "winnerPresenceRate": 0.173,
+      "finalBoardPresenceRate": 0.128,
+      "battleBoardAppearances": 10299,
+      "top4RateDeltaVsCostBand": 0.03283895336833409,
+      "winRateDeltaVsCostBand": 0.0024516834296838264,
+      "averagePlacementDeltaVsCostBand": -0.1550911212541295,
+      "top4RateConfidence95": {
+        "low": 0.6236465021415242,
+        "high": 0.6818480409865221
+      },
+      "winRateConfidence95": {
+        "low": 0.14724158435129578,
+        "high": 0.19312370150598027
+      }
+    },
+    "crocodile": {
+      "cost": 3,
+      "finalBoards": 2048,
+      "top4Boards": 1069,
+      "winningBoards": 284,
+      "top4Rate": 0.52197265625,
+      "winRate": 0.138671875,
+      "averagePlacement": 4.34814453125,
+      "winnerPresenceRate": 0.284,
+      "finalBoardPresenceRate": 0.256,
+      "battleBoardAppearances": 19107,
+      "top4RateDeltaVsCostBand": -0.09850870288166591,
+      "winRateDeltaVsCostBand": -0.027821754070316174,
+      "averagePlacementDeltaVsCostBand": 0.4752799724958705,
+      "top4RateConfidence95": {
+        "low": 0.5003175154425351,
+        "high": 0.5435455195987663
+      },
+      "winRateConfidence95": {
+        "low": 0.1243789023185044,
+        "high": 0.1543178547800942
+      }
+    },
+    "jinbe": {
+      "cost": 3,
+      "finalBoards": 2451,
+      "top4Boards": 1593,
+      "winningBoards": 416,
+      "top4Rate": 0.6499388004895961,
+      "winRate": 0.1697266421868625,
+      "averagePlacement": 3.7494900040799672,
+      "winnerPresenceRate": 0.416,
+      "finalBoardPresenceRate": 0.306375,
+      "battleBoardAppearances": 26163,
+      "top4RateDeltaVsCostBand": 0.02945744135793016,
+      "winRateDeltaVsCostBand": 0.003233013116546335,
+      "averagePlacementDeltaVsCostBand": -0.12337455467416225,
+      "top4RateConfidence95": {
+        "low": 0.630833541836913,
+        "high": 0.6685747784392303
+      },
+      "winRateConfidence95": {
+        "low": 0.15538438024439816,
+        "high": 0.18510259863032846
+      }
+    },
+    "kuma": {
+      "cost": 3,
+      "finalBoards": 2008,
+      "top4Boards": 1278,
+      "winningBoards": 357,
+      "top4Rate": 0.6364541832669323,
+      "winRate": 0.17778884462151395,
+      "averagePlacement": 3.7863545816733066,
+      "winnerPresenceRate": 0.357,
+      "finalBoardPresenceRate": 0.251,
+      "battleBoardAppearances": 21868,
+      "top4RateDeltaVsCostBand": 0.01597282413526635,
+      "winRateDeltaVsCostBand": 0.01129521555119778,
+      "averagePlacementDeltaVsCostBand": -0.08650997708082286,
+      "top4RateConfidence95": {
+        "low": 0.6151725124787429,
+        "high": 0.6572147370939868
+      },
+      "winRateConfidence95": {
+        "low": 0.16168560138044394,
+        "high": 0.19512260857008099
+      }
+    },
+    "law": {
+      "cost": 4,
+      "finalBoards": 682,
+      "top4Boards": 564,
+      "winningBoards": 189,
+      "top4Rate": 0.8269794721407625,
+      "winRate": 0.27712609970674484,
+      "averagePlacement": 2.875366568914956,
+      "winnerPresenceRate": 0.189,
+      "finalBoardPresenceRate": 0.08525,
+      "battleBoardAppearances": 4474,
+      "top4RateDeltaVsCostBand": 0.06268976817502059,
+      "winRateDeltaVsCostBand": 0.00678538103238252,
+      "averagePlacementDeltaVsCostBand": -0.219774000811352,
+      "top4RateConfidence95": {
+        "low": 0.7967787509542167,
+        "high": 0.8535171774350793
+      },
+      "winRateConfidence95": {
+        "low": 0.24485359263621187,
+        "high": 0.3118953709728781
+      }
+    },
+    "ace": {
+      "cost": 4,
+      "finalBoards": 748,
+      "top4Boards": 581,
+      "winningBoards": 217,
+      "top4Rate": 0.7767379679144385,
+      "winRate": 0.29010695187165775,
+      "averagePlacement": 3.0427807486631018,
+      "winnerPresenceRate": 0.217,
+      "finalBoardPresenceRate": 0.0935,
+      "battleBoardAppearances": 5067,
+      "top4RateDeltaVsCostBand": 0.01244826394869658,
+      "winRateDeltaVsCostBand": 0.019766233197295424,
+      "averagePlacementDeltaVsCostBand": -0.05235982106320636,
+      "top4RateConfidence95": {
+        "low": 0.7455232119032233,
+        "high": 0.8051246905272886
+      },
+      "winRateConfidence95": {
+        "low": 0.2587226228456247,
+        "high": 0.3236362144413783
+      }
+    },
+    "hancock": {
+      "cost": 4,
+      "finalBoards": 560,
+      "top4Boards": 415,
+      "winningBoards": 166,
+      "top4Rate": 0.7410714285714286,
+      "winRate": 0.29642857142857143,
+      "averagePlacement": 3.148214285714286,
+      "winnerPresenceRate": 0.166,
+      "finalBoardPresenceRate": 0.07,
+      "battleBoardAppearances": 3721,
+      "top4RateDeltaVsCostBand": -0.023218275394313315,
+      "winRateDeltaVsCostBand": 0.026087852754209107,
+      "averagePlacementDeltaVsCostBand": 0.05307371598797772,
+      "top4RateConfidence95": {
+        "low": 0.7032342310993253,
+        "high": 0.7756236609043864
+      },
+      "winRateConfidence95": {
+        "low": 0.26009436358884325,
+        "high": 0.33553674983024456
+      }
+    },
+    "doflamingo": {
+      "cost": 4,
+      "finalBoards": 559,
+      "top4Boards": 390,
+      "winningBoards": 131,
+      "top4Rate": 0.6976744186046512,
+      "winRate": 0.23434704830053668,
+      "averagePlacement": 3.3989266547406083,
+      "winnerPresenceRate": 0.131,
+      "finalBoardPresenceRate": 0.069875,
+      "battleBoardAppearances": 3512,
+      "top4RateDeltaVsCostBand": -0.06661528536109074,
+      "winRateDeltaVsCostBand": -0.03599367037382564,
+      "averagePlacementDeltaVsCostBand": 0.30378608501430016,
+      "top4RateConfidence95": {
+        "low": 0.6583586607308494,
+        "high": 0.7342917759106498
+      },
+      "winRateConfidence95": {
+        "low": 0.20111806822710848,
+        "high": 0.2712023856981167
+      }
+    },
+    "kizaru": {
+      "cost": 4,
+      "finalBoards": 846,
+      "top4Boards": 684,
+      "winningBoards": 251,
+      "top4Rate": 0.8085106382978723,
+      "winRate": 0.2966903073286052,
+      "averagePlacement": 2.8747044917257685,
+      "winnerPresenceRate": 0.251,
+      "finalBoardPresenceRate": 0.10575,
+      "battleBoardAppearances": 5842,
+      "top4RateDeltaVsCostBand": 0.04422093433213037,
+      "winRateDeltaVsCostBand": 0.02634958865424286,
+      "averagePlacementDeltaVsCostBand": -0.22043607800053966,
+      "top4RateConfidence95": {
+        "low": 0.7806246572059998,
+        "high": 0.8336074538132772
+      },
+      "winRateConfidence95": {
+        "low": 0.2668833151583702,
+        "high": 0.3283353703001906
+      }
+    },
+    "kuzan": {
+      "cost": 4,
+      "finalBoards": 917,
+      "top4Boards": 683,
+      "winningBoards": 229,
+      "top4Rate": 0.7448200654307524,
+      "winRate": 0.24972737186477645,
+      "averagePlacement": 3.19629225736096,
+      "winnerPresenceRate": 0.229,
+      "finalBoardPresenceRate": 0.114625,
+      "battleBoardAppearances": 5972,
+      "top4RateDeltaVsCostBand": -0.01946963853498951,
+      "winRateDeltaVsCostBand": -0.020613346809585875,
+      "averagePlacementDeltaVsCostBand": 0.10115168763465165,
+      "top4RateConfidence95": {
+        "low": 0.7156215028701903,
+        "high": 0.7719759297392833
+      },
+      "winRateConfidence95": {
+        "low": 0.22279397063650128,
+        "high": 0.2787489657382237
+      }
+    },
+    "akainu": {
+      "cost": 4,
+      "finalBoards": 1059,
+      "top4Boards": 788,
+      "winningBoards": 269,
+      "top4Rate": 0.7440982058545798,
+      "winRate": 0.25401322001888577,
+      "averagePlacement": 3.1737488196411707,
+      "winnerPresenceRate": 0.269,
+      "finalBoardPresenceRate": 0.132375,
+      "battleBoardAppearances": 7153,
+      "top4RateDeltaVsCostBand": -0.020191498111162165,
+      "winRateDeltaVsCostBand": -0.016327498655476558,
+      "averagePlacementDeltaVsCostBand": 0.0786082499148626,
+      "top4RateConfidence95": {
+        "low": 0.7169665421980036,
+        "high": 0.7694653023967128
+      },
+      "winRateConfidence95": {
+        "low": 0.22871651985856079,
+        "high": 0.28108813965043844
+      }
+    },
+    "garp": {
+      "cost": 5,
+      "finalBoards": 497,
+      "top4Boards": 472,
+      "winningBoards": 254,
+      "top4Rate": 0.9496981891348089,
+      "winRate": 0.5110663983903421,
+      "averagePlacement": 1.8712273641851107,
+      "winnerPresenceRate": 0.254,
+      "finalBoardPresenceRate": 0.062125,
+      "battleBoardAppearances": 2695,
+      "top4RateDeltaVsCostBand": -0.001094137804307116,
+      "winRateDeltaVsCostBand": -0.02771592020849034,
+      "averagePlacementDeltaVsCostBand": 0.038033035577938135,
+      "top4RateConfidence95": {
+        "low": 0.9267984419988841,
+        "high": 0.9656993057920343
+      },
+      "winRateConfidence95": {
+        "low": 0.4672020663504183,
+        "high": 0.5547609654744142
+      }
+    },
+    "mihawk": {
+      "cost": 5,
+      "finalBoards": 266,
+      "top4Boards": 254,
+      "winningBoards": 139,
+      "top4Rate": 0.9548872180451128,
+      "winRate": 0.5225563909774437,
+      "averagePlacement": 1.8421052631578947,
+      "winnerPresenceRate": 0.139,
+      "finalBoardPresenceRate": 0.03325,
+      "battleBoardAppearances": 1286,
+      "top4RateDeltaVsCostBand": 0.004094891105996812,
+      "winRateDeltaVsCostBand": -0.016225927621388747,
+      "averagePlacementDeltaVsCostBand": 0.008910934550722116,
+      "top4RateConfidence95": {
+        "low": 0.9228140847298499,
+        "high": 0.974008347393292
+      },
+      "winRateConfidence95": {
+        "low": 0.46263673691545143,
+        "high": 0.5818337969088366
+      }
+    },
+    "shanks": {
+      "cost": 5,
+      "finalBoards": 244,
+      "top4Boards": 234,
+      "winningBoards": 148,
+      "top4Rate": 0.9590163934426229,
+      "winRate": 0.6065573770491803,
+      "averagePlacement": 1.6844262295081966,
+      "winnerPresenceRate": 0.148,
+      "finalBoardPresenceRate": 0.0305,
+      "battleBoardAppearances": 1209,
+      "top4RateDeltaVsCostBand": 0.008224066503506933,
+      "winRateDeltaVsCostBand": 0.06777505845034792,
+      "averagePlacementDeltaVsCostBand": -0.14876809909897593,
+      "top4RateConfidence95": {
+        "low": 0.9262141634020744,
+        "high": 0.9775889108195253
+      },
+      "winRateConfidence95": {
+        "low": 0.5440634031482849,
+        "high": 0.665748024796015
+      }
+    },
+    "blackbeard": {
+      "cost": 5,
+      "finalBoards": 192,
+      "top4Boards": 180,
+      "winningBoards": 105,
+      "top4Rate": 0.9375,
+      "winRate": 0.546875,
+      "averagePlacement": 1.9114583333333333,
+      "winnerPresenceRate": 0.105,
+      "finalBoardPresenceRate": 0.024,
+      "battleBoardAppearances": 1046,
+      "top4RateDeltaVsCostBand": -0.013292326939115973,
+      "winRateDeltaVsCostBand": 0.00809268140116759,
+      "averagePlacementDeltaVsCostBand": 0.07826400472616069,
+      "top4RateConfidence95": {
+        "low": 0.8939464188171837,
+        "high": 0.9638897099726136
+      },
+      "winRateConfidence95": {
+        "low": 0.47622956171841735,
+        "high": 0.6156814520804894
+      }
+    }
+  },
+  "costBands": {
+    "1": {
+      "cost": 1,
+      "unitIds": [
+        "nami",
+        "usopp",
+        "chopper",
+        "tashigi",
+        "koby",
+        "koala"
+      ],
+      "unitCount": 6,
+      "finalBoards": 12568,
+      "finalBoardRepresentationRate": 0.27586206896551724,
+      "finalBoardPlayerPresence": 7243,
+      "finalBoardPlayerPresenceRate": 0.905375,
+      "top4Boards": 5538,
+      "winningBoards": 1260,
+      "top4Rate": 0.44064290260980266,
+      "winRate": 0.10025461489497135,
+      "averagePlacement": 4.835852959898154
+    },
+    "2": {
+      "cost": 2,
+      "unitIds": [
+        "sanji",
+        "robin",
+        "smoker",
+        "sabo",
+        "franky",
+        "brook",
+        "ivankov"
+      ],
+      "unitCount": 7,
+      "finalBoards": 15826,
+      "finalBoardRepresentationRate": 0.34737373515661013,
+      "finalBoardPlayerPresence": 7696,
+      "finalBoardPlayerPresenceRate": 0.962,
+      "top4Boards": 7582,
+      "winningBoards": 1755,
+      "top4Rate": 0.47908504991785666,
+      "winRate": 0.11089346644761784,
+      "averagePlacement": 4.605143434854038
+    },
+    "3": {
+      "cost": 3,
+      "unitIds": [
+        "luffy",
+        "zoro",
+        "kid",
+        "crocodile",
+        "jinbe",
+        "kuma"
+      ],
+      "unitCount": 6,
+      "finalBoards": 10595,
+      "finalBoardRepresentationRate": 0.23255558726047543,
+      "finalBoardPlayerPresence": 6543,
+      "finalBoardPlayerPresenceRate": 0.817875,
+      "top4Boards": 6574,
+      "winningBoards": 1764,
+      "top4Rate": 0.6204813591316659,
+      "winRate": 0.16649362907031617,
+      "averagePlacement": 3.8728645587541295
+    },
+    "4": {
+      "cost": 4,
+      "unitIds": [
+        "law",
+        "ace",
+        "hancock",
+        "doflamingo",
+        "kizaru",
+        "kuzan",
+        "akainu"
+      ],
+      "unitCount": 7,
+      "finalBoards": 5371,
+      "finalBoardRepresentationRate": 0.11789108628372001,
+      "finalBoardPlayerPresence": 3700,
+      "finalBoardPlayerPresenceRate": 0.4625,
+      "top4Boards": 4105,
+      "winningBoards": 1452,
+      "top4Rate": 0.7642897039657419,
+      "winRate": 0.2703407186743623,
+      "averagePlacement": 3.095140569726308
+    },
+    "5": {
+      "cost": 5,
+      "unitIds": [
+        "garp",
+        "mihawk",
+        "shanks",
+        "blackbeard"
+      ],
+      "unitCount": 4,
+      "finalBoards": 1199,
+      "finalBoardRepresentationRate": 0.02631752233367721,
+      "finalBoardPlayerPresence": 1049,
+      "finalBoardPlayerPresenceRate": 0.131125,
+      "top4Boards": 1140,
+      "winningBoards": 646,
+      "top4Rate": 0.950792326939116,
+      "winRate": 0.5387823185988324,
+      "averagePlacement": 1.8331943286071726
+    }
+  },
+  "shopPoolAvailability": {
+    "preparationSnapshots": 38776,
+    "shopSlots": 1428006,
+    "emptyShopSlots": 0,
+    "emptyShopSlotRate": 0,
+    "byCost": {
+      "1": {
+        "cost": 1,
+        "unitIds": [
+          "nami",
+          "usopp",
+          "chopper",
+          "tashigi",
+          "koby",
+          "koala"
+        ],
+        "initialCopiesPerUnit": 27,
+        "eligiblePlayerPreparations": 238001,
+        "eligibleShopSlots": 1428006,
+        "shopOffers": 470231,
+        "playerPreparationsWithOffer": 189137,
+        "poolDefinitionObservations": 232656,
+        "totalAvailablePoolCopies": 2213382,
+        "zeroAvailablePoolDefinitions": 26535,
+        "finalCrewUnitInstances": 40086,
+        "finalCrewTwoStarOrHigherInstances": 37655,
+        "offerRatePerEligibleSlot": 0.32929203378697286,
+        "playerPreparationOfferRate": 0.7946899382775703,
+        "averageAvailablePoolCopiesPerDefinition": 9.51353930266144,
+        "zeroAvailabilityRate": 0.11405250670517846
+      },
+      "2": {
+        "cost": 2,
+        "unitIds": [
+          "sanji",
+          "robin",
+          "smoker",
+          "sabo",
+          "franky",
+          "brook",
+          "ivankov"
+        ],
+        "initialCopiesPerUnit": 22,
+        "eligiblePlayerPreparations": 230001,
+        "eligibleShopSlots": 1380006,
+        "shopOffers": 496197,
+        "playerPreparationsWithOffer": 211870,
+        "poolDefinitionObservations": 271432,
+        "totalAvailablePoolCopies": 3121079,
+        "zeroAvailablePoolDefinitions": 4057,
+        "finalCrewUnitInstances": 34884,
+        "finalCrewTwoStarOrHigherInstances": 27716,
+        "offerRatePerEligibleSlot": 0.3595614801674775,
+        "playerPreparationOfferRate": 0.9211699079569219,
+        "averageAvailablePoolCopiesPerDefinition": 11.498566860208081,
+        "zeroAvailabilityRate": 0.014946653305431932
+      },
+      "3": {
+        "cost": 3,
+        "unitIds": [
+          "luffy",
+          "zoro",
+          "kid",
+          "crocodile",
+          "jinbe",
+          "kuma"
+        ],
+        "initialCopiesPerUnit": 18,
+        "eligiblePlayerPreparations": 206001,
+        "eligibleShopSlots": 1236006,
+        "shopOffers": 334392,
+        "playerPreparationsWithOffer": 166073,
+        "poolDefinitionObservations": 232656,
+        "totalAvailablePoolCopies": 2817866,
+        "zeroAvailablePoolDefinitions": 930,
+        "finalCrewUnitInstances": 24713,
+        "finalCrewTwoStarOrHigherInstances": 15580,
+        "offerRatePerEligibleSlot": 0.27054237600788344,
+        "playerPreparationOfferRate": 0.8061756981762225,
+        "averageAvailablePoolCopiesPerDefinition": 12.111727185200468,
+        "zeroAvailabilityRate": 0.003997317928615639
+      },
+      "4": {
+        "cost": 4,
+        "unitIds": [
+          "law",
+          "ace",
+          "hancock",
+          "doflamingo",
+          "kizaru",
+          "kuzan",
+          "akainu"
+        ],
+        "initialCopiesPerUnit": 14,
+        "eligiblePlayerPreparations": 170411,
+        "eligibleShopSlots": 1022466,
+        "shopOffers": 112469,
+        "playerPreparationsWithOffer": 75899,
+        "poolDefinitionObservations": 271432,
+        "totalAvailablePoolCopies": 3355807,
+        "zeroAvailablePoolDefinitions": 0,
+        "finalCrewUnitInstances": 18686,
+        "finalCrewTwoStarOrHigherInstances": 6370,
+        "offerRatePerEligibleSlot": 0.1099977896575534,
+        "playerPreparationOfferRate": 0.44538791509937736,
+        "averageAvailablePoolCopiesPerDefinition": 12.363343305137198,
+        "zeroAvailabilityRate": 0
+      },
+      "5": {
+        "cost": 5,
+        "unitIds": [
+          "garp",
+          "mihawk",
+          "shanks",
+          "blackbeard"
+        ],
+        "initialCopiesPerUnit": 10,
+        "eligiblePlayerPreparations": 85348,
+        "eligibleShopSlots": 512088,
+        "shopOffers": 14717,
+        "playerPreparationsWithOffer": 12903,
+        "poolDefinitionObservations": 155104,
+        "totalAvailablePoolCopies": 1486784,
+        "zeroAvailablePoolDefinitions": 24,
+        "finalCrewUnitInstances": 5569,
+        "finalCrewTwoStarOrHigherInstances": 1066,
+        "offerRatePerEligibleSlot": 0.028739201074815268,
+        "playerPreparationOfferRate": 0.1511810470075456,
+        "averageAvailablePoolCopiesPerDefinition": 9.58572312770786,
+        "zeroAvailabilityRate": 0.00015473488755931504
+      }
+    }
+  },
+  "characterCombatExpression": {
+    "nami": {
+      "battleBoardAppearances": 53135,
+      "casts": 81562,
+      "castTargets": 121046,
+      "abilityDamageEvents": 120822,
+      "totalAbilityDamage": 23404009,
+      "kills": 39952,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 16013,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 2,
+        "pull": 0
+      },
+      "heals": {
+        "events": 0,
+        "amount": 0
+      },
+      "shields": {
+        "events": 1524,
+        "amount": 83922
+      },
+      "castsPerBattleBoardAppearance": 1.5349957655029642,
+      "averageTargetsPerCast": 1.4840979868075819,
+      "abilityDamagePerCast": 286.94746327946837,
+      "controlEventsPerCast": 0.000024521223118609157
+    },
+    "usopp": {
+      "battleBoardAppearances": 47998,
+      "casts": 69675,
+      "castTargets": 102511,
+      "abilityDamageEvents": 102261,
+      "totalAbilityDamage": 18452755,
+      "kills": 53673,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 433,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 72976,
+        "pull": 0
+      },
+      "heals": {
+        "events": 47,
+        "amount": 2186
+      },
+      "shields": {
+        "events": 21800,
+        "amount": 2028072
+      },
+      "castsPerBattleBoardAppearance": 1.4516229842910122,
+      "averageTargetsPerCast": 1.4712737710800143,
+      "abilityDamagePerCast": 264.8404018658055,
+      "controlEventsPerCast": 1.0473771080014351
+    },
+    "chopper": {
+      "battleBoardAppearances": 43513,
+      "casts": 62853,
+      "castTargets": 77168,
+      "abilityDamageEvents": 45698,
+      "totalAbilityDamage": 12114737,
+      "kills": 27707,
+      "stunsApplied": 35932,
+      "stunDurationTicks": 215592,
+      "burnsApplied": 935,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 220,
+        "pull": 0
+      },
+      "heals": {
+        "events": 33271,
+        "amount": 11768489
+      },
+      "shields": {
+        "events": 53243,
+        "amount": 6267453
+      },
+      "castsPerBattleBoardAppearance": 1.4444648725668192,
+      "averageTargetsPerCast": 1.2277536473994877,
+      "abilityDamagePerCast": 192.74715606255867,
+      "controlEventsPerCast": 0.5751833643581055
+    },
+    "tashigi": {
+      "battleBoardAppearances": 41709,
+      "casts": 47180,
+      "castTargets": 47180,
+      "abilityDamageEvents": 46881,
+      "totalAbilityDamage": 10395150,
+      "kills": 32670,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 2410,
+      "displacements": {
+        "lunge": 46897,
+        "knockback": 19,
+        "pull": 0
+      },
+      "heals": {
+        "events": 3710,
+        "amount": 224827
+      },
+      "shields": {
+        "events": 24635,
+        "amount": 2470761
+      },
+      "castsPerBattleBoardAppearance": 1.1311707305377736,
+      "averageTargetsPerCast": 1,
+      "abilityDamagePerCast": 220.3295888088173,
+      "controlEventsPerCast": 0.994404408647732
+    },
+    "koby": {
+      "battleBoardAppearances": 37849,
+      "casts": 44349,
+      "castTargets": 44349,
+      "abilityDamageEvents": 44073,
+      "totalAbilityDamage": 8203959,
+      "kills": 21321,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 2423,
+      "displacements": {
+        "lunge": 44085,
+        "knockback": 10467,
+        "pull": 0
+      },
+      "heals": {
+        "events": 5646,
+        "amount": 360851
+      },
+      "shields": {
+        "events": 6699,
+        "amount": 393090
+      },
+      "castsPerBattleBoardAppearance": 1.171735052445243,
+      "averageTargetsPerCast": 1,
+      "abilityDamagePerCast": 184.98633565582088,
+      "controlEventsPerCast": 1.2300615571940743
+    },
+    "koala": {
+      "battleBoardAppearances": 37675,
+      "casts": 41921,
+      "castTargets": 62701,
+      "abilityDamageEvents": 62639,
+      "totalAbilityDamage": 9829503,
+      "kills": 16532,
+      "stunsApplied": 56296,
+      "stunDurationTicks": 168888,
+      "burnsApplied": 2137,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 8028,
+        "pull": 0
+      },
+      "heals": {
+        "events": 4829,
+        "amount": 269463
+      },
+      "shields": {
+        "events": 530,
+        "amount": 41919
+      },
+      "castsPerBattleBoardAppearance": 1.1127007299270073,
+      "averageTargetsPerCast": 1.4956942821020491,
+      "abilityDamagePerCast": 234.47682545740798,
+      "controlEventsPerCast": 1.5344099615944276
+    },
+    "sanji": {
+      "battleBoardAppearances": 33771,
+      "casts": 46877,
+      "castTargets": 46877,
+      "abilityDamageEvents": 46780,
+      "totalAbilityDamage": 11155518,
+      "kills": 25886,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 40459,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 33417,
+        "pull": 0
+      },
+      "heals": {
+        "events": 6814,
+        "amount": 367122
+      },
+      "shields": {
+        "events": 767,
+        "amount": 85388
+      },
+      "castsPerBattleBoardAppearance": 1.3880844511563175,
+      "averageTargetsPerCast": 1,
+      "abilityDamagePerCast": 237.97423043283487,
+      "controlEventsPerCast": 0.7128655844017322
+    },
+    "robin": {
+      "battleBoardAppearances": 43778,
+      "casts": 75175,
+      "castTargets": 79748,
+      "abilityDamageEvents": 79381,
+      "totalAbilityDamage": 19505079,
+      "kills": 40914,
+      "stunsApplied": 60062,
+      "stunDurationTicks": 737166,
+      "burnsApplied": 9418,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 1,
+        "pull": 0
+      },
+      "heals": {
+        "events": 0,
+        "amount": 0
+      },
+      "shields": {
+        "events": 1589,
+        "amount": 83171
+      },
+      "castsPerBattleBoardAppearance": 1.7171867147882498,
+      "averageTargetsPerCast": 1.0608313934153641,
+      "abilityDamagePerCast": 259.46230794812107,
+      "controlEventsPerCast": 0.7989757233122714
+    },
+    "smoker": {
+      "battleBoardAppearances": 23406,
+      "casts": 35524,
+      "castTargets": 45338,
+      "abilityDamageEvents": 45266,
+      "totalAbilityDamage": 9063621,
+      "kills": 17392,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 358,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 25284,
+        "pull": 0
+      },
+      "heals": {
+        "events": 747,
+        "amount": 70237
+      },
+      "shields": {
+        "events": 28743,
+        "amount": 2565089
+      },
+      "castsPerBattleBoardAppearance": 1.5177304964539007,
+      "averageTargetsPerCast": 1.2762639342416395,
+      "abilityDamagePerCast": 255.14077806553317,
+      "controlEventsPerCast": 0.7117441729534962
+    },
+    "sabo": {
+      "battleBoardAppearances": 31834,
+      "casts": 52122,
+      "castTargets": 83747,
+      "abilityDamageEvents": 83636,
+      "totalAbilityDamage": 17121839,
+      "kills": 28398,
+      "stunsApplied": 72769,
+      "stunDurationTicks": 436614,
+      "burnsApplied": 1737,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 12532,
+        "pull": 0
+      },
+      "heals": {
+        "events": 14552,
+        "amount": 1399800
+      },
+      "shields": {
+        "events": 7588,
+        "amount": 3315265
+      },
+      "castsPerBattleBoardAppearance": 1.637306025004712,
+      "averageTargetsPerCast": 1.6067495491347223,
+      "abilityDamagePerCast": 328.49543378995435,
+      "controlEventsPerCast": 1.6365642147269868
+    },
+    "franky": {
+      "battleBoardAppearances": 34795,
+      "casts": 58366,
+      "castTargets": 91339,
+      "abilityDamageEvents": 91139,
+      "totalAbilityDamage": 19508504,
+      "kills": 30599,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 642,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 61115,
+        "pull": 0
+      },
+      "heals": {
+        "events": 2407,
+        "amount": 251957
+      },
+      "shields": {
+        "events": 34511,
+        "amount": 3182187
+      },
+      "castsPerBattleBoardAppearance": 1.6774249173731859,
+      "averageTargetsPerCast": 1.5649350649350648,
+      "abilityDamagePerCast": 334.244320323476,
+      "controlEventsPerCast": 1.047099338656067
+    },
+    "brook": {
+      "battleBoardAppearances": 34411,
+      "casts": 50072,
+      "castTargets": 63135,
+      "abilityDamageEvents": 62978,
+      "totalAbilityDamage": 14639326,
+      "kills": 42177,
+      "stunsApplied": 52360,
+      "stunDurationTicks": 209440,
+      "burnsApplied": 1865,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 18,
+        "pull": 0
+      },
+      "heals": {
+        "events": 5182,
+        "amount": 324746
+      },
+      "shields": {
+        "events": 15999,
+        "amount": 2266385
+      },
+      "castsPerBattleBoardAppearance": 1.4551160965970185,
+      "averageTargetsPerCast": 1.2608843265697396,
+      "abilityDamagePerCast": 292.3655136603291,
+      "controlEventsPerCast": 1.0460536826969165
+    },
+    "ivankov": {
+      "battleBoardAppearances": 29556,
+      "casts": 60916,
+      "castTargets": 60916,
+      "abilityDamageEvents": 0,
+      "totalAbilityDamage": 0,
+      "kills": 21153,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 2461,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 9,
+        "pull": 0
+      },
+      "heals": {
+        "events": 59676,
+        "amount": 33926990
+      },
+      "shields": {
+        "events": 51125,
+        "amount": 13807093
+      },
+      "castsPerBattleBoardAppearance": 2.0610366761402084,
+      "averageTargetsPerCast": 1,
+      "abilityDamagePerCast": 0,
+      "controlEventsPerCast": 0.00014774443495961653
+    },
+    "luffy": {
+      "battleBoardAppearances": 7514,
+      "casts": 14420,
+      "castTargets": 23576,
+      "abilityDamageEvents": 68211,
+      "totalAbilityDamage": 5151859,
+      "kills": 8901,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 819,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 17171,
+        "pull": 0
+      },
+      "heals": {
+        "events": 3997,
+        "amount": 412074
+      },
+      "shields": {
+        "events": 3104,
+        "amount": 1793753
+      },
+      "castsPerBattleBoardAppearance": 1.9190843758317806,
+      "averageTargetsPerCast": 1.6349514563106795,
+      "abilityDamagePerCast": 357.27177531206655,
+      "controlEventsPerCast": 1.1907766990291262
+    },
+    "zoro": {
+      "battleBoardAppearances": 25078,
+      "casts": 34449,
+      "castTargets": 34449,
+      "abilityDamageEvents": 97902,
+      "totalAbilityDamage": 12010033,
+      "kills": 29669,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 1509,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 8,
+        "pull": 0
+      },
+      "heals": {
+        "events": 8894,
+        "amount": 557297
+      },
+      "shields": {
+        "events": 12500,
+        "amount": 2396853
+      },
+      "castsPerBattleBoardAppearance": 1.3736741366935161,
+      "averageTargetsPerCast": 1,
+      "abilityDamagePerCast": 348.63226799036255,
+      "controlEventsPerCast": 0.0002322273505762141
+    },
+    "kid": {
+      "battleBoardAppearances": 10299,
+      "casts": 13739,
+      "castTargets": 22193,
+      "abilityDamageEvents": 22130,
+      "totalAbilityDamage": 5861733,
+      "kills": 9040,
+      "stunsApplied": 18454,
+      "stunDurationTicks": 147632,
+      "burnsApplied": 6,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 4,
+        "pull": 10541
+      },
+      "heals": {
+        "events": 7,
+        "amount": 578
+      },
+      "shields": {
+        "events": 85,
+        "amount": 5990
+      },
+      "castsPerBattleBoardAppearance": 1.334013010971939,
+      "averageTargetsPerCast": 1.6153286265375937,
+      "abilityDamagePerCast": 426.6491738845622,
+      "controlEventsPerCast": 2.1107067472159544
+    },
+    "crocodile": {
+      "battleBoardAppearances": 19107,
+      "casts": 35572,
+      "castTargets": 52369,
+      "abilityDamageEvents": 52211,
+      "totalAbilityDamage": 20565986,
+      "kills": 31431,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 2047,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 0,
+        "pull": 0
+      },
+      "heals": {
+        "events": 52955,
+        "amount": 1196082
+      },
+      "shields": {
+        "events": 7073,
+        "amount": 721762
+      },
+      "castsPerBattleBoardAppearance": 1.861726068979955,
+      "averageTargetsPerCast": 1.472197233779377,
+      "abilityDamagePerCast": 578.1509614303385,
+      "controlEventsPerCast": 0
+    },
+    "jinbe": {
+      "battleBoardAppearances": 26163,
+      "casts": 44907,
+      "castTargets": 76225,
+      "abilityDamageEvents": 76081,
+      "totalAbilityDamage": 18971882,
+      "kills": 20286,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 148,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 46699,
+        "pull": 0
+      },
+      "heals": {
+        "events": 931,
+        "amount": 106893
+      },
+      "shields": {
+        "events": 28828,
+        "amount": 2823333
+      },
+      "castsPerBattleBoardAppearance": 1.7164316018805184,
+      "averageTargetsPerCast": 1.697396842363106,
+      "abilityDamagePerCast": 422.47048344356114,
+      "controlEventsPerCast": 1.0399046919188546
+    },
+    "kuma": {
+      "battleBoardAppearances": 21868,
+      "casts": 37900,
+      "castTargets": 201061,
+      "abilityDamageEvents": 200620,
+      "totalAbilityDamage": 30693562,
+      "kills": 20866,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 354,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 134103,
+        "pull": 0
+      },
+      "heals": {
+        "events": 846,
+        "amount": 70241
+      },
+      "shields": {
+        "events": 18543,
+        "amount": 1852495
+      },
+      "castsPerBattleBoardAppearance": 1.7331260289006767,
+      "averageTargetsPerCast": 5.3050395778364114,
+      "abilityDamagePerCast": 809.8565171503958,
+      "controlEventsPerCast": 3.5383377308707122
+    },
+    "law": {
+      "battleBoardAppearances": 4474,
+      "casts": 5121,
+      "castTargets": 27638,
+      "abilityDamageEvents": 27527,
+      "totalAbilityDamage": 4916600,
+      "kills": 3383,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 0,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 0,
+        "pull": 20950
+      },
+      "heals": {
+        "events": 17471,
+        "amount": 273414
+      },
+      "shields": {
+        "events": 34,
+        "amount": 3962
+      },
+      "castsPerBattleBoardAppearance": 1.1446133214126062,
+      "averageTargetsPerCast": 5.396992774848663,
+      "abilityDamagePerCast": 960.0859207186096,
+      "controlEventsPerCast": 4.090997851982035
+    },
+    "ace": {
+      "battleBoardAppearances": 5067,
+      "casts": 8137,
+      "castTargets": 13173,
+      "abilityDamageEvents": 13111,
+      "totalAbilityDamage": 4614559,
+      "kills": 9057,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 10588,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 8667,
+        "pull": 0
+      },
+      "heals": {
+        "events": 804,
+        "amount": 116435
+      },
+      "shields": {
+        "events": 6405,
+        "amount": 1337043
+      },
+      "castsPerBattleBoardAppearance": 1.6058811920268403,
+      "averageTargetsPerCast": 1.6189013149809512,
+      "abilityDamagePerCast": 567.1081479660809,
+      "controlEventsPerCast": 1.065134570480521
+    },
+    "hancock": {
+      "battleBoardAppearances": 3721,
+      "casts": 6027,
+      "castTargets": 32562,
+      "abilityDamageEvents": 32305,
+      "totalAbilityDamage": 9805784,
+      "kills": 5665,
+      "stunsApplied": 27593,
+      "stunDurationTicks": 275930,
+      "burnsApplied": 1675,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 0,
+        "pull": 0
+      },
+      "heals": {
+        "events": 36193,
+        "amount": 781112
+      },
+      "shields": {
+        "events": 332,
+        "amount": 19632
+      },
+      "castsPerBattleBoardAppearance": 1.6197258801397474,
+      "averageTargetsPerCast": 5.402687904430064,
+      "abilityDamagePerCast": 1626.9759415961507,
+      "controlEventsPerCast": 4.578231292517007
+    },
+    "doflamingo": {
+      "battleBoardAppearances": 3512,
+      "casts": 5905,
+      "castTargets": 9777,
+      "abilityDamageEvents": 9687,
+      "totalAbilityDamage": 3494817,
+      "kills": 4588,
+      "stunsApplied": 7238,
+      "stunDurationTicks": 101332,
+      "burnsApplied": 692,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 0,
+        "pull": 5523
+      },
+      "heals": {
+        "events": 22795,
+        "amount": 514484
+      },
+      "shields": {
+        "events": 168,
+        "amount": 8410
+      },
+      "castsPerBattleBoardAppearance": 1.681378132118451,
+      "averageTargetsPerCast": 1.6557154953429296,
+      "abilityDamagePerCast": 591.8403048264183,
+      "controlEventsPerCast": 2.1610499576629976
+    },
+    "kizaru": {
+      "battleBoardAppearances": 5842,
+      "casts": 8830,
+      "castTargets": 13175,
+      "abilityDamageEvents": 13103,
+      "totalAbilityDamage": 5533189,
+      "kills": 10386,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 0,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 0,
+        "pull": 0
+      },
+      "heals": {
+        "events": 0,
+        "amount": 0
+      },
+      "shields": {
+        "events": 5690,
+        "amount": 737284
+      },
+      "castsPerBattleBoardAppearance": 1.5114686751112634,
+      "averageTargetsPerCast": 1.4920724801812004,
+      "abilityDamagePerCast": 626.6352208380521,
+      "controlEventsPerCast": 0
+    },
+    "kuzan": {
+      "battleBoardAppearances": 5972,
+      "casts": 8771,
+      "castTargets": 44940,
+      "abilityDamageEvents": 44735,
+      "totalAbilityDamage": 10755998,
+      "kills": 8032,
+      "stunsApplied": 39524,
+      "stunDurationTicks": 276668,
+      "burnsApplied": 3741,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 0,
+        "pull": 0
+      },
+      "heals": {
+        "events": 0,
+        "amount": 0
+      },
+      "shields": {
+        "events": 840,
+        "amount": 47200
+      },
+      "castsPerBattleBoardAppearance": 1.4686872069658405,
+      "averageTargetsPerCast": 5.123703112529928,
+      "abilityDamagePerCast": 1226.3137612586934,
+      "controlEventsPerCast": 4.506213658647817
+    },
+    "akainu": {
+      "battleBoardAppearances": 7153,
+      "casts": 10132,
+      "castTargets": 16984,
+      "abilityDamageEvents": 16935,
+      "totalAbilityDamage": 5021648,
+      "kills": 6853,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 14572,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 1765,
+        "pull": 0
+      },
+      "heals": {
+        "events": 2984,
+        "amount": 137340
+      },
+      "shields": {
+        "events": 2018,
+        "amount": 133178
+      },
+      "castsPerBattleBoardAppearance": 1.4164686145673144,
+      "averageTargetsPerCast": 1.676273193841295,
+      "abilityDamagePerCast": 495.6225819186735,
+      "controlEventsPerCast": 0.1742005527043032
+    },
+    "garp": {
+      "battleBoardAppearances": 2695,
+      "casts": 4337,
+      "castTargets": 24938,
+      "abilityDamageEvents": 24858,
+      "totalAbilityDamage": 7265287,
+      "kills": 4087,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 594,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 15406,
+        "pull": 0
+      },
+      "heals": {
+        "events": 792,
+        "amount": 57547
+      },
+      "shields": {
+        "events": 3785,
+        "amount": 366380
+      },
+      "castsPerBattleBoardAppearance": 1.6092764378478663,
+      "averageTargetsPerCast": 5.750057643532395,
+      "abilityDamagePerCast": 1675.187226193221,
+      "controlEventsPerCast": 3.5522250403504727
+    },
+    "mihawk": {
+      "battleBoardAppearances": 1286,
+      "casts": 1653,
+      "castTargets": 2503,
+      "abilityDamageEvents": 2489,
+      "totalAbilityDamage": 1555308,
+      "kills": 1986,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 21,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 0,
+        "pull": 0
+      },
+      "heals": {
+        "events": 7658,
+        "amount": 258606
+      },
+      "shields": {
+        "events": 304,
+        "amount": 50011
+      },
+      "castsPerBattleBoardAppearance": 1.2853810264385692,
+      "averageTargetsPerCast": 1.514216575922565,
+      "abilityDamagePerCast": 940.9001814882033,
+      "controlEventsPerCast": 0
+    },
+    "shanks": {
+      "battleBoardAppearances": 1209,
+      "casts": 1687,
+      "castTargets": 2774,
+      "abilityDamageEvents": 2752,
+      "totalAbilityDamage": 1303140,
+      "kills": 2011,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 63,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 0,
+        "pull": 0
+      },
+      "heals": {
+        "events": 177,
+        "amount": 16956
+      },
+      "shields": {
+        "events": 9818,
+        "amount": 582145
+      },
+      "castsPerBattleBoardAppearance": 1.3953680727874276,
+      "averageTargetsPerCast": 1.6443390634262003,
+      "abilityDamagePerCast": 772.4599881446354,
+      "controlEventsPerCast": 0
+    },
+    "blackbeard": {
+      "battleBoardAppearances": 1046,
+      "casts": 1380,
+      "castTargets": 7053,
+      "abilityDamageEvents": 7016,
+      "totalAbilityDamage": 1738894,
+      "kills": 1232,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 237,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 0,
+        "pull": 5257
+      },
+      "heals": {
+        "events": 0,
+        "amount": 0
+      },
+      "shields": {
+        "events": 8645,
+        "amount": 386150
+      },
+      "castsPerBattleBoardAppearance": 1.3193116634799236,
+      "averageTargetsPerCast": 5.110869565217391,
+      "abilityDamagePerCast": 1260.068115942029,
+      "controlEventsPerCast": 3.8094202898550726
+    }
+  },
+  "formReachability": {
+    "robin-demonio-fleur": {
+      "baseDefinitionId": "robin",
+      "lifecycle": "persistent",
+      "battleStartUnitAppearances": 3346,
+      "transformEvents": 0,
+      "matchesReached": 397,
+      "finalBoards": 420,
+      "top4Boards": 261,
+      "winningBoards": 59,
+      "top4Rate": 0.6214285714285714,
+      "winRate": 0.14047619047619048,
+      "averagePlacement": 3.9523809523809526,
+      "top4RateConfidence95": {
+        "low": 0.5741380601958586,
+        "high": 0.666517882967814
+      },
+      "winRateConfidence95": {
+        "low": 0.1104932684148563,
+        "high": 0.1769763900613292
+      },
+      "finalBoardShareOfBaseCharacter": 0.12352941176470589,
+      "winnerPresenceRate": 0.059
+    },
+    "luffy-gear-4-boundman": {
+      "baseDefinitionId": "luffy",
+      "lifecycle": "persistent",
+      "battleStartUnitAppearances": 0,
+      "transformEvents": 0,
+      "matchesReached": 0,
+      "finalBoards": 0,
+      "top4Boards": 0,
+      "winningBoards": 0,
+      "top4Rate": null,
+      "winRate": null,
+      "averagePlacement": null,
+      "top4RateConfidence95": null,
+      "winRateConfidence95": null,
+      "finalBoardShareOfBaseCharacter": 0,
+      "winnerPresenceRate": 0
+    },
+    "luffy-gear-4-snakeman": {
+      "baseDefinitionId": "luffy",
+      "lifecycle": "persistent",
+      "battleStartUnitAppearances": 4,
+      "transformEvents": 0,
+      "matchesReached": 1,
+      "finalBoards": 1,
+      "top4Boards": 1,
+      "winningBoards": 1,
+      "top4Rate": 1,
+      "winRate": 1,
+      "averagePlacement": 1,
+      "top4RateConfidence95": {
+        "low": 0.2065432914738929,
+        "high": 1
+      },
+      "winRateConfidence95": {
+        "low": 0.2065432914738929,
+        "high": 1
+      },
+      "finalBoardShareOfBaseCharacter": 0.001455604075691412,
+      "winnerPresenceRate": 0.001
+    },
+    "chopper-monster-point": {
+      "baseDefinitionId": "chopper",
+      "lifecycle": "battle-temporary",
+      "battleStartUnitAppearances": 0,
+      "transformEvents": 42212,
+      "matchesReached": 999,
+      "finalBoards": 0,
+      "top4Boards": 0,
+      "winningBoards": 0,
+      "top4Rate": null,
+      "winRate": null,
+      "averagePlacement": null,
+      "top4RateConfidence95": null,
+      "winRateConfidence95": null,
+      "finalBoardShareOfBaseCharacter": 0,
+      "winnerPresenceRate": 0
+    }
+  },
+  "pilotFormReachability": {
+    "robin": {
+      "allFinalBoards": 3400,
+      "threeStarFinalBoards": 420,
+      "demonioFinalBoards": 420,
+      "demonioThreeStarFinalBoards": 420,
+      "nonDemonioThreeStarFinalBoards": 0,
+      "demonioShareOfAllFinalBoards": 0.12352941176470589,
+      "demonioShareOfThreeStarFinalBoards": 1,
+      "threeStarInvariantHolds": true
+    },
+    "luffy": {
+      "threeStarFinalBoards": 166,
+      "branches": {
+        "base": {
+          "finalBoards": 165,
+          "top4Boards": 161,
+          "winningBoards": 77,
+          "top4Rate": 0.9757575757575757,
+          "winRate": 0.4666666666666667,
+          "averagePlacement": 1.9090909090909092,
+          "top4RateConfidence95": {
+            "low": 0.9393323414727202,
+            "high": 0.9905332840603236
+          },
+          "winRateConfidence95": {
+            "low": 0.3921690859511836,
+            "high": 0.5426810931515966
+          },
+          "shareOfThreeStarFinalBoards": 0.9939759036144579
+        },
+        "boundman": {
+          "finalBoards": 0,
+          "top4Boards": 0,
+          "winningBoards": 0,
+          "top4Rate": null,
+          "winRate": null,
+          "averagePlacement": null,
+          "top4RateConfidence95": null,
+          "winRateConfidence95": null,
+          "shareOfThreeStarFinalBoards": 0
+        },
+        "snakeman": {
+          "finalBoards": 1,
+          "top4Boards": 1,
+          "winningBoards": 1,
+          "top4Rate": 1,
+          "winRate": 1,
+          "averagePlacement": 1,
+          "top4RateConfidence95": {
+            "low": 0.2065432914738929,
+            "high": 1
+          },
+          "winRateConfidence95": {
+            "low": 0.2065432914738929,
+            "high": 1
+          },
+          "shareOfThreeStarFinalBoards": 0.006024096385542169
+        }
+      }
+    },
+    "chopper": {
+      "deployedBoards": 43513,
+      "eligibleBoards": 40588,
+      "eligibleCombatantAppearances": 52457,
+      "eligibleCombatantsDiedBeforeTransform": 10231,
+      "transformedPlayerBattleBoards": 34498,
+      "eligibleBoardRate": 0.9327787098108611,
+      "transformEvents": 42212,
+      "transformRateAmongEligibleCombatants": 0.8046971805478773,
+      "survivalToTriggerRate": 0.8046971805478773,
+      "matchesReached": 999,
+      "transformsPerPvpBattle": 0.594669221232954
+    }
+  },
+  "pilotCombatExpression": {
+    "chopper:base": {
+      "sourceAppearances": 56380,
+      "casts": 31346,
+      "castTargets": 31346,
+      "abilityDamageEvents": 0,
+      "totalAbilityDamage": 0,
+      "kills": 3932,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 835,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 81,
+        "pull": 0
+      },
+      "heals": {
+        "events": 31771,
+        "amount": 11599404
+      },
+      "shields": {
+        "events": 51570,
+        "amount": 6108440
+      },
+      "castsPerSourceAppearance": 0.5559772969137993,
+      "averageTargetsPerCast": 1,
+      "abilityDamagePerCast": 0,
+      "controlEventsPerCast": 0.0025840617622663177
+    },
+    "chopper-monster-point": {
+      "sourceAppearances": 42212,
+      "casts": 31507,
+      "castTargets": 45822,
+      "abilityDamageEvents": 45698,
+      "totalAbilityDamage": 12114737,
+      "kills": 23775,
+      "stunsApplied": 35932,
+      "stunDurationTicks": 215592,
+      "burnsApplied": 100,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 139,
+        "pull": 0
+      },
+      "heals": {
+        "events": 1500,
+        "amount": 169085
+      },
+      "shields": {
+        "events": 1673,
+        "amount": 159013
+      },
+      "castsPerSourceAppearance": 0.7463991282099877,
+      "averageTargetsPerCast": 1.4543434792268384,
+      "abilityDamagePerCast": 384.50937886818804,
+      "controlEventsPerCast": 1.144856698511442
+    },
+    "robin:base": {
+      "sourceAppearances": 51204,
+      "casts": 68590,
+      "castTargets": 68590,
+      "abilityDamageEvents": 68257,
+      "totalAbilityDamage": 15804214,
+      "kills": 35162,
+      "stunsApplied": 51851,
+      "stunDurationTicks": 622212,
+      "burnsApplied": 7238,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 1,
+        "pull": 0
+      },
+      "heals": {
+        "events": 0,
+        "amount": 0
+      },
+      "shields": {
+        "events": 1306,
+        "amount": 68231
+      },
+      "castsPerSourceAppearance": 1.3395437856417467,
+      "averageTargetsPerCast": 1,
+      "abilityDamagePerCast": 230.41571657676047,
+      "controlEventsPerCast": 0.7559702580551101
+    },
+    "robin-demonio-fleur": {
+      "sourceAppearances": 3346,
+      "casts": 6585,
+      "castTargets": 11158,
+      "abilityDamageEvents": 11124,
+      "totalAbilityDamage": 3700865,
+      "kills": 5752,
+      "stunsApplied": 8211,
+      "stunDurationTicks": 114954,
+      "burnsApplied": 2180,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 0,
+        "pull": 0
+      },
+      "heals": {
+        "events": 0,
+        "amount": 0
+      },
+      "shields": {
+        "events": 283,
+        "amount": 14940
+      },
+      "castsPerSourceAppearance": 1.9680215182307232,
+      "averageTargetsPerCast": 1.6944570994684889,
+      "abilityDamagePerCast": 562.0144267274108,
+      "controlEventsPerCast": 1.2469248291571755
+    },
+    "luffy:base": {
+      "sourceAppearances": 9641,
+      "casts": 14409,
+      "castTargets": 23565,
+      "abilityDamageEvents": 68172,
+      "totalAbilityDamage": 5147512,
+      "kills": 8886,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 819,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 17171,
+        "pull": 0
+      },
+      "heals": {
+        "events": 3997,
+        "amount": 412074
+      },
+      "shields": {
+        "events": 3104,
+        "amount": 1793753
+      },
+      "castsPerSourceAppearance": 1.494554506793901,
+      "averageTargetsPerCast": 1.6354361857172601,
+      "abilityDamagePerCast": 357.2428343396488,
+      "controlEventsPerCast": 1.1916857519605801
+    },
+    "luffy-gear-4-boundman": {
+      "sourceAppearances": 0,
+      "casts": 0,
+      "castTargets": 0,
+      "abilityDamageEvents": 0,
+      "totalAbilityDamage": 0,
+      "kills": 0,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 0,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 0,
+        "pull": 0
+      },
+      "heals": {
+        "events": 0,
+        "amount": 0
+      },
+      "shields": {
+        "events": 0,
+        "amount": 0
+      },
+      "castsPerSourceAppearance": 0,
+      "averageTargetsPerCast": 0,
+      "abilityDamagePerCast": 0,
+      "controlEventsPerCast": 0
+    },
+    "luffy-gear-4-snakeman": {
+      "sourceAppearances": 4,
+      "casts": 11,
+      "castTargets": 11,
+      "abilityDamageEvents": 39,
+      "totalAbilityDamage": 4347,
+      "kills": 15,
+      "stunsApplied": 0,
+      "stunDurationTicks": 0,
+      "burnsApplied": 0,
+      "displacements": {
+        "lunge": 0,
+        "knockback": 0,
+        "pull": 0
+      },
+      "heals": {
+        "events": 0,
+        "amount": 0
+      },
+      "shields": {
+        "events": 0,
+        "amount": 0
+      },
+      "castsPerSourceAppearance": 2.75,
+      "averageTargetsPerCast": 1,
+      "abilityDamagePerCast": 395.1818181818182,
+      "controlEventsPerCast": 0
+    }
+  },
+  "formEventVolume": {
+    "unitTransformEvents": 42212,
+    "monsterPointTransformsPerPvpBattle": 0.594669221232954
+  },
+  "combatReadability": {
+    "pvpBattleCount": 70984,
+    "casts": 1014826,
+    "castTargets": 1615516,
+    "multiTargetCasts": 309862,
+    "abilityHitEvents": 104969,
+    "statusApplications": {
+      "stun": 389715,
+      "burn": 125896,
+      "emergencyShield": 12740
+    },
+    "displacements": {
+      "lunge": 93403,
+      "knockback": 474734,
+      "pull": 46411
+    },
+    "abilityDrainEvents": 257415,
+    "totalEnergyDrained": 3568873,
+    "allEnemyAbilityCasts": 68861,
+    "defensePierceCasts": 13315,
+    "castsPerPvpBattle": 14.296545700439536,
+    "castTargetsPerPvpBattle": 22.75887523949059,
+    "multiTargetCastsPerPvpBattle": 4.365237236560351,
+    "abilityHitEventsPerPvpBattle": 1.4787698636312407,
+    "stunsPerPvpBattle": 5.490180885833428,
+    "statusApplicationsPerPvpBattle": 7.443240730305421,
+    "displacementsPerPvpBattle": 8.657556632480558,
+    "abilityDrainEventsPerPvpBattle": 3.6263805928096473,
+    "energyDrainedPerPvpBattle": 50.27714696269582,
+    "controlEventsPerPvpBattle": 17.774118111123634,
+    "allEnemyAbilityCastsPerPvpBattle": 0.9700918516848868,
+    "defensePierceCastsPerPvpBattle": 0.18757748224952103
+  },
+  "traitPlayerBattleBoards": 238001,
+  "traitReachability": {
+    "straw-hat": {
+      "activations": 174157,
+      "activationRate": 0.7317490262645955,
+      "matchesReached": 1000,
+      "matchReachRate": 1,
+      "maxTier": 3
+    },
+    "navy": {
+      "activations": 55814,
+      "activationRate": 0.23451161969907688,
+      "matchesReached": 1000,
+      "matchReachRate": 1,
+      "maxTier": 2
+    },
+    "warlord": {
+      "activations": 7088,
+      "activationRate": 0.029781387473161877,
+      "matchesReached": 612,
+      "matchReachRate": 0.612,
+      "maxTier": 2
+    },
+    "supernova": {
+      "activations": 16529,
+      "activationRate": 0.06944928802820156,
+      "matchesReached": 845,
+      "matchReachRate": 0.845,
+      "maxTier": 2
+    },
+    "brotherhood": {
+      "activations": 8845,
+      "activationRate": 0.03716370939617901,
+      "matchesReached": 607,
+      "matchReachRate": 0.607,
+      "maxTier": 2
+    },
+    "revolutionary": {
+      "activations": 163125,
+      "activationRate": 0.6853962798475637,
+      "matchesReached": 1000,
+      "matchReachRate": 1,
+      "maxTier": 2
+    },
+    "emperor": {
+      "activations": 3648,
+      "activationRate": 0.01532766669047609,
+      "matchesReached": 434,
+      "matchReachRate": 0.434,
+      "maxTier": 2
+    },
+    "captain": {
+      "activations": 8628,
+      "activationRate": 0.0362519485212247,
+      "matchesReached": 646,
+      "matchReachRate": 0.646,
+      "maxTier": 2
+    },
+    "brawler": {
+      "activations": 69792,
+      "activationRate": 0.2932424653677926,
+      "matchesReached": 1000,
+      "matchReachRate": 1,
+      "maxTier": 2
+    },
+    "swordsman": {
+      "activations": 39410,
+      "activationRate": 0.16558753954815317,
+      "matchesReached": 996,
+      "matchReachRate": 0.996,
+      "maxTier": 2
+    },
+    "marksman": {
+      "activations": 19779,
+      "activationRate": 0.08310469283742505,
+      "matchesReached": 920,
+      "matchReachRate": 0.92,
+      "maxTier": 2
+    },
+    "specialist": {
+      "activations": 68388,
+      "activationRate": 0.28734333049020805,
+      "matchesReached": 1000,
+      "matchReachRate": 1,
+      "maxTier": 2
+    },
+    "guardian": {
+      "activations": 64301,
+      "activationRate": 0.2701711337347322,
+      "matchesReached": 1000,
+      "matchReachRate": 1,
+      "maxTier": 2
+    }
+  },
+  "traitTierReachability": {
+    "straw-hat": [
+      {
+        "tier": 1,
+        "required": 2,
+        "activations": 123278,
+        "activationRate": 0.5179726135604472,
+        "matchesReached": 1000,
+        "matchReachRate": 1
+      },
+      {
+        "tier": 2,
+        "required": 4,
+        "activations": 45918,
+        "activationRate": 0.19293196247074593,
+        "matchesReached": 1000,
+        "matchReachRate": 1
+      },
+      {
+        "tier": 3,
+        "required": 6,
+        "activations": 4961,
+        "activationRate": 0.02084445023340238,
+        "matchesReached": 534,
+        "matchReachRate": 0.534
+      }
+    ],
+    "navy": [
+      {
+        "tier": 1,
+        "required": 2,
+        "activations": 40322,
+        "activationRate": 0.16941945622077217,
+        "matchesReached": 1000,
+        "matchReachRate": 1
+      },
+      {
+        "tier": 2,
+        "required": 3,
+        "activations": 15492,
+        "activationRate": 0.06509216347830471,
+        "matchesReached": 885,
+        "matchReachRate": 0.885
+      }
+    ],
+    "warlord": [
+      {
+        "tier": 1,
+        "required": 2,
+        "activations": 6785,
+        "activationRate": 0.028508283578640426,
+        "matchesReached": 612,
+        "matchReachRate": 0.612
+      },
+      {
+        "tier": 2,
+        "required": 4,
+        "activations": 303,
+        "activationRate": 0.0012731038945214515,
+        "matchesReached": 42,
+        "matchReachRate": 0.042
+      }
+    ],
+    "supernova": [
+      {
+        "tier": 1,
+        "required": 2,
+        "activations": 16159,
+        "activationRate": 0.0678946727114592,
+        "matchesReached": 845,
+        "matchReachRate": 0.845
+      },
+      {
+        "tier": 2,
+        "required": 4,
+        "activations": 370,
+        "activationRate": 0.0015546153167423666,
+        "matchesReached": 51,
+        "matchReachRate": 0.051
+      }
+    ],
+    "brotherhood": [
+      {
+        "tier": 1,
+        "required": 2,
+        "activations": 7791,
+        "activationRate": 0.03273515657497238,
+        "matchesReached": 607,
+        "matchReachRate": 0.607
+      },
+      {
+        "tier": 2,
+        "required": 3,
+        "activations": 1054,
+        "activationRate": 0.004428552821206634,
+        "matchesReached": 105,
+        "matchReachRate": 0.105
+      }
+    ],
+    "revolutionary": [
+      {
+        "tier": 1,
+        "required": 1,
+        "activations": 84814,
+        "activationRate": 0.35635984722753267,
+        "matchesReached": 1000,
+        "matchReachRate": 1
+      },
+      {
+        "tier": 2,
+        "required": 2,
+        "activations": 78311,
+        "activationRate": 0.329036432620031,
+        "matchesReached": 1000,
+        "matchReachRate": 1
+      }
+    ],
+    "emperor": [
+      {
+        "tier": 1,
+        "required": 1,
+        "activations": 3486,
+        "activationRate": 0.014646997281524026,
+        "matchesReached": 434,
+        "matchReachRate": 0.434
+      },
+      {
+        "tier": 2,
+        "required": 2,
+        "activations": 162,
+        "activationRate": 0.0006806694089520633,
+        "matchesReached": 28,
+        "matchReachRate": 0.028
+      }
+    ],
+    "captain": [
+      {
+        "tier": 1,
+        "required": 2,
+        "activations": 6809,
+        "activationRate": 0.02860912349107777,
+        "matchesReached": 645,
+        "matchReachRate": 0.645
+      },
+      {
+        "tier": 2,
+        "required": 3,
+        "activations": 1819,
+        "activationRate": 0.0076428250301469325,
+        "matchesReached": 214,
+        "matchReachRate": 0.214
+      }
+    ],
+    "brawler": [
+      {
+        "tier": 1,
+        "required": 2,
+        "activations": 60946,
+        "activationRate": 0.2560745543085953,
+        "matchesReached": 1000,
+        "matchReachRate": 1
+      },
+      {
+        "tier": 2,
+        "required": 4,
+        "activations": 8846,
+        "activationRate": 0.03716791105919723,
+        "matchesReached": 645,
+        "matchReachRate": 0.645
+      }
+    ],
+    "swordsman": [
+      {
+        "tier": 1,
+        "required": 2,
+        "activations": 29184,
+        "activationRate": 0.12262133352380872,
+        "matchesReached": 996,
+        "matchReachRate": 0.996
+      },
+      {
+        "tier": 2,
+        "required": 3,
+        "activations": 10226,
+        "activationRate": 0.042966206024344436,
+        "matchesReached": 644,
+        "matchReachRate": 0.644
+      }
+    ],
+    "marksman": [
+      {
+        "tier": 1,
+        "required": 2,
+        "activations": 16109,
+        "activationRate": 0.06768458956054807,
+        "matchesReached": 918,
+        "matchReachRate": 0.918
+      },
+      {
+        "tier": 2,
+        "required": 3,
+        "activations": 3670,
+        "activationRate": 0.015420103276876988,
+        "matchesReached": 363,
+        "matchReachRate": 0.363
+      }
+    ],
+    "specialist": [
+      {
+        "tier": 1,
+        "required": 2,
+        "activations": 59118,
+        "activationRate": 0.2483939143112844,
+        "matchesReached": 1000,
+        "matchReachRate": 1
+      },
+      {
+        "tier": 2,
+        "required": 4,
+        "activations": 9270,
+        "activationRate": 0.03894941617892362,
+        "matchesReached": 727,
+        "matchReachRate": 0.727
+      }
+    ],
+    "guardian": [
+      {
+        "tier": 1,
+        "required": 2,
+        "activations": 36516,
+        "activationRate": 0.1534279267734169,
+        "matchesReached": 1000,
+        "matchReachRate": 1
+      },
+      {
+        "tier": 2,
+        "required": 3,
+        "activations": 27785,
+        "activationRate": 0.1167432069613153,
+        "matchesReached": 966,
+        "matchReachRate": 0.966
+      }
+    ]
+  },
+  "traitCombinations": {
+    "emperor+captain": {
+      "activations": 1674,
+      "activationRate": 0.007033583892504653,
+      "matchesReached": 255,
+      "matchReachRate": 0.255
+    }
+  },
+  "itemUsage": {
+    "black-blade": 2503,
+    "meat-platter": 610,
+    "clima-tact": 58,
+    "sniper-goggles": 1341,
+    "sea-prism-stone": 0,
+    "armament-wraps": 884,
+    "den-den-mushi": 3648,
+    "cola-engine": 2571,
+    "jolly-roger-fragment": 149,
+    "devil-fruit-essence": 1988,
+    "cola-canister": 2471,
+    "jet-dial": 769,
+    "sniper-lens": 1181,
+    "sea-king-meat": 896,
+    "sea-prism-shard": 23,
+    "black-blade-shard": 556,
+    "armament-plate": 581,
+    "captains-sash": 62,
+    "emperors-jolly-roger": 53,
+    "specialists-log-pose": 746,
+    "marine-justice-coat": 1268,
+    "marksmans-thunder-dial": 613,
+    "captains-logbook": 955,
+    "brawlers-rumble-emblem": 281,
+    "guardians-sea-prism-crest": 68,
+    "revolutionary-flame": 662,
+    "straw-hat-token": 213,
+    "swordsmans-knot": 52,
+    "devil-fruit-codex": 1885,
+    "observation-haki-mantle": 3322,
+    "barrier-bubble": 1132,
+    "reflect-dial": 468,
+    "flame-flame-grimoire": 2877,
+    "sea-prism-boots": 2886,
+    "lucky-pirate-ribbon": 1865,
+    "cola-reservoir": 2229,
+    "energy-siphon-scope": 5069,
+    "healing-bubble": 121,
+    "star-shield-dial": 665,
+    "shark-tooth-charm": 2875,
+    "miracle-talisman": 158,
+    "efficient-bandanna": 1175,
+    "observation-goggles": 1416,
+    "armor-piercing-scope": 2270,
+    "rush-flag": 3,
+    "ricochet-dial": 354,
+    "impact-dial": 1644,
+    "jet-sash": 584,
+    "mystery-treasure-chest": 28,
+    "smoke-star-escape": 830,
+    "gas-mask": 1044,
+    "armament-sash": 1509,
+    "spiked-armament": 961,
+    "impact-proof-gauntlets": 1169,
+    "phoenix-feather": 27,
+    "banquet-belt": 490,
+    "healing-dial": 570,
+    "guard-point-dummy": 176,
+    "reversal-band": 12,
+    "advanced-armament-orb": 1205,
+    "mera-mera-ember": 1219,
+    "bombardier-band": 440,
+    "iron-pirate-helm": 952,
+    "bodyguard-band": 611,
+    "nullification-bandanna": 20
+  },
+  "targets": {
+    "matchLength20To30Minutes": false,
+    "noCharacterAbove65PercentOfWinningBoards": true,
+    "everyTraitReached": true
+  }
+}

@@ -227,6 +227,59 @@ export type CombatReadabilityReport = {
   defensePierceCastsPerPvpBattle: number;
 };
 
+export const CAPTAIN_DAMAGE_STAGE_REACH_ROUNDS = [
+  22, 24, 27, 28, 32, 34, 36,
+] as const;
+
+export type CaptainDamageKind = "pvp" | "ghost" | "pve";
+
+export type CaptainDamagePacingMatchInput = {
+  damageEvents: Array<{
+    round: number;
+    kind: CaptainDamageKind;
+    damage: number;
+  }>;
+  eliminationsByRound: Record<string, number>;
+  stageReachRounds: number[];
+};
+
+type CaptainDamageSummary = {
+  damageEvents: number;
+  totalDamage: number;
+  averageDamage: number;
+  maxSingleLossDamage: number;
+};
+
+export type CaptainDamagePacingReport = CaptainDamageSummary & {
+  damageP50: number;
+  damageP90: number;
+  damageP95: number;
+  byKind: Record<CaptainDamageKind, CaptainDamageSummary>;
+  byRound: Record<
+    string,
+    {
+      damageEvents: number;
+      totalDamage: number;
+      averageDamage: number;
+      eliminations: number;
+    }
+  >;
+  firstEliminationRound: {
+    min: number | null;
+    max: number | null;
+    average: number | null;
+    median: number | null;
+  };
+  eliminationsByRound: Record<string, number>;
+  stageReach: Record<
+    string,
+    {
+      matchesReached: number;
+      rate: number;
+    }
+  >;
+};
+
 export type ProductionSoakReport = {
   generatedAt: string;
   gitSha: string;
@@ -247,6 +300,7 @@ export type ProductionSoakReport = {
   battleCount: number;
   timeoutRate: number;
   drawRate: number;
+  captainDamagePacing: CaptainDamagePacingReport;
   characterPresence: Record<string, CharacterPresenceReport>;
   costBands: Record<string, CostBandReport>;
   shopPoolAvailability: {
@@ -310,6 +364,142 @@ function increment(counter: MutableCounter, key: string, amount = 1): void {
 
 function rate(numerator: number, denominator: number): number {
   return denominator > 0 ? numerator / denominator : 0;
+}
+
+export function nearestRank(
+  values: readonly number[],
+  percentile: number,
+): number {
+  if (values.length === 0) return 0;
+  const sorted = [...values].sort((left, right) => left - right);
+  const rank = Math.max(1, Math.ceil(percentile * sorted.length));
+  return sorted[Math.min(sorted.length - 1, rank - 1)] ?? 0;
+}
+
+export function classifyCaptainDamageKind(
+  stageKind: "pvp" | "pve" | "carousel",
+  ghostOfPlayerId: string | null,
+): CaptainDamageKind {
+  if (stageKind === "pve") return "pve";
+  return ghostOfPlayerId ? "ghost" : "pvp";
+}
+
+function summarizeDamage(values: readonly number[]): CaptainDamageSummary {
+  const totalDamage = values.reduce((total, value) => total + value, 0);
+  return {
+    damageEvents: values.length,
+    totalDamage,
+    averageDamage: rate(totalDamage, values.length),
+    maxSingleLossDamage: Math.max(0, ...values),
+  };
+}
+
+export function summarizeCaptainDamagePacing(
+  matches: readonly CaptainDamagePacingMatchInput[],
+): CaptainDamagePacingReport {
+  const allEvents = matches.flatMap((match) => match.damageEvents);
+  const allDamage = allEvents.map((event) => event.damage);
+  const byKind = Object.fromEntries(
+    (["pvp", "ghost", "pve"] as const).map((kind) => [
+      kind,
+      summarizeDamage(
+        allEvents
+          .filter((event) => event.kind === kind)
+          .map((event) => event.damage),
+      ),
+    ]),
+  ) as Record<CaptainDamageKind, CaptainDamageSummary>;
+  const roundKeys = new Set<string>();
+  for (const match of matches) {
+    for (const event of match.damageEvents) roundKeys.add(String(event.round));
+    for (const round of Object.keys(match.eliminationsByRound)) {
+      roundKeys.add(round);
+    }
+  }
+  const eliminationsByRound = Object.fromEntries(
+    [...roundKeys]
+      .sort((left, right) => Number(left) - Number(right))
+      .map((round) => [
+        round,
+        matches.reduce(
+          (total, match) => total + (match.eliminationsByRound[round] ?? 0),
+          0,
+        ),
+      ]),
+  );
+  const byRound = Object.fromEntries(
+    [...roundKeys]
+      .sort((left, right) => Number(left) - Number(right))
+      .map((round) => {
+        const values = allEvents
+          .filter((event) => event.round === Number(round))
+          .map((event) => event.damage);
+        const summary = summarizeDamage(values);
+        return [
+          round,
+          {
+            damageEvents: summary.damageEvents,
+            totalDamage: summary.totalDamage,
+            averageDamage: summary.averageDamage,
+            eliminations: eliminationsByRound[round] ?? 0,
+          },
+        ];
+      }),
+  );
+  const firstEliminationRounds = matches
+    .map((match) =>
+      Object.entries(match.eliminationsByRound)
+        .filter(([, count]) => count > 0)
+        .map(([round]) => Number(round))
+        .sort((left, right) => left - right)[0],
+    )
+    .filter((round): round is number => round !== undefined);
+  const totalSummary = summarizeDamage(allDamage);
+
+  return {
+    ...totalSummary,
+    damageP50: nearestRank(allDamage, 0.5),
+    damageP90: nearestRank(allDamage, 0.9),
+    damageP95: nearestRank(allDamage, 0.95),
+    byKind,
+    byRound,
+    firstEliminationRound: {
+      min:
+        firstEliminationRounds.length > 0
+          ? Math.min(...firstEliminationRounds)
+          : null,
+      max:
+        firstEliminationRounds.length > 0
+          ? Math.max(...firstEliminationRounds)
+          : null,
+      average:
+        firstEliminationRounds.length > 0
+          ? rate(
+              firstEliminationRounds.reduce(
+                (total, round) => total + round,
+                0,
+              ),
+              firstEliminationRounds.length,
+            )
+          : null,
+      median:
+        firstEliminationRounds.length > 0
+          ? nearestRank(firstEliminationRounds, 0.5)
+          : null,
+    },
+    eliminationsByRound,
+    stageReach: Object.fromEntries(
+      CAPTAIN_DAMAGE_STAGE_REACH_ROUNDS.map((round) => {
+        const matchesReached = matches.filter((match) =>
+          match.stageReachRounds.includes(round),
+        ).length;
+        return [
+          String(round),
+          { matchesReached, rate: rate(matchesReached, matches.length) },
+        ];
+      }),
+    ),
+  };
 }
 
 function wilson95(successes: number, observations: number): ConfidenceInterval | null {
@@ -944,6 +1134,7 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
     ]),
   );
   const itemUsage: MutableCounter = {};
+  const captainDamagePacingMatches: CaptainDamagePacingMatchInput[] = [];
   let completeMatches = 0;
   let crashes = 0;
   let battleCount = 0;
@@ -970,11 +1161,35 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
       const traitsReachedInMatch = new Set<string>();
       const traitTiersReachedInMatch = new Set<string>();
       const formsReachedInMatch = new Set<ProductionFormId>();
+      const captainDamagePacing: CaptainDamagePacingMatchInput = {
+        damageEvents: [],
+        eliminationsByRound: {},
+        stageReachRounds: [],
+      };
+      const reachedStageRounds = new Set<number>();
 
       let transitions = 0;
       let fullSeconds = 0;
       let paced = 0;
       while (state.phase !== "game-over" && transitions < 400) {
+        if (
+          state.players.filter((player) => player.alive).length >= 2 &&
+          CAPTAIN_DAMAGE_STAGE_REACH_ROUNDS.some(
+            (round) => round === state.round,
+          )
+        ) {
+          reachedStageRounds.add(state.round);
+        }
+        const resolvedBattleRound =
+          state.phase === "battle" ? state.round : null;
+        const aliveBeforeBattleResolution =
+          state.phase === "battle"
+            ? new Set(
+                state.players
+                  .filter((player) => player.alive)
+                  .map((player) => player.id),
+              )
+            : null;
         if (state.phase === "preparation") {
           preparationSnapshots += 1;
           const stage = getStageDefinition(state.round, DEFAULT_CONTENT);
@@ -1049,6 +1264,21 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
             battleCount += 1;
             if (result.timedOut) timeouts += 1;
             if (result.winnerId === null) draws += 1;
+            const kind = classifyCaptainDamageKind(
+              stage.kind,
+              result.ghostOfPlayerId,
+            );
+            for (const damage of [
+              result.playerADamage,
+              result.playerBDamage,
+            ]) {
+              if (damage <= 0) continue;
+              captainDamagePacing.damageEvents.push({
+                round: state.round,
+                kind,
+                damage,
+              });
+            }
             if (stage.kind === "pvp") {
               const formAudit = auditFormBattleResult(result);
               for (const formId of PRODUCTION_FORM_IDS) {
@@ -1096,6 +1326,22 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
         }
 
         state = advanceMatchPhase(state, DEFAULT_CONTENT);
+        if (
+          resolvedBattleRound !== null &&
+          aliveBeforeBattleResolution !== null
+        ) {
+          const eliminated = [...aliveBeforeBattleResolution].filter(
+            (playerId) =>
+              !state.players.find((player) => player.id === playerId)?.alive,
+          ).length;
+          if (eliminated > 0) {
+            increment(
+              captainDamagePacing.eliminationsByRound,
+              String(resolvedBattleRound),
+              eliminated,
+            );
+          }
+        }
         transitions += 1;
       }
 
@@ -1114,6 +1360,10 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
       rounds.push(state.round);
       fullClockSeconds.push(fullSeconds);
       pacedSeconds.push(paced);
+      captainDamagePacing.stageReachRounds = [...reachedStageRounds].sort(
+        (left, right) => left - right,
+      );
+      captainDamagePacingMatches.push(captainDamagePacing);
 
       for (const player of state.players) {
         if (player.placement === null) {
@@ -1587,6 +1837,9 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
     battleCount,
     timeoutRate: timeouts / Math.max(1, battleCount),
     drawRate: draws / Math.max(1, battleCount),
+    captainDamagePacing: summarizeCaptainDamagePacing(
+      captainDamagePacingMatches,
+    ),
     characterPresence,
     costBands,
     shopPoolAvailability: {

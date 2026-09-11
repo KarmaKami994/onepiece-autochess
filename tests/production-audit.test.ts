@@ -178,6 +178,23 @@ describe("production configuration audit", () => {
     expect(report.timeoutRate).toBeLessThanOrEqual(1);
     expect(report.drawRate).toBeGreaterThanOrEqual(0);
     expect(report.drawRate).toBeLessThanOrEqual(1);
+    expect(report.captainDamagePacing.damageEvents).toBeGreaterThan(0);
+    expect(report.captainDamagePacing.totalDamage).toBeGreaterThan(0);
+    expect(report.captainDamagePacing.damageP50).toBeGreaterThan(0);
+    expect(Object.keys(report.captainDamagePacing.byKind)).toEqual([
+      "pvp",
+      "ghost",
+      "pve",
+    ]);
+    expect(Object.keys(report.captainDamagePacing.stageReach)).toEqual([
+      "22",
+      "24",
+      "27",
+      "28",
+      "32",
+      "34",
+      "36",
+    ]);
     expect(Object.keys(report.characterPresence)).toHaveLength(30);
     expect(Object.keys(report.costBands)).toEqual(["1", "2", "3", "4", "5"]);
     expect(Object.keys(report.shopPoolAvailability.byCost)).toEqual([
