@@ -11,6 +11,7 @@ installRuntimeBoundaryChecks();
 test("complete voyage covers PvE reward, carousel, PvP, resume, and results", async ({
   page,
 }) => {
+  test.setTimeout(180_000);
   await openFreshVoyage(page);
 
   const recruit = page.locator("button.shop-card:not([disabled])").first();

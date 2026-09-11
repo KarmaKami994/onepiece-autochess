@@ -23,10 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-P7 Major Asset Production is implemented on `feat/p7-major-asset-production` from exact base `dba5cb9335d093ca8bd12d8f958c6f2eda438a9a` and is ready for review. All 30 crew and eight PvE archetypes have production runtime visuals with preferred 46-frame v2 atlases; all 65 items, 13 traits, eight status categories and four forms have local presentation assets with explicit fallbacks and visible-only loading. The deterministic source/generation/provenance/QA pipeline is recorded and validated. Gameplay remains unchanged; GameContent is `1.26.0` and schema remains 6.
+P8 Captain Damage & Pacing is implemented on `feat/p8-captain-damage-pacing` from exact base `e6e205aa3a45eb9c600a7c40e1e7fe9d37cd84aa` and is ready for review. Captain damage changes from `1 + sum(living winner survivor stars)` to `max(1, ceil(round / 4) + living winner survivor count)`; PAC's reference is `ceil(round / 2) + survivor count`. Exactly one PRE and one POST 1,000-seed run completed without crashes, and every hard pacing/stage-reach gate passed. GameContent is `1.27.0`; schema remains 6. P9 has not started.
 
 ## Last Completed Work
 
+- 2026-09-11 — P8 Captain Damage & Pacing: added reporting-only Captain-damage/stage-reach/elimination diagnostics, captured the old star-weighted PRE control, replaced the domain formula with explicit round pressure plus one per living winner survivor across PvP/ghost/PvE, preserved frozen-result elimination fairness/history/save behavior, and captured the same-seed POST comparison. PRE/POST report SHA-256: `cfe1a0527298146e656b5e0bdf47f89092a5bd4a2b88659bb0e541dddcd3ddbb` / `0ce0bc301c05015860c92f17a5af0ae83368e40d0f2431e7b13cea034b3fcb1f`. Average rounds 38.776→38.510, paced minutes 26.034→26.126, damage/loss 8.944→8.554, first elimination average 20.597→23.031, and stage-36 reach 72.8%→83.8%; all hard gates passed. GameContent is `1.27.0`; schema remains 6. Material files: `game/matchFlow.ts`, `game/engine.ts`, `game/content.ts`, production-soak diagnostics, focused/affected tests, two raw P8 reports, `docs/P8_CAPTAIN_DAMAGE_AND_PACING.md`, `PROJECT_STATE.md`.
 - 2026-09-11 — P7 Major Asset Production: replaced the remaining 12 shared-placeholder crew and three P5 PvE placeholders with distinct static and 46-frame v2 identities; completed v2 coverage for all 30 crew/eight PvE units; added 65 item, 13 trait, eight status and four form visual families, explicit manifests/fallbacks, visible-only loading, deterministic generators/editables, four QA contact sheets and source/hash provenance. Runtime public assets increased by 971,677 bytes (0.93 MiB). GameContent is `1.26.0`; schema remains 6. Material files: animation/UI asset sources, generated runtime assets and QA sheets, asset manifests/loaders, selectors/screens/styles, validation/generation scripts, focused/affected tests, `e2e/p7-assets.spec.ts`, `ASSET_PROVENANCE.md`, `docs/P7_MAJOR_ASSET_PRODUCTION.md`, `PROJECT_STATE.md`.
 - 2026-09-10 — PR #49 review correction: Brawler Counterstrike and Marksman bonus shots suppress only victim damaged-Energy; split basic bundles, including Bodyguard cover, resolve Guardian/Brawler once per actual recipient in stable ID order and preserve covered Marksman success; P6 Navy/Emperor start Shields remain visible without entering Bombardier's runtime meter; active trait semantics now state current, active and next thresholds or maximum tier. GameContent remains `1.25.0`; schema remains 6. Material files: `game/combat.ts`, `app/selectors.ts`, focused P6 regressions, `PROJECT_STATE.md`.
 - 2026-09-09 — P6 Trait Identity & Depth: added explicit tier scope, typed battle-local behaviors and final deterministic identities for all 13 existing traits; integrated trait-grant holders, persistent forms, P4 damage/status/item authorities and Phoenix per-unit/team reset semantics; expanded semantic keyboard-reachable trait presentation without bot tuning. GameContent is `1.25.0`; schema remains 6. Material files: trait/content/combat/type modules, selectors/screens/styles, focused and affected regressions, `docs/P6_TRAIT_IDENTITY_AND_DEPTH.md`, `PROJECT_STATE.md`.
@@ -81,6 +82,15 @@ P7 Major Asset Production is implemented on `feat/p7-major-asset-production` fro
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+P8 Captain Damage & Pacing:
+
+- PASS — instrumentation-only focused tests and typecheck/lint before the PRE control; old Captain-damage formula and GameContent 1.26.0 were unchanged at measurement SHA `f4b1b40449b9d3984d2f1a1bc6aa538d810c8a72`.
+- PASS — PRE normalized production soak: 1,000/1,000 complete, zero crashes, seeds `production-0` through `production-999`; raw SHA-256 `cfe1a0527298146e656b5e0bdf47f89092a5bd4a2b88659bb0e541dddcd3ddbb`.
+- PASS — focused P8 and affected P3/pairing/P4B7/P4C/P5/P6/save/production/history/carousel suites before POST: 13 files / 239 tests; focused P8 plus production audit: 2 files / 43 tests.
+- PASS — POST normalized production soak at implementation SHA `dba043bba4bf12ff6681b189e0a955f313f3993e`: 1,000/1,000 complete, zero crashes, same seeds; raw SHA-256 `0ce0bc301c05015860c92f17a5af0ae83368e40d0f2431e7b13cea034b3fcb1f`.
+- PASS — POST hard gates: 26.126 paced minutes; stage 22/24/28/32/34/36 reach 100%/100%/100%/100%/99.7%/83.8%.
+- PASS — final post-measurement verification: affected cross-system suites 13 files / 239 tests; typecheck; lint; full suite 55 files / 724 tests; asset validation; production smoke 50/50 with zero crashes; build; Browser E2E 19 passed / 3 expected project skips. The unchanged full-voyage assertions passed after raising only that test's timeout from 90 to 180 seconds.
 
 P7 Major Asset Production:
 
@@ -620,6 +630,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- P8 Captain damage now equals `max(1, ceil(round / 4) + living winner survivor count)` for a resolved winner and zero for a draw. Each qualifying survivor contributes exactly one regardless of star or other properties. PvP losers and real players losing to ghosts take the result; ghost owners remain unmodified; PvE losses use the same formula. Recent battle values reflect the new exact damage. GameContent is `1.27.0`; schema remains 6 and historical saved battle records are not rewritten.
 - Presentation only for P7: every production crew/PvE definition now resolves to a distinct local static asset and preferred v2 atlas, while item, trait, status and form surfaces render their manifest-backed SVG identity with accessible text/glyph fallback. Board animation loading remains current-board/visible-content driven; new crew support is v2-only. Combat, economy, bots, content values, stage behavior, deterministic RNG and schema 6 are unchanged.
 - P6 secondary Counterstrike/Volley damage no longer grants victim damaged-Energy. One primary basic now aggregates direct Guardian/Brawler reactions once per actual damaged recipient, including Bodyguard cover, in stable ID order; covered damage still advances Marksman while its volley retains the original selected target. Navy/Emperor tick-zero Shields emit normally but do not inflate Bombardier's runtime-Shield meter; Guard Point and other in-combat Shields still count. Trait semantics explicitly announce current, active and next thresholds or maximum tier.
 - P6 replaces production traits' implicit all-team stat application with explicit tier scope: Straw Hat, Emperor and Captain remain crew-wide; Navy, Warlord, Supernova, Brotherhood, Revolutionary, Brawler, Swordsman, Marksman, Specialist and Guardian affect holders only. All 13 traits now expose their approved deterministic start/cast/dodge/direct-hit/kill/death/attack identities through existing combat authorities. Effective persistent form and trait-grant-item membership applies identically; Phoenix resets per-unit P6 runtime without replaying start effects or team-consumed triggers. Trait details now state threshold, scope, static effects and dynamic behavior semantically. GameContent is `1.25.0`; schema remains 6.
@@ -670,6 +681,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- None for P8. The locked divisor/formula was not changed after measurement; exactly two authorized 1,000-seed runs were performed, with no candidate iteration, bot/unit/item/trait/economy/P5/P6 tuning, stage/start-HP/timeout/draw/pairing change, P9 work or P11 baseline.
 - None for P7. No gameplay/domain behavior, item/trait/form value, bot/economy/captain-damage logic, RNG, save schema, dependency, P8 work, tuning, baseline or 1,000-seed soak changed. The first Browser E2E run exposed missing SVG image namespaces; the deterministic generator, validator and regression contract were corrected before the final 22/22 pass.
 - None for the PR #49 review correction. No trait values/scopes, item values, P5 content, unit data, bot/economy/captain-damage behavior, version, schema, RNG, dependency, P7/P8, tuning, baseline or 1,000-seed soak changed.
 - None for P6. No threshold, unit trait, item value/acquisition, stage, economy, captain damage, bot weight, unit balance, schema, dependency, P7/P8 work, baseline or 1,000-seed soak was changed or added.
@@ -721,6 +733,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- No hard P8 gate failed. POST first elimination moved 2.434 rounds later and stage-36 reach increased 11.0 percentage points; average rounds changed only -0.69%, timeout/draw were materially stable, and the sole PvE damage event was 8 damage. These are review observations, not tuning authority. Smoker remains frozen/watch.
 - No blocking P7 defect remains. The 12 imported crew reference sheets retain their recorded third-party source-page permissions and hashes; any distribution beyond those permissions requires a separate rights review. Generated runtime/QA files are deterministic, but external reference provenance must remain with the assets.
 - No blocking P6 issue found. Dynamic behavior remains intentionally absent from bot valuation; bots continue using existing structural affinity and active-trait counts. The 50-match smoke is regression evidence only and must not be used for tuning.
 - No blocking P5 issue found. The three new PvE archetypes intentionally share the existing placeholder until the post-P6 asset pass. The 50-match smoke is regression evidence only and must not be used as balance evidence.
@@ -756,6 +769,7 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
+- P8 keeps one pure Captain-damage authority in `game/matchFlow.ts` and explicitly passes round from PvP/ghost/PvE result construction. PAC round-plus-survivor topology, one point per ordinary survivor, no star multiplier and draw-zero semantics are direct; `ceil(round / 2)` is adapted to `ceil(round / 4)`. Spawn/Inanimate exclusions remain reference-only; Double Up/backend/network/Pokémon passive/mission systems are rejected. Diagnostics remain production-harness-only and cannot influence gameplay.
 - P7 keeps presentation authority in explicit local manifests: deterministic content IDs map to static/v2, item, trait, status and form assets; unknown or failed assets retain semantic glyph/text fallbacks. Only currently visible board definitions and choice assets are loaded. Third-party sprite sheets remain traceable source inputs, while project-owned generators produce derived atlases, SVG families, editables and QA artifacts without affecting gameplay state or RNG.
 - Primary-basic direct reactions use a private per-bundle recipient collector shared through Bodyguard recursion, then resolve once per recipient in ID order; ability hits remain immediate per hit. Damage and Shield options narrowly suppress secondary-trait damaged-Energy and tick-zero P6 Shield metering without changing central formulas or defaults.
 - P6 keeps `getActiveTraitEffects(...)` compatible and adds serializable scoped effect/behavior grants. Production tiers explicitly select `team` or `holders`; holder authority is `getEffectiveUnitTraits(...)`. Typed content contains data only, while narrow combat switches attach behaviors to existing start, dodge, damage, cast, kill and death authorities in explicit order. Runtime and counters are battle-local, add no P6 RNG draws and never enter `MatchState`; schema remains 6.
@@ -800,7 +814,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-Review and merge P7 Major Asset Production. Do not start P8, P1B, captain damage, economy tuning, balance work or a 1,000-seed baseline without separate approval.
+Review and merge P8 Captain Damage & Pacing. The next separately approved implementation task is P9 Four-Character Expansion Pack; do not start it automatically. P1B, tuning and the P11 official baseline remain deferred.
 
 ## Codex Update Contract
 
