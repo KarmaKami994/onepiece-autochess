@@ -304,7 +304,7 @@ export function TutorialCoach({
       eyebrow: "STEP 5 OF 6 · COMBAT",
       title: "WATCH THE PLAN UNFOLD",
       copy: "Your crew now moves, attacks, and casts abilities automatically.",
-      hint: "The first Marine wave rewards a choice of three components when defeated.",
+      hint: "Defeat the first Marine wave to receive a component automatically.",
       legend: [
         { icon: "♥", text: "Health" },
         { icon: "◆", text: "Energy — casts at 100" },
@@ -2047,18 +2047,23 @@ export function CarouselScreen({
 
 export function RewardScreen({
   choices,
+  source,
   onChoose,
 }: {
   choices: ChoiceView[];
+  source: "pve" | "supply";
   onChoose: (id: string) => void;
 }) {
+  const completed = choices[0]?.kind === "completed";
   return (
     <section className="choice-screen reward-screen">
       <div className="reward-rays" aria-hidden="true" />
       <header className="choice-heading">
-        <span className="eyebrow">PVE ENCOUNTER CLEARED</span>
-        <h2>CLAIM A COMPONENT</h2>
-        <p>Choose one of three distinct components. Pair it on a crewmate to craft a completed item.</p>
+        <span className="eyebrow">{source === "pve" ? "PVE ENCOUNTER CLEARED" : "ROUND SUPPLIES"}</span>
+        <h2>{completed ? "CLAIM A COMPLETED ITEM" : "CLAIM A COMPONENT"}</h2>
+        <p>{completed
+          ? "Choose one of three distinct completed items for your crew."
+          : "Choose one of three distinct components. Pair it on a crewmate to craft a completed item."}</p>
       </header>
       <div className="reward-cards">
         {choices.map((choice, index) => (

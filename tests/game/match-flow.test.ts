@@ -5,6 +5,7 @@ import {
   applyCommand,
   createMatch,
   createPairings,
+  getStageDefinition,
   runBotTurn,
   type MatchBattleResult,
   type MatchState,
@@ -195,6 +196,8 @@ describe("round and special-stage flow", () => {
 
   it("offers rewards only to PvE winners and accepts a choice", () => {
     const state = createMatch("pve-win-reward");
+    state.round = 2;
+    state.stageId = getStageDefinition(2).id;
     state.phase = "battle";
     state.lastResults = state.players.map(
       (player): MatchBattleResult => ({
@@ -221,7 +224,7 @@ describe("round and special-stage flow", () => {
     }, PLAYER_CONTEXT);
     expect(choice.ok).toBe(true);
     if (choice.ok) {
-      expect(choice.state.round).toBe(2);
+      expect(choice.state.round).toBe(3);
       expect(choice.state.phase).toBe("preparation");
       expect(
         choice.state.players.find(

@@ -341,7 +341,7 @@ describe("P8 captain damage formula", () => {
 describe("P8 battle-result integration", () => {
   it.each([
     [5, 3],
-    [20, 6],
+    [21, 7],
     [34, 10],
   ])(
     "applies round-scaled PvP damage and history at round %i",
@@ -377,7 +377,7 @@ describe("P8 battle-result integration", () => {
   );
 
   it("damages only the real player after a ghost loss and preserves ghost-owner state", () => {
-    const battle = pairedBattle(20, {
+    const battle = pairedBattle(21, {
       ghost: true,
       strongPlayerA: false,
     });
@@ -385,19 +385,19 @@ describe("P8 battle-result integration", () => {
     expect(battle.lastResults[0]).toMatchObject({
       ghostOfPlayerId: "bot-1",
       winnerId: "bot-1",
-      playerADamage: 6,
+      playerADamage: 7,
       playerBDamage: 0,
     });
 
     const resolved = advanceMatchPhase(battle, deterministicCombatContent());
     const fighter = player(resolved, "player-1");
     const owner = player(resolved, "bot-1");
-    expect(fighter.hp).toBe(94);
+    expect(fighter.hp).toBe(93);
     expect(fighter.recentBattles.at(-1)).toMatchObject({
       opponentId: "bot-1",
       isGhost: true,
       captainDamageDealt: 0,
-      captainDamageTaken: 6,
+      captainDamageTaken: 7,
     });
     expect(owner.hp).toBe(ownerBefore.hp);
     expect(owner.winStreak).toBe(ownerBefore.winStreak);
@@ -407,7 +407,7 @@ describe("P8 battle-result integration", () => {
   });
 
   it("never damages the ghost owner when the real player wins", () => {
-    const battle = pairedBattle(20, { ghost: true });
+    const battle = pairedBattle(21, { ghost: true });
     const ownerHp = player(battle, "bot-1").hp;
     expect(battle.lastResults[0]).toMatchObject({
       winnerId: "player-1",
@@ -419,15 +419,15 @@ describe("P8 battle-result integration", () => {
   });
 
   it("applies normal damage for a timed-out winner and zero for a timed-out draw", () => {
-    const wonOnTimeout = pairedBattle(20);
+    const wonOnTimeout = pairedBattle(21);
     wonOnTimeout.lastResults[0].timedOut = true;
     const resolvedWinner = advanceMatchPhase(
       wonOnTimeout,
       deterministicCombatContent(),
     );
-    expect(player(resolvedWinner, "bot-1").hp).toBe(94);
+    expect(player(resolvedWinner, "bot-1").hp).toBe(93);
 
-    const drawnOnTimeout = pairedBattle(20);
+    const drawnOnTimeout = pairedBattle(21);
     drawnOnTimeout.lastResults[0] = {
       ...drawnOnTimeout.lastResults[0],
       winnerId: null,
@@ -526,12 +526,12 @@ describe("P8 battle-result integration", () => {
     expect(player(reversed, "bot-1").placement).toBe(8);
   });
 
-  it("preserves the P5 PvE and carousel topology", () => {
+  it("preserves the P10 PvE and carousel topology", () => {
     expect(
       DEFAULT_CONTENT.stages
         .filter((stage) => stage.kind === "pve")
         .map((stage) => stage.round),
-    ).toEqual([1, 2, 3, 9, 14, 19, 24, 28, 32, 36]);
+    ).toEqual([1, 2, 3, 9, 10, 14, 19, 20, 24, 28, 32, 36, 40]);
     expect(
       DEFAULT_CONTENT.stages
         .filter((stage) => stage.kind === "carousel")
@@ -541,7 +541,7 @@ describe("P8 battle-result integration", () => {
 
   it("restores schema-6 saves without rewriting history and uses P8 for future battles", () => {
     const state = createMatch("p8-save-restore");
-    state.round = 20;
+    state.round = 21;
     const human = player(state, "player-1");
     human.recentBattles = [
       {
@@ -556,7 +556,7 @@ describe("P8 battle-result integration", () => {
     const restored = deserializeMatch(serializeMatch(state));
     expect(restored.schemaVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
     expect(restored.schemaVersion).toBe(6);
-    expect(restored.contentVersion).toBe("1.28.0");
+    expect(restored.contentVersion).toBe("1.29.0");
     expect(player(restored, "player-1").recentBattles).toEqual(
       human.recentBattles,
     );
@@ -571,7 +571,7 @@ describe("P8 battle-result integration", () => {
     setSoloUnit(restoredHuman, "nami");
     setSoloUnit(opponent, "usopp");
     restored.phase = "battle";
-    restored.stageId = getStageDefinition(20).id;
+    restored.stageId = getStageDefinition(21).id;
     restored.pairings = [
       {
         playerAId: restoredHuman.id,
@@ -583,7 +583,7 @@ describe("P8 battle-result integration", () => {
       restored,
       deterministicCombatContent(),
     );
-    expect(futureBattle.lastResults[0].playerBDamage).toBe(6);
+    expect(futureBattle.lastResults[0].playerBDamage).toBe(7);
     expect(player(futureBattle, "player-1").recentBattles).toEqual(
       human.recentBattles,
     );

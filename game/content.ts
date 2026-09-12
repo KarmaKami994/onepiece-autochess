@@ -2186,6 +2186,31 @@ export const PVE_ENEMY_DEFINITIONS: PvEEnemyDefinition[] = [
   },
 ];
 
+const CALM_BELT_WAVE = [
+  { enemyId: "sea-king", count: 1 },
+  { enemyId: "pirate-raider", count: 2 },
+];
+const SIEGE_OF_JUSTICE_WAVE = [
+  { enemyId: "pacifista", count: 2 },
+  { enemyId: "sea-king", count: 1 },
+];
+const COMPONENT_CHOICE = {
+  trigger: "stage-complete",
+  mode: "choice",
+  itemKind: "component",
+  amount: 1,
+  offerCount: 3,
+  distinct: true,
+} as const;
+const COMPLETED_PVE_CHOICE = {
+  trigger: "pve-win",
+  mode: "choice",
+  itemKind: "completed",
+  amount: 1,
+  offerCount: 3,
+  distinct: true,
+} as const;
+
 export const STAGE_DEFINITIONS: StageDefinition[] = [
   {
     id: "east-blue-patrol",
@@ -2195,7 +2220,7 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
     preparationSeconds: 20,
     battleSeconds: 45,
     enemyWave: [{ enemyId: "marine-recruit", count: 2 }],
-    itemChoices: 3,
+    itemReward: { trigger: "pve-win", mode: "grant", itemKind: "component", amount: 1 },
   },
   {
     id: "rifle-line",
@@ -2208,7 +2233,7 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
       { enemyId: "marine-recruit", count: 2 },
       { enemyId: "rifle-marine", count: 1 },
     ],
-    itemChoices: 3,
+    itemReward: { ...COMPONENT_CHOICE, trigger: "pve-win" },
   },
   {
     id: "raider-ambush",
@@ -2221,7 +2246,7 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
       { enemyId: "marine-recruit", count: 2 },
       { enemyId: "pirate-raider", count: 1 },
     ],
-    itemChoices: 3,
+    itemReward: { trigger: "pve-win", mode: "grant", itemKind: "component", amount: 1 },
   },
   {
     id: "first-muster",
@@ -2230,6 +2255,25 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
     name: "First Muster",
     preparationSeconds: 30,
     battleSeconds: 45,
+    carouselItemKind: "component",
+  },
+  {
+    id: "round-five-supplies",
+    round: 5,
+    kind: "pvp",
+    name: "Rival Battle 5",
+    preparationSeconds: 40,
+    battleSeconds: 45,
+    itemReward: COMPONENT_CHOICE,
+  },
+  {
+    id: "round-eight-supplies",
+    round: 8,
+    kind: "pvp",
+    name: "Rival Battle 8",
+    preparationSeconds: 40,
+    battleSeconds: 45,
+    itemReward: COMPONENT_CHOICE,
   },
   {
     id: "calm-belt",
@@ -2238,11 +2282,26 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
     name: "Calm Belt",
     preparationSeconds: 40,
     battleSeconds: 45,
-    enemyWave: [
-      { enemyId: "sea-king", count: 1 },
-      { enemyId: "pirate-raider", count: 2 },
-    ],
-    itemChoices: 3,
+    enemyWave: CALM_BELT_WAVE,
+    itemReward: { trigger: "pve-win", mode: "grant", itemKind: "component", amount: 1 },
+  },
+  {
+    id: "portal-slot-ten-bridge",
+    round: 10,
+    kind: "pve",
+    name: "Calm Belt Bridge",
+    preparationSeconds: 50,
+    battleSeconds: 45,
+    enemyWave: CALM_BELT_WAVE,
+  },
+  {
+    id: "round-eleven-supplies",
+    round: 11,
+    kind: "pvp",
+    name: "Rival Battle 11",
+    preparationSeconds: 40,
+    battleSeconds: 45,
+    itemReward: COMPONENT_CHOICE,
   },
   {
     id: "grand-line-muster",
@@ -2251,6 +2310,7 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
     name: "Grand Line Muster",
     preparationSeconds: 30,
     battleSeconds: 45,
+    carouselItemKind: "component",
   },
   {
     id: "pacifista-test",
@@ -2263,7 +2323,7 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
       { enemyId: "pacifista", count: 1 },
       { enemyId: "rifle-marine", count: 2 },
     ],
-    itemChoices: 3,
+    itemReward: { ...COMPONENT_CHOICE, trigger: "pve-win" },
   },
   {
     id: "new-world-muster",
@@ -2272,6 +2332,7 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
     name: "New World Muster",
     preparationSeconds: 30,
     battleSeconds: 45,
+    carouselItemKind: "component",
   },
   {
     id: "siege-of-justice",
@@ -2280,11 +2341,17 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
     name: "Siege of Justice",
     preparationSeconds: 40,
     battleSeconds: 45,
-    enemyWave: [
-      { enemyId: "pacifista", count: 2 },
-      { enemyId: "sea-king", count: 1 },
-    ],
-    itemChoices: 3,
+    enemyWave: SIEGE_OF_JUSTICE_WAVE,
+    itemReward: { trigger: "pve-win", mode: "grant", itemKind: "component", amount: 2, distinct: true },
+  },
+  {
+    id: "portal-slot-twenty-bridge",
+    round: 20,
+    kind: "pve",
+    name: "Siege Bridge",
+    preparationSeconds: 50,
+    battleSeconds: 45,
+    enemyWave: SIEGE_OF_JUSTICE_WAVE,
   },
   {
     id: "new-world-exchange",
@@ -2293,7 +2360,7 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
     name: "New World Exchange",
     preparationSeconds: 30,
     battleSeconds: 45,
-    rewardItemKind: "completed",
+    carouselItemKind: "completed",
   },
   {
     id: "vice-admiral-vanguard",
@@ -2303,8 +2370,7 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
     preparationSeconds: 30,
     battleSeconds: 45,
     enemyWave: [{ enemyId: "vice-admiral", count: 3 }],
-    itemChoices: 3,
-    rewardItemKind: "completed",
+    itemReward: COMPLETED_PVE_CHOICE,
   },
   {
     id: "emperors-crossroads",
@@ -2313,7 +2379,7 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
     name: "Emperor's Crossroads",
     preparationSeconds: 30,
     battleSeconds: 45,
-    rewardItemKind: "completed",
+    carouselItemKind: "completed",
   },
   {
     id: "cipher-pol-hunt",
@@ -2323,8 +2389,7 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
     preparationSeconds: 30,
     battleSeconds: 45,
     enemyWave: [{ enemyId: "cipher-pol-agent", count: 3 }],
-    itemChoices: 3,
-    rewardItemKind: "completed",
+    itemReward: COMPLETED_PVE_CHOICE,
   },
   {
     id: "seraphim-deployment",
@@ -2334,8 +2399,7 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
     preparationSeconds: 30,
     battleSeconds: 45,
     enemyWave: [{ enemyId: "seraphim", count: 3 }],
-    itemChoices: 3,
-    rewardItemKind: "completed",
+    itemReward: COMPLETED_PVE_CHOICE,
   },
   {
     id: "final-voyage-muster",
@@ -2344,7 +2408,7 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
     name: "Final Voyage Muster",
     preparationSeconds: 30,
     battleSeconds: 45,
-    rewardItemKind: "completed",
+    carouselItemKind: "completed",
   },
   {
     id: "world-government-onslaught",
@@ -2358,8 +2422,28 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
       { enemyId: "cipher-pol-agent", count: 2 },
       { enemyId: "seraphim", count: 2 },
     ],
-    itemChoices: 3,
-    rewardItemKind: "completed",
+    itemReward: COMPLETED_PVE_CHOICE,
+  },
+  {
+    id: "final-new-world-stand",
+    round: 40,
+    kind: "pve",
+    name: "Final New World Stand",
+    preparationSeconds: 30,
+    battleSeconds: 45,
+    enemyWave: [
+      { enemyId: "vice-admiral", count: 2 },
+      { enemyId: "cipher-pol-agent", count: 2 },
+      { enemyId: "seraphim", count: 3 },
+    ],
+    itemReward: {
+      trigger: "pve-win",
+      mode: "grant",
+      itemKind: "completed",
+      amount: 3,
+      distinct: true,
+      excludeTraitGrantItems: true,
+    },
   },
 ];
 
@@ -2477,7 +2561,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.28.0",
+  version: "1.29.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,

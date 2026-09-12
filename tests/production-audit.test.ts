@@ -194,6 +194,7 @@ describe("production configuration audit", () => {
       "32",
       "34",
       "36",
+      "40",
     ]);
     expect(Object.keys(report.characterPresence)).toHaveLength(34);
     expect(Object.keys(report.costBands)).toEqual(["1", "2", "3", "4", "5"]);

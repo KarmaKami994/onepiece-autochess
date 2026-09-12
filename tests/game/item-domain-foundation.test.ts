@@ -81,6 +81,8 @@ function equip(
 
 function winningPvEReward(seed: string): string[] {
   const state = createMatch(seed);
+  state.round = 2;
+  state.stageId = "rifle-line";
   state.phase = "battle";
   state.lastResults = state.players.map(
     (player): MatchBattleResult => ({
@@ -508,6 +510,6 @@ describe("P4A form and save compatibility", () => {
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(restored.schemaVersion).toBe(6);
     expect(human(restored).inventory).toEqual(LEGACY_ITEM_IDS);
-    expect(restored.contentVersion).toBe("1.28.0");
+    expect(restored.contentVersion).toBe("1.29.0");
   });
 });

@@ -91,7 +91,7 @@ async function expectFile(relativePath: string): Promise<void> {
 
 describe("P7 major asset production", () => {
   it("completes real static and preferred v2 presentation for all crew", async () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.28.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.29.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(DEFAULT_CONTENT.units).toHaveLength(34);
     expect(DEFAULT_CONTENT.units.some((unit) =>
@@ -165,7 +165,7 @@ describe("P7 major asset production", () => {
         : value,
     );
     expect(createHash("sha256").update(normalized).digest("hex"))
-      .toBe("a69a13b5fc86a061d9ecfecb6bd874bcc31a35534de6eaece0948cb89aa580be");
+      .toBe("a8df8b6385d004a5a5a1280d89f4503c7ef7172d9eaff9857b861f50fd5b53e2");
   });
 
   it("maps all 65 item identities and preserves recipes and glyph fallback", async () => {

@@ -3,6 +3,7 @@ export * from "./schema";
 export * from "./rng";
 export * from "./content";
 export * from "./items";
+export * from "./itemRewards";
 export * from "./forms";
 export * from "./traits";
 export * from "./combat";

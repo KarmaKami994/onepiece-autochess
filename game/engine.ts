@@ -10,6 +10,7 @@ import {
   isComponentItem,
   resolveItemRecipe,
 } from "./items";
+import { selectStageItemReward } from "./itemRewards";
 import {
   reconcileProductionFormProgression,
   resolvePersistentFormId,
@@ -686,6 +687,9 @@ function resolveBattleResults(
   }
   const survivors = next.players.filter((player) => player.alive);
   if (survivors.length <= 1) {
+    if (stage.itemReward?.mode === "grant") {
+      prepareItemRewards(next, content);
+    }
     const winner = survivors[0] ?? null;
     if (winner) {
       winner.placement = 1;
@@ -695,8 +699,8 @@ function resolveBattleResults(
     return next;
   }
 
-  if (stage.kind === "pve") {
-    prepareItemChoices(next, content);
+  if (stage.itemReward) {
+    prepareItemRewards(next, content);
     if (Object.keys(next.pendingItemChoices).length > 0) {
       next.phase = "item-choice";
       autoChooseBotItems(next, content);
@@ -708,51 +712,29 @@ function resolveBattleResults(
   return beginNextRound(next, content);
 }
 
-function prepareItemChoices(
+function prepareItemRewards(
   state: MatchState,
   content: GameContent,
 ): void {
   state.pendingItemChoices = {};
   const stage = getStageDefinition(state.round, content);
-  const choiceCount = stage.itemChoices ?? 3;
+  const reward = stage.itemReward;
+  if (!reward) return;
   for (const player of state.players.filter((candidate) => {
-    if (!candidate.alive) {
-      return false;
-    }
-    return state.lastResults.some(
+    if (!candidate.alive) return false;
+    return reward.trigger === "stage-complete" || state.lastResults.some(
       (result) =>
         result.playerAId === candidate.id &&
         result.winnerId === candidate.id,
     );
   })) {
-    if (stage.rewardItemKind === "completed") {
-      const completedItems = getItemsByKind(content, "completed");
-      const nonTraitShuffle = shuffleDeterministic(
-        completedItems.filter((item) => !item.grantedTraitId),
-        state.rngState,
-      );
-      state.rngState = nonTraitShuffle.state;
-      const firstChoices = nonTraitShuffle.values.slice(0, 2);
-      const selectedIds = new Set(firstChoices.map((item) => item.id));
-      const finalShuffle = shuffleDeterministic(
-        completedItems.filter((item) => !selectedIds.has(item.id)),
-        state.rngState,
-      );
-      state.rngState = finalShuffle.state;
-      state.pendingItemChoices[player.id] = [
-        ...firstChoices,
-        ...finalShuffle.values.slice(0, 1),
-      ].map((item) => item.id);
-      continue;
+    const selected = selectStageItemReward(reward, content, state.rngState);
+    state.rngState = selected.rngState;
+    if (reward.mode === "grant") {
+      player.inventory.push(...selected.itemIds);
+    } else {
+      state.pendingItemChoices[player.id] = selected.itemIds;
     }
-    const shuffled = shuffleDeterministic(
-      getAcquirableItems(content),
-      state.rngState,
-    );
-    state.rngState = shuffled.state;
-    state.pendingItemChoices[player.id] = shuffled.values
-      .slice(0, choiceCount)
-      .map((item) => item.id);
   }
 }
 
@@ -786,7 +768,7 @@ function createCarouselChoices(
 ): CarouselChoice[] {
   const livingPlayers = state.players.filter((player) => player.alive).length;
   const stage = getStageDefinition(state.round, content);
-  if (stage.rewardItemKind === "completed") {
+  if (stage.carouselItemKind === "completed") {
     const desiredCount = Math.min(10, Math.max(6, livingPlayers + 4));
     const itemPool = getItemsByKind(content, "completed");
     const itemShuffle = shuffleDeterministic(itemPool, state.rngState);
