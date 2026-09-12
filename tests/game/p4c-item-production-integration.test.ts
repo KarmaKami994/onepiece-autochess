@@ -121,7 +121,7 @@ describe("P4C item production integration", () => {
         effects,
       });
     }
-    expect(DEFAULT_CONTENT.version).toBe("1.28.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.29.0");
   });
 
   it("counts deployed grants like native traits while deduping native and same-definition contributors", () => {
@@ -302,6 +302,8 @@ describe("P4C item production integration", () => {
 
   it("keeps component acquisition deterministic, distinct for PvE, and victory-gated", () => {
     const state = createMatch("p4c-pve-reward");
+    state.round = 2;
+    state.stageId = "rifle-line";
     state.phase = "battle";
     state.lastResults = state.players.map((player): MatchBattleResult => ({
       playerAId: player.id,

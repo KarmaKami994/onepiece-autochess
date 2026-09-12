@@ -1130,7 +1130,7 @@ export default function GameClient() {
       tutorialStep === "await-reward" &&
       view.phase === "preparation"
     ) {
-      nextStep = "sail";
+      nextStep = view.inventory.length > 0 ? "equip" : "sail";
     } else if (
       tutorialStep === "treasure" &&
       view.phase === "preparation" &&
@@ -1301,7 +1301,11 @@ export default function GameClient() {
         />
       )}
       {screen === "reward" && view && (
-        <RewardScreen choices={view.choices} onChoose={chooseReward} />
+        <RewardScreen
+          choices={view.choices}
+          source={GameEngine.getStageDefinition(view.round).kind === "pve" ? "pve" : "supply"}
+          onChoose={chooseReward}
+        />
       )}
       {screen === "results" && view && (
         <ResultsScreen

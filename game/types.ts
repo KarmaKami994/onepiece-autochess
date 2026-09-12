@@ -357,6 +357,16 @@ export interface PvEWaveEntry {
   count: number;
 }
 
+export interface StageItemRewardDefinition {
+  trigger: "pve-win" | "stage-complete";
+  mode: "grant" | "choice";
+  itemKind: ItemKind;
+  amount: number;
+  offerCount?: number;
+  distinct?: boolean;
+  excludeTraitGrantItems?: boolean;
+}
+
 export interface StageDefinition {
   id: string;
   round: number;
@@ -365,8 +375,8 @@ export interface StageDefinition {
   preparationSeconds: number;
   battleSeconds: number;
   enemyWave?: PvEWaveEntry[];
-  itemChoices?: number;
-  rewardItemKind?: ItemKind;
+  itemReward?: StageItemRewardDefinition;
+  carouselItemKind?: ItemKind;
 }
 
 export interface BotPersonality {

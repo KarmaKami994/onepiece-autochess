@@ -155,7 +155,7 @@ describe("Luffy Gear 4 production content", () => {
     const boundman = getUnitFormDefinition(BOUNDMAN_FORM_ID);
     const snakeman = getUnitFormDefinition(SNAKEMAN_FORM_ID);
 
-    expect(DEFAULT_CONTENT.version).toBe("1.28.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.29.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(DEFAULT_CONTENT.units).toHaveLength(34);
     expect(DEFAULT_CONTENT.forms).toHaveLength(4);
@@ -820,7 +820,7 @@ describe("Luffy Gear 4 schema-6 persistence", () => {
     const restoredPlayer = human(restored);
 
     expect(restored.schemaVersion).toBe(6);
-    expect(restored.contentVersion).toBe("1.28.0");
+    expect(restored.contentVersion).toBe("1.29.0");
     expect(restoredPlayer.units.bound.formId).toBe(BOUNDMAN_FORM_ID);
     expect(restoredPlayer.units.snake.formId).toBe(SNAKEMAN_FORM_ID);
     expect(restoredPlayer.units["legacy-arm"].formId).toBe(BOUNDMAN_FORM_ID);

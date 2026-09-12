@@ -17,7 +17,6 @@ import {
 } from "../../game";
 
 const PLAYER_CONTEXT = { actorPlayerId: "player-1" };
-const EARLY_PVE_ROUNDS = [1, 2, 3, 9, 14, 19];
 const EARLY_CAROUSEL_ROUNDS = [4, 12, 17];
 const LATE_PVE_ROUNDS = [24, 28, 32, 36];
 const LATE_CAROUSEL_ROUNDS = [22, 27, 34];
@@ -84,18 +83,22 @@ function completedItems() {
 describe("P5 late-game content topology", () => {
   it("keeps the early schedule and declares only the approved late-game stages", () => {
     expect(DEFAULT_CONTENT.stages.filter((stage) => stage.kind === "pve").map((stage) => stage.round))
-      .toEqual([...EARLY_PVE_ROUNDS, ...LATE_PVE_ROUNDS]);
+      .toEqual([1, 2, 3, 9, 14, 19, ...LATE_PVE_ROUNDS, 40]);
     expect(DEFAULT_CONTENT.stages.filter((stage) => stage.kind === "carousel").map((stage) => stage.round))
       .toEqual([...EARLY_CAROUSEL_ROUNDS, ...LATE_CAROUSEL_ROUNDS]);
     expect(DEFAULT_CONTENT.stages.filter((stage) => stage.kind === "pve" && stage.round < 20).map((stage) => stage.round))
-      .toEqual(EARLY_PVE_ROUNDS);
+      .toEqual([1, 2, 3, 9, 14, 19]);
     expect(DEFAULT_CONTENT.stages.filter((stage) => stage.kind === "carousel" && stage.round < 20).map((stage) => stage.round))
       .toEqual(EARLY_CAROUSEL_ROUNDS);
-    expect(DEFAULT_CONTENT.stages.filter((stage) => stage.kind === "pve" && stage.rewardItemKind === "completed").map((stage) => stage.round))
-      .toEqual(LATE_PVE_ROUNDS);
-    expect(DEFAULT_CONTENT.stages.filter((stage) => stage.kind === "carousel" && stage.rewardItemKind === "completed").map((stage) => stage.round))
+    expect(DEFAULT_CONTENT.stages.filter((stage) => stage.kind === "pve" && stage.itemReward?.itemKind === "completed").map((stage) => stage.round))
+      .toEqual([...LATE_PVE_ROUNDS, 40]);
+    expect(DEFAULT_CONTENT.stages.filter((stage) => stage.kind === "carousel" && stage.carouselItemKind === "completed").map((stage) => stage.round))
       .toEqual(LATE_CAROUSEL_ROUNDS);
-    expect(DEFAULT_CONTENT.stages.some((stage) => stage.round === 40)).toBe(false);
+    expect([10, 20].map((round) => getStageDefinition(round))).toMatchObject([
+      { id: "pvp-10", kind: "pvp", preparationSeconds: 50 },
+      { id: "pvp-20", kind: "pvp", preparationSeconds: 50 },
+    ]);
+    expect(getStageDefinition(40).kind).toBe("pve");
     const specialRounds = new Set(DEFAULT_CONTENT.stages.map((stage) => stage.round));
     for (let round = 1; round <= 40; round += 1) {
       if (!specialRounds.has(round)) expect(getStageDefinition(round).kind).toBe("pvp");
@@ -107,7 +110,7 @@ describe("P5 late-game content topology", () => {
     const enemyIds = new Set(DEFAULT_CONTENT.enemies.map((enemy) => enemy.id));
     expect(new Set(rounds).size).toBe(rounds.length);
     for (const stage of DEFAULT_CONTENT.stages) {
-      expect([undefined, "component", "completed"]).toContain(stage.rewardItemKind);
+      expect([undefined, "component", "completed"]).toContain(stage.itemReward?.itemKind ?? stage.carouselItemKind);
       for (const entry of stage.enemyWave ?? []) {
         expect(enemyIds.has(entry.enemyId)).toBe(true);
       }
@@ -116,10 +119,10 @@ describe("P5 late-game content topology", () => {
 
   it("defines the exact late PvE waves, timing, and three completed choices", () => {
     expect(LATE_PVE_ROUNDS.map((round) => getStageDefinition(round))).toMatchObject([
-      { id: "vice-admiral-vanguard", name: "Vice Admiral Vanguard", preparationSeconds: 30, battleSeconds: 45, enemyWave: [{ enemyId: "vice-admiral", count: 3 }], itemChoices: 3, rewardItemKind: "completed" },
-      { id: "cipher-pol-hunt", name: "Cipher Pol Hunt", preparationSeconds: 30, battleSeconds: 45, enemyWave: [{ enemyId: "cipher-pol-agent", count: 3 }], itemChoices: 3, rewardItemKind: "completed" },
-      { id: "seraphim-deployment", name: "Seraphim Deployment", preparationSeconds: 30, battleSeconds: 45, enemyWave: [{ enemyId: "seraphim", count: 3 }], itemChoices: 3, rewardItemKind: "completed" },
-      { id: "world-government-onslaught", name: "World Government Onslaught", preparationSeconds: 30, battleSeconds: 45, enemyWave: [{ enemyId: "vice-admiral", count: 2 }, { enemyId: "cipher-pol-agent", count: 2 }, { enemyId: "seraphim", count: 2 }], itemChoices: 3, rewardItemKind: "completed" },
+      { id: "vice-admiral-vanguard", name: "Vice Admiral Vanguard", preparationSeconds: 30, battleSeconds: 45, enemyWave: [{ enemyId: "vice-admiral", count: 3 }], itemReward: { mode: "choice", itemKind: "completed", amount: 1, offerCount: 3 } },
+      { id: "cipher-pol-hunt", name: "Cipher Pol Hunt", preparationSeconds: 30, battleSeconds: 45, enemyWave: [{ enemyId: "cipher-pol-agent", count: 3 }], itemReward: { mode: "choice", itemKind: "completed", amount: 1, offerCount: 3 } },
+      { id: "seraphim-deployment", name: "Seraphim Deployment", preparationSeconds: 30, battleSeconds: 45, enemyWave: [{ enemyId: "seraphim", count: 3 }], itemReward: { mode: "choice", itemKind: "completed", amount: 1, offerCount: 3 } },
+      { id: "world-government-onslaught", name: "World Government Onslaught", preparationSeconds: 30, battleSeconds: 45, enemyWave: [{ enemyId: "vice-admiral", count: 2 }, { enemyId: "cipher-pol-agent", count: 2 }, { enemyId: "seraphim", count: 2 }], itemReward: { mode: "choice", itemKind: "completed", amount: 1, offerCount: 3 } },
     ]);
   });
 
@@ -200,7 +203,7 @@ describe("P5 completed-item rewards", () => {
       .toEqual(carousel.carouselChoices);
   });
 
-  it.each(EARLY_PVE_ROUNDS)("keeps three deterministic component rewards at early PvE round %i", (round) => {
+  it.each([2, 14])("keeps three deterministic component offers at PvE round %i", (round) => {
     const first = resolvePve(round, `p5-early-pve-${round}`);
     const second = resolvePve(round, `p5-early-pve-${round}`);
     const choices = first.pendingItemChoices["player-1"];
@@ -210,11 +213,7 @@ describe("P5 completed-item rewards", () => {
   });
 
   it("preserves representative early acquisition output and carousel counts", () => {
-    expect(resolvePve(1, "p4a-reward-1").pendingItemChoices["player-1"]).toEqual([
-      "jet-dial",
-      "sniper-lens",
-      "devil-fruit-essence",
-    ]);
+    expect(resolvePve(1, "p4a-reward-1").players[0].inventory).toHaveLength(1);
     const earlyCarousel = enterCarousel(4, "p4a-carousel-1");
     expect(earlyCarousel.carouselChoices.map((choice) => choice.itemId)).toEqual([
       "armament-plate",
@@ -324,7 +323,7 @@ describe("P5 item, bot, and save compatibility", () => {
     human(state).inventory = ["black-blade", "jet-dial"];
     const restored = deserializeMatch(serializeMatch(state));
     expect(restored.schemaVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
-    expect(restored.contentVersion).toBe("1.28.0");
+    expect(restored.contentVersion).toBe("1.29.0");
     expect(human(restored).inventory).toEqual(["black-blade", "jet-dial"]);
     const next = advanceMatchPhase(restored);
     expect(next).toMatchObject({ round: 22, phase: "carousel", stageId: "new-world-exchange" });
@@ -332,7 +331,7 @@ describe("P5 item, bot, and save compatibility", () => {
   });
 
   it("keeps GameContent 1.26.0 and save schema 6", () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.28.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.29.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 });

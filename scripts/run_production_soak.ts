@@ -10,6 +10,7 @@ import {
   createMatch,
   getActiveTraits,
   getActiveTraitsForUnits,
+  getItemDefinition,
   getStageDefinition,
   hashCanonicalValue,
   hashGameContent,
@@ -18,6 +19,7 @@ import {
   type MatchBattleResult,
   type MatchState,
   type PlayerState,
+  type StageDefinition,
   type UnitFormLifecycle,
   type UnitInstance,
 } from "../game/index";
@@ -228,7 +230,7 @@ export type CombatReadabilityReport = {
 };
 
 export const CAPTAIN_DAMAGE_STAGE_REACH_ROUNDS = [
-  22, 24, 27, 28, 32, 34, 36,
+  22, 24, 27, 28, 32, 34, 36, 40,
 ] as const;
 
 export type CaptainDamageKind = "pvp" | "ghost" | "pve";
@@ -338,12 +340,99 @@ export type ProductionSoakReport = {
     }
   >;
   itemUsage: Record<string, number>;
+  itemEconomy: ItemEconomyReport;
   targets: {
     matchLength20To30Minutes: boolean;
     noCharacterAbove65PercentOfWinningBoards: boolean;
     everyTraitReached: boolean;
   };
 };
+
+const ITEM_ACQUISITION_SOURCES = [
+  "pveAutomatic",
+  "pveChoice",
+  "supplyChoice",
+  "carousel",
+] as const;
+
+type ItemAcquisitionSource = (typeof ITEM_ACQUISITION_SOURCES)[number];
+
+type ItemAcquisitionCounter = {
+  components: number;
+  completed: number;
+  total: number;
+};
+
+export type ItemEconomyReport = {
+  participantPlayerMatches: number;
+  averageComponentsAcquiredPerPlayer: number;
+  averageCompletedItemsAcquiredPerPlayer: number;
+  averageTotalItemAcquisitionsPerPlayer: number;
+  survivingPlayerMatches: number;
+  averageTotalItemAcquisitionsPerSurvivingPlayer: number;
+  bySource: Record<
+    ItemAcquisitionSource,
+    ItemAcquisitionCounter & { averagePerPlayer: number }
+  >;
+};
+
+function emptyItemAcquisitionCounter(): ItemAcquisitionCounter {
+  return { components: 0, completed: 0, total: 0 };
+}
+
+function inventoryCounts(state: MatchState): Map<string, MutableCounter> {
+  return new Map(
+    state.players.map((player) => {
+      const counts: MutableCounter = {};
+      for (const itemId of player.inventory) increment(counts, itemId);
+      return [player.id, counts];
+    }),
+  );
+}
+
+function itemAcquisitionSource(
+  phase: MatchState["phase"],
+  stage: StageDefinition,
+): ItemAcquisitionSource | null {
+  if (phase === "carousel") return "carousel";
+  const reward = stage.itemReward;
+  if (!reward) return null;
+  if (phase === "item-choice" && reward.mode === "choice") {
+    return reward.trigger === "pve-win" ? "pveChoice" : "supplyChoice";
+  }
+  if (phase === "battle") {
+    if (reward.mode === "grant") return "pveAutomatic";
+    return reward.trigger === "pve-win" ? "pveChoice" : "supplyChoice";
+  }
+  return null;
+}
+
+function recordInventoryAcquisitions(
+  before: Map<string, MutableCounter>,
+  state: MatchState,
+  source: ItemAcquisitionSource,
+  totals: ItemAcquisitionCounter,
+  bySource: Record<ItemAcquisitionSource, ItemAcquisitionCounter>,
+  byPlayer: Map<string, number>,
+): void {
+  for (const player of state.players) {
+    const previous = before.get(player.id) ?? {};
+    const current: MutableCounter = {};
+    for (const itemId of player.inventory) increment(current, itemId);
+    for (const [itemId, count] of Object.entries(current)) {
+      const added = Math.max(0, count - (previous[itemId] ?? 0));
+      if (added === 0) continue;
+      const item = getItemDefinition(itemId, DEFAULT_CONTENT);
+      if (!item) continue;
+      const kind = item.kind === "component" ? "components" : "completed";
+      totals[kind] += added;
+      totals.total += added;
+      bySource[source][kind] += added;
+      bySource[source].total += added;
+      byPlayer.set(player.id, (byPlayer.get(player.id) ?? 0) + added);
+    }
+  }
+}
 
 function currentGitSha(): string {
   try {
@@ -1134,6 +1223,13 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
     ]),
   );
   const itemUsage: MutableCounter = {};
+  const itemAcquisitionTotals = emptyItemAcquisitionCounter();
+  const itemAcquisitionsBySource = Object.fromEntries(
+    ITEM_ACQUISITION_SOURCES.map((source) => [
+      source,
+      emptyItemAcquisitionCounter(),
+    ]),
+  ) as Record<ItemAcquisitionSource, ItemAcquisitionCounter>;
   const captainDamagePacingMatches: CaptainDamagePacingMatchInput[] = [];
   let completeMatches = 0;
   let crashes = 0;
@@ -1148,11 +1244,18 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
   let nonDemonioThreeStarFinalBoards = 0;
   let luffyThreeStarFinalBoards = 0;
   let totalTransformEvents = 0;
+  let participantPlayerMatches = 0;
+  let survivingPlayerMatches = 0;
+  let survivingPlayerAcquisitions = 0;
 
   for (let seedIndex = 0; seedIndex < seedCount; seedIndex += 1) {
     try {
       let state = createMatch(`production-${seedIndex}`, DEFAULT_CONTENT);
       normalizeProductionSoakPopulation(state, seedIndex);
+      participantPlayerMatches += state.players.length;
+      const matchItemAcquisitions = new Map(
+        state.players.map((player) => [player.id, 0]),
+      );
       const lastDeployedBoards = new Map<string, Set<string>>();
       const lastDeployedPilotUnits = new Map<
         string,
@@ -1325,7 +1428,28 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
           paced += carouselSeconds;
         }
 
+        const itemAcquisitionStage = getStageDefinition(
+          state.round,
+          DEFAULT_CONTENT,
+        );
+        const acquisitionSource = itemAcquisitionSource(
+          state.phase,
+          itemAcquisitionStage,
+        );
+        const inventoriesBefore = acquisitionSource
+          ? inventoryCounts(state)
+          : null;
         state = advanceMatchPhase(state, DEFAULT_CONTENT);
+        if (acquisitionSource && inventoriesBefore) {
+          recordInventoryAcquisitions(
+            inventoriesBefore,
+            state,
+            acquisitionSource,
+            itemAcquisitionTotals,
+            itemAcquisitionsBySource,
+            matchItemAcquisitions,
+          );
+        }
         if (
           resolvedBattleRound !== null &&
           aliveBeforeBattleResolution !== null
@@ -1364,6 +1488,12 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
         (left, right) => left - right,
       );
       captainDamagePacingMatches.push(captainDamagePacing);
+
+      for (const survivor of state.players.filter((player) => player.alive)) {
+        survivingPlayerMatches += 1;
+        survivingPlayerAcquisitions +=
+          matchItemAcquisitions.get(survivor.id) ?? 0;
+      }
 
       for (const player of state.players) {
         if (player.placement === null) {
@@ -1881,6 +2011,38 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
     itemUsage: Object.fromEntries(
       DEFAULT_CONTENT.items.map((item) => [item.id, itemUsage[item.id] ?? 0]),
     ),
+    itemEconomy: {
+      participantPlayerMatches,
+      averageComponentsAcquiredPerPlayer: rate(
+        itemAcquisitionTotals.components,
+        participantPlayerMatches,
+      ),
+      averageCompletedItemsAcquiredPerPlayer: rate(
+        itemAcquisitionTotals.completed,
+        participantPlayerMatches,
+      ),
+      averageTotalItemAcquisitionsPerPlayer: rate(
+        itemAcquisitionTotals.total,
+        participantPlayerMatches,
+      ),
+      survivingPlayerMatches,
+      averageTotalItemAcquisitionsPerSurvivingPlayer: rate(
+        survivingPlayerAcquisitions,
+        survivingPlayerMatches,
+      ),
+      bySource: Object.fromEntries(
+        ITEM_ACQUISITION_SOURCES.map((source) => [
+          source,
+          {
+            ...itemAcquisitionsBySource[source],
+            averagePerPlayer: rate(
+              itemAcquisitionsBySource[source].total,
+              participantPlayerMatches,
+            ),
+          },
+        ]),
+      ) as ItemEconomyReport["bySource"],
+    },
     targets: {
       matchLength20To30Minutes:
         averageFullClockMinutes >= 20 && averageFullClockMinutes <= 30,

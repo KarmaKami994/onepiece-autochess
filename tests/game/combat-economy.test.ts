@@ -215,6 +215,8 @@ describe("combat economy command policy", () => {
 
   it("resolves the original result while retaining battle economy changes", () => {
     const battleStart = createBattleState("combat-economy-resolution");
+    battleStart.round = 2;
+    battleStart.stageId = "rifle-line";
     const baselineResolved = advanceMatchPhase(battleStart);
     const baselinePlayer = player(baselineResolved);
     let changed = run(battleStart, { type: "BUY_UNIT", shopIndex: 0 });

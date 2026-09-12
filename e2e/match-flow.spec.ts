@@ -61,7 +61,12 @@ test("complete voyage covers PvE reward, carousel, PvP, resume, and results", as
     .getByRole("button", { name: /SKIP ANIMATION|CONTINUE/i })
     .click();
 
+  await expect(page.locator(".reward-screen")).toHaveCount(0);
+  await expect(page.locator(".match-screen")).toBeVisible();
+  await page.getByRole("button", { name: /START BATTLE|SET SAIL/i }).click();
+  await page.getByRole("button", { name: /SKIP ANIMATION|CONTINUE/i }).click();
   await expect(page.locator(".reward-screen")).toBeVisible();
+  await expect(page.locator(".reward-screen")).toContainText("PVE ENCOUNTER CLEARED");
   await page.locator("button.reward-card").first().click();
   await expect(page.locator(".match-screen")).toBeVisible();
 

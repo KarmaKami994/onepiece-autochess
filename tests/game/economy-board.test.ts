@@ -93,7 +93,7 @@ function advanceAutomaticShop(state: MatchState): MatchState {
       candidate.shopLocked = true;
     }
   }
-  state.round = 5;
+  state.round = 6;
   state.phase = "battle";
   state.lastResults = [];
   return advanceMatchPhase(state);
@@ -277,7 +277,7 @@ describe("shop, economy, pool, and upgrades", () => {
     human.lossStreak = 0;
     human.level = 2;
     human.xp = 0;
-    state.round = 5;
+    state.round = 6;
     state.phase = "battle";
     state.lastResults = [
       {
