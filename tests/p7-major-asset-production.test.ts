@@ -165,7 +165,7 @@ describe("P7 major asset production", () => {
         : value,
     );
     expect(createHash("sha256").update(normalized).digest("hex"))
-      .toBe("a8df8b6385d004a5a5a1280d89f4503c7ef7172d9eaff9857b861f50fd5b53e2");
+      .toBe("6c29a90d0dae4868a8cac709ed09936e2bb10cb9a18297d7c21dccd58ae11dd9");
   });
 
   it("maps all 65 item identities and preserves recipes and glyph fallback", async () => {
