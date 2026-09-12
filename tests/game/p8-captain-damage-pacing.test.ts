@@ -531,7 +531,7 @@ describe("P8 battle-result integration", () => {
       DEFAULT_CONTENT.stages
         .filter((stage) => stage.kind === "pve")
         .map((stage) => stage.round),
-    ).toEqual([1, 2, 3, 9, 10, 14, 19, 20, 24, 28, 32, 36, 40]);
+    ).toEqual([1, 2, 3, 9, 14, 19, 24, 28, 32, 36, 40]);
     expect(
       DEFAULT_CONTENT.stages
         .filter((stage) => stage.kind === "carousel")

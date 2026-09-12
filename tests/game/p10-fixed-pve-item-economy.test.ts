@@ -15,7 +15,7 @@ import {
   type MatchState,
 } from "../../game";
 
-const PVE_ROUNDS = [1, 2, 3, 9, 10, 14, 19, 20, 24, 28, 32, 36, 40];
+const PVE_ROUNDS = [1, 2, 3, 9, 14, 19, 24, 28, 32, 36, 40];
 const CAROUSEL_ROUNDS = [4, 12, 17, 22, 27, 34];
 const SUPPLY_ROUNDS = [5, 8, 11];
 const PVE_CHOICE_ROUNDS = [2, 14, 24, 28, 32, 36];
@@ -72,17 +72,20 @@ describe("P10 fixed cadence and reward content", () => {
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 
-  it("uses preceding enemy waves for no-reward PvE bridges", () => {
-    for (const [bridge, preceding] of [[10, 9], [20, 19]]) {
-      expect(getStageDefinition(bridge)).toMatchObject({ kind: "pve" });
-      expect(getStageDefinition(bridge).enemyWave).toEqual(getStageDefinition(preceding).enemyWave);
-      expect(getStageDefinition(bridge).itemReward).toBeUndefined();
-      const { after } = resolvedRound(bridge, `p10-bridge-${bridge}`);
-      const repeat = resolvedRound(bridge, `p10-bridge-${bridge}`).after;
-      expect(after.round).toBe(bridge + 1);
+  it("leaves PAC Portal slots on the existing no-reward PvP fallback", () => {
+    for (const round of [10, 20]) {
+      expect(DEFAULT_CONTENT.stages.some((stage) => stage.round === round)).toBe(false);
+      expect(getStageDefinition(round)).toMatchObject({
+        id: `pvp-${round}`, kind: "pvp", preparationSeconds: 50,
+      });
+      expect(getStageDefinition(round).enemyWave).toBeUndefined();
+      expect(getStageDefinition(round).itemReward).toBeUndefined();
+      const { after } = resolvedRound(round, `p10-fallback-${round}`);
+      const repeat = resolvedRound(round, `p10-fallback-${round}`).after;
+      expect(after.round).toBe(round + 1);
       expect(player(after).inventory).toEqual([]);
       expect(after.rngState).toBe(repeat.rngState);
-      expect(player(after).recentBattles).toEqual([]);
+      expect(player(after).winStreak).toBe(1);
     }
   });
 
@@ -238,7 +241,7 @@ describe("P10 fixed cadence and reward content", () => {
     expect(advanceMatchPhase(after).round).toBe(25);
   });
 
-  it("round-trips early, supply, late, and bridge checkpoints without duplicate rewards", () => {
+  it("round-trips early, supply, late, and fallback checkpoints without duplicate rewards", () => {
     for (const round of [2, 5, 24]) {
       const offered = resolvedRound(round, `p10-save-${round}`).after;
       const restored = deserializeMatch(serializeMatch(offered));
@@ -247,13 +250,13 @@ describe("P10 fixed cadence and reward content", () => {
       expect(restored.rngState).toBe(offered.rngState);
       expect(advanceMatchPhase(restored)).toEqual(advanceMatchPhase(offered));
     }
-    const beforeBridge = createMatch("p10-bridge-save");
-    beforeBridge.round = 10;
-    beforeBridge.stageId = getStageDefinition(10).id;
-    const restoredBefore = deserializeMatch(serializeMatch(beforeBridge));
-    expect(restoredBefore).toEqual(beforeBridge);
-    const afterBridge = resolvedRound(10, "p10-bridge-after").after;
-    expect(deserializeMatch(serializeMatch(afterBridge))).toEqual(afterBridge);
+    const beforeFallback = createMatch("p10-fallback-save");
+    beforeFallback.round = 10;
+    beforeFallback.stageId = getStageDefinition(10).id;
+    const restoredBefore = deserializeMatch(serializeMatch(beforeFallback));
+    expect(restoredBefore).toEqual(beforeFallback);
+    const afterFallback = resolvedRound(10, "p10-fallback-after").after;
+    expect(deserializeMatch(serializeMatch(afterFallback))).toEqual(afterFallback);
     const grant = resolvedRound(19, "p10-grant-save").after;
     const restoredGrant = deserializeMatch(serializeMatch(grant));
     expect(player(restoredGrant).inventory).toEqual(player(grant).inventory);

@@ -327,7 +327,7 @@ describe("P4C item production integration", () => {
     state.lastResults = state.lastResults.map((result) => ({ ...result, winnerId: null }));
     expect(advanceMatchPhase(state).pendingItemChoices["player-1"]).toBeUndefined();
     expect(DEFAULT_CONTENT.stages.filter((stage) => stage.kind === "pve" && stage.round < 20).map((stage) => stage.round))
-      .toEqual([1, 2, 3, 9, 10, 14, 19]);
+      .toEqual([1, 2, 3, 9, 14, 19]);
   });
 
   it("keeps carousel cadence and limits each component to two copies", () => {

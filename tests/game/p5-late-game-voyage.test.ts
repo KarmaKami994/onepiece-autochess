@@ -17,7 +17,6 @@ import {
 } from "../../game";
 
 const PLAYER_CONTEXT = { actorPlayerId: "player-1" };
-const BRIDGE_PVE_ROUNDS = [10, 20];
 const EARLY_CAROUSEL_ROUNDS = [4, 12, 17];
 const LATE_PVE_ROUNDS = [24, 28, 32, 36];
 const LATE_CAROUSEL_ROUNDS = [22, 27, 34];
@@ -84,18 +83,21 @@ function completedItems() {
 describe("P5 late-game content topology", () => {
   it("keeps the early schedule and declares only the approved late-game stages", () => {
     expect(DEFAULT_CONTENT.stages.filter((stage) => stage.kind === "pve").map((stage) => stage.round))
-      .toEqual([1, 2, 3, 9, 10, 14, 19, 20, ...LATE_PVE_ROUNDS, 40]);
+      .toEqual([1, 2, 3, 9, 14, 19, ...LATE_PVE_ROUNDS, 40]);
     expect(DEFAULT_CONTENT.stages.filter((stage) => stage.kind === "carousel").map((stage) => stage.round))
       .toEqual([...EARLY_CAROUSEL_ROUNDS, ...LATE_CAROUSEL_ROUNDS]);
     expect(DEFAULT_CONTENT.stages.filter((stage) => stage.kind === "pve" && stage.round < 20).map((stage) => stage.round))
-      .toEqual([1, 2, 3, 9, 10, 14, 19]);
+      .toEqual([1, 2, 3, 9, 14, 19]);
     expect(DEFAULT_CONTENT.stages.filter((stage) => stage.kind === "carousel" && stage.round < 20).map((stage) => stage.round))
       .toEqual(EARLY_CAROUSEL_ROUNDS);
     expect(DEFAULT_CONTENT.stages.filter((stage) => stage.kind === "pve" && stage.itemReward?.itemKind === "completed").map((stage) => stage.round))
       .toEqual([...LATE_PVE_ROUNDS, 40]);
     expect(DEFAULT_CONTENT.stages.filter((stage) => stage.kind === "carousel" && stage.carouselItemKind === "completed").map((stage) => stage.round))
       .toEqual(LATE_CAROUSEL_ROUNDS);
-    expect(BRIDGE_PVE_ROUNDS.map((round) => getStageDefinition(round).itemReward)).toEqual([undefined, undefined]);
+    expect([10, 20].map((round) => getStageDefinition(round))).toMatchObject([
+      { id: "pvp-10", kind: "pvp", preparationSeconds: 50 },
+      { id: "pvp-20", kind: "pvp", preparationSeconds: 50 },
+    ]);
     expect(getStageDefinition(40).kind).toBe("pve");
     const specialRounds = new Set(DEFAULT_CONTENT.stages.map((stage) => stage.round));
     for (let round = 1; round <= 40; round += 1) {

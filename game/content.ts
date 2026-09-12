@@ -2186,14 +2186,6 @@ export const PVE_ENEMY_DEFINITIONS: PvEEnemyDefinition[] = [
   },
 ];
 
-const CALM_BELT_WAVE = [
-  { enemyId: "sea-king", count: 1 },
-  { enemyId: "pirate-raider", count: 2 },
-];
-const SIEGE_OF_JUSTICE_WAVE = [
-  { enemyId: "pacifista", count: 2 },
-  { enemyId: "sea-king", count: 1 },
-];
 const COMPONENT_CHOICE = {
   trigger: "stage-complete",
   mode: "choice",
@@ -2282,17 +2274,11 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
     name: "Calm Belt",
     preparationSeconds: 40,
     battleSeconds: 45,
-    enemyWave: CALM_BELT_WAVE,
+    enemyWave: [
+      { enemyId: "sea-king", count: 1 },
+      { enemyId: "pirate-raider", count: 2 },
+    ],
     itemReward: { trigger: "pve-win", mode: "grant", itemKind: "component", amount: 1 },
-  },
-  {
-    id: "portal-slot-ten-bridge",
-    round: 10,
-    kind: "pve",
-    name: "Calm Belt Bridge",
-    preparationSeconds: 50,
-    battleSeconds: 45,
-    enemyWave: CALM_BELT_WAVE,
   },
   {
     id: "round-eleven-supplies",
@@ -2341,17 +2327,11 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
     name: "Siege of Justice",
     preparationSeconds: 40,
     battleSeconds: 45,
-    enemyWave: SIEGE_OF_JUSTICE_WAVE,
+    enemyWave: [
+      { enemyId: "pacifista", count: 2 },
+      { enemyId: "sea-king", count: 1 },
+    ],
     itemReward: { trigger: "pve-win", mode: "grant", itemKind: "component", amount: 2, distinct: true },
-  },
-  {
-    id: "portal-slot-twenty-bridge",
-    round: 20,
-    kind: "pve",
-    name: "Siege Bridge",
-    preparationSeconds: 50,
-    battleSeconds: 45,
-    enemyWave: SIEGE_OF_JUSTICE_WAVE,
   },
   {
     id: "new-world-exchange",
