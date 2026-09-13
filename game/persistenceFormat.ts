@@ -2,6 +2,7 @@ import { DEFAULT_CONTENT, getStageDefinition } from "./content";
 import { regenerateBattleResults, resolveLegacyCarousel } from "./engine";
 import { reconcileProductionFormProgression } from "./forms";
 import { CURRENT_SAVE_SCHEMA_VERSION } from "./schema";
+import { prepareVoyageRecruitOffers } from "./voyageRecruitment";
 import type { GameContent, MatchState, SaveEnvelope } from "./types";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -207,6 +208,9 @@ export function migrateMatchState(
   mutable.carouselChoices = Array.isArray(mutable.carouselChoices)
     ? mutable.carouselChoices
     : [];
+  mutable.pendingVoyageRecruitOffers = isRecord(mutable.pendingVoyageRecruitOffers)
+    ? mutable.pendingVoyageRecruitOffers
+    : {};
   if (
     typeof mutable.seed !== "string" || typeof mutable.round !== "number" ||
     typeof mutable.rngState !== "number" || typeof mutable.phase !== "string"
@@ -241,6 +245,19 @@ export function migrateMatchState(
     }
   } else {
     migrated = { ...migrated, carouselSession: null };
+  }
+  const voyageStage = getStageDefinition(migrated.round, content);
+  if (
+    voyageStage.kind === "voyage-choice" &&
+    ((migrated.stageId === `pvp-${migrated.round}` &&
+      (migrated.phase === "preparation" || migrated.phase === "battle")) ||
+      (migrated.stageId === voyageStage.id && migrated.phase === "voyage-choice"))
+  ) {
+    migrated.stageId = voyageStage.id;
+    migrated.phase = "voyage-choice";
+    migrated.pairings = [];
+    migrated.lastResults = [];
+    prepareVoyageRecruitOffers(migrated, content);
   }
   for (const player of migrated.players) {
     if (isRecord(player.units)) {

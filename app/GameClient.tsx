@@ -53,6 +53,7 @@ import {
   MatchScreen,
   ResultsScreen,
   RewardScreen,
+  VoyageRecruitmentScreen,
   SettingsScreen,
   TutorialCoach,
   type Settings,
@@ -72,6 +73,7 @@ type Screen =
   | "match"
   | "carousel"
   | "reward"
+  | "voyage-recruitment"
   | "results"
   | "confirm-new";
 
@@ -343,13 +345,17 @@ export default function GameClient() {
         }
         return;
       }
+      if (view.phase === "voyage-choice") {
+        if (screen !== "voyage-recruitment") setScreen("voyage-recruitment");
+        return;
+      }
       if (view.phase === "carousel") {
         if (screen !== "carousel") {
           setScreen("carousel");
         }
         return;
       }
-      if (screen === "reward" || screen === "carousel" || screen === "results") {
+      if (screen === "reward" || screen === "voyage-recruitment" || screen === "carousel" || screen === "results") {
         setScreen("match");
       }
     }, 0);
@@ -818,6 +824,15 @@ export default function GameClient() {
     [engineStateRef, issueCommand, screen, setEngineState, view],
   );
 
+  const chooseVoyageRecruit = useCallback((definitionId: string) => {
+    if (!view || view.phase !== "voyage-choice") return;
+    issueCommand(
+      { type: "CHOOSE_VOYAGE_RECRUIT", definitionId },
+      "reward",
+      `Recruited ${view.voyageRecruits.find((unit) => unit.id === definitionId)?.name ?? "a crewmate"}.`,
+    );
+  }, [issueCommand, view]);
+
   const setCarouselTarget = useCallback(
     (target: { x: number; y: number }) => {
       if (!view || view.phase !== "carousel") return;
@@ -999,6 +1014,16 @@ export default function GameClient() {
         }
         return;
       }
+      if (screen === "voyage-recruitment" && view) {
+        if (/^[1-3]$/.test(key)) {
+          const recruit = view.voyageRecruits[Number(key) - 1];
+          if (recruit) {
+            event.preventDefault();
+            chooseVoyageRecruit(recruit.id);
+          }
+        }
+        return;
+      }
       if (screen !== "match" || !view) return;
       if (key === "enter") {
         const mayStartTutorialBattle =
@@ -1060,6 +1085,7 @@ export default function GameClient() {
   }, [
     buyUnit,
     chooseReward,
+    chooseVoyageRecruit,
     closeSettings,
     issueCommand,
     openSettings,
@@ -1305,6 +1331,13 @@ export default function GameClient() {
           choices={view.choices}
           source={GameEngine.getStageDefinition(view.round).kind === "pve" ? "pve" : "supply"}
           onChoose={chooseReward}
+        />
+      )}
+      {screen === "voyage-recruitment" && view && (
+        <VoyageRecruitmentScreen
+          round={view.round}
+          recruits={view.voyageRecruits}
+          onChoose={chooseVoyageRecruit}
         />
       )}
       {screen === "results" && view && (

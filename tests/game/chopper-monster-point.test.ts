@@ -167,7 +167,7 @@ describe("Chopper Monster Point production content", () => {
     const chopper = DEFAULT_CONTENT.units.find((unit) => unit.id === "chopper");
     const form = getUnitFormDefinition(MONSTER_POINT_FORM_ID);
 
-    expect(DEFAULT_CONTENT.version).toBe("1.29.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.30.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(DEFAULT_CONTENT.units).toHaveLength(34);
     expect([1, 2, 3, 4, 5].map((cost) =>
@@ -741,7 +741,7 @@ describe("Monster Point persistence and economy isolation", () => {
     const restored = deserializeMatch(serializeMatch(state, "monster-roundtrip"));
     const restoredResult = restored.lastResults[0];
     expect(restored.schemaVersion).toBe(6);
-    expect(restored.contentVersion).toBe("1.29.0");
+    expect(restored.contentVersion).toBe("1.30.0");
     expect(restoredResult).toEqual(frozen[0]);
     expect(restoredResult.initialUnits.find((unit) =>
       unit.definitionId === "chopper"

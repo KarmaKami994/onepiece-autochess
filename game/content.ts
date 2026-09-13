@@ -2281,6 +2281,15 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
     itemReward: { trigger: "pve-win", mode: "grant", itemKind: "component", amount: 1 },
   },
   {
+    id: "grand-line-recruitment",
+    round: 10,
+    kind: "voyage-choice",
+    name: "Grand Line Recruitment",
+    preparationSeconds: 50,
+    battleSeconds: 0,
+    voyageRecruitCost: 4,
+  },
+  {
     id: "round-eleven-supplies",
     round: 11,
     kind: "pvp",
@@ -2332,6 +2341,15 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
       { enemyId: "sea-king", count: 1 },
     ],
     itemReward: { trigger: "pve-win", mode: "grant", itemKind: "component", amount: 2, distinct: true },
+  },
+  {
+    id: "new-world-recruitment",
+    round: 20,
+    kind: "voyage-choice",
+    name: "New World Recruitment",
+    preparationSeconds: 50,
+    battleSeconds: 0,
+    voyageRecruitCost: 5,
   },
   {
     id: "new-world-exchange",
@@ -2541,7 +2559,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.29.0",
+  version: "1.30.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,

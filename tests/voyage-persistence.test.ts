@@ -91,7 +91,7 @@ describe("voyage battle save compatibility", () => {
       seed: state.seed,
       replayBattle: false,
       schemaVersion: 6,
-      contentVersion: "1.29.0",
+      contentVersion: "1.30.0",
     });
 
     const restored = restoreVoyageState(envelope);
@@ -119,5 +119,27 @@ describe("voyage battle save compatibility", () => {
     expect(restored.phase).toBe("battle");
     expect(restored.lastResults.length).toBeGreaterThan(0);
     expect(createVoyageSaveEnvelope(restored, saved.seed, 5678).replayBattle).toBe(false);
+  });
+
+  it("does not replay a legacy round-10/20 battle past the migrated recruitment choice", () => {
+    for (const round of [10, 20]) {
+      const old = createMatch(`legacy-voyage-${round}`);
+      old.round = round;
+      old.stageId = `pvp-${round}`;
+      old.phase = "battle";
+      const saved: VoyageSaveEnvelope = {
+        state: old,
+        seed: old.seed,
+        updatedAt: 1234,
+        schemaVersion: 6,
+        contentVersion: "1.29.0",
+        replayBattle: true,
+      };
+      const restored = restoreVoyageState(saved);
+      expect(restored.phase).toBe("voyage-choice");
+      expect(restored.round).toBe(round);
+      expect(restored.pendingVoyageRecruitOffers["player-1"]).toHaveLength(3);
+      expect(restoreVoyageState(createVoyageSaveEnvelope(restored, saved.seed, 5678))).toEqual(restored);
+    }
   });
 });

@@ -3,9 +3,10 @@ export type MatchPhase =
   | "preparation"
   | "battle"
   | "item-choice"
+  | "voyage-choice"
   | "carousel"
   | "game-over";
-export type StageKind = "pve" | "pvp" | "carousel";
+export type StageKind = "pve" | "pvp" | "carousel" | "voyage-choice";
 export type TraitCategory = "origin" | "role";
 
 export interface Position {
@@ -377,6 +378,7 @@ export interface StageDefinition {
   enemyWave?: PvEWaveEntry[];
   itemReward?: StageItemRewardDefinition;
   carouselItemKind?: ItemKind;
+  voyageRecruitCost?: 4 | 5;
 }
 
 export interface BotPersonality {
@@ -573,6 +575,7 @@ export interface MatchState {
   pairings: MatchPairing[];
   lastResults: MatchBattleResult[];
   pendingItemChoices: Record<string, string[]>;
+  pendingVoyageRecruitOffers: Record<string, string[]>;
   carouselChoices: CarouselChoice[];
   carouselSession: CarouselSessionState | null;
   winnerId: string | null;
@@ -604,6 +607,7 @@ export type GameCommand =
     }
   | { type: "END_PREPARATION" }
   | { type: "CHOOSE_ITEM"; choiceId: string }
+  | { type: "CHOOSE_VOYAGE_RECRUIT"; definitionId: string }
   | {
       type: "CAROUSEL_SET_TARGET";
       x: number;
@@ -627,6 +631,7 @@ export type CommandErrorCode =
   | "INVALID_BOARD_CELL"
   | "INVALID_CAROUSEL_TARGET"
   | "INVALID_ITEM_CHOICE"
+  | "INVALID_VOYAGE_RECRUIT"
   | "INVALID_SHOP_SLOT"
   | "ITEM_CAP"
   | "ITEM_DUPLICATE"

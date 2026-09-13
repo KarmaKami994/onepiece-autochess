@@ -2045,6 +2045,48 @@ export function CarouselScreen({
   );
 }
 
+export function VoyageRecruitmentScreen({
+  round,
+  recruits,
+  onChoose,
+}: {
+  round: number;
+  recruits: ShopUnitView[];
+  onChoose: (id: string) => void;
+}) {
+  return (
+    <section className="choice-screen reward-screen voyage-recruitment-screen">
+      <div className="reward-rays" aria-hidden="true" />
+      <header className="choice-heading">
+        <span className="eyebrow">VOYAGE CHOICE · ROUND {round}</span>
+        <h2>{round === 10 ? "GRAND LINE RECRUITMENT" : "NEW WORLD RECRUITMENT"}</h2>
+        <p>Choose one crewmate. A full bench converts the recruit to its gold value unless it can combine.</p>
+      </header>
+      <div className="reward-cards">
+        {recruits.map((recruit, index) => (
+          <button
+            type="button"
+            className="reward-card"
+            key={recruit.id}
+            style={{ "--choice-color": recruit.color } as CSSProperties}
+            onClick={() => onChoose(recruit.id)}
+            aria-label={`Recruit ${recruit.name} for ${recruit.cost} gold value. Shortcut ${index + 1}`}
+          >
+            <span className="reward-number">0{index + 1}</span>
+            <kbd>{index + 1}</kbd>
+            <VisualIcon className="treasure-icon" imagePath={recruit.portrait} fallback={recruit.shortName} />
+            <strong>{recruit.name}</strong>
+            <small>{recruit.cost} GOLD VALUE</small>
+            <small>{recruit.traitDetails.map((trait) => trait.name).join(" · ")}</small>
+            <p><b>{recruit.ability.name}</b> — {recruit.ability.description}</p>
+            <span className="choose-label">RECRUIT</span>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export function RewardScreen({
   choices,
   source,

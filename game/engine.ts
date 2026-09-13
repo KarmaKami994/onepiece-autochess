@@ -11,6 +11,7 @@ import {
   resolveItemRecipe,
 } from "./items";
 import { selectStageItemReward } from "./itemRewards";
+import { prepareVoyageRecruitOffers, resolveVoyageRecruit } from "./voyageRecruitment";
 import {
   reconcileProductionFormProgression,
   resolvePersistentFormId,
@@ -188,6 +189,7 @@ export function createMatch(
     pairings: [],
     lastResults: [],
     pendingItemChoices: {},
+    pendingVoyageRecruitOffers: {},
     carouselChoices: [],
     carouselSession: null,
     winnerId: null,
@@ -565,6 +567,11 @@ function beginBattle(
 ): MatchState {
   const next = cloneMatch(state);
   const stage = getStageDefinition(next.round, content);
+  if (stage.kind === "voyage-choice") {
+    prepareVoyageRecruitOffers(next, content);
+    autoChooseBotVoyageRecruits(next, content);
+    return next;
+  }
   if (stage.kind === "pve") {
     simulatePveRound(next, content);
   } else {
@@ -760,6 +767,42 @@ function autoChooseBotItems(
     }
     delete state.pendingItemChoices[player.id];
   }
+}
+
+function autoChooseBotVoyageRecruits(
+  state: MatchState,
+  content: GameContent,
+): void {
+  for (const player of state.players.filter((candidate) => candidate.alive && candidate.isBot)) {
+    const offers = state.pendingVoyageRecruitOffers[player.id];
+    if (!offers?.length) continue;
+    const personality = botPersonality(player, content);
+    const selected = [...offers].sort((left, right) =>
+      botUnitScore(right, player, personality, content) -
+        botUnitScore(left, player, personality, content) ||
+      left.localeCompare(right)
+    )[0];
+    resolveVoyageRecruit(state, player, selected, content);
+  }
+}
+
+function autoResolveVoyageRecruits(
+  state: MatchState,
+  content: GameContent,
+): MatchState {
+  const next = cloneMatch(state);
+  for (const [playerId, offers] of Object.entries(next.pendingVoyageRecruitOffers)) {
+    const player = findPlayer(next, playerId);
+    if (!player || offers.length === 0) continue;
+    const personality = botPersonality(player, content);
+    const selected = [...offers].sort((left, right) =>
+      botUnitScore(right, player, personality, content) -
+        botUnitScore(left, player, personality, content) ||
+      left.localeCompare(right)
+    )[0];
+    resolveVoyageRecruit(next, player, selected, content);
+  }
+  return beginNextRound(next, content);
 }
 
 function createCarouselChoices(
@@ -1309,6 +1352,7 @@ function beginNextRound(
   state.pairings = [];
   state.lastResults = [];
   state.pendingItemChoices = {};
+  state.pendingVoyageRecruitOffers = {};
   state.carouselChoices = [];
   state.carouselSession = null;
   const stage = getStageDefinition(state.round, content);
@@ -1332,6 +1376,13 @@ function beginNextRound(
   }
   if (stage.kind === "carousel") {
     return prepareCarousel(state, content);
+  }
+  if (stage.kind === "voyage-choice") {
+    prepareVoyageRecruitOffers(state, content);
+    autoChooseBotVoyageRecruits(state, content);
+    return Object.keys(state.pendingVoyageRecruitOffers).length > 0
+      ? state
+      : beginNextRound(state, content);
   }
   state.phase = "preparation";
   return state;
@@ -2066,6 +2117,8 @@ export function advanceMatchPhase(
       return resolveBattleResults(state, content);
     case "item-choice":
       return autoResolveItemChoices(state, content);
+    case "voyage-choice":
+      return autoResolveVoyageRecruits(state, content);
     case "carousel":
       return autoResolveCarousel(state, content);
     case "game-over":
@@ -2123,6 +2176,9 @@ export function applyCommand(
       "WRONG_PHASE",
       "There is no item choice right now.",
     );
+  }
+  if (command.type === "CHOOSE_VOYAGE_RECRUIT" && state.phase !== "voyage-choice") {
+    return commandFailure(state, "WRONG_PHASE", "There is no voyage recruitment choice right now.");
   }
   if (
     command.type === "CAROUSEL_SET_TARGET" &&
@@ -2335,6 +2391,15 @@ export function applyCommand(
       player.inventory.push(selected);
       delete next.pendingItemChoices[player.id];
       if (Object.keys(next.pendingItemChoices).length === 0) {
+        next = beginNextRound(next, content);
+      }
+      return { ok: true, state: next };
+    }
+    case "CHOOSE_VOYAGE_RECRUIT": {
+      if (!resolveVoyageRecruit(next, player, command.definitionId, content)) {
+        return commandFailure(state, "INVALID_VOYAGE_RECRUIT", "That recruit is not one of your offers.");
+      }
+      if (Object.keys(next.pendingVoyageRecruitOffers).length === 0) {
         next = beginNextRound(next, content);
       }
       return { ok: true, state: next };
