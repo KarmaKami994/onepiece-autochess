@@ -1,0 +1,11 @@
+# P11 — Voyage Recruitment Choice
+
+Pinned PAC reference: [`keldaanCommunity/pokemonAutoChess@a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee`](https://github.com/keldaanCommunity/pokemonAutoChess/tree/a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee). PAC schedules Portal Carousel slots at rounds 10/20, separate from PvE and item carousels. P11 adapts those non-combat slots into local crew recruitment; it does not port PAC's portal, online room, or item/rarity systems.
+
+Rounds 10 and 20 enter `voyage-choice` directly after the previous round. Grand Line Recruitment offers three distinct available cost-4 crew; New World Recruitment offers cost-5 crew. When fewer than three primary-band definitions have shared-pool copies, only the remaining slots fall back to cost 3 or 4 respectively. Owned crew traits seed relevant candidates first; serialized RNG shuffles relevant and other candidates deterministically. No battle, captain damage, streak/history/result mutation, or item reward occurs on either round. A choice advances to preparation at round 11/21. Existing PvE, carousel, supply and item reward cadence is unchanged.
+
+Each offer reserves one shared-pool copy. Selection converts its reserved copy into a unit without another pool decrement and returns all unselected reservations. An invalid choice changes nothing. If the bench is full and the recruit cannot combine, its reserved copy returns to the pool and the player receives gold equal to its normal cost. Bots choose from their own offers with existing `scoreBotUnit` and stable ID tie-breaks; no bot weights changed.
+
+Offers and RNG are persisted in schema 6 separately from item choices. Old schema-6 round-10/20 `pvp-10`/`pvp-20` preparation or battle checkpoints enter the new choice once on load, without applying old battle results or duplicating round income/rewards/reservations; a legacy `replayBattle` flag cannot skip that choice. GameContent is `1.30.0`; no new units, items, traits, assets, combat mechanics, or schema migration were added.
+
+The previous P10 50-match comparison remains a historical measurement of its exact pre-review harness, not evidence for P11 balance. No new 1,000-seed soak or authoritative broad baseline was generated.

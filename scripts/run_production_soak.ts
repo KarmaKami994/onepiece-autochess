@@ -1332,6 +1332,9 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
           }
         } else if (state.phase === "battle") {
           const stage = getStageDefinition(state.round, DEFAULT_CONTENT);
+          if (stage.kind === "voyage-choice") {
+            throw new Error("Voyage recruitment cannot resolve as a battle.");
+          }
           for (const player of state.players.filter((candidate) => candidate.alive)) {
             const definitions = deployedDefinitions(player);
             lastDeployedBoards.set(player.id, definitions);

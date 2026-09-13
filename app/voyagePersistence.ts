@@ -36,7 +36,7 @@ export function restoreVoyageState(
   content: GameContent = DEFAULT_CONTENT,
 ): MatchState {
   const restored = migrateMatchState(saved.state, content);
-  return saved.replayBattle === true
+  return saved.replayBattle === true && restored.phase !== "voyage-choice"
     ? advanceMatchPhase(restored, content)
     : restored;
 }

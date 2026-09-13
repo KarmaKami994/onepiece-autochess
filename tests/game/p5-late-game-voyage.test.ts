@@ -95,8 +95,8 @@ describe("P5 late-game content topology", () => {
     expect(DEFAULT_CONTENT.stages.filter((stage) => stage.kind === "carousel" && stage.carouselItemKind === "completed").map((stage) => stage.round))
       .toEqual(LATE_CAROUSEL_ROUNDS);
     expect([10, 20].map((round) => getStageDefinition(round))).toMatchObject([
-      { id: "pvp-10", kind: "pvp", preparationSeconds: 50 },
-      { id: "pvp-20", kind: "pvp", preparationSeconds: 50 },
+      { id: "grand-line-recruitment", kind: "voyage-choice", preparationSeconds: 50, voyageRecruitCost: 4 },
+      { id: "new-world-recruitment", kind: "voyage-choice", preparationSeconds: 50, voyageRecruitCost: 5 },
     ]);
     expect(getStageDefinition(40).kind).toBe("pve");
     const specialRounds = new Set(DEFAULT_CONTENT.stages.map((stage) => stage.round));
@@ -323,15 +323,15 @@ describe("P5 item, bot, and save compatibility", () => {
     human(state).inventory = ["black-blade", "jet-dial"];
     const restored = deserializeMatch(serializeMatch(state));
     expect(restored.schemaVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
-    expect(restored.contentVersion).toBe("1.29.0");
+    expect(restored.contentVersion).toBe("1.30.0");
     expect(human(restored).inventory).toEqual(["black-blade", "jet-dial"]);
     const next = advanceMatchPhase(restored);
     expect(next).toMatchObject({ round: 22, phase: "carousel", stageId: "new-world-exchange" });
     expect(next.carouselChoices.every((choice) => getItemDefinition(choice.itemId)?.kind === "completed")).toBe(true);
   });
 
-  it("keeps GameContent 1.26.0 and save schema 6", () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.29.0");
+  it("keeps current GameContent 1.30.0 and save schema 6", () => {
+    expect(DEFAULT_CONTENT.version).toBe("1.30.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 });

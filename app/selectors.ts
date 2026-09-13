@@ -221,6 +221,7 @@ export type MatchView = {
   standings: StandingView[];
   opponent: StandingView | null;
   choices: ChoiceView[];
+  voyageRecruits: ShopUnitView[];
   carouselSession: CarouselSessionView | null;
   selectedDefinitionByUnit: Map<string, ShopUnitView>;
   itemsById: Map<string, ChoiceView>;
@@ -1529,6 +1530,9 @@ export function selectMatchView(
     player,
     content,
   );
+  const voyageRecruits = (state.pendingVoyageRecruitOffers[player.id] ?? []).map((id) =>
+    enrichUnitView(definitionView(id, content), player, content)
+  );
   const carouselSlice =
     state.phase === "carousel" ? selectCarouselView(state, content) : null;
   const events = combatEvents(state, player.id, content);
@@ -1554,6 +1558,8 @@ export function selectMatchView(
           ? "TREASURE"
           : state.phase === "carousel"
             ? "CAROUSEL"
+            : state.phase === "voyage-choice"
+              ? "RECRUITMENT"
             : "VOYAGE ENDED";
   return {
     playerId: player.id,
@@ -1583,6 +1589,7 @@ export function selectMatchView(
     standings,
     opponent,
     choices,
+    voyageRecruits,
     carouselSession: carouselSlice?.carouselSession ?? null,
     selectedDefinitionByUnit: board.views,
     itemsById,

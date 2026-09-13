@@ -23,10 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-P10 Fixed PvE Cadence and Item Economy is in PR #53 on `task/p10-fixed-pve-item-economy` from exact base `e8d9b76683d9d335fdc702542b386f11ada50f17`; the 10/20 topology review correction is awaiting CI/review. Fixed local PvE is exactly `1,2,3,9,14,19,24,28,32,36,40`; rounds 10/20 use default PvP fallback with their existing 50-second preparation timing. Carousels stay `4,12,17,22,27,34`; supply choices are `5,8,11`. GameContent is `1.29.0`; save schema remains 6. P1B and balance tuning remain deferred.
+P11 Voyage Recruitment Choice is in PR #54 on `task/p11-voyage-recruitment-choice` from exact base `a2b3b9309f3bb3a670fad0452eea7eb7b0ad5370`, pending CI/review. Rounds 10/20 are now non-combat cost-4/cost-5 recruitment choices; fixed PvE remains `1,2,3,9,14,19,24,28,32,36,40`, carousels remain `4,12,17,22,27,34`, and supply choices remain `5,8,11`. GameContent is `1.30.0`; save schema remains 6. P1B and balance tuning remain deferred.
 
 ## Last Completed Work
 
+- 2026-09-13 — PR #54, implementation commit `5c68cd3cff61ba8383a830480212dbec29080ffc`: P11 Voyage Recruitment Choice added explicit non-combat rounds 10/20 with persisted trait-aware deterministic offers, shared-pool reservations/release, existing-score bot picks, full-bench gold conversion, schema-6 legacy checkpoint/replay reconciliation, dedicated recruitment presentation and focused domain/browser regressions. No new content definitions, item rewards, combat, balance or 1,000-seed baseline. Material files: `game/types.ts`, `game/content.ts`, `game/engine.ts`, `game/voyageRecruitment.ts`, `game/persistenceFormat.ts`, `app/voyagePersistence.ts`, selectors/screens/client, affected topology/content-version tests, P11/save tests/E2E/doc, `PROJECT_STATE.md`.
 - 2026-09-12 — PR #53 review correction: removed the 10/20 special stage definitions; both rounds now use the pre-existing default PvP fallback, including 50-second preparation, ordinary PvP damage and no extra item reward. Corrected exact PvE topology is `1,2,3,9,14,19,24,28,32,36,40`. No other P10 reward, carousel, supply-choice, version or schema behavior changed. Material files: `game/content.ts`, focused/affected topology tests, `docs/P10_FIXED_PVE_ITEM_ECONOMY.md`, `PROJECT_STATE.md`.
 - 2026-09-12 — P10 Fixed PvE Cadence and Item Economy, PR #53, initial implementation commit `aa925bf6f306e49722ada44a623d78972a74b9bc`: added explicit seeded stage rewards, final round-40 PvE, automatic/choice/multi-item component and completed-item rewards, supply choices at 5/8/11, generic reward/tutorial presentation, save/choice regressions and item-source production-audit counters. Pinned PAC commit `a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee` has PvE `1,2,3,9,14,19,24,28,32,36,40`, item carousels `4,12,17,22,27,34`, Additional Picks `5,8,11`, and Portal Carousels `0,10,20` (not PvE). The initial same-seed 50-match POST audit in `docs/P10_FIXED_PVE_ITEM_ECONOMY.md` predates the review correction and must not be treated as corrected-head measurement; exact-base PRE 1,000 raw report is retained. GameContent `1.29.0`; schema 6.
 - 2026-09-11 — P9 Four-Character Expansion: added Killer, Buggy, Capone Bege and Whitebeard with locked content-driven identities; completed distinct static/portrait/token/v2 asset integration from four SHA-pinned licensed-reference sheets; added own-property missing-pool-key backfill for schema-6 saves; expanded focused, affected, asset and browser coverage. GameContent is `1.28.0`; schema remains 6. Material files: `game/content.ts`, `game/persistenceFormat.ts`, animation manifests/pipeline/source matrix, four source sheets and derived asset families, focused/affected tests, `e2e/p7-assets.spec.ts`, `ASSET_PROVENANCE.md`, `docs/P9_FOUR_CHARACTER_EXPANSION.md`, `PROJECT_STATE.md`.
@@ -85,6 +86,12 @@ P10 Fixed PvE Cadence and Item Economy is in PR #53 on `task/p10-fixed-pve-item-
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+P11 Voyage Recruitment Choice:
+
+- PASS — focused P11/P10/P5/P7: 4 files / 74 tests; focused P11/content RNG: 2 files / 16 tests; focused P11/save replay: 2 files / 13 tests.
+- PASS — typecheck, lint, full test suite (58 files / 782 tests), 50-match production smoke (50/50 complete, zero crashes), production build, and focused 1280-px Browser E2E (rounds 10/20, 2/2).
+- NOT RUN — 1,000-seed production soak, new authoritative baseline, full Browser E2E; normal GitHub CI is pending on PR #54.
 
 PR #53 10/20 topology review correction:
 
@@ -660,7 +667,8 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
-- P10 makes stage cadence and reward delivery explicit. Rounds 10/20 retain ordinary fallback PvP with 50-second preparation, normal PvP captain damage and no extra item reward. PvE 40 uses only existing late-game enemies and grants three distinct non-trait completed items on victory, including a terminal match victory. PvP 5/8/11 grant a living-player component choice regardless of result. R1/3/9 automatically grant one component, R19 grants two distinct components, R2/14 offer one of three components, and R24/28/32/36 offer one of three controlled completed items. Existing carousel rounds and mechanics remain; early carousels use components, late ones completed items. Rewards use serialized seeded RNG and existing inventory/choice state. GameContent is `1.29.0`; schema 6.
+- P11 supersedes the P10 round-10/20 PvP fallback with immediate non-combat Voyage Recruitment. Each living player chooses one of three distinct reserved cost-4/cost-5 offers (cost-3/cost-4 fallback only if needed); bots use existing scoring. No battle, damage, streak/history/result or item reward occurs. A full-bench non-combining choice converts to its normal gold cost. Choice advances to R11/R21 preparation; schema-6 legacy PvP checkpoints reconcile once. GameContent is `1.30.0`; schema 6.
+- P10's other stage cadence and reward delivery remain unchanged: PvE 40 grants three distinct non-trait completed items on victory, including terminal victory; PvP 5/8/11 grant a living-player component choice regardless of result; R1/3/9 grant one component, R19 two, R2/14 offer one of three, and R24/28/32/36 offer completed-item choices. Existing carousel rounds/mechanics and seeded item-choice behavior remain.
 - P9 adds Killer (2-cost Supernova/Swordsman), Buggy (3-cost Emperor/Warlord/Captain), Capone Bege (4-cost Supernova/Captain/Marksman) and Whitebeard (5-cost Emperor/Captain/Guardian) through existing Physical/Special, area, Pierce and Knockback data. The production roster is 34 at `6/8/7/8/5`; trait definitions/effects, shop odds, pool constants, economy, bots and combat RNG are unchanged. Schema-6 loads add only absent current-definition pool keys at their cost's full pool count; present zero/custom counts and unknown keys remain untouched. GameContent is `1.28.0`; schema remains 6.
 - P8 Captain damage now equals `max(1, ceil(round / 4) + living winner survivor count)` for a resolved winner and zero for a draw. Each qualifying survivor contributes exactly one regardless of star or other properties. PvP losers and real players losing to ghosts take the result; ghost owners remain unmodified; PvE losses use the same formula. Recent battle values reflect the new exact damage. GameContent is `1.27.0`; schema remains 6 and historical saved battle records are not rewritten.
 - Presentation only for P7: every production crew/PvE definition now resolves to a distinct local static asset and preferred v2 atlas, while item, trait, status and form surfaces render their manifest-backed SVG identity with accessible text/glyph fallback. Board animation loading remains current-board/visible-content driven; new crew support is v2-only. Combat, economy, bots, content values, stage behavior, deterministic RNG and schema 6 are unchanged.
@@ -713,6 +721,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- None for P11. The global `npm` shim was broken locally, so equivalent installed Node package entrypoints ran the authorized checks. No 1,000-seed soak, new baseline, portal mechanics or tuning was added.
 - P10's POST 1,000-seed audit and final CI-equivalent local rerun were stopped at the user's explicit request. The prior 50-seed PRE/POST item comparison measured the initial, now-superseded 10/20 topology; no new large baseline is generated for this correction. No unit/trait/item-value, bot-heuristic, captain-damage, combat, shop/XP/pool, persistence-schema, asset or balance tuning was added. No Voyage Choice or Portal Carousel implementation was started.
 - None for P9. Exactly four units and the required narrow save backfill were added; no trait tier/effect, existing unit, item/form, bot, economy, captain-damage, stage, metric, schema, RNG, dependency, tuning, baseline or 1,000-seed soak changed. The four complete licensed-reference PNGs are explicitly retained as their editable source instead of fabricating failing LibreSprite conversions.
 - None for P8. The locked divisor/formula was not changed after measurement; exactly two authorized 1,000-seed runs were performed, with no candidate iteration, bot/unit/item/trait/economy/P5/P6 tuning, stage/start-HP/timeout/draw/pairing change, P9 work or P11 baseline.
@@ -767,6 +776,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- P11's 50-match smoke is crash/regression evidence only, not balance authority. GitHub CI remains to be checked after PR publication; Smoker remains frozen/watch.
 - P10's old 50-seed POST item-economy averages include the removed 10/20 stages and do not describe the corrected PR. They remain historical evidence only, not tuning authority. Normal GitHub CI must complete before review/merge; Smoker remains frozen/watch.
 - No blocking P9 defect remains. The first Browser E2E full run had one isolated 1280 full-voyage transition timeout; its focused rerun and the subsequent complete run passed. The 50-match smoke is crash/regression evidence only and is not balance authority. Imported asset redistribution remains bounded by the recorded owner attestation and requires separate rights review for any broader use.
 - No hard P8 gate failed. POST first elimination moved 2.434 rounds later and stage-36 reach increased 11.0 percentage points; average rounds changed only -0.69%, timeout/draw were materially stable, and the sole PvE damage event was 8 damage. These are review observations, not tuning authority. Smoker remains frozen/watch.
@@ -805,7 +815,8 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
-- P10 supersedes P5's optional `rewardItemKind`/`itemChoices` stage fields with a narrow explicit `itemReward` and separate `carouselItemKind`. The pinned PAC fixed PvE/carousel schedule and reward modes are direct structural references; local 5/8/11 item-only supply choices are ADAPTED. PAC's actual 10/20 Portal Carousel is not implemented, so those rounds remain default PvP rather than placeholder special stages. Online systems, Gift Shop and extra acquisition systems are likewise absent. Existing serialized RNG, item inventory, pending choices and bot item scoring remain authoritative; save schema stays 6.
+- P11 adapts PAC's round-10/20 non-combat portal slots into local Voyage Recruitment, not PAC Portal Carousel. Offers are separate persisted state and explicit shared-pool reservations; serialized RNG, existing bot scoring and schema 6 remain authoritative. No networking, new roster or item system was introduced.
+- P10 superseded P5's optional `rewardItemKind`/`itemChoices` stage fields with a narrow explicit `itemReward` and separate `carouselItemKind`. Its fixed PvE/carousel schedule and reward modes remain; local 5/8/11 item-only supply choices are adapted. Its historical round-10/20 default PvP fallback was superseded by P11.
 - P9 keeps roster expansion content-driven and reuses existing typed traits/combat fields. Save compatibility uses own-property presence on `pool`: only missing current-definition keys receive the existing full cost-band pool count, preserving explicit zero/custom counts and future keys. The four P9 licensed-reference PNGs are the retained editable sources; runtime atlases and static identity assets remain offline deterministic derivatives recorded by matrix and SHA-256.
 - P8 keeps one pure Captain-damage authority in `game/matchFlow.ts` and explicitly passes round from PvP/ghost/PvE result construction. PAC round-plus-survivor topology, one point per ordinary survivor, no star multiplier and draw-zero semantics are direct; `ceil(round / 2)` is adapted to `ceil(round / 4)`. Spawn/Inanimate exclusions remain reference-only; Double Up/backend/network/Pokémon passive/mission systems are rejected. Diagnostics remain production-harness-only and cannot influence gameplay.
 - P7 keeps presentation authority in explicit local manifests: deterministic content IDs map to static/v2, item, trait, status and form assets; unknown or failed assets retain semantic glyph/text fallbacks. Only currently visible board definitions and choice assets are loaded. Third-party sprite sheets remain traceable source inputs, while project-owned generators produce derived atlases, SVG families, editables and QA artifacts without affecting gameplay state or RNG.
@@ -852,7 +863,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-Review the P10 PR and its GitHub CI; do not merge or start P1B, tuning, Voyage Choice or a new authoritative baseline automatically.
+Review PR #54 and its GitHub CI; do not merge or start P1B, tuning or a new authoritative baseline automatically.
 
 ## Codex Update Contract
 

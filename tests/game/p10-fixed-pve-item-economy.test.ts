@@ -68,24 +68,28 @@ describe("P10 fixed cadence and reward content", () => {
       .toEqual(["component", "component", "component", "completed", "completed", "completed"]);
     expect(DEFAULT_CONTENT.items.filter((item) => item.kind === "component")).toHaveLength(10);
     expect(DEFAULT_CONTENT.items.filter((item) => item.kind === "completed")).toHaveLength(55);
-    expect(DEFAULT_CONTENT.version).toBe("1.29.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.30.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 
-  it("leaves PAC Portal slots on the existing no-reward PvP fallback", () => {
+  it("replaces PAC Portal slots with non-combat recruitment without changing rewards", () => {
     for (const round of [10, 20]) {
-      expect(DEFAULT_CONTENT.stages.some((stage) => stage.round === round)).toBe(false);
       expect(getStageDefinition(round)).toMatchObject({
-        id: `pvp-${round}`, kind: "pvp", preparationSeconds: 50,
+        kind: "voyage-choice", preparationSeconds: 50,
       });
       expect(getStageDefinition(round).enemyWave).toBeUndefined();
       expect(getStageDefinition(round).itemReward).toBeUndefined();
-      const { after } = resolvedRound(round, `p10-fallback-${round}`);
-      const repeat = resolvedRound(round, `p10-fallback-${round}`).after;
-      expect(after.round).toBe(round + 1);
+      const before = createMatch(`p10-recruit-${round}`);
+      before.round = round - 1;
+      before.phase = "item-choice";
+      const after = advanceMatchPhase(before);
+      const repeat = advanceMatchPhase(before);
+      expect(after.round).toBe(round);
+      expect(after.phase).toBe("voyage-choice");
       expect(player(after).inventory).toEqual([]);
       expect(after.rngState).toBe(repeat.rngState);
-      expect(player(after).winStreak).toBe(1);
+      expect(player(after).winStreak).toBe(0);
+      expect(after.lastResults).toEqual([]);
     }
   });
 
@@ -125,7 +129,7 @@ describe("P10 fixed cadence and reward content", () => {
 
   it.each(AUTO_COMPONENT_ROUNDS)("grants one component without a choice at round %i", (round) => {
     const { after } = resolvedRound(round, `p10-auto-${round}`);
-    expect(after.phase).toBe(round === 3 ? "carousel" : "preparation");
+    expect(after.phase).toBe(round === 3 ? "carousel" : round === 9 ? "voyage-choice" : "preparation");
     expect(player(after).inventory).toHaveLength(1);
     expect(itemKinds(player(after).inventory)).toEqual(["component"]);
     expect(after.pendingItemChoices).toEqual({});
@@ -134,7 +138,7 @@ describe("P10 fixed cadence and reward content", () => {
   it("grants two different components at 19 and three non-trait completed items at 40", () => {
     const mid = resolvedRound(19, "p10-mid-grant").after;
     const final = resolvedRound(40, "p10-final-grant").after;
-    expect(mid.phase).toBe("preparation");
+    expect(mid.phase).toBe("voyage-choice");
     expect(player(mid).inventory).toHaveLength(2);
     expect(new Set(player(mid).inventory).size).toBe(2);
     expect(itemKinds(player(mid).inventory)).toEqual(["component", "component"]);
@@ -250,13 +254,11 @@ describe("P10 fixed cadence and reward content", () => {
       expect(restored.rngState).toBe(offered.rngState);
       expect(advanceMatchPhase(restored)).toEqual(advanceMatchPhase(offered));
     }
-    const beforeFallback = createMatch("p10-fallback-save");
-    beforeFallback.round = 10;
-    beforeFallback.stageId = getStageDefinition(10).id;
-    const restoredBefore = deserializeMatch(serializeMatch(beforeFallback));
-    expect(restoredBefore).toEqual(beforeFallback);
-    const afterFallback = resolvedRound(10, "p10-fallback-after").after;
-    expect(deserializeMatch(serializeMatch(afterFallback))).toEqual(afterFallback);
+    const beforeRecruitment = createMatch("p10-recruit-save");
+    beforeRecruitment.round = 9;
+    beforeRecruitment.phase = "item-choice";
+    const recruitment = advanceMatchPhase(beforeRecruitment);
+    expect(deserializeMatch(serializeMatch(recruitment))).toEqual(recruitment);
     const grant = resolvedRound(19, "p10-grant-save").after;
     const restoredGrant = deserializeMatch(serializeMatch(grant));
     expect(player(restoredGrant).inventory).toEqual(player(grant).inventory);

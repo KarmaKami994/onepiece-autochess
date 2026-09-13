@@ -13,6 +13,7 @@ export * from "./state";
 export * from "./pairing";
 export * from "./economy";
 export * from "./roster";
+export * from "./voyageRecruitment";
 export * from "./carousel";
 export * from "./matchFlow";
 export * from "./bots";

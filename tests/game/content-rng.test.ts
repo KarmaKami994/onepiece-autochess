@@ -219,7 +219,8 @@ describe("canonical game content", () => {
     expect(getStageDefinition(5).preparationSeconds).toBe(40);
     expect(getStageDefinition(10).preparationSeconds).toBe(50);
     expect(getStageDefinition(6).preparationSeconds).toBe(30);
-    expect(getStageDefinition(20).battleSeconds).toBe(45);
+    expect(getStageDefinition(20).battleSeconds).toBe(0);
+    expect(getStageDefinition(20).kind).toBe("voyage-choice");
   });
 
   it("pins the level rarity table and shared-pool sizes", () => {
