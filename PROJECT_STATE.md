@@ -23,11 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-P11 Voyage Recruitment Choice is implemented on `task/p11-voyage-recruitment-choice` from exact base `a2b3b9309f3bb3a670fad0452eea7eb7b0ad5370`, pending PR/CI review. Rounds 10/20 are now non-combat cost-4/cost-5 recruitment choices; fixed PvE remains `1,2,3,9,14,19,24,28,32,36,40`, carousels remain `4,12,17,22,27,34`, and supply choices remain `5,8,11`. GameContent is `1.30.0`; save schema remains 6. P1B and balance tuning remain deferred.
+P11 Voyage Recruitment Choice is in PR #54 on `task/p11-voyage-recruitment-choice` from exact base `a2b3b9309f3bb3a670fad0452eea7eb7b0ad5370`, pending CI/review. Rounds 10/20 are now non-combat cost-4/cost-5 recruitment choices; fixed PvE remains `1,2,3,9,14,19,24,28,32,36,40`, carousels remain `4,12,17,22,27,34`, and supply choices remain `5,8,11`. GameContent is `1.30.0`; save schema remains 6. P1B and balance tuning remain deferred.
 
 ## Last Completed Work
 
-- 2026-09-13 — P11 Voyage Recruitment Choice: added explicit non-combat rounds 10/20 with persisted trait-aware deterministic offers, shared-pool reservations/release, existing-score bot picks, full-bench gold conversion, schema-6 legacy checkpoint/replay reconciliation, dedicated recruitment presentation and focused domain/browser regressions. No new content definitions, item rewards, combat, balance or 1,000-seed baseline. Material files: `game/types.ts`, `game/content.ts`, `game/engine.ts`, `game/voyageRecruitment.ts`, `game/persistenceFormat.ts`, `app/voyagePersistence.ts`, selectors/screens/client, affected topology/content-version tests, P11/save tests/E2E/doc, `PROJECT_STATE.md`.
+- 2026-09-13 — PR #54, implementation commit `5c68cd3cff61ba8383a830480212dbec29080ffc`: P11 Voyage Recruitment Choice added explicit non-combat rounds 10/20 with persisted trait-aware deterministic offers, shared-pool reservations/release, existing-score bot picks, full-bench gold conversion, schema-6 legacy checkpoint/replay reconciliation, dedicated recruitment presentation and focused domain/browser regressions. No new content definitions, item rewards, combat, balance or 1,000-seed baseline. Material files: `game/types.ts`, `game/content.ts`, `game/engine.ts`, `game/voyageRecruitment.ts`, `game/persistenceFormat.ts`, `app/voyagePersistence.ts`, selectors/screens/client, affected topology/content-version tests, P11/save tests/E2E/doc, `PROJECT_STATE.md`.
 - 2026-09-12 — PR #53 review correction: removed the 10/20 special stage definitions; both rounds now use the pre-existing default PvP fallback, including 50-second preparation, ordinary PvP damage and no extra item reward. Corrected exact PvE topology is `1,2,3,9,14,19,24,28,32,36,40`. No other P10 reward, carousel, supply-choice, version or schema behavior changed. Material files: `game/content.ts`, focused/affected topology tests, `docs/P10_FIXED_PVE_ITEM_ECONOMY.md`, `PROJECT_STATE.md`.
 - 2026-09-12 — P10 Fixed PvE Cadence and Item Economy, PR #53, initial implementation commit `aa925bf6f306e49722ada44a623d78972a74b9bc`: added explicit seeded stage rewards, final round-40 PvE, automatic/choice/multi-item component and completed-item rewards, supply choices at 5/8/11, generic reward/tutorial presentation, save/choice regressions and item-source production-audit counters. Pinned PAC commit `a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee` has PvE `1,2,3,9,14,19,24,28,32,36,40`, item carousels `4,12,17,22,27,34`, Additional Picks `5,8,11`, and Portal Carousels `0,10,20` (not PvE). The initial same-seed 50-match POST audit in `docs/P10_FIXED_PVE_ITEM_ECONOMY.md` predates the review correction and must not be treated as corrected-head measurement; exact-base PRE 1,000 raw report is retained. GameContent `1.29.0`; schema 6.
 - 2026-09-11 — P9 Four-Character Expansion: added Killer, Buggy, Capone Bege and Whitebeard with locked content-driven identities; completed distinct static/portrait/token/v2 asset integration from four SHA-pinned licensed-reference sheets; added own-property missing-pool-key backfill for schema-6 saves; expanded focused, affected, asset and browser coverage. GameContent is `1.28.0`; schema remains 6. Material files: `game/content.ts`, `game/persistenceFormat.ts`, animation manifests/pipeline/source matrix, four source sheets and derived asset families, focused/affected tests, `e2e/p7-assets.spec.ts`, `ASSET_PROVENANCE.md`, `docs/P9_FOUR_CHARACTER_EXPANSION.md`, `PROJECT_STATE.md`.
@@ -91,7 +91,7 @@ P11 Voyage Recruitment Choice:
 
 - PASS — focused P11/P10/P5/P7: 4 files / 74 tests; focused P11/content RNG: 2 files / 16 tests; focused P11/save replay: 2 files / 13 tests.
 - PASS — typecheck, lint, full test suite (58 files / 782 tests), 50-match production smoke (50/50 complete, zero crashes), production build, and focused 1280-px Browser E2E (rounds 10/20, 2/2).
-- NOT RUN — 1,000-seed production soak, new authoritative baseline, full Browser E2E; normal GitHub CI is pending PR publication.
+- NOT RUN — 1,000-seed production soak, new authoritative baseline, full Browser E2E; normal GitHub CI is pending on PR #54.
 
 PR #53 10/20 topology review correction:
 
@@ -863,7 +863,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-Review the P11 PR and its GitHub CI; do not merge or start P1B, tuning or a new authoritative baseline automatically.
+Review PR #54 and its GitHub CI; do not merge or start P1B, tuning or a new authoritative baseline automatically.
 
 ## Codex Update Contract
 
