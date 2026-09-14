@@ -4,7 +4,43 @@
 
 This non-commercial, localhost-only fan prototype has both original generated project art and the separately documented v2 crew derivatives below. It is not affiliated with or endorsed by Eiichiro Oda, Shueisha, Toei Animation, or any other One Piece rights holder. One Piece character names and recognizable character elements remain the property of their respective rights holders.
 
-On `2026-08-14`, the project owner explicitly attested in the project conversation that the 17 listed source sheets may be used, adapted, and distributed in this public collaboration repository. That owner attestation is the recorded permission basis for these imports; a Sprite Database URL is not treated as permission, and this repository does not independently establish chain of title or grant a downstream asset license. The MIT license applies to code only. Reuse, redistribution, or commercialization of franchise or imported art requires its own appropriate rights clearance.
+On `2026-08-14`, the project owner explicitly attested in the project conversation that the initial 17 listed source sheets may be used, adapted, and distributed in this public collaboration repository. Later source additions record their own permission basis in `art/animation-v2/source-matrix.json`. An owner attestation is not independent verification of chain of title; a Sprite Database URL is not treated as permission, and this repository grants no downstream asset license. The MIT license applies to code only. Reuse, redistribution, or commercialization of franchise or imported art requires its own appropriate rights clearance.
+
+## P12 named PvE encounters
+
+P12 replaces the anonymous combat presentation in the eight PvE waves from rounds 9–40 with named bosses and matching faction enemies. The eight boss atlases use the exact, SHA-pinned local source sheets below; the eight faction minions are original deterministic vector/pixel compositions in `scripts/assets/build_p12_pve_assets.mjs`. Each of the 16 visual bases has a transparent `1024×768` atlas with 46 frames, a static enemy cutout, portrait, and token. Five extra combat-role profiles share their faction base atlas without duplicating image files. Source dimensions, contributor basis, source SHA-256, frame-map method, pivot, and permission note for every base are in `art/animation-v2/source-matrix.json`.
+
+| Boss atlas | Source page | Contributor |
+|---|---|---|
+| Arlong | [Gigant Battle! file 12051](https://spritedatabase.net/file/12051) | Alejo |
+| Enel | [Gigant Battle! 2 file 15207](https://spritedatabase.net/file/15207) | Grim |
+| Rob Lucci | [Gigant Battle! 2 file 14627](https://spritedatabase.net/file/14627) | Grim |
+| Magellan | [Gigant Battle! file 12485](https://spritedatabase.net/file/12485) | Grim |
+| Hody Jones | [Gigant Battle! 2 file 14847](https://spritedatabase.net/file/14847) | Grim |
+| Caesar Clown | [Great Pirate Colosseum file 21059](https://spritedatabase.net/file/21059) | Omega |
+| Pica | [Great Pirate Colosseum file 21146](https://spritedatabase.net/file/21146) | Grim |
+| Kaido | [Great Pirate Colosseum file 21137](https://spritedatabase.net/file/21137) | Megadoomer |
+
+| Atlas key | Local source | Source SHA-256 | Atlas SHA-256 |
+|---|---|---|---|
+| `arlong-v2` | `art/licensed-reference/gigant-battle/Arlong.PNG` | `2d2dca0ffea6462a47c3cb56ec5c68b02b3e9072e4a1ca23cd9c44bc85b87fd2` | `2fdc66b232cf2dc973d9db1a351561fac8758f52ab876286d952782c10b6efc7` |
+| `fish-man-raider-v2` | `public/assets/enemies/fish-man-raider.png` | `98c0fbe10760687a8d0d374666a3e6957dd27a13ab984da4aa280bea10b8f8fa` | `820cf6283a72ae36121ec2345574889d19e9049bd62fb1bc500e1914a789cba0` |
+| `enel-v2` | `art/licensed-reference/gigant-battle-2/Enel.png` | `3e0d6f5930123fd26212af101e2bc4536abb8a791121d39412feb90e662d96c3` | `15addfd47ed3a89963179e35bdac79898f927649775ad11c4679b669fcc572a6` |
+| `skypiea-priest-v2` | `public/assets/enemies/skypiea-priest.png` | `ef4acbb167707a8efccde3cd8994ee09eba7c6a38525d5f061a8477025311a7c` | `1eeda37a2c7a7f47fb4cb4c69a2e15a36978ac940a50c23d976b834eef8562b2` |
+| `rob-lucci-v2` | `art/licensed-reference/gigant-battle-2/RobLucci.png` | `df73e9c50321649f5db252d86a5d9a5c504d13787980099d8bb718efd4f0a57a` | `49660a6d0b814bae9c62cf2d57af5a2d9e0d3eb888922890b454658c6cc0c898` |
+| `cp9-elite-v2` | `public/assets/enemies/cp9-elite.png` | `c3667a1639a389e8163217733993f197e21762cb33a2be9da8ec019a4a2145ab` | `840a2fcc76fb30c586da92c70a7b1656a78b103a0c726acf6426af3f32352525` |
+| `magellan-v2` | `art/licensed-reference/gigant-battle/Magellan.png` | `9ad3ac06697c731d37df7ad3f4025aedf298fe5e062bfbf5702462d6508b983b` | `bd3d3a1f38cfdf467386d91b86e2f9386a5d54e9545b2c01f8380cbf289cc793` |
+| `impel-down-guard-v2` | `public/assets/enemies/impel-down-guard.png` | `3858021d5aad82cf91999a7fe0caace175551d93468d2453672a95415a5f3f24` | `81f4f5863e4fba4e3499493dfce9e0ebf44ee30c78fda33ece4210853e2555ee` |
+| `hody-jones-v2` | `art/licensed-reference/gigant-battle-2/HodyJones.png` | `951c8489a717f445186e6758891853ee0b1abb5ee0c2b824375bc973aff9d31a` | `a109480d5f5d0b87b92bfc06dd0865565998d7dac543f4dcc08f6abf37dd49c7` |
+| `new-fish-man-officer-v2` | `public/assets/enemies/new-fish-man-officer.png` | `ed7f39d55f360a3306b11a60b190617f55b5d2002313e63b1088fbfb520cdcaf` | `4aef0a15c4a7ccf874034ed78a573946cd533c0a49804f560ce3e66b76b08fd8` |
+| `caesar-clown-v2` | `art/licensed-reference/great-pirate-colosseum/CaesarClown.png` | `45e594abd8d4f50cab78c65e29f316c7788f7c23dfedf79e3adfc59b668a71a1` | `11b9e77aaef721e01a04c4c4a7527bd64026003524c355b9ad869da84c601a9f` |
+| `punk-hazard-guard-v2` | `public/assets/enemies/punk-hazard-guard.png` | `286c448cb41c3d78cba59721bd9a79b6aab1067428d8ec5de23d40c830302e59` | `9dd71165709aafe9b035f46c3390aa5bf18822481391a1e2059c1f0a8133d3fa` |
+| `pica-v2` | `art/licensed-reference/great-pirate-colosseum/Pica.png` | `51b419bed175b54da00ca5eed01b8fb3385f2c2b163cd69329ef15746f23c2a7` | `5bb2658c9c1e58acc8b916a009c5834800c4ab8d0eae3acf07964306f4b106ae` |
+| `donquixote-officer-v2` | `public/assets/enemies/donquixote-officer.png` | `132d020d58a64631a0e51d040cf63411df147185515c8364a0761fae60f1a27f` | `ad01354650ad58085a7233565804b5b18d42e0a519638cc8412312d408da6c9c` |
+| `kaido-v2` | `art/licensed-reference/great-pirate-colosseum/Kaido.png` | `6d79b1b23f29ae8114551b7626b2dead05f186cd060795c258cef9fd30197458` | `0c9375fc29c32b45bc3b93282e77d9645d528e712813c0b6829daa166981e832` |
+| `beast-pirate-v2` | `public/assets/enemies/beast-pirate.png` | `a75322629000bf2a36a98079ee13661bc7e5b1f4d0aba0991199eca395cc3fc9` | `48bb8ab34085a75a076c5c49de22679bce401a0bb7e2bbd3e17bbf1e925ca95f` |
+
+The compact Great Pirate Colosseum sheets provide support poses, not complete full-body walk cycles. Pica therefore appears as a stone-head boss and Kaido as a large upper-body boss silhouette. Their missing motion frames are deterministic holds, offsets, and locally drawn effects; they are not presented as extracted source poses. The P12 contact sheet at `art/qa/p12-pve-contact-sheet.png` was inspected for alpha, pivot, silhouette, and readability. `npm run assets:p12` rebuilds all P12 assets without a GUI, external service, or runtime network request. Identical source inputs produced identical atlas and contact-sheet hashes on a second build.
 
 ## Roster-expansion placeholder
 

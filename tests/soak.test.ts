@@ -143,7 +143,7 @@ describe("50-seed complete headless match soak", () => {
       }
 
       expect(visitedPhases).toEqual(
-        new Set(["preparation", "battle", "item-choice", "carousel"]),
+        new Set(["preparation", "battle", "item-choice", "carousel", "voyage-choice"]),
       );
       expect(Object.keys(winningBoards).length).toBeGreaterThanOrEqual(8);
       expect(Math.max(...Object.values(winningBoards))).toBeLessThanOrEqual(

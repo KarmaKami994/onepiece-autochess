@@ -119,10 +119,10 @@ describe("P5 late-game content topology", () => {
 
   it("defines the exact late PvE waves, timing, and three completed choices", () => {
     expect(LATE_PVE_ROUNDS.map((round) => getStageDefinition(round))).toMatchObject([
-      { id: "vice-admiral-vanguard", name: "Vice Admiral Vanguard", preparationSeconds: 30, battleSeconds: 45, enemyWave: [{ enemyId: "vice-admiral", count: 3 }], itemReward: { mode: "choice", itemKind: "completed", amount: 1, offerCount: 3 } },
-      { id: "cipher-pol-hunt", name: "Cipher Pol Hunt", preparationSeconds: 30, battleSeconds: 45, enemyWave: [{ enemyId: "cipher-pol-agent", count: 3 }], itemReward: { mode: "choice", itemKind: "completed", amount: 1, offerCount: 3 } },
-      { id: "seraphim-deployment", name: "Seraphim Deployment", preparationSeconds: 30, battleSeconds: 45, enemyWave: [{ enemyId: "seraphim", count: 3 }], itemReward: { mode: "choice", itemKind: "completed", amount: 1, offerCount: 3 } },
-      { id: "world-government-onslaught", name: "World Government Onslaught", preparationSeconds: 30, battleSeconds: 45, enemyWave: [{ enemyId: "vice-admiral", count: 2 }, { enemyId: "cipher-pol-agent", count: 2 }, { enemyId: "seraphim", count: 2 }], itemReward: { mode: "choice", itemKind: "completed", amount: 1, offerCount: 3 } },
+      { id: "vice-admiral-vanguard", name: "Impel Down", preparationSeconds: 30, battleSeconds: 45, enemyWave: [{ enemyId: "magellan", count: 1 }, { enemyId: "impel-down-guard", count: 2 }], itemReward: { mode: "choice", itemKind: "completed", amount: 1, offerCount: 3 } },
+      { id: "cipher-pol-hunt", name: "Fish-Man Island Uprising", preparationSeconds: 30, battleSeconds: 45, enemyWave: [{ enemyId: "hody-jones", count: 1 }, { enemyId: "new-fish-man-officer", count: 2 }], itemReward: { mode: "choice", itemKind: "completed", amount: 1, offerCount: 3 } },
+      { id: "seraphim-deployment", name: "Punk Hazard", preparationSeconds: 30, battleSeconds: 45, enemyWave: [{ enemyId: "caesar-clown", count: 1 }, { enemyId: "punk-hazard-guard", count: 2 }], itemReward: { mode: "choice", itemKind: "completed", amount: 1, offerCount: 3 } },
+      { id: "world-government-onslaught", name: "Dressrosa Siege", preparationSeconds: 30, battleSeconds: 45, enemyWave: [{ enemyId: "pica", count: 1 }, { enemyId: "donquixote-officer-vanguard", count: 1 }, { enemyId: "donquixote-officer-assault", count: 2 }, { enemyId: "donquixote-officer-artillery", count: 2 }], itemReward: { mode: "choice", itemKind: "completed", amount: 1, offerCount: 3 } },
     ]);
   });
 
@@ -323,15 +323,15 @@ describe("P5 item, bot, and save compatibility", () => {
     human(state).inventory = ["black-blade", "jet-dial"];
     const restored = deserializeMatch(serializeMatch(state));
     expect(restored.schemaVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
-    expect(restored.contentVersion).toBe("1.30.0");
+    expect(restored.contentVersion).toBe("1.31.0");
     expect(human(restored).inventory).toEqual(["black-blade", "jet-dial"]);
     const next = advanceMatchPhase(restored);
     expect(next).toMatchObject({ round: 22, phase: "carousel", stageId: "new-world-exchange" });
     expect(next.carouselChoices.every((choice) => getItemDefinition(choice.itemId)?.kind === "completed")).toBe(true);
   });
 
-  it("keeps current GameContent 1.30.0 and save schema 6", () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.30.0");
+  it("keeps current GameContent 1.31.0 and save schema 6", () => {
+    expect(DEFAULT_CONTENT.version).toBe("1.31.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 });

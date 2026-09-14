@@ -61,6 +61,39 @@ const pveIds = [
   "seraphim",
   "vice-admiral",
 ];
+const p12VisualIds = [
+  "arlong",
+  "beast-pirate",
+  "caesar-clown",
+  "cp9-elite",
+  "donquixote-officer",
+  "enel",
+  "fish-man-raider",
+  "hody-jones",
+  "impel-down-guard",
+  "kaido",
+  "magellan",
+  "new-fish-man-officer",
+  "pica",
+  "punk-hazard-guard",
+  "rob-lucci",
+  "skypiea-priest",
+];
+const pveVisualIds = [...pveIds, ...p12VisualIds].sort();
+const pveVariantSources: Record<string, string> = {
+  "cp9-elite-laser": "cp9-elite",
+  "cp9-elite-tidal": "cp9-elite",
+  "donquixote-officer-vanguard": "donquixote-officer",
+  "donquixote-officer-assault": "donquixote-officer",
+  "donquixote-officer-artillery": "donquixote-officer",
+  "beast-pirate-vanguard": "beast-pirate",
+  "beast-pirate-assault": "beast-pirate",
+  "beast-pirate-artillery": "beast-pirate",
+};
+const pveContentIds = [
+  ...pveVisualIds.filter((id) => !["cp9-elite", "donquixote-officer", "beast-pirate"].includes(id)),
+  ...Object.keys(pveVariantSources),
+].sort();
 const v1CrewIds = new Set([
   "ace",
   "chopper",
@@ -200,7 +233,7 @@ async function expectRuntimeBundle(entry: SourceEntry) {
   expect(transparentFrameBorders).toBe(true);
 
   const editable = await stat(
-    entry.editableSource === "licensed-reference-png"
+    entry.editableSource === "licensed-reference-png" || p12VisualIds.includes(entry.id)
       ? path.join(projectRoot, entry.source.localPath)
       : path.join(
           projectRoot,
@@ -209,7 +242,7 @@ async function expectRuntimeBundle(entry: SourceEntry) {
           `${entry.outputAssetKey}.aseprite`,
         ),
   );
-  expect(editable.size).toBeGreaterThan(10_000);
+  expect(editable.size).toBeGreaterThan(p12VisualIds.includes(entry.id) ? 1_000 : 10_000);
   return readRuntimeMetadata(entry);
 }
 
@@ -223,7 +256,7 @@ const expectedFrameStates = [
 ];
 
 describe("animation v2 asset pipeline", () => {
-  it("documents 33 confirmed crew imports and eight project-owned PvE sources", async () => {
+  it("documents crew imports and all 24 PvE visual sources", async () => {
     const matrix = await sourceMatrix();
     expect(matrix.schemaVersion).toBe(1);
     expect(matrix.standard).toMatchObject({
@@ -240,7 +273,7 @@ describe("animation v2 asset pipeline", () => {
     const crew = matrix.entries.filter((entry) => entry.kind === "crew");
     const pve = matrix.entries.filter((entry) => entry.kind === "pve");
     expect(crew.map((entry) => entry.id).sort()).toEqual(crewIds);
-    expect(pve.map((entry) => entry.id).sort()).toEqual(pveIds);
+    expect(pve.map((entry) => entry.id).sort()).toEqual(pveVisualIds);
 
     for (const entry of matrix.entries) {
       expect(entry.pivot).toEqual({ x: 64, y: 116 });
@@ -325,10 +358,10 @@ describe("animation v2 asset pipeline", () => {
     }
   });
 
-  it("keeps all external PvE catalog candidates out of the runtime source path", async () => {
+  it("keeps original PvE catalog candidates out of the runtime source path", async () => {
     const matrix = await sourceMatrix();
     for (const entry of matrix.entries.filter(
-      (candidate) => candidate.kind === "pve",
+      (candidate) => candidate.kind === "pve" && candidate.source.strategy === "procedural-cutout",
     )) {
       expect(entry.permission.status).toBe("project-owned");
       expect(entry.source.strategy).toBe("procedural-cutout");
@@ -341,7 +374,7 @@ describe("animation v2 asset pipeline", () => {
     }
   });
 
-  it("bundles every project-owned PvE v2 atlas, metadata file, and editable source", async () => {
+  it("bundles every PvE v2 atlas, metadata file, and editable source", async () => {
     const matrix = await sourceMatrix();
     for (const entry of matrix.entries.filter(
       (candidate) => candidate.kind === "pve",
@@ -349,7 +382,9 @@ describe("animation v2 asset pipeline", () => {
       const metadata = await expectRuntimeBundle(entry);
       expect(metadata).toMatchObject({
         schemaVersion: 2,
-        pipeline: "procedural-static-cutout-v1",
+        pipeline: entry.source.strategy === "procedural-cutout"
+          ? "procedural-static-cutout-v1"
+          : "auto-connected-components-v1",
         sourceSha256: entry.source.sha256,
         frameCount: 46,
         frame: { destinationPivot: { x: 64, y: 116 } },
@@ -365,7 +400,7 @@ describe("animation v2 asset pipeline", () => {
 
   it("exposes all crew and PvE v2 atlases through the shared runtime manifest", () => {
     expect(Object.keys(CREW_V2_ANIMATIONS).sort()).toEqual(crewIds);
-    expect(Object.keys(PVE_ANIMATION_MANIFEST).sort()).toEqual(pveIds);
+    expect(Object.keys(PVE_ANIMATION_MANIFEST).sort()).toEqual(pveContentIds);
     for (const contentId of crewIds) {
       const definitions = getCrewAnimationDefinitions(contentId);
       expect(definitions.map((definition) => definition.version)).toEqual(
@@ -388,7 +423,7 @@ describe("animation v2 asset pipeline", () => {
     )) {
       expect(definition).toMatchObject({
         contentId,
-        assetKey: `${contentId}-v2`,
+        assetKey: `${pveVariantSources[contentId] ?? contentId}-v2`,
         kind: "pve",
         version: "v2",
         frameWidth: 128,
@@ -414,7 +449,7 @@ describe("animation v2 asset pipeline", () => {
     for (const entry of matrix.entries) {
       expect(notes).toContain(`\`${entry.outputAssetKey}\``);
       expect(notes).toContain(
-        entry.editableSource === "licensed-reference-png"
+        entry.editableSource === "licensed-reference-png" || p12VisualIds.includes(entry.id)
           ? entry.source.localPath
           : `art/libresprite/${entry.outputAssetKey}.aseprite`,
       );

@@ -45,6 +45,9 @@ started through the manual GitHub Actions `Release Production Soak` workflow.
 Run `npx playwright install chromium` once before the first local E2E check.
 
 Use `npm run assets:v2` to rebuild the standard 128×128 animation atlases.
+Use `npm run assets:p12` for the complete named-PvE source, atlas, portrait,
+token, and contact-sheet rebuild. The combined `npm run assets:all` includes
+P12 without a GUI or network service.
 Licensed imports must have their local source, source-page metadata, SHA-256,
 frame map, pivot, processing steps, and explicit public-redistribution
 permission recorded in `art/animation-v2/source-matrix.json` before they may

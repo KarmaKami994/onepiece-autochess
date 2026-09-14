@@ -98,7 +98,7 @@ for (const unit of DEFAULT_CONTENT.units) {
   await requireFile(path.join(publicRoot, preferred.sheetPath.replace(/^\//, "")));
 }
 
-if (DEFAULT_CONTENT.enemies.length !== 8) throw new Error(`Expected 8 PvE enemies, found ${DEFAULT_CONTENT.enemies.length}`);
+if (DEFAULT_CONTENT.enemies.length !== 29) throw new Error(`Expected 29 PvE enemy profiles, found ${DEFAULT_CONTENT.enemies.length}`);
 for (const enemy of DEFAULT_CONTENT.enemies) {
   if (enemy.assetPath.endsWith("/placeholder.svg")) throw new Error(`${enemy.id} still uses the production placeholder`);
   await requireFile(path.join(publicRoot, enemy.assetPath.replace(/^\//, "")));
@@ -142,7 +142,7 @@ await Promise.all([
   requireFile(path.join(root, "ASSET_LICENSE.md")),
   requireFile(path.join(publicRoot, "assets", "maps", "pirate-ship.png")),
   requireFile(path.join(publicRoot, "assets", "maps", "marine-harbor.png")),
-  ...["p7-crew-contact-sheet.png", "p7-pve-contact-sheet.png", "p7-item-contact-sheet.png", "p7-trait-status-contact-sheet.png"].map((file) => requireFile(path.join(root, "art", "qa", file))),
+  ...["p7-crew-contact-sheet.png", "p7-pve-contact-sheet.png", "p7-item-contact-sheet.png", "p7-trait-status-contact-sheet.png", "p12-pve-contact-sheet.png"].map((file) => requireFile(path.join(root, "art", "qa", file))),
 ]);
 const animationEntries = await readdir(animationsRoot, { withFileTypes: true });
 await Promise.all(animationEntries.filter((entry) => entry.isDirectory()).map((entry) => validateAnimation(path.join(animationsRoot, entry.name))));

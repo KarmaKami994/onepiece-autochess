@@ -91,7 +91,7 @@ async function expectFile(relativePath: string): Promise<void> {
 
 describe("P7 major asset production", () => {
   it("completes real static and preferred v2 presentation for all crew", async () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.30.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.31.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(DEFAULT_CONTENT.units).toHaveLength(34);
     expect(DEFAULT_CONTENT.units.some((unit) =>
@@ -146,9 +146,9 @@ describe("P7 major asset production", () => {
     )).toEqual([CREW_V2_ANIMATIONS.koby]);
   });
 
-  it("completes real static and v2 presentation for all eight PvE identities", async () => {
-    expect(DEFAULT_CONTENT.enemies.map((enemy) => enemy.id)).toEqual(pveIds);
-    for (const enemy of DEFAULT_CONTENT.enemies) {
+  it("retains complete static and v2 presentation for the original eight PvE identities", async () => {
+    expect(DEFAULT_CONTENT.enemies.slice(0, pveIds.length).map((enemy) => enemy.id)).toEqual(pveIds);
+    for (const enemy of DEFAULT_CONTENT.enemies.slice(0, pveIds.length)) {
       expect(enemy.assetPath).toBe(`/assets/enemies/${enemy.id}.png`);
       await expectFile(`public/assets/enemies/${enemy.id}.png`);
       await expectFile(`public/assets/portraits/${enemy.id}.png`);
@@ -158,14 +158,14 @@ describe("P7 major asset production", () => {
     }
   });
 
-  it("preserves all gameplay content while changing presentation metadata only", () => {
+  it("pins the cumulative content contract after the P12 encounter update", () => {
     const normalized = JSON.stringify(DEFAULT_CONTENT, (key, value) =>
       ["version", "assetPath", "presentation"].includes(key)
         ? undefined
         : value,
     );
     expect(createHash("sha256").update(normalized).digest("hex"))
-      .toBe("81f4b76d2c8e6c2a0096ab0b5917413ea5c4c4568589fd4f8659a5480608db08");
+      .toBe("1485fd67999cd7f5a1dae170fd80d155f8f86125b46d85e70b6642f1fe12d180");
   });
 
   it("maps all 65 item identities and preserves recipes and glyph fallback", async () => {

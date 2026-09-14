@@ -957,6 +957,118 @@
       "processing": ["transparent alpha trim", "nearest-neighbor reduction", "integer offsets", "local pixel bite/wave effects", "deterministic hold frames"],
       "permission": { "status": "project-owned", "note": "No external sheet is used. The v2 atlas derives only from the already-provenanced original generated Sea King cutout. See ASSET_PROVENANCE.md." },
       "recipe": { "maxWidth": 112, "maxHeight": 100, "idleVisualTopPx": 15, "effectColor": "#49d8d2", "attackEffect": "bite", "castEffect": "waves" }
+    },
+    {
+      "id": "arlong", "kind": "pve", "outputAssetKey": "arlong-v2", "editableSource": "licensed-reference-png",
+      "source": { "strategy": "auto-frame-map", "localPath": "art/licensed-reference/gigant-battle/Arlong.PNG", "sha256": "2d2dca0ffea6462a47c3cb56ec5c68b02b3e9072e4a1ca23cd9c44bc85b87fd2", "dimensions": { "width": 547, "height": 244 }, "game": "One Piece: Gigant Battle!", "gameUrl": "https://spritedatabase.net/game/2000", "sheetUrl": "https://spritedatabase.net/file/12051", "fileId": 12051, "sourceCharacterName": "Arlong", "contributor": "Alejo", "contributorBasis": "Sprite Database file page read 2026-09-13", "frameMap": "auto:connected-components-v1", "derivedFrameMap": "public/assets/animations/arlong-v2/arlong-v2.json#frames" },
+      "pivot": { "x": 64, "y": 116 }, "processing": ["real support poses", "deterministic holds", "integer offsets", "nearest-neighbor only", "local pixel effects"],
+      "permission": { "status": "confirmed", "note": "Project-owner attestation records written authorization for applicable One Piece assets in this private/local project; no downstream asset license is granted." },
+      "recipe": { "minimumCandidateCount": 2, "effectColor": "#4bc0c7", "attackEffect": "bite", "castEffect": "waves" }
+    },
+    {
+      "id": "enel", "kind": "pve", "outputAssetKey": "enel-v2", "editableSource": "licensed-reference-png",
+      "source": { "strategy": "auto-frame-map", "localPath": "art/licensed-reference/gigant-battle-2/Enel.png", "sha256": "3e0d6f5930123fd26212af101e2bc4536abb8a791121d39412feb90e662d96c3", "dimensions": { "width": 1170, "height": 7623 }, "game": "One Piece: Gigant Battle! 2 - New World", "gameUrl": "https://spritedatabase.net/game/2232", "sheetUrl": "https://spritedatabase.net/file/15207", "fileId": 15207, "sourceCharacterName": "Enel", "contributor": "Grim", "contributorBasis": "Sprite Database file page read 2026-09-13", "frameMap": "auto:connected-components-v1", "derivedFrameMap": "public/assets/animations/enel-v2/enel-v2.json#frames" },
+      "pivot": { "x": 64, "y": 116 }, "processing": ["real sheet poses", "deterministic frame mapping", "nearest-neighbor only", "local pixel effects"],
+      "permission": { "status": "confirmed", "note": "Project-owner attestation records written authorization for applicable One Piece assets in this private/local project; no downstream asset license is granted." },
+      "recipe": { "effectColor": "#f3d25f", "attackEffect": "beam", "castEffect": "beam" }
+    },
+    {
+      "id": "rob-lucci", "kind": "pve", "outputAssetKey": "rob-lucci-v2", "editableSource": "licensed-reference-png",
+      "source": { "strategy": "auto-frame-map", "localPath": "art/licensed-reference/gigant-battle-2/RobLucci.png", "sha256": "df73e9c50321649f5db252d86a5d9a5c504d13787980099d8bb718efd4f0a57a", "dimensions": { "width": 882, "height": 4724 }, "game": "One Piece: Gigant Battle! 2 - New World", "gameUrl": "https://spritedatabase.net/game/2232", "sheetUrl": "https://spritedatabase.net/file/14627", "fileId": 14627, "sourceCharacterName": "Rob Lucci", "contributor": "Grim", "contributorBasis": "Sprite Database file page read 2026-09-13", "frameMap": "auto:connected-components-v1", "derivedFrameMap": "public/assets/animations/rob-lucci-v2/rob-lucci-v2.json#frames" },
+      "pivot": { "x": 64, "y": 116 }, "processing": ["real sheet poses", "deterministic frame mapping", "nearest-neighbor only", "local pixel effects"],
+      "permission": { "status": "confirmed", "note": "Project-owner attestation records written authorization for applicable One Piece assets in this private/local project; no downstream asset license is granted." },
+      "recipe": { "effectColor": "#d6d1c9", "attackEffect": "slash", "castEffect": "pulse" }
+    },
+    {
+      "id": "magellan", "kind": "pve", "outputAssetKey": "magellan-v2", "editableSource": "licensed-reference-png",
+      "source": { "strategy": "auto-frame-map", "localPath": "art/licensed-reference/gigant-battle/Magellan.png", "sha256": "9ad3ac06697c731d37df7ad3f4025aedf298fe5e062bfbf5702462d6508b983b", "dimensions": { "width": 1030, "height": 5258 }, "game": "One Piece: Gigant Battle!", "gameUrl": "https://spritedatabase.net/game/2000", "sheetUrl": "https://spritedatabase.net/file/12485", "fileId": 12485, "sourceCharacterName": "Magellan", "contributor": "Grim", "contributorBasis": "Sprite Database file page read 2026-09-13", "frameMap": "auto:connected-components-v1", "derivedFrameMap": "public/assets/animations/magellan-v2/magellan-v2.json#frames" },
+      "pivot": { "x": 64, "y": 116 }, "processing": ["real sheet poses", "deterministic frame mapping", "nearest-neighbor only", "local pixel effects"],
+      "permission": { "status": "confirmed", "note": "Project-owner attestation records written authorization for applicable One Piece assets in this private/local project; no downstream asset license is granted." },
+      "recipe": { "effectColor": "#a075c9", "attackEffect": "slash", "castEffect": "waves" }
+    },
+    {
+      "id": "hody-jones", "kind": "pve", "outputAssetKey": "hody-jones-v2", "editableSource": "licensed-reference-png",
+      "source": { "strategy": "auto-frame-map", "localPath": "art/licensed-reference/gigant-battle-2/HodyJones.png", "sha256": "951c8489a717f445186e6758891853ee0b1abb5ee0c2b824375bc973aff9d31a", "dimensions": { "width": 1232, "height": 5742 }, "game": "One Piece: Gigant Battle! 2 - New World", "gameUrl": "https://spritedatabase.net/game/2232", "sheetUrl": "https://spritedatabase.net/file/14847", "fileId": 14847, "sourceCharacterName": "Hody Jones", "contributor": "Grim", "contributorBasis": "Sprite Database file page read 2026-09-13", "frameMap": "auto:connected-components-v1", "derivedFrameMap": "public/assets/animations/hody-jones-v2/hody-jones-v2.json#frames" },
+      "pivot": { "x": 64, "y": 116 }, "processing": ["real sheet poses", "deterministic frame mapping", "nearest-neighbor only", "local pixel effects"],
+      "permission": { "status": "confirmed", "note": "Project-owner attestation records written authorization for applicable One Piece assets in this private/local project; no downstream asset license is granted." },
+      "recipe": { "effectColor": "#a8e5f1", "attackEffect": "bite", "castEffect": "waves" }
+    },
+    {
+      "id": "caesar-clown", "kind": "pve", "outputAssetKey": "caesar-clown-v2", "editableSource": "licensed-reference-png", "scanOptions": { "maxWidth": 300, "maxHeight": 300 },
+      "source": { "strategy": "auto-frame-map", "localPath": "art/licensed-reference/great-pirate-colosseum/CaesarClown.png", "sha256": "45e594abd8d4f50cab78c65e29f316c7788f7c23dfedf79e3adfc59b668a71a1", "dimensions": { "width": 1498, "height": 231 }, "game": "One Piece: Great Pirate Colosseum", "gameUrl": "https://spritedatabase.net/game/2801", "sheetUrl": "https://spritedatabase.net/file/21059", "fileId": 21059, "sourceCharacterName": "Caesar Clown", "contributor": "Omega", "contributorBasis": "Sprite Database file page read 2026-09-13", "frameMap": "auto:connected-components-v1", "derivedFrameMap": "public/assets/animations/caesar-clown-v2/caesar-clown-v2.json#frames" },
+      "pivot": { "x": 64, "y": 116 }, "processing": ["real support poses", "deterministic holds", "integer offsets", "nearest-neighbor only", "local pixel effects"],
+      "permission": { "status": "confirmed", "note": "Project-owner attestation records written authorization for applicable One Piece assets in this private/local project; no downstream asset license is granted." },
+      "recipe": { "minimumCandidateCount": 2, "effectColor": "#b67cd8", "attackEffect": "beam", "castEffect": "waves" }
+    },
+    {
+      "id": "pica", "kind": "pve", "outputAssetKey": "pica-v2", "editableSource": "licensed-reference-png", "scanOptions": { "maxWidth": 300, "maxHeight": 300 },
+      "source": { "strategy": "auto-frame-map", "localPath": "art/licensed-reference/great-pirate-colosseum/Pica.png", "sha256": "51b419bed175b54da00ca5eed01b8fb3385f2c2b163cd69329ef15746f23c2a7", "dimensions": { "width": 959, "height": 228 }, "game": "One Piece: Great Pirate Colosseum", "gameUrl": "https://spritedatabase.net/game/2801", "sheetUrl": "https://spritedatabase.net/file/21146", "fileId": 21146, "sourceCharacterName": "Pica", "contributor": "Grim", "contributorBasis": "Sprite Database file page read 2026-09-13", "frameMap": "auto:connected-components-v1", "derivedFrameMap": "public/assets/animations/pica-v2/pica-v2.json#frames" },
+      "pivot": { "x": 64, "y": 116 }, "processing": ["real support poses", "deterministic holds", "integer offsets", "nearest-neighbor only", "local pixel effects"],
+      "permission": { "status": "confirmed", "note": "Project-owner attestation records written authorization for applicable One Piece assets in this private/local project; no downstream asset license is granted." },
+      "recipe": { "minimumCandidateCount": 2, "effectColor": "#c29bc8", "attackEffect": "slash", "castEffect": "waves" }
+    },
+    {
+      "id": "kaido", "kind": "pve", "outputAssetKey": "kaido-v2", "editableSource": "licensed-reference-png", "scanOptions": { "maxWidth": 300, "maxHeight": 300 },
+      "source": { "strategy": "auto-frame-map", "localPath": "art/licensed-reference/great-pirate-colosseum/Kaido.png", "sha256": "6d79b1b23f29ae8114551b7626b2dead05f186cd060795c258cef9fd30197458", "dimensions": { "width": 776, "height": 244 }, "game": "One Piece: Great Pirate Colosseum", "gameUrl": "https://spritedatabase.net/game/2801", "sheetUrl": "https://spritedatabase.net/file/21137", "fileId": 21137, "sourceCharacterName": "Kaido", "contributor": "Megadoomer", "contributorBasis": "Sprite Database file page read 2026-09-13", "frameMap": "auto:connected-components-v1", "derivedFrameMap": "public/assets/animations/kaido-v2/kaido-v2.json#frames" },
+      "pivot": { "x": 64, "y": 116 }, "processing": ["real support poses", "deterministic holds", "integer offsets", "nearest-neighbor only", "local pixel effects"],
+      "permission": { "status": "confirmed", "note": "Project-owner attestation records written authorization for applicable One Piece assets in this private/local project; no downstream asset license is granted." },
+      "recipe": { "minimumCandidateCount": 2, "effectColor": "#a28ddb", "attackEffect": "slash", "castEffect": "beam" }
+    },
+    {
+      "id": "fish-man-raider", "kind": "pve", "outputAssetKey": "fish-man-raider-v2",
+      "source": { "strategy": "procedural-cutout", "localPath": "public/assets/enemies/fish-man-raider.png", "sha256": "98c0fbe10760687a8d0d374666a3e6957dd27a13ab984da4aa280bea10b8f8fa", "dimensions": { "width": 512, "height": 768 }, "game": "Repository-authored faction minion", "gameUrl": null, "sheetUrl": null, "sourceCharacterName": "Fish-Man Raider", "contributor": "One Piece Autochess project", "frameMap": "procedural:static-cutout-v1", "derivedFrameMap": "public/assets/animations/fish-man-raider-v2/fish-man-raider-v2.json#frames" },
+      "pivot": { "x": 64, "y": 116 }, "processing": ["repository-authored vector composition", "deterministic pixel rasterization", "integer offsets", "local pixel effects"],
+      "permission": { "status": "project-owned", "note": "Locally authored faction minion generated deterministically by scripts/assets/build_p12_pve_assets.mjs; no external sheet pixels are used." },
+      "recipe": { "maxWidth": 88, "maxHeight": 110, "effectColor": "#4bc0c7", "attackEffect": "slash", "castEffect": "waves" }
+    },
+    {
+      "id": "skypiea-priest", "kind": "pve", "outputAssetKey": "skypiea-priest-v2",
+      "source": { "strategy": "procedural-cutout", "localPath": "public/assets/enemies/skypiea-priest.png", "sha256": "ef4acbb167707a8efccde3cd8994ee09eba7c6a38525d5f061a8477025311a7c", "dimensions": { "width": 512, "height": 768 }, "game": "Repository-authored faction minion", "gameUrl": null, "sheetUrl": null, "sourceCharacterName": "Skypiea Priest", "contributor": "One Piece Autochess project", "frameMap": "procedural:static-cutout-v1", "derivedFrameMap": "public/assets/animations/skypiea-priest-v2/skypiea-priest-v2.json#frames" },
+      "pivot": { "x": 64, "y": 116 }, "processing": ["repository-authored vector composition", "deterministic pixel rasterization", "integer offsets", "local pixel effects"],
+      "permission": { "status": "project-owned", "note": "Locally authored faction minion generated deterministically by scripts/assets/build_p12_pve_assets.mjs; no external sheet pixels are used." },
+      "recipe": { "maxWidth": 88, "maxHeight": 110, "effectColor": "#f3d25f", "attackEffect": "shot", "castEffect": "pulse" }
+    },
+    {
+      "id": "cp9-elite", "kind": "pve", "outputAssetKey": "cp9-elite-v2",
+      "source": { "strategy": "procedural-cutout", "localPath": "public/assets/enemies/cp9-elite.png", "sha256": "c3667a1639a389e8163217733993f197e21762cb33a2be9da8ec019a4a2145ab", "dimensions": { "width": 512, "height": 768 }, "game": "Repository-authored faction minion", "gameUrl": null, "sheetUrl": null, "sourceCharacterName": "CP9 Elite", "contributor": "One Piece Autochess project", "frameMap": "procedural:static-cutout-v1", "derivedFrameMap": "public/assets/animations/cp9-elite-v2/cp9-elite-v2.json#frames" },
+      "pivot": { "x": 64, "y": 116 }, "processing": ["repository-authored vector composition", "deterministic pixel rasterization", "integer offsets", "local pixel effects"],
+      "permission": { "status": "project-owned", "note": "Locally authored faction minion generated deterministically by scripts/assets/build_p12_pve_assets.mjs; no external sheet pixels are used." },
+      "recipe": { "maxWidth": 88, "maxHeight": 110, "effectColor": "#d6d1c9", "attackEffect": "slash", "castEffect": "pulse" }
+    },
+    {
+      "id": "impel-down-guard", "kind": "pve", "outputAssetKey": "impel-down-guard-v2",
+      "source": { "strategy": "procedural-cutout", "localPath": "public/assets/enemies/impel-down-guard.png", "sha256": "3858021d5aad82cf91999a7fe0caace175551d93468d2453672a95415a5f3f24", "dimensions": { "width": 512, "height": 768 }, "game": "Repository-authored faction minion", "gameUrl": null, "sheetUrl": null, "sourceCharacterName": "Impel Down Guard", "contributor": "One Piece Autochess project", "frameMap": "procedural:static-cutout-v1", "derivedFrameMap": "public/assets/animations/impel-down-guard-v2/impel-down-guard-v2.json#frames" },
+      "pivot": { "x": 64, "y": 116 }, "processing": ["repository-authored vector composition", "deterministic pixel rasterization", "integer offsets", "local pixel effects"],
+      "permission": { "status": "project-owned", "note": "Locally authored faction minion generated deterministically by scripts/assets/build_p12_pve_assets.mjs; no external sheet pixels are used." },
+      "recipe": { "maxWidth": 88, "maxHeight": 110, "effectColor": "#a075c9", "attackEffect": "slash", "castEffect": "waves" }
+    },
+    {
+      "id": "new-fish-man-officer", "kind": "pve", "outputAssetKey": "new-fish-man-officer-v2",
+      "source": { "strategy": "procedural-cutout", "localPath": "public/assets/enemies/new-fish-man-officer.png", "sha256": "ed7f39d55f360a3306b11a60b190617f55b5d2002313e63b1088fbfb520cdcaf", "dimensions": { "width": 512, "height": 768 }, "game": "Repository-authored faction minion", "gameUrl": null, "sheetUrl": null, "sourceCharacterName": "New Fish-Man Officer", "contributor": "One Piece Autochess project", "frameMap": "procedural:static-cutout-v1", "derivedFrameMap": "public/assets/animations/new-fish-man-officer-v2/new-fish-man-officer-v2.json#frames" },
+      "pivot": { "x": 64, "y": 116 }, "processing": ["repository-authored vector composition", "deterministic pixel rasterization", "integer offsets", "local pixel effects"],
+      "permission": { "status": "project-owned", "note": "Locally authored faction minion generated deterministically by scripts/assets/build_p12_pve_assets.mjs; no external sheet pixels are used." },
+      "recipe": { "maxWidth": 88, "maxHeight": 110, "effectColor": "#a8e5f1", "attackEffect": "slash", "castEffect": "waves" }
+    },
+    {
+      "id": "punk-hazard-guard", "kind": "pve", "outputAssetKey": "punk-hazard-guard-v2",
+      "source": { "strategy": "procedural-cutout", "localPath": "public/assets/enemies/punk-hazard-guard.png", "sha256": "286c448cb41c3d78cba59721bd9a79b6aab1067428d8ec5de23d40c830302e59", "dimensions": { "width": 512, "height": 768 }, "game": "Repository-authored faction minion", "gameUrl": null, "sheetUrl": null, "sourceCharacterName": "Punk Hazard Guard", "contributor": "One Piece Autochess project", "frameMap": "procedural:static-cutout-v1", "derivedFrameMap": "public/assets/animations/punk-hazard-guard-v2/punk-hazard-guard-v2.json#frames" },
+      "pivot": { "x": 64, "y": 116 }, "processing": ["repository-authored vector composition", "deterministic pixel rasterization", "integer offsets", "local pixel effects"],
+      "permission": { "status": "project-owned", "note": "Locally authored faction minion generated deterministically by scripts/assets/build_p12_pve_assets.mjs; no external sheet pixels are used." },
+      "recipe": { "maxWidth": 88, "maxHeight": 110, "effectColor": "#b67cd8", "attackEffect": "beam", "castEffect": "waves" }
+    },
+    {
+      "id": "donquixote-officer", "kind": "pve", "outputAssetKey": "donquixote-officer-v2",
+      "source": { "strategy": "procedural-cutout", "localPath": "public/assets/enemies/donquixote-officer.png", "sha256": "132d020d58a64631a0e51d040cf63411df147185515c8364a0761fae60f1a27f", "dimensions": { "width": 512, "height": 768 }, "game": "Repository-authored faction minion", "gameUrl": null, "sheetUrl": null, "sourceCharacterName": "Donquixote Officer", "contributor": "One Piece Autochess project", "frameMap": "procedural:static-cutout-v1", "derivedFrameMap": "public/assets/animations/donquixote-officer-v2/donquixote-officer-v2.json#frames" },
+      "pivot": { "x": 64, "y": 116 }, "processing": ["repository-authored vector composition", "deterministic pixel rasterization", "integer offsets", "local pixel effects"],
+      "permission": { "status": "project-owned", "note": "Locally authored faction minion generated deterministically by scripts/assets/build_p12_pve_assets.mjs; no external sheet pixels are used." },
+      "recipe": { "maxWidth": 88, "maxHeight": 110, "effectColor": "#c29bc8", "attackEffect": "slash", "castEffect": "waves" }
+    },
+    {
+      "id": "beast-pirate", "kind": "pve", "outputAssetKey": "beast-pirate-v2",
+      "source": { "strategy": "procedural-cutout", "localPath": "public/assets/enemies/beast-pirate.png", "sha256": "a75322629000bf2a36a98079ee13661bc7e5b1f4d0aba0991199eca395cc3fc9", "dimensions": { "width": 512, "height": 768 }, "game": "Repository-authored faction minion", "gameUrl": null, "sheetUrl": null, "sourceCharacterName": "Beast Pirate", "contributor": "One Piece Autochess project", "frameMap": "procedural:static-cutout-v1", "derivedFrameMap": "public/assets/animations/beast-pirate-v2/beast-pirate-v2.json#frames" },
+      "pivot": { "x": 64, "y": 116 }, "processing": ["repository-authored vector composition", "deterministic pixel rasterization", "integer offsets", "local pixel effects"],
+      "permission": { "status": "project-owned", "note": "Locally authored faction minion generated deterministically by scripts/assets/build_p12_pve_assets.mjs; no external sheet pixels are used." },
+      "recipe": { "maxWidth": 88, "maxHeight": 110, "effectColor": "#a28ddb", "attackEffect": "slash", "castEffect": "beam" }
     }
   ]
 }
