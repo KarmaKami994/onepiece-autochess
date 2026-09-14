@@ -678,8 +678,8 @@ describe("P4B5 ordering and contracts", () => {
     state.players[0].inventory = DEFAULT_CONTENT.items.map((item) => item.id);
     const restored = deserializeMatch(serializeMatch(state));
     expect(restored.players[0].inventory).toEqual(state.players[0].inventory);
-    expect(DEFAULT_CONTENT.version).toBe("1.31.0");
-    expect(restored.contentVersion).toBe("1.31.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.32.0");
+    expect(restored.contentVersion).toBe("1.32.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(restored.schemaVersion).toBe(6);
 

@@ -2,12 +2,32 @@ import { getUnitDefinition } from "./content";
 import { scoreBotInstance } from "./scoring";
 import type {
   BotPersonality,
+  GameConfig,
   GameContent,
   PlayerState,
   UnitInstance,
 } from "./types";
 
 export type BotFormationBand = "backline" | "frontline" | "flex" | "middle";
+
+export function getBotTargetLevel(
+  round: number,
+  personality: BotPersonality,
+  config: GameConfig,
+): number {
+  const base = Math.max(
+    config.startLevel,
+    Math.min(config.maxLevel, 2 + Math.floor(round / 5)),
+  );
+  return Math.min(
+    config.maxLevel,
+    base + (personality.levelAggression >= 0.75 ? 1 : 0),
+  );
+}
+
+export function getBotXpActionBudget(personality: BotPersonality): number {
+  return Math.min(5, Math.max(1, Math.ceil(personality.levelAggression * 5)));
+}
 
 export function getBotPersonality(
   player: PlayerState,
