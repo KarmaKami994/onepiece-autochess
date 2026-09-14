@@ -2029,7 +2029,7 @@ const basicEnemyAbility = (
 ): UnitDefinition["ability"] =>
   ability(id, name, `${name} damages its target.`, power, "nearest-enemy", "single");
 
-export const PVE_ENEMY_DEFINITIONS: PvEEnemyDefinition[] = [
+const LEGACY_PVE_ENEMY_DEFINITIONS: PvEEnemyDefinition[] = [
   {
     id: "marine-recruit",
     name: "Marine Recruit",
@@ -2186,6 +2186,77 @@ export const PVE_ENEMY_DEFINITIONS: PvEEnemyDefinition[] = [
   },
 ];
 
+// Reuse the established PvE stat/effect profiles so P12 changes encounter
+// identity without silently rebalancing rewards, damage, or combat timing.
+const PVE_SIGNATURES: Record<string, { name: string; description: string }> = {
+  arlong: { name: "Shark-Tooth Crash", description: "Crashes into the nearest crew member and adjacent allies, briefly stunning them." },
+  "fish-man-raider": { name: "Saw-Tooth Slash", description: "Cuts the nearest crew member." },
+  enel: { name: "El Thor", description: "Strikes through the nearest crew member's line with lightning." },
+  "skypiea-priest": { name: "Thunder Staff", description: "Strikes the nearest crew member with a charged staff." },
+  "rob-lucci": { name: "Rokuogan", description: "Releases a shockwave through the nearest crew member's line." },
+  "cp9-elite-laser": { name: "Rankyaku Wave", description: "Cuts through the nearest crew member's line." },
+  "cp9-elite-tidal": { name: "Six Powers Sweep", description: "Hits the nearest crew member and adjacent allies, briefly stunning them." },
+  magellan: { name: "Venom Shockwave", description: "Hits the nearest crew member and adjacent allies, briefly stunning them." },
+  "impel-down-guard": { name: "Trident Sweep", description: "Hits the nearest crew member and adjacent allies, briefly stunning them." },
+  "hody-jones": { name: "Energy Steroid Rush", description: "Lunges at the nearest crew member with a Defense-piercing strike." },
+  "new-fish-man-officer": { name: "Fish-Man Karate Rush", description: "Lunges at the nearest crew member with a Defense-piercing strike." },
+  "caesar-clown": { name: "Gas Jet", description: "Burns through the farthest crew member's line with a gas blast." },
+  "punk-hazard-guard": { name: "Hazard Flamethrower", description: "Burns through the farthest crew member's line." },
+  pica: { name: "Stone Crush", description: "Hits the nearest crew member and adjacent allies, briefly stunning them." },
+  "donquixote-officer-vanguard": { name: "Officer Crush", description: "Hits the nearest crew member and adjacent allies, briefly stunning them." },
+  "donquixote-officer-assault": { name: "Officer Blitz", description: "Lunges at the nearest crew member with a Defense-piercing strike." },
+  "donquixote-officer-artillery": { name: "Officer Volley", description: "Burns through the farthest crew member's line." },
+  kaido: { name: "Boro Breath", description: "Burns through the farthest crew member's line." },
+  "beast-pirate-vanguard": { name: "Oni Club", description: "Hits the nearest crew member and adjacent allies, briefly stunning them." },
+  "beast-pirate-assault": { name: "Beast Charge", description: "Lunges at the nearest crew member with a Defense-piercing strike." },
+  "beast-pirate-artillery": { name: "Beast Fire", description: "Burns through the farthest crew member's line." },
+};
+
+function pveIdentity(
+  sourceId: string,
+  id: string,
+  name: string,
+  assetId = id,
+): PvEEnemyDefinition {
+  const source = LEGACY_PVE_ENEMY_DEFINITIONS.find((enemy) => enemy.id === sourceId);
+  if (!source) throw new Error(`Missing PvE source profile: ${sourceId}`);
+  const signature = PVE_SIGNATURES[id];
+  if (!signature || !source.ability) throw new Error(`Missing PvE signature: ${id}`);
+  return {
+    ...source,
+    id,
+    name,
+    stats: { ...source.stats },
+    ability: { ...source.ability, id: `${id}-signature`, ...signature },
+    assetPath: `/assets/enemies/${assetId}.png`,
+  };
+}
+
+export const PVE_ENEMY_DEFINITIONS: PvEEnemyDefinition[] = [
+  ...LEGACY_PVE_ENEMY_DEFINITIONS,
+  pveIdentity("sea-king", "arlong", "Arlong"),
+  pveIdentity("pirate-raider", "fish-man-raider", "Fish-Man Raider"),
+  pveIdentity("pacifista", "enel", "Enel"),
+  pveIdentity("rifle-marine", "skypiea-priest", "Skypiea Priest"),
+  pveIdentity("pacifista", "rob-lucci", "Rob Lucci"),
+  pveIdentity("pacifista", "cp9-elite-laser", "CP9 Elite", "cp9-elite"),
+  pveIdentity("sea-king", "cp9-elite-tidal", "CP9 Elite", "cp9-elite"),
+  pveIdentity("vice-admiral", "magellan", "Magellan"),
+  pveIdentity("vice-admiral", "impel-down-guard", "Impel Down Guard"),
+  pveIdentity("cipher-pol-agent", "hody-jones", "Hody Jones"),
+  pveIdentity("cipher-pol-agent", "new-fish-man-officer", "New Fish-Man Officer"),
+  pveIdentity("seraphim", "caesar-clown", "Caesar Clown"),
+  pveIdentity("seraphim", "punk-hazard-guard", "Punk Hazard Guard"),
+  pveIdentity("vice-admiral", "pica", "Pica"),
+  pveIdentity("vice-admiral", "donquixote-officer-vanguard", "Donquixote Officer", "donquixote-officer"),
+  pveIdentity("cipher-pol-agent", "donquixote-officer-assault", "Donquixote Officer", "donquixote-officer"),
+  pveIdentity("seraphim", "donquixote-officer-artillery", "Donquixote Officer", "donquixote-officer"),
+  pveIdentity("seraphim", "kaido", "Kaido"),
+  pveIdentity("vice-admiral", "beast-pirate-vanguard", "Beast Pirate", "beast-pirate"),
+  pveIdentity("cipher-pol-agent", "beast-pirate-assault", "Beast Pirate", "beast-pirate"),
+  pveIdentity("seraphim", "beast-pirate-artillery", "Beast Pirate", "beast-pirate"),
+];
+
 const COMPONENT_CHOICE = {
   trigger: "stage-complete",
   mode: "choice",
@@ -2271,12 +2342,12 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
     id: "calm-belt",
     round: 9,
     kind: "pve",
-    name: "Calm Belt",
+    name: "Arlong Park",
     preparationSeconds: 40,
     battleSeconds: 45,
     enemyWave: [
-      { enemyId: "sea-king", count: 1 },
-      { enemyId: "pirate-raider", count: 2 },
+      { enemyId: "arlong", count: 1 },
+      { enemyId: "fish-man-raider", count: 2 },
     ],
     itemReward: { trigger: "pve-win", mode: "grant", itemKind: "component", amount: 1 },
   },
@@ -2311,12 +2382,12 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
     id: "pacifista-test",
     round: 14,
     kind: "pve",
-    name: "Pacifista Test",
+    name: "Skypiea Judgment",
     preparationSeconds: 30,
     battleSeconds: 45,
     enemyWave: [
-      { enemyId: "pacifista", count: 1 },
-      { enemyId: "rifle-marine", count: 2 },
+      { enemyId: "enel", count: 1 },
+      { enemyId: "skypiea-priest", count: 2 },
     ],
     itemReward: { ...COMPONENT_CHOICE, trigger: "pve-win" },
   },
@@ -2333,12 +2404,13 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
     id: "siege-of-justice",
     round: 19,
     kind: "pve",
-    name: "Siege of Justice",
+    name: "Enies Lobby Showdown",
     preparationSeconds: 40,
     battleSeconds: 45,
     enemyWave: [
-      { enemyId: "pacifista", count: 2 },
-      { enemyId: "sea-king", count: 1 },
+      { enemyId: "rob-lucci", count: 1 },
+      { enemyId: "cp9-elite-laser", count: 1 },
+      { enemyId: "cp9-elite-tidal", count: 1 },
     ],
     itemReward: { trigger: "pve-win", mode: "grant", itemKind: "component", amount: 2, distinct: true },
   },
@@ -2364,10 +2436,10 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
     id: "vice-admiral-vanguard",
     round: 24,
     kind: "pve",
-    name: "Vice Admiral Vanguard",
+    name: "Impel Down",
     preparationSeconds: 30,
     battleSeconds: 45,
-    enemyWave: [{ enemyId: "vice-admiral", count: 3 }],
+    enemyWave: [{ enemyId: "magellan", count: 1 }, { enemyId: "impel-down-guard", count: 2 }],
     itemReward: COMPLETED_PVE_CHOICE,
   },
   {
@@ -2383,20 +2455,20 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
     id: "cipher-pol-hunt",
     round: 28,
     kind: "pve",
-    name: "Cipher Pol Hunt",
+    name: "Fish-Man Island Uprising",
     preparationSeconds: 30,
     battleSeconds: 45,
-    enemyWave: [{ enemyId: "cipher-pol-agent", count: 3 }],
+    enemyWave: [{ enemyId: "hody-jones", count: 1 }, { enemyId: "new-fish-man-officer", count: 2 }],
     itemReward: COMPLETED_PVE_CHOICE,
   },
   {
     id: "seraphim-deployment",
     round: 32,
     kind: "pve",
-    name: "Seraphim Deployment",
+    name: "Punk Hazard",
     preparationSeconds: 30,
     battleSeconds: 45,
-    enemyWave: [{ enemyId: "seraphim", count: 3 }],
+    enemyWave: [{ enemyId: "caesar-clown", count: 1 }, { enemyId: "punk-hazard-guard", count: 2 }],
     itemReward: COMPLETED_PVE_CHOICE,
   },
   {
@@ -2412,13 +2484,14 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
     id: "world-government-onslaught",
     round: 36,
     kind: "pve",
-    name: "World Government Onslaught",
+    name: "Dressrosa Siege",
     preparationSeconds: 30,
     battleSeconds: 45,
     enemyWave: [
-      { enemyId: "vice-admiral", count: 2 },
-      { enemyId: "cipher-pol-agent", count: 2 },
-      { enemyId: "seraphim", count: 2 },
+      { enemyId: "pica", count: 1 },
+      { enemyId: "donquixote-officer-vanguard", count: 1 },
+      { enemyId: "donquixote-officer-assault", count: 2 },
+      { enemyId: "donquixote-officer-artillery", count: 2 },
     ],
     itemReward: COMPLETED_PVE_CHOICE,
   },
@@ -2426,13 +2499,14 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
     id: "final-new-world-stand",
     round: 40,
     kind: "pve",
-    name: "Final New World Stand",
+    name: "Onigashima Final Stand",
     preparationSeconds: 30,
     battleSeconds: 45,
     enemyWave: [
-      { enemyId: "vice-admiral", count: 2 },
-      { enemyId: "cipher-pol-agent", count: 2 },
-      { enemyId: "seraphim", count: 3 },
+      { enemyId: "kaido", count: 1 },
+      { enemyId: "beast-pirate-vanguard", count: 2 },
+      { enemyId: "beast-pirate-assault", count: 2 },
+      { enemyId: "beast-pirate-artillery", count: 2 },
     ],
     itemReward: {
       trigger: "pve-win",
@@ -2559,7 +2633,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.30.0",
+  version: "1.31.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,

@@ -363,10 +363,10 @@ describe("P4B2 component and simple item content", () => {
     if (!player) throw new Error("Missing player-1.");
     player.inventory = [...LEGACY_ITEM_IDS];
     const restored = deserializeMatch(serializeMatch(state));
-    expect(DEFAULT_CONTENT.version).toBe("1.30.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.31.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(restored.schemaVersion).toBe(6);
-    expect(restored.contentVersion).toBe("1.30.0");
+    expect(restored.contentVersion).toBe("1.31.0");
     expect(
       restored.players.find((candidate) => candidate.id === "player-1")?.inventory,
     ).toEqual(LEGACY_ITEM_IDS);

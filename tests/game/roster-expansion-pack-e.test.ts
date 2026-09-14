@@ -321,7 +321,7 @@ describe("Roster Expansion Pack E content", () => {
         (cost) => DEFAULT_CONTENT.units.filter((unit) => unit.cost === cost).length,
       ),
     ).toEqual([6, 8, 7, 8, 5]);
-    expect(DEFAULT_CONTENT.version).toBe("1.30.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.31.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
 
     const state = createMatch("pack-e-pool", DEFAULT_CONTENT);

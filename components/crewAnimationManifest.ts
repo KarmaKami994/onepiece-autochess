@@ -96,6 +96,22 @@ const V2_IDLE_VISUAL_TOP_PX: Record<string, number> = {
   "vice-admiral": 4,
   "cipher-pol-agent": 4,
   seraphim: 5,
+  arlong: 36,
+  enel: 27,
+  "rob-lucci": 40,
+  magellan: 22,
+  "hody-jones": 24,
+  "caesar-clown": 18,
+  pica: 12,
+  kaido: 3,
+  "fish-man-raider": 4,
+  "skypiea-priest": 4,
+  "cp9-elite": 4,
+  "impel-down-guard": 4,
+  "new-fish-man-officer": 4,
+  "punk-hazard-guard": 4,
+  "donquixote-officer": 4,
+  "beast-pirate": 4,
 };
 
 function standardDefinition(
@@ -246,8 +262,9 @@ function pveV2Definition(
   contentId: string,
   displaySize: number,
   yOffset = 7,
+  sourceId = contentId,
 ): CrewAnimationDefinition {
-  const assetKey = `${contentId}-v2`;
+  const assetKey = `${sourceId}-v2`;
   return {
     contentId,
     assetKey,
@@ -260,7 +277,7 @@ function pveV2Definition(
     sheetColumns: 8,
     displaySize,
     yOffset,
-    idleVisualTopPx: V2_IDLE_VISUAL_TOP_PX[contentId] ?? 32,
+    idleVisualTopPx: V2_IDLE_VISUAL_TOP_PX[sourceId] ?? 32,
     originX: 64 / 128,
     originY: 116 / 128,
     clips: V2_CLIPS,
@@ -276,6 +293,27 @@ export const PVE_ANIMATION_MANIFEST = {
   "vice-admiral": pveV2Definition("vice-admiral", 88, 9),
   "cipher-pol-agent": pveV2Definition("cipher-pol-agent", 82, 8),
   seraphim: pveV2Definition("seraphim", 92, 10),
+  arlong: pveV2Definition("arlong", 94, 10),
+  "fish-man-raider": pveV2Definition("fish-man-raider", 82),
+  enel: pveV2Definition("enel", 96, 10),
+  "skypiea-priest": pveV2Definition("skypiea-priest", 80),
+  "rob-lucci": pveV2Definition("rob-lucci", 96, 10),
+  "cp9-elite-laser": pveV2Definition("cp9-elite-laser", 82, 8, "cp9-elite"),
+  "cp9-elite-tidal": pveV2Definition("cp9-elite-tidal", 82, 8, "cp9-elite"),
+  magellan: pveV2Definition("magellan", 98, 10),
+  "impel-down-guard": pveV2Definition("impel-down-guard", 82),
+  "hody-jones": pveV2Definition("hody-jones", 96, 10),
+  "new-fish-man-officer": pveV2Definition("new-fish-man-officer", 82),
+  "caesar-clown": pveV2Definition("caesar-clown", 96, 10),
+  "punk-hazard-guard": pveV2Definition("punk-hazard-guard", 82),
+  pica: pveV2Definition("pica", 104, 11),
+  "donquixote-officer-vanguard": pveV2Definition("donquixote-officer-vanguard", 84, 8, "donquixote-officer"),
+  "donquixote-officer-assault": pveV2Definition("donquixote-officer-assault", 84, 8, "donquixote-officer"),
+  "donquixote-officer-artillery": pveV2Definition("donquixote-officer-artillery", 84, 8, "donquixote-officer"),
+  kaido: pveV2Definition("kaido", 108, 12),
+  "beast-pirate-vanguard": pveV2Definition("beast-pirate-vanguard", 84, 8, "beast-pirate"),
+  "beast-pirate-assault": pveV2Definition("beast-pirate-assault", 84, 8, "beast-pirate"),
+  "beast-pirate-artillery": pveV2Definition("beast-pirate-artillery", 84, 8, "beast-pirate"),
 } as const satisfies Record<string, CrewAnimationDefinition>;
 
 export const ANIMATION_CONTENT_MANIFEST = {

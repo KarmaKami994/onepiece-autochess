@@ -49,7 +49,7 @@ const characterSlugs = [
   "shanks",
   "whitebeard",
 ].sort();
-const enemySlugs = [
+const originalEnemySlugs = [
   "cipher-pol-agent",
   "marine-recruit",
   "pacifista",
@@ -59,7 +59,36 @@ const enemySlugs = [
   "seraphim",
   "vice-admiral",
 ];
-const allSpriteSlugs = [...characterSlugs, ...enemySlugs].sort();
+const p12EnemySlugs = [
+  "arlong",
+  "beast-pirate",
+  "caesar-clown",
+  "cp9-elite",
+  "donquixote-officer",
+  "enel",
+  "fish-man-raider",
+  "hody-jones",
+  "impel-down-guard",
+  "kaido",
+  "magellan",
+  "new-fish-man-officer",
+  "pica",
+  "punk-hazard-guard",
+  "rob-lucci",
+  "skypiea-priest",
+];
+const enemySlugs = [...originalEnemySlugs, ...p12EnemySlugs].sort();
+const variantSlugs = [
+  "cp9-elite-laser",
+  "cp9-elite-tidal",
+  "donquixote-officer-vanguard",
+  "donquixote-officer-assault",
+  "donquixote-officer-artillery",
+  "beast-pirate-vanguard",
+  "beast-pirate-assault",
+  "beast-pirate-artillery",
+];
+const allSpriteSlugs = [...characterSlugs, ...enemySlugs, ...variantSlugs].sort();
 
 async function sourceFiles(directory: string): Promise<string[]> {
   const absolute = path.join(projectRoot, directory);
@@ -171,10 +200,10 @@ describe("local-only product boundary", () => {
       enemySlugs.map((slug) => `${slug}.png`),
     );
     expect(await namesIn("portraits")).toEqual(
-      allSpriteSlugs.map((slug) => `${slug}.png`),
+      allSpriteSlugs.map((slug) => `${slug}.png`).sort(),
     );
     expect(await namesIn("tokens")).toEqual(
-      allSpriteSlugs.map((slug) => `${slug}.png`),
+      allSpriteSlugs.map((slug) => `${slug}.png`).sort(),
     );
 
     const requiredFiles = [
@@ -213,10 +242,14 @@ describe("local-only product boundary", () => {
         `Final asset: \`public/assets/characters/${slug}.png\``,
       );
     }
-    for (const slug of enemySlugs) {
+    for (const slug of originalEnemySlugs) {
       expect(notes).toContain(
         `Final asset: \`public/assets/enemies/${slug}.png\``,
       );
+    }
+    expect(notes).toContain("## P12 named PvE encounters");
+    for (const slug of p12EnemySlugs) {
+      expect(notes).toContain(`\`${slug}-v2\``);
     }
     expect(notes).toContain("Final asset: `public/og.png`");
   });
@@ -263,10 +296,11 @@ describe("local-only product boundary", () => {
 
   it("bundles the licensed Luffy v2 pilot with a reproducible source map", async () => {
     expect(
-      ALL_CREW_ANIMATION_DEFINITIONS.map((definition) => definition.assetKey),
+      ALL_CREW_ANIMATION_DEFINITIONS.filter((definition) => definition.kind === "crew")
+        .map((definition) => definition.assetKey),
     ).toHaveLength(
       new Set(
-        ALL_CREW_ANIMATION_DEFINITIONS.map(
+        ALL_CREW_ANIMATION_DEFINITIONS.filter((definition) => definition.kind === "crew").map(
           (definition) => definition.assetKey,
         ),
       ).size,

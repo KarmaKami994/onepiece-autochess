@@ -158,7 +158,7 @@ describe("combat resource bars", () => {
     const definitions = ALL_UNIT_ANIMATION_DEFINITIONS.filter(
       (definition) => definition.version === "v2",
     );
-    expect(definitions).toHaveLength(42);
+    expect(definitions).toHaveLength(63);
 
     for (const definition of definitions) {
       const metadata = JSON.parse(

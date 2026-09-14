@@ -58,7 +58,7 @@ describe("canonical game content", () => {
     ]);
     expect(DEFAULT_CONTENT.traits).toHaveLength(13);
     expect(DEFAULT_CONTENT.items).toHaveLength(65);
-    expect(DEFAULT_CONTENT.enemies).toHaveLength(8);
+    expect(DEFAULT_CONTENT.enemies).toHaveLength(29);
     expect(
       DEFAULT_CONTENT.stages
         .filter((stage) => stage.kind === "pve")
