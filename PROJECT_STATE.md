@@ -23,10 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-P13 Final Production Baseline is a measurement-only branch from exact main commit `b2bada40ab52488423425bb4fda1abb851717fa9`. The single official 50-seed report for `production-0`–`production-49` is in `docs/analysis/p13-final-production-baseline-50.json` (SHA-256 `8d02ba30bdf2030da2b4adc5b4715b179269ffd039e443ddfd2f10688246db84`); its interpretation is in `docs/P13_FINAL_PRODUCTION_BASELINE.md`. P11 and P12 are complete; GameContent remains `1.31.0`, save schema remains 6. Next phase is P1B Bot Tuning, not started here.
+PR #57 is documentation-only after P1B candidate rejection. Production behavior is restored to exact base `67a0e26dd6d2b9ebf84c12c597574750dff6bc21`; GameContent is `1.31.0`, save schema is 6, and no P1B bot tuning is merged. The rejected experiment report remains at `docs/analysis/p1b-post-bot-tuning-50.json` (SHA-256 `289dd6ae10a0b1bebfae5b2830e94d025bfde5eecd71ac9340858a555a643855`) as historical evidence only. Next task is a separately approved targeted bot-progression diagnostic before another candidate.
 
 ## Last Completed Work
 
+- 2026-09-15 — PR #57 review correction: rejected the P1B round-target/XP-budget candidate and reverted all production behavior, version assertions, and candidate-only tests to exact base `67a0e26dd6d2b9ebf84c12c597574750dff6bc21`. Retained the exact POST raw report as historical rejected-experiment evidence and rewrote its interpretation. No P1B tuning is production policy or merged. Material branch delta: the raw report, `docs/P1B_ADAPTIVE_BOT_TUNING.md`, and `PROJECT_STATE.md` only.
 - 2026-09-14 — P13 Final Production Baseline from exact `b2bada40ab52488423425bb4fda1abb851717fa9`: one unchanged-harness 50-seed run completed 50/50 matches with zero crashes, 34–47 rounds (40.06 average), 24.926 paced / 34.941 full-clock minutes. Raw report and SHA-256 are pinned above. The full-clock 20–30-minute target is false; other existing target booleans are true. These are directional signals before P1B, not tuning authority. Material files: raw report, `docs/P13_FINAL_PRODUCTION_BASELINE.md`, `PROJECT_STATE.md` only.
 - 2026-09-14 — P12 Named PvE Boss Identity, PR #55, merge commit `b2bada40ab52488423425bb4fda1abb851717fa9`: named bosses and faction enemies for eight late PvE waves, 16 reproducible v2 visual bases, portraits/tokens, local headless asset pipeline, provenance and validation; preserved existing combat stat/effect profiles and rewards. GameContent `1.31.0`; schema 6. Asset chain of title remains independently unverified and is explicitly documented for rights review.
 - 2026-09-13 — P11 Voyage Recruitment Choice, merged PR #54 at `08c9b20c5a93aa653002583c2a7f75b9f272a9a6` (implementation commit `5c68cd3cff61ba8383a830480212dbec29080ffc`): added explicit non-combat rounds 10/20 with persisted trait-aware deterministic offers, shared-pool reservations/release, existing-score bot picks, full-bench gold conversion, schema-6 legacy checkpoint/replay reconciliation, dedicated recruitment presentation and focused domain/browser regressions. No new item rewards, combat, balance or 1,000-seed baseline. GameContent `1.30.0` at P11; superseded by P12's `1.31.0`.
@@ -88,6 +89,13 @@ P13 Final Production Baseline is a measurement-only branch from exact main commi
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+Rejected P1B candidate / PR #57 documentation-only correction:
+
+- PASS — branch diff inspection confirms production source and tests match exact base `67a0e26dd6d2b9ebf84c12c597574750dff6bc21`; only the two P1B documentation artifacts and retained raw report differ.
+- PASS — the historical POST report remains byte-identical at SHA-256 `289dd6ae10a0b1bebfae5b2830e94d025bfde5eecd71ac9340858a555a643855`.
+- PASS — GitHub CI run 147 on reverted head `8732462c841f6e08aa99d92efbb9fe2eb6e22f0b`: typecheck, lint, tests, coverage, asset validation, normal 50-match production smoke, build, Browser E2E, and dependency review all completed successfully.
+- NOT RUN locally — tests, production smoke, Browser E2E, build, or any aggregate soak after the revert. No 1,000-seed run or additional authored baseline was generated.
 
 P13 Final Production Baseline:
 
@@ -675,6 +683,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- PR #57 changes no production behavior after review correction. The rejected P1B target-level/XP-budget policy and its tests/version changes are fully reverted; GameContent remains `1.31.0` and schema 6. Its raw POST report is historical evidence, not production policy.
 - P13 changes no production behavior or harness instrumentation. The raw 50-seed measurement and documentation are its only artifacts; GameContent `1.31.0` and schema 6 remain fixed.
 - P12 replaces eight late-wave generic PvE presentations with named bosses and faction enemies and adds corresponding static/v2 assets and provenance, while preserving the established PvE combat profiles/rewards. GameContent is `1.31.0`; schema remains 6.
 - P11 supersedes the P10 round-10/20 PvP fallback with immediate non-combat Voyage Recruitment. Each living player chooses one of three distinct reserved cost-4/cost-5 offers (cost-3/cost-4 fallback only if needed); bots use existing scoring. No battle, damage, streak/history/result or item reward occurs. A full-bench non-combining choice converts to its normal gold cost. Choice advances to R11/R21 preparation; schema-6 legacy PvP checkpoints reconcile once. GameContent is `1.30.0`; schema 6.
@@ -731,6 +740,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- P1B candidate was rejected in review because its high-cost-access objective failed. The branch was intentionally converted to documentation-only instead of retuning; no additional soak or second candidate was run.
 - None for P13. Exactly one 50-seed official baseline was run and no balancing, bot heuristic, content/config, save, stage, RNG, combat, economy, harness, or gameplay change was made.
 - None for P11. The global `npm` shim was broken locally, so equivalent installed Node package entrypoints ran the authorized checks. No 1,000-seed soak, new baseline, portal mechanics or tuning was added.
 - P10's POST 1,000-seed audit and final CI-equivalent local rerun were stopped at the user's explicit request. The prior 50-seed PRE/POST item comparison measured the initial, now-superseded 10/20 topology; no new large baseline is generated for this correction. No unit/trait/item-value, bot-heuristic, captain-damage, combat, shop/XP/pool, persistence-schema, asset or balance tuning was added. No Voyage Choice or Portal Carousel implementation was started.
@@ -787,6 +797,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- The rejected P1B candidate passed its original stability gates but failed its objective: cost-4/5 player-board presence fell 259/102→178/54 and final-board presences fell 429/128→274/68, while Nami/Robin presence rose 164/153→180/157. The existing reports lack intermediate level/roster traces, so a targeted bot-progression diagnostic is required before another candidate. No production tuning follows from this historical experiment. Smoker remains frozen/watch.
 - P13's 50-match report is directional evidence, not balance proof: all hard gates passed, but full-clock duration averaged 34.941 minutes versus the existing 20–30-minute target, while paced duration was 24.926 minutes. Frequent Nami/Robin final-board presence with below-band conditional results and low observed 5-cost offer frequency are P1B investigation candidates, not automatic weight or unit-value changes. Gear 4's zero observed transitions rests on only four 3★ Luffy final boards. The recorded P12 asset permission attestations do not independently establish chain of title; rights review remains necessary beyond the existing recorded scope.
 - P11's historical 50-match smoke is crash/regression evidence only, not balance authority. PR #54 is merged; Smoker remains frozen/watch.
 - P10's old 50-seed POST item-economy averages include the removed 10/20 stages and do not describe the corrected PR. They remain historical evidence only, not tuning authority. Normal GitHub CI must complete before review/merge; Smoker remains frozen/watch.
@@ -827,6 +838,7 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
+- The first P1B target-level/XP-budget candidate is rejected and not production policy. Its report remains immutable historical evidence. A targeted diagnostic must precede any separately approved replacement candidate; there is no automatic bot, unit, item, economy, or Smoker tuning.
 - P11 adapts PAC's round-10/20 non-combat portal slots into local Voyage Recruitment, not PAC Portal Carousel. Offers are separate persisted state and explicit shared-pool reservations; serialized RNG, existing bot scoring and schema 6 remain authoritative. No networking, new roster or item system was introduced.
 - P10 superseded P5's optional `rewardItemKind`/`itemChoices` stage fields with a narrow explicit `itemReward` and separate `carouselItemKind`. Its fixed PvE/carousel schedule and reward modes remain; local 5/8/11 item-only supply choices are adapted. Its historical round-10/20 default PvP fallback was superseded by P11.
 - P9 keeps roster expansion content-driven and reuses existing typed traits/combat fields. Save compatibility uses own-property presence on `pool`: only missing current-definition keys receive the existing full cost-band pool count, preserving explicit zero/custom counts and future keys. The four P9 licensed-reference PNGs are the retained editable sources; runtime atlases and static identity assets remain offline deterministic derivatives recorded by matrix and SHA-256.
@@ -875,7 +887,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-Review the P13 baseline PR and its standard GitHub CI before merging. P1B Bot Tuning follows only as a separate scoped task; do not implement candidates, rerun an authoritative baseline or change gameplay in P13.
+After PR #57's documentation-only CI completes, the next bounded task is a targeted bot-progression diagnostic. Do not implement another tuning candidate, or infer unit/item/economy changes, without separate approval.
 
 ## Codex Update Contract
 
