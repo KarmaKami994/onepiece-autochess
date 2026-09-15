@@ -94,7 +94,8 @@ Rejected P1B candidate / PR #57 documentation-only correction:
 
 - PASS — branch diff inspection confirms production source and tests match exact base `67a0e26dd6d2b9ebf84c12c597574750dff6bc21`; only the two P1B documentation artifacts and retained raw report differ.
 - PASS — the historical POST report remains byte-identical at SHA-256 `289dd6ae10a0b1bebfae5b2830e94d025bfde5eecd71ac9340858a555a643855`.
-- NOT RUN locally — tests, production smoke, Browser E2E, build, or any aggregate soak after the revert. Normal GitHub CI is the requested validation gate.
+- PASS — GitHub CI run 147 on reverted head `8732462c841f6e08aa99d92efbb9fe2eb6e22f0b`: typecheck, lint, tests, coverage, asset validation, normal 50-match production smoke, build, Browser E2E, and dependency review all completed successfully.
+- NOT RUN locally — tests, production smoke, Browser E2E, build, or any aggregate soak after the revert. No 1,000-seed run or additional authored baseline was generated.
 
 P13 Final Production Baseline:
 
