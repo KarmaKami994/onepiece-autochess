@@ -23,10 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-PR #57 is documentation-only after P1B candidate rejection. Production behavior is restored to exact base `67a0e26dd6d2b9ebf84c12c597574750dff6bc21`; GameContent is `1.31.0`, save schema is 6, and no P1B bot tuning is merged. The rejected experiment report remains at `docs/analysis/p1b-post-bot-tuning-50.json` (SHA-256 `289dd6ae10a0b1bebfae5b2830e94d025bfde5eecd71ac9340858a555a643855`) as historical evidence only. Next task is a separately approved targeted bot-progression diagnostic before another candidate.
+P1B Bot Progression Diagnostic is complete on `task/p1b-bot-progression-diagnostic` from exact base `339d65de5941a923f6745e4765efb2950d5e56fe`. Opt-in immutable observation of the existing bot turn produced exactly one 50-seed diagnostic report without changing default production behavior, state, RNG or gameplay-derived P13 metrics. GameContent remains `1.31.0`, save schema remains 6, and no tuning is implemented. The next task is architecture/review of the evidence before any separately approved replacement candidate.
 
 ## Last Completed Work
 
+- 2026-09-15 — P1B Bot Progression Diagnostic: added disabled-by-default immutable observation around the real `runBotTurn`, opt-in `--bot-diagnostics` production-soak aggregation, behavioral-equivalence tests, one official `production-0`–`production-49` report, and a facts/inferences/limitations analysis. The report completed 50/50 with zero crashes and exactly matched all P13 gameplay-derived metrics; SHA-256 `4cbdcb8a3e6ad4907e767b2663431c5b08d3181faf60fd74458d38cb194dbdf3`. No bot policy, content, schema, tuning or baseline was changed. Material files: `game/engine.ts`, `scripts/run_production_soak.ts`, `tests/game/bot-progression-diagnostics.test.ts`, the raw report, `docs/P1B_BOT_PROGRESSION_DIAGNOSTIC.md`, and `PROJECT_STATE.md`.
 - 2026-09-15 — PR #57 review correction: rejected the P1B round-target/XP-budget candidate and reverted all production behavior, version assertions, and candidate-only tests to exact base `67a0e26dd6d2b9ebf84c12c597574750dff6bc21`. Retained the exact POST raw report as historical rejected-experiment evidence and rewrote its interpretation. No P1B tuning is production policy or merged. Material branch delta: the raw report, `docs/P1B_ADAPTIVE_BOT_TUNING.md`, and `PROJECT_STATE.md` only.
 - 2026-09-14 — P13 Final Production Baseline from exact `b2bada40ab52488423425bb4fda1abb851717fa9`: one unchanged-harness 50-seed run completed 50/50 matches with zero crashes, 34–47 rounds (40.06 average), 24.926 paced / 34.941 full-clock minutes. Raw report and SHA-256 are pinned above. The full-clock 20–30-minute target is false; other existing target booleans are true. These are directional signals before P1B, not tuning authority. Material files: raw report, `docs/P13_FINAL_PRODUCTION_BASELINE.md`, `PROJECT_STATE.md` only.
 - 2026-09-14 — P12 Named PvE Boss Identity, PR #55, merge commit `b2bada40ab52488423425bb4fda1abb851717fa9`: named bosses and faction enemies for eight late PvE waves, 16 reproducible v2 visual bases, portraits/tokens, local headless asset pipeline, provenance and validation; preserved existing combat stat/effect profiles and rewards. GameContent `1.31.0`; schema 6. Asset chain of title remains independently unverified and is explicitly documented for rights review.
@@ -89,6 +90,14 @@ PR #57 is documentation-only after P1B candidate rejection. Production behavior 
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+P1B Bot Progression Diagnostic:
+
+- PASS — focused diagnostic and production-audit tests: 2 files / 14 tests; observer-enabled and disabled runs preserve exact serialized `MatchState` and RNG, deterministic order, detached/frozen events, and normal-report equality.
+- PASS — TypeScript (`tsc --noEmit`), ESLint, and full unit suite (60 files / 790 tests).
+- PASS — exactly one official diagnostic 50-seed production run: 50/50 complete, zero crashes, GameContent `1.31.0`, schema 6, content/config hashes `a6d7c074` / `977295da`, 12,241 observed preparations; raw SHA-256 `4cbdcb8a3e6ad4907e767b2663431c5b08d3181faf60fd74458d38cb194dbdf3`.
+- PASS — every P13 gameplay-derived report field is exactly equal. Only expected diagnostic/metadata fields differ (`generatedAt`, Git SHA, Node version).
+- NOT RUN — P13 PRE rerun, any second diagnostic aggregate, 1,000-seed soak, local Browser E2E or local build. Normal GitHub CI remains the merge gate.
 
 Rejected P1B candidate / PR #57 documentation-only correction:
 
@@ -683,6 +692,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- P1B diagnostics add no default production behavior change. A supplied observer receives deeply frozen, detached end-of-turn facts from commands the unchanged bot policy already executed; the production-soak report includes diagnostics only with `--bot-diagnostics`. No observer data enters `MatchState`, saves, command decisions or RNG.
 - PR #57 changes no production behavior after review correction. The rejected P1B target-level/XP-budget policy and its tests/version changes are fully reverted; GameContent remains `1.31.0` and schema 6. Its raw POST report is historical evidence, not production policy.
 - P13 changes no production behavior or harness instrumentation. The raw 50-seed measurement and documentation are its only artifacts; GameContent `1.31.0` and schema 6 remain fixed.
 - P12 replaces eight late-wave generic PvE presentations with named bosses and faction enemies and adds corresponding static/v2 assets and provenance, while preserving the established PvE combat profiles/rewards. GameContent is `1.31.0`; schema remains 6.
@@ -740,6 +750,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- None in product scope for P1B diagnostics. The first full-suite attempt exceeded Vitest's default five-second timeout only in the newly added test that runs two production matches; that test's timeout was narrowly set to 20 seconds and the focused and full suites then passed. No production behavior or E2E assertion changed.
 - P1B candidate was rejected in review because its high-cost-access objective failed. The branch was intentionally converted to documentation-only instead of retuning; no additional soak or second candidate was run.
 - None for P13. Exactly one 50-seed official baseline was run and no balancing, bot heuristic, content/config, save, stage, RNG, combat, economy, harness, or gameplay change was made.
 - None for P11. The global `npm` shim was broken locally, so equivalent installed Node package entrypoints ran the authorized checks. No 1,000-seed soak, new baseline, portal mechanics or tuning was added.
@@ -797,6 +808,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- P1B diagnostics rule out the roster-size guard as the measured progression bottleneck (0 stops in 12,241 preparations). XP stops were reserve-limited 58.9% and budget-limited 36.5%; all 400 players reached L7, but only 342 reached L8 and 91 L9. Cost-5 offers appeared in 3.6% of eligible shop slots and 32.2% of eligible preparations; personality offer-to-buy conversion varied from 8.5% to 55.1%. The observer does not distinguish affordability, reserve, receive/replacement legality, scoring or competing-purchase reasons for a skipped visible offer, so another policy must not be selected from conversion totals alone.
 - The rejected P1B candidate passed its original stability gates but failed its objective: cost-4/5 player-board presence fell 259/102→178/54 and final-board presences fell 429/128→274/68, while Nami/Robin presence rose 164/153→180/157. The existing reports lack intermediate level/roster traces, so a targeted bot-progression diagnostic is required before another candidate. No production tuning follows from this historical experiment. Smoker remains frozen/watch.
 - P13's 50-match report is directional evidence, not balance proof: all hard gates passed, but full-clock duration averaged 34.941 minutes versus the existing 20–30-minute target, while paced duration was 24.926 minutes. Frequent Nami/Robin final-board presence with below-band conditional results and low observed 5-cost offer frequency are P1B investigation candidates, not automatic weight or unit-value changes. Gear 4's zero observed transitions rests on only four 3★ Luffy final boards. The recorded P12 asset permission attestations do not independently establish chain of title; rights review remains necessary beyond the existing recorded scope.
 - P11's historical 50-match smoke is crash/regression evidence only, not balance authority. PR #54 is merged; Smoker remains frozen/watch.
@@ -838,6 +850,7 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
+- P1B measurement uses one optional observer on the real bot-turn authority. It is disabled by default, receives detached deeply frozen facts only after existing actions execute, and cannot add RNG draws, commands, state/save fields or control flow. The diagnostic identifies reserve/budget-limited upper-level progression, narrow cost-5 exposure and personality-dependent conversion as review inputs, not an automatic tuning prescription.
 - The first P1B target-level/XP-budget candidate is rejected and not production policy. Its report remains immutable historical evidence. A targeted diagnostic must precede any separately approved replacement candidate; there is no automatic bot, unit, item, economy, or Smoker tuning.
 - P11 adapts PAC's round-10/20 non-combat portal slots into local Voyage Recruitment, not PAC Portal Carousel. Offers are separate persisted state and explicit shared-pool reservations; serialized RNG, existing bot scoring and schema 6 remain authoritative. No networking, new roster or item system was introduced.
 - P10 superseded P5's optional `rewardItemKind`/`itemChoices` stage fields with a narrow explicit `itemReward` and separate `carouselItemKind`. Its fixed PvE/carousel schedule and reward modes remain; local 5/8/11 item-only supply choices are adapted. Its historical round-10/20 default PvP fallback was superseded by P11.
@@ -887,7 +900,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-After PR #57's documentation-only CI completes, the next bounded task is a targeted bot-progression diagnostic. Do not implement another tuning candidate, or infer unit/item/economy changes, without separate approval.
+Review and lock the architecture of a replacement P1B candidate against the completed diagnostic. Preserve a deliberate reroll channel and investigate high-cost offer rejection before implementation; do not automatically tune bots, units, items, economy or Smoker.
 
 ## Codex Update Contract
 
