@@ -57,8 +57,6 @@ import {
 import {
   getBotFormationBand as botFormationBand,
   getBotPersonality as botPersonality,
-  getBotTargetLevel,
-  getBotXpActionBudget,
   selectDesiredBotUnits as desiredBotUnits,
   type BotFormationBand,
 } from "./bots";
@@ -2001,40 +1999,39 @@ export function runBotTurn(
   }
   const personality = botPersonality(player, content);
 
-  const targetLevel = getBotTargetLevel(next.round, personality, content.config);
-  let xpRemaining = getBotXpActionBudget(personality);
-  let rerollsRemaining = Math.min(
+  const xpPurchases = Math.min(
+    3,
+    Math.floor(personality.levelAggression * 4),
+  );
+  for (let purchase = 0; purchase < xpPurchases; purchase += 1) {
+    player = findPlayer(next, playerId);
+    if (
+      !player ||
+      player.level >= content.config.maxLevel ||
+      player.gold - content.config.buyXpCost < personality.economyReserve ||
+      Object.keys(player.units).length < player.level
+    ) {
+      break;
+    }
+    const result = applyCommand(
+      next,
+      { type: "BUY_XP" },
+      { actorPlayerId: playerId },
+      content,
+    );
+    if (result.ok) {
+      next = result.state;
+    }
+  }
+
+  const rerolls = Math.min(
     3,
     Math.floor(personality.rerollAggression * 4),
   );
-  const actionLimit = xpRemaining + rerollsRemaining;
-  for (let action = 0; action < actionLimit; action += 1) {
+  for (let reroll = 0; reroll < rerolls; reroll += 1) {
     player = findPlayer(next, playerId);
-    if (!player) break;
-    if (player.level < targetLevel) {
-      if (
-        xpRemaining === 0 ||
-        player.gold - content.config.buyXpCost < personality.economyReserve
-      ) break;
-      if (Object.keys(player.units).length >= player.level) {
-        const result = applyCommand(
-          next,
-          { type: "BUY_XP" },
-          { actorPlayerId: playerId },
-          content,
-        );
-        if (!result.ok) break;
-        next = result.state;
-        xpRemaining -= 1;
-        continue;
-      }
-      // Reroll only for the existing roster-size guard, then try XP again.
-      if (
-        rerollsRemaining === 0 ||
-        player.gold - content.config.rerollCost < personality.economyReserve
-      ) break;
-    } else if (
-      rerollsRemaining === 0 ||
+    if (
+      !player ||
       player.gold - content.config.rerollCost < personality.economyReserve
     ) {
       break;
@@ -2049,7 +2046,6 @@ export function runBotTurn(
       break;
     }
     next = botBuyPass(rerollResult.state, playerId, content);
-    rerollsRemaining -= 1;
   }
 
   next = arrangeBotBoard(next, playerId, content);

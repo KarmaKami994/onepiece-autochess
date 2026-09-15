@@ -220,7 +220,7 @@ describe("P9 four-character expansion content", () => {
         assetPath: "/assets/characters/whitebeard.png",
       },
     } as const;
-    expect(DEFAULT_CONTENT.version).toBe("1.32.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.31.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(DEFAULT_CONTENT.units.filter((unit) => P9_ID_SET.has(unit.id)).map((unit) => unit.id))
       .toEqual(P9_IDS);
@@ -470,7 +470,7 @@ describe("P9 economy, items, bots, save, and P8 integration", () => {
       "historical-unknown": 3,
     });
     expect(restored).toMatchObject({
-      contentVersion: "1.32.0",
+      contentVersion: "1.31.0",
       schemaVersion: 6,
       round: 17,
       phase: anchors.phase,
