@@ -1650,10 +1650,142 @@ export function planBotFormation(
   return placements;
 }
 
+export type BotProgressionStopReason =
+  | "budget-exhausted"
+  | "max-level"
+  | "reserve"
+  | "roster-guard"
+  | "command-rejected"
+  | "not-applicable";
+
+export type BotProgressionPlayerSnapshot = {
+  readonly level: number;
+  readonly xp: number;
+  readonly gold: number;
+  readonly totalOwnedUnits: number;
+  readonly boardCount: number;
+  readonly benchCount: number;
+  readonly cost4ShopEligible: boolean;
+  readonly cost5ShopEligible: boolean;
+};
+
+export type BotProgressionShopSnapshot = {
+  readonly source: "initial-buy-pass" | "post-reroll";
+  readonly level: number;
+  readonly offers: ReadonlyArray<{
+    readonly definitionId: string;
+    readonly cost: number | null;
+  }>;
+  readonly cost4Offers: number;
+  readonly cost5Offers: number;
+  readonly cost4ShopEligible: boolean;
+  readonly cost5ShopEligible: boolean;
+};
+
+export type BotProgressionPurchase = {
+  readonly source: "initial-buy-pass" | "post-reroll";
+  readonly definitionId: string;
+  readonly cost: number;
+  readonly level: number;
+};
+
+export type BotTurnDiagnostic = {
+  readonly seed: string;
+  readonly round: number;
+  readonly playerId: string;
+  readonly personalityId: string;
+  readonly economyReserve: number;
+  readonly start: BotProgressionPlayerSnapshot;
+  readonly end: BotProgressionPlayerSnapshot;
+  readonly shopSnapshots: ReadonlyArray<BotProgressionShopSnapshot>;
+  readonly purchases: ReadonlyArray<BotProgressionPurchase>;
+  readonly xp: {
+    readonly attemptBudget: number;
+    readonly attempts: number;
+    readonly successfulPurchases: number;
+    readonly goldSpent: number;
+    readonly stopReason: BotProgressionStopReason;
+  };
+  readonly rerolls: {
+    readonly attemptBudget: number;
+    readonly attempts: number;
+    readonly successfulRerolls: number;
+    readonly goldSpent: number;
+    readonly stopReason: BotProgressionStopReason;
+  };
+};
+
+export type BotTurnObserver = (diagnostic: BotTurnDiagnostic) => void;
+
+function highCostEligibility(
+  level: number,
+  content: GameContent,
+): { cost4ShopEligible: boolean; cost5ShopEligible: boolean } {
+  const odds =
+    content.config.shopOddsByLevel[String(level)] ??
+    content.config.shopOddsByLevel[String(content.config.maxLevel)] ??
+    [];
+  return {
+    cost4ShopEligible: (odds[3] ?? 0) > 0,
+    cost5ShopEligible: (odds[4] ?? 0) > 0,
+  };
+}
+
+function botProgressionPlayerSnapshot(
+  player: PlayerState,
+  content: GameContent,
+): BotProgressionPlayerSnapshot {
+  return {
+    level: player.level,
+    xp: player.xp,
+    gold: player.gold,
+    totalOwnedUnits: Object.keys(player.units).length,
+    boardCount: Object.keys(player.board).length,
+    benchCount: player.bench.filter(Boolean).length,
+    ...highCostEligibility(player.level, content),
+  };
+}
+
+function botProgressionShopSnapshot(
+  player: PlayerState,
+  source: BotProgressionShopSnapshot["source"],
+  content: GameContent,
+): BotProgressionShopSnapshot {
+  const offers = player.shop.flatMap((definitionId) => {
+    if (!definitionId) return [];
+    return [
+      {
+        definitionId,
+        cost: getUnitDefinition(definitionId, content)?.cost ?? null,
+      },
+    ];
+  });
+  return {
+    source,
+    level: player.level,
+    offers,
+    cost4Offers: offers.filter((offer) => offer.cost === 4).length,
+    cost5Offers: offers.filter((offer) => offer.cost === 5).length,
+    ...highCostEligibility(player.level, content),
+  };
+}
+
+function deepFreezeDiagnostic<T>(value: T): T {
+  if (value && typeof value === "object") {
+    for (const child of Object.values(value as Record<string, unknown>)) {
+      deepFreezeDiagnostic(child);
+    }
+    Object.freeze(value);
+  }
+  return value;
+}
+
 function botBuyPass(
   state: MatchState,
   playerId: string,
   content: GameContent,
+  purchaseSource?: BotProgressionPurchase["source"],
+  purchases?: BotProgressionPurchase[],
 ): MatchState {
   let next = state;
   const player = findPlayer(next, playerId);
@@ -1754,6 +1886,14 @@ function botBuyPass(
     );
     if (result.ok) {
       next = result.state;
+      if (purchaseSource && purchases) {
+        purchases.push({
+          source: purchaseSource,
+          definitionId: definition.id,
+          cost: definition.cost,
+          level: currentPlayer.level,
+        });
+      }
     } else if (stateBeforeReplacement) {
       next = stateBeforeReplacement;
     }
@@ -1982,6 +2122,7 @@ export function runBotTurn(
   state: MatchState,
   playerId: string,
   content: GameContent = DEFAULT_CONTENT,
+  observer?: BotTurnObserver,
 ): MatchState {
   const initialPlayer = findPlayer(state, playerId);
   if (
@@ -1991,26 +2132,58 @@ export function runBotTurn(
   ) {
     return state;
   }
+  const personality = botPersonality(initialPlayer, content);
+  const diagnostic = observer
+    ? {
+        seed: state.seed,
+        round: state.round,
+        playerId,
+        personalityId: personality.id,
+        economyReserve: personality.economyReserve,
+        start: botProgressionPlayerSnapshot(initialPlayer, content),
+        shopSnapshots: [
+          botProgressionShopSnapshot(initialPlayer, "initial-buy-pass", content),
+        ],
+        purchases: [] as BotProgressionPurchase[],
+      }
+    : null;
   let next = cloneMatch(state);
-  next = botBuyPass(next, playerId, content);
+  next = botBuyPass(
+    next,
+    playerId,
+    content,
+    diagnostic ? "initial-buy-pass" : undefined,
+    diagnostic?.purchases,
+  );
   let player = findPlayer(next, playerId);
   if (!player) {
     return next;
   }
-  const personality = botPersonality(player, content);
-
   const xpPurchases = Math.min(
     3,
     Math.floor(personality.levelAggression * 4),
   );
+  let successfulXpPurchases = 0;
+  let xpAttempts = 0;
+  let xpStopReason: BotProgressionStopReason =
+    xpPurchases === 0 ? "not-applicable" : "budget-exhausted";
+  let xpCommandRejected = false;
   for (let purchase = 0; purchase < xpPurchases; purchase += 1) {
     player = findPlayer(next, playerId);
-    if (
-      !player ||
-      player.level >= content.config.maxLevel ||
-      player.gold - content.config.buyXpCost < personality.economyReserve ||
-      Object.keys(player.units).length < player.level
-    ) {
+    if (!player) {
+      xpStopReason = "command-rejected";
+      break;
+    }
+    if (player.level >= content.config.maxLevel) {
+      xpStopReason = "max-level";
+      break;
+    }
+    if (player.gold - content.config.buyXpCost < personality.economyReserve) {
+      xpStopReason = "reserve";
+      break;
+    }
+    if (Object.keys(player.units).length < player.level) {
+      xpStopReason = "roster-guard";
       break;
     }
     const result = applyCommand(
@@ -2019,21 +2192,32 @@ export function runBotTurn(
       { actorPlayerId: playerId },
       content,
     );
+    xpAttempts += 1;
     if (result.ok) {
       next = result.state;
+      successfulXpPurchases += 1;
+    } else {
+      xpCommandRejected = true;
     }
   }
+  if (xpCommandRejected) xpStopReason = "command-rejected";
 
   const rerolls = Math.min(
     3,
     Math.floor(personality.rerollAggression * 4),
   );
+  let successfulRerolls = 0;
+  let rerollAttempts = 0;
+  let rerollStopReason: BotProgressionStopReason =
+    rerolls === 0 ? "not-applicable" : "budget-exhausted";
   for (let reroll = 0; reroll < rerolls; reroll += 1) {
     player = findPlayer(next, playerId);
-    if (
-      !player ||
-      player.gold - content.config.rerollCost < personality.economyReserve
-    ) {
+    if (!player) {
+      rerollStopReason = "command-rejected";
+      break;
+    }
+    if (player.gold - content.config.rerollCost < personality.economyReserve) {
+      rerollStopReason = "reserve";
       break;
     }
     const rerollResult = applyCommand(
@@ -2042,10 +2226,25 @@ export function runBotTurn(
       { actorPlayerId: playerId },
       content,
     );
+    rerollAttempts += 1;
     if (!rerollResult.ok) {
+      rerollStopReason = "command-rejected";
       break;
     }
-    next = botBuyPass(rerollResult.state, playerId, content);
+    successfulRerolls += 1;
+    const rerolledPlayer = findPlayer(rerollResult.state, playerId);
+    if (diagnostic && rerolledPlayer) {
+      diagnostic.shopSnapshots.push(
+        botProgressionShopSnapshot(rerolledPlayer, "post-reroll", content),
+      );
+    }
+    next = botBuyPass(
+      rerollResult.state,
+      playerId,
+      content,
+      diagnostic ? "post-reroll" : undefined,
+      diagnostic?.purchases,
+    );
   }
 
   next = arrangeBotBoard(next, playerId, content);
@@ -2056,18 +2255,46 @@ export function runBotTurn(
     { actorPlayerId: playerId },
     content,
   );
-  return readyResult.ok ? readyResult.state : next;
+  const result = readyResult.ok ? readyResult.state : next;
+  const finalPlayer = findPlayer(result, playerId);
+  if (observer && diagnostic && finalPlayer) {
+    const event: BotTurnDiagnostic = {
+      ...diagnostic,
+      end: botProgressionPlayerSnapshot(finalPlayer, content),
+      xp: {
+        attemptBudget: xpPurchases,
+        attempts: xpAttempts,
+        successfulPurchases: successfulXpPurchases,
+        goldSpent: successfulXpPurchases * content.config.buyXpCost,
+        stopReason: xpStopReason,
+      },
+      rerolls: {
+        attemptBudget: rerolls,
+        attempts: rerollAttempts,
+        successfulRerolls,
+        goldSpent: successfulRerolls * content.config.rerollCost,
+        stopReason: rerollStopReason,
+      },
+    };
+    try {
+      observer(deepFreezeDiagnostic(event));
+    } catch {
+      // Diagnostic consumers cannot affect authoritative bot execution.
+    }
+  }
+  return result;
 }
 
 function runAllBotTurns(
   state: MatchState,
   content: GameContent,
+  observer?: BotTurnObserver,
 ): MatchState {
   let next = state;
   for (const bot of next.players.filter(
     (player) => player.alive && player.isBot,
   )) {
-    next = runBotTurn(next, bot.id, content);
+    next = runBotTurn(next, bot.id, content, observer);
   }
   return next;
 }
@@ -2109,10 +2336,14 @@ function autoResolveCarousel(
 export function advanceMatchPhase(
   state: MatchState,
   content: GameContent = DEFAULT_CONTENT,
+  botObserver?: BotTurnObserver,
 ): MatchState {
   switch (state.phase) {
     case "preparation":
-      return beginBattle(runAllBotTurns(cloneMatch(state), content), content);
+      return beginBattle(
+        runAllBotTurns(cloneMatch(state), content, botObserver),
+        content,
+      );
     case "battle":
       return resolveBattleResults(state, content);
     case "item-choice":

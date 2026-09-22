@@ -16,6 +16,9 @@ import {
   hashGameContent,
   resolvePersistentFormId,
   type BattleEvent,
+  type BotProgressionStopReason,
+  type BotTurnDiagnostic,
+  type BotTurnObserver,
   type MatchBattleResult,
   type MatchState,
   type PlayerState,
@@ -346,7 +349,335 @@ export type ProductionSoakReport = {
     noCharacterAbove65PercentOfWinningBoards: boolean;
     everyTraitReached: boolean;
   };
+  botProgressionDiagnostics?: BotProgressionDiagnosticsReport;
 };
+
+type StopReasonCounts = Record<BotProgressionStopReason, number>;
+
+type XpDiagnosticSummary = {
+  attemptBudget: number;
+  attempts: number;
+  successfulPurchases: number;
+  goldSpent: number;
+  stopReasons: StopReasonCounts;
+};
+
+type RerollDiagnosticSummary = {
+  attemptBudget: number;
+  attempts: number;
+  successfulRerolls: number;
+  goldSpent: number;
+  stopReasons: StopReasonCounts;
+};
+
+type HighCostFunnelSummary = {
+  preparations: number;
+  cost4EligibilityPreparations: number;
+  cost5EligibilityPreparations: number;
+  cost4OffersSeen: number;
+  cost5OffersSeen: number;
+  cost4Purchases: number;
+  cost5Purchases: number;
+  firstCost4EligibilityRound: number | null;
+  firstCost4OfferRound: number | null;
+  firstCost4PurchaseRound: number | null;
+  firstCost5EligibilityRound: number | null;
+  firstCost5OfferRound: number | null;
+  firstCost5PurchaseRound: number | null;
+};
+
+export type BotProgressionDiagnosticsReport = {
+  preparationCount: number;
+  levelDistributionByRound: Record<string, Record<string, number>>;
+  levelDistributionByPersonality: Record<string, Record<string, number>>;
+  firstRoundEachPlayerReachesEachLevel: Record<string, Record<string, number>>;
+  xp: {
+    overall: XpDiagnosticSummary;
+    byPersonality: Record<string, XpDiagnosticSummary>;
+    byRound: Record<string, XpDiagnosticSummary>;
+    rosterGuardFrequency: number;
+    reserveBlockFrequency: number;
+  };
+  rerolls: {
+    overall: RerollDiagnosticSummary;
+    byPersonality: Record<string, RerollDiagnosticSummary>;
+    byRound: Record<string, RerollDiagnosticSummary>;
+    reserveBlockFrequency: number;
+    commandBlockFrequency: number;
+  };
+  purchases: {
+    initialBuyPass: number;
+    postReroll: number;
+    cost4: number;
+    cost5: number;
+  };
+  highCostFunnel: {
+    overall: HighCostFunnelSummary;
+    byPersonality: Record<string, HighCostFunnelSummary>;
+    byRoundBucket: Record<string, HighCostFunnelSummary>;
+  };
+  rawPreparations: BotTurnDiagnostic[];
+};
+
+export type ProductionSoakOptions = { botDiagnostics?: boolean };
+
+const BOT_STOP_REASONS: BotProgressionStopReason[] = [
+  "budget-exhausted",
+  "max-level",
+  "reserve",
+  "roster-guard",
+  "command-rejected",
+  "not-applicable",
+];
+
+function emptyStopReasonCounts(): StopReasonCounts {
+  return Object.fromEntries(
+    BOT_STOP_REASONS.map((reason) => [reason, 0]),
+  ) as StopReasonCounts;
+}
+
+function emptyXpDiagnosticSummary(): XpDiagnosticSummary {
+  return {
+    attemptBudget: 0,
+    attempts: 0,
+    successfulPurchases: 0,
+    goldSpent: 0,
+    stopReasons: emptyStopReasonCounts(),
+  };
+}
+
+function emptyRerollDiagnosticSummary(): RerollDiagnosticSummary {
+  return {
+    attemptBudget: 0,
+    attempts: 0,
+    successfulRerolls: 0,
+    goldSpent: 0,
+    stopReasons: emptyStopReasonCounts(),
+  };
+}
+
+function emptyHighCostFunnelSummary(): HighCostFunnelSummary {
+  return {
+    preparations: 0,
+    cost4EligibilityPreparations: 0,
+    cost5EligibilityPreparations: 0,
+    cost4OffersSeen: 0,
+    cost5OffersSeen: 0,
+    cost4Purchases: 0,
+    cost5Purchases: 0,
+    firstCost4EligibilityRound: null,
+    firstCost4OfferRound: null,
+    firstCost4PurchaseRound: null,
+    firstCost5EligibilityRound: null,
+    firstCost5OfferRound: null,
+    firstCost5PurchaseRound: null,
+  };
+}
+
+function roundBucket(round: number): "1-9" | "10-19" | "20-29" | "30-39" | "40+" {
+  if (round <= 9) return "1-9";
+  if (round <= 19) return "10-19";
+  if (round <= 29) return "20-29";
+  if (round <= 39) return "30-39";
+  return "40+";
+}
+
+function earliest(current: number | null, round: number): number {
+  return current === null ? round : Math.min(current, round);
+}
+
+function addXpDiagnostic(
+  summary: XpDiagnosticSummary,
+  diagnostic: BotTurnDiagnostic,
+): void {
+  summary.attemptBudget += diagnostic.xp.attemptBudget;
+  summary.attempts += diagnostic.xp.attempts;
+  summary.successfulPurchases += diagnostic.xp.successfulPurchases;
+  summary.goldSpent += diagnostic.xp.goldSpent;
+  summary.stopReasons[diagnostic.xp.stopReason] += 1;
+}
+
+function addRerollDiagnostic(
+  summary: RerollDiagnosticSummary,
+  diagnostic: BotTurnDiagnostic,
+): void {
+  summary.attemptBudget += diagnostic.rerolls.attemptBudget;
+  summary.attempts += diagnostic.rerolls.attempts;
+  summary.successfulRerolls += diagnostic.rerolls.successfulRerolls;
+  summary.goldSpent += diagnostic.rerolls.goldSpent;
+  summary.stopReasons[diagnostic.rerolls.stopReason] += 1;
+}
+
+function addHighCostFunnel(
+  summary: HighCostFunnelSummary,
+  diagnostic: BotTurnDiagnostic,
+): void {
+  const cost4Offers = diagnostic.shopSnapshots.reduce(
+    (total, snapshot) => total + snapshot.cost4Offers,
+    0,
+  );
+  const cost5Offers = diagnostic.shopSnapshots.reduce(
+    (total, snapshot) => total + snapshot.cost5Offers,
+    0,
+  );
+  const cost4Purchases = diagnostic.purchases.filter(
+    (purchase) => purchase.cost === 4,
+  ).length;
+  const cost5Purchases = diagnostic.purchases.filter(
+    (purchase) => purchase.cost === 5,
+  ).length;
+  summary.preparations += 1;
+  summary.cost4OffersSeen += cost4Offers;
+  summary.cost5OffersSeen += cost5Offers;
+  summary.cost4Purchases += cost4Purchases;
+  summary.cost5Purchases += cost5Purchases;
+  if (diagnostic.end.cost4ShopEligible) {
+    summary.cost4EligibilityPreparations += 1;
+    summary.firstCost4EligibilityRound = earliest(
+      summary.firstCost4EligibilityRound,
+      diagnostic.round,
+    );
+  }
+  if (diagnostic.end.cost5ShopEligible) {
+    summary.cost5EligibilityPreparations += 1;
+    summary.firstCost5EligibilityRound = earliest(
+      summary.firstCost5EligibilityRound,
+      diagnostic.round,
+    );
+  }
+  if (cost4Offers > 0) {
+    summary.firstCost4OfferRound = earliest(
+      summary.firstCost4OfferRound,
+      diagnostic.round,
+    );
+  }
+  if (cost5Offers > 0) {
+    summary.firstCost5OfferRound = earliest(
+      summary.firstCost5OfferRound,
+      diagnostic.round,
+    );
+  }
+  if (cost4Purchases > 0) {
+    summary.firstCost4PurchaseRound = earliest(
+      summary.firstCost4PurchaseRound,
+      diagnostic.round,
+    );
+  }
+  if (cost5Purchases > 0) {
+    summary.firstCost5PurchaseRound = earliest(
+      summary.firstCost5PurchaseRound,
+      diagnostic.round,
+    );
+  }
+}
+
+export function summarizeBotProgressionDiagnostics(
+  diagnostics: BotTurnDiagnostic[],
+): BotProgressionDiagnosticsReport {
+  const levelDistributionByRound: Record<string, Record<string, number>> = {};
+  const levelDistributionByPersonality: Record<
+    string,
+    Record<string, number>
+  > = {};
+  const firstRoundEachPlayerReachesEachLevel: Record<
+    string,
+    Record<string, number>
+  > = {};
+  const xpOverall = emptyXpDiagnosticSummary();
+  const xpByPersonality: Record<string, XpDiagnosticSummary> = {};
+  const xpByRound: Record<string, XpDiagnosticSummary> = {};
+  const rerollOverall = emptyRerollDiagnosticSummary();
+  const rerollByPersonality: Record<string, RerollDiagnosticSummary> = {};
+  const rerollByRound: Record<string, RerollDiagnosticSummary> = {};
+  const funnelOverall = emptyHighCostFunnelSummary();
+  const funnelByPersonality: Record<string, HighCostFunnelSummary> = {};
+  const funnelByRoundBucket = Object.fromEntries(
+    ["1-9", "10-19", "20-29", "30-39", "40+"].map((bucket) => [
+      bucket,
+      emptyHighCostFunnelSummary(),
+    ]),
+  ) as Record<string, HighCostFunnelSummary>;
+  const purchases = { initialBuyPass: 0, postReroll: 0, cost4: 0, cost5: 0 };
+
+  for (const diagnostic of diagnostics) {
+    const round = String(diagnostic.round);
+    const level = String(diagnostic.end.level);
+    const roundLevels = (levelDistributionByRound[round] ??= {});
+    roundLevels[level] = (roundLevels[level] ?? 0) + 1;
+    const personalityLevels = (levelDistributionByPersonality[
+      diagnostic.personalityId
+    ] ??= {});
+    personalityLevels[level] = (personalityLevels[level] ?? 0) + 1;
+
+    const playerKey = `${diagnostic.seed}:${diagnostic.playerId}`;
+    const firstRounds = (firstRoundEachPlayerReachesEachLevel[playerKey] ??= {});
+    for (
+      let reachedLevel = diagnostic.start.level;
+      reachedLevel <= diagnostic.end.level;
+      reachedLevel += 1
+    ) {
+      firstRounds[String(reachedLevel)] ??= diagnostic.round;
+    }
+
+    addXpDiagnostic(xpOverall, diagnostic);
+    addXpDiagnostic(
+      (xpByPersonality[diagnostic.personalityId] ??=
+        emptyXpDiagnosticSummary()),
+      diagnostic,
+    );
+    addXpDiagnostic((xpByRound[round] ??= emptyXpDiagnosticSummary()), diagnostic);
+    addRerollDiagnostic(rerollOverall, diagnostic);
+    addRerollDiagnostic(
+      (rerollByPersonality[diagnostic.personalityId] ??=
+        emptyRerollDiagnosticSummary()),
+      diagnostic,
+    );
+    addRerollDiagnostic(
+      (rerollByRound[round] ??= emptyRerollDiagnosticSummary()),
+      diagnostic,
+    );
+    addHighCostFunnel(funnelOverall, diagnostic);
+    addHighCostFunnel(
+      (funnelByPersonality[diagnostic.personalityId] ??=
+        emptyHighCostFunnelSummary()),
+      diagnostic,
+    );
+    addHighCostFunnel(funnelByRoundBucket[roundBucket(diagnostic.round)], diagnostic);
+    for (const purchase of diagnostic.purchases) {
+      purchases[purchase.source === "initial-buy-pass" ? "initialBuyPass" : "postReroll"] += 1;
+      if (purchase.cost === 4) purchases.cost4 += 1;
+      if (purchase.cost === 5) purchases.cost5 += 1;
+    }
+  }
+
+  return {
+    preparationCount: diagnostics.length,
+    levelDistributionByRound,
+    levelDistributionByPersonality,
+    firstRoundEachPlayerReachesEachLevel,
+    xp: {
+      overall: xpOverall,
+      byPersonality: xpByPersonality,
+      byRound: xpByRound,
+      rosterGuardFrequency: xpOverall.stopReasons["roster-guard"],
+      reserveBlockFrequency: xpOverall.stopReasons.reserve,
+    },
+    rerolls: {
+      overall: rerollOverall,
+      byPersonality: rerollByPersonality,
+      byRound: rerollByRound,
+      reserveBlockFrequency: rerollOverall.stopReasons.reserve,
+      commandBlockFrequency: rerollOverall.stopReasons["command-rejected"],
+    },
+    purchases,
+    highCostFunnel: {
+      overall: funnelOverall,
+      byPersonality: funnelByPersonality,
+      byRoundBucket: funnelByRoundBucket,
+    },
+    rawPreparations: diagnostics,
+  };
+}
 
 const ITEM_ACQUISITION_SOURCES = [
   "pveAutomatic",
@@ -1147,7 +1478,10 @@ export function normalizeProductionSoakPopulation(
   });
 }
 
-export function runProductionSoak(seedCount = 50): ProductionSoakReport {
+export function runProductionSoak(
+  seedCount = 50,
+  options: ProductionSoakOptions = {},
+): ProductionSoakReport {
   if (!Number.isInteger(seedCount) || seedCount <= 0) {
     throw new Error("seedCount must be a positive integer");
   }
@@ -1247,6 +1581,12 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
   let participantPlayerMatches = 0;
   let survivingPlayerMatches = 0;
   let survivingPlayerAcquisitions = 0;
+  const botTurnDiagnostics: BotTurnDiagnostic[] = [];
+  const botObserver: BotTurnObserver | undefined = options.botDiagnostics
+    ? (diagnostic) => {
+        botTurnDiagnostics.push(diagnostic);
+      }
+    : undefined;
 
   for (let seedIndex = 0; seedIndex < seedCount; seedIndex += 1) {
     try {
@@ -1442,7 +1782,7 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
         const inventoriesBefore = acquisitionSource
           ? inventoryCounts(state)
           : null;
-        state = advanceMatchPhase(state, DEFAULT_CONTENT);
+        state = advanceMatchPhase(state, DEFAULT_CONTENT, botObserver);
         if (acquisitionSource && inventoriesBefore) {
           recordInventoryAcquisitions(
             inventoriesBefore,
@@ -2055,6 +2395,12 @@ export function runProductionSoak(seedCount = 50): ProductionSoakReport {
         (trait) => trait.activations > 0,
       ),
     },
+    ...(options.botDiagnostics
+      ? {
+          botProgressionDiagnostics:
+            summarizeBotProgressionDiagnostics(botTurnDiagnostics),
+        }
+      : {}),
   };
 }
 
@@ -2065,9 +2411,15 @@ function argumentValue(name: string): string | undefined {
   );
 }
 
+function hasArgument(name: string): boolean {
+  return process.argv.includes(`--${name}`);
+}
+
 async function main(): Promise<void> {
   const seeds = Number(argumentValue("seeds") ?? 50);
-  const report = runProductionSoak(seeds);
+  const report = runProductionSoak(seeds, {
+    botDiagnostics: hasArgument("bot-diagnostics"),
+  });
   const outputPath = argumentValue("out");
   if (outputPath) {
     const absolute = path.resolve(outputPath);
