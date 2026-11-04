@@ -477,6 +477,11 @@ export interface PlayerState {
   shopLocked: boolean;
   inventory: string[];
   finalCrew: UnitInstance[];
+  // Presentation-only snapshot; absent in legacy saves whose deployment is unknown.
+  finalLineup?: {
+    deployed: BattleSetupUnit[];
+    reserve: UnitInstance[];
+  };
   ready: boolean;
   winStreak: number;
   lossStreak: number;

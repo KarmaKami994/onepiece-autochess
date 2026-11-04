@@ -581,6 +581,30 @@ function beginBattle(
   return next;
 }
 
+function captureFinalLineup(state: MatchState, player: PlayerState): void {
+  const result = state.lastResults.find(
+    (battle) => battle.playerAId === player.id || battle.playerBId === player.id,
+  );
+  if (!result) return;
+  const fighters = result.initialUnits.filter((unit) => unit.teamId === player.id);
+  // Older battle logs may not retain equipment. Do not invent a frozen lineup.
+  if (fighters.some((unit) => !unit.items)) return;
+  player.finalLineup = {
+    deployed: fighters.map((unit) => ({
+      id: unit.id,
+      definitionId: unit.definitionId,
+      ...(unit.formId ? { formId: unit.formId } : {}),
+      star: unit.star,
+      items: [...(unit.items ?? [])],
+      position: { x: unit.x, y: unit.y },
+    })),
+    reserve: player.bench.flatMap((id) => {
+      const unit = id ? player.units[id] : undefined;
+      return unit ? [{ ...unit, items: [...unit.items] }] : [];
+    }),
+  };
+}
+
 function returnEliminatedPlayerPieces(
   state: MatchState,
   player: PlayerState,
@@ -687,6 +711,7 @@ function resolveBattleResults(
   const firstEliminatedPlacement =
     aliveCountBeforeElimination - eliminated.length + 1;
   for (const [index, player] of eliminated.entries()) {
+    captureFinalLineup(next, player);
     player.hp = 0;
     player.alive = false;
     player.placement = firstEliminatedPlacement + index;
@@ -699,6 +724,7 @@ function resolveBattleResults(
     }
     const winner = survivors[0] ?? null;
     if (winner) {
+      captureFinalLineup(next, winner);
       winner.placement = 1;
     }
     next.winnerId = winner?.id ?? null;

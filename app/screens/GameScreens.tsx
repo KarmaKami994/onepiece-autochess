@@ -2152,7 +2152,14 @@ export function ResultsScreen({
   onMenu: () => void;
 }) {
   const won = view.placement === 1;
-  const activeTraits = view.traits.filter((trait) => trait.tier > 0);
+  const activeTraits = view.resultTraits.filter((trait) => trait.tier > 0);
+  const groups = view.resultLineup
+    ? [
+        { title: "LAST DEPLOYED CREW", units: view.resultLineup.deployed },
+        { title: "RESERVE AT VOYAGE END", units: view.resultLineup.reserve },
+      ]
+    : [{ title: "SAVED CREW — DEPLOYMENT UNKNOWN", units: view.resultCrew }];
+  const shownCrew = groups.flatMap((group) => group.units);
   return (
     <section className={`results-screen ${won ? "victory" : ""}`}>
       <div className="results-panel">
@@ -2170,14 +2177,19 @@ export function ResultsScreen({
         <div className="result-stats">
           <div><span>ROUNDS</span><strong>{view.round}</strong></div>
           <div><span>FINAL LEVEL</span><strong>{view.level}</strong></div>
-          <div><span>CREW SIZE</span><strong>{view.resultCrew.length}</strong></div>
+          <div><span>CREW SHOWN</span><strong>{shownCrew.length}</strong></div>
           <div>
-            <span>ITEMS HELD</span>
+            <span>ITEMS SHOWN</span>
             <strong>
-              {view.resultCrew.reduce((count, unit) => count + unit.items.length, 0)}
+              {shownCrew.reduce((count, unit) => count + unit.items.length, 0)}
             </strong>
           </div>
         </div>
+        <p className="result-lineup-note">
+          {view.resultLineup
+            ? "Last deployed crew is frozen at battle start. Reserve shows the bench at voyage end."
+            : "This older save has no final deployment record. All available crew are shown without guessing their battle or bench role."}
+        </p>
         {activeTraits.length > 0 && (
           <div className="results-traits" aria-label="Active final crew bonds">
             <span>ACTIVE BONDS</span>
@@ -2192,10 +2204,12 @@ export function ResultsScreen({
             </ul>
           </div>
         )}
-        <div className="final-crew" aria-label="Final crew composition">
-          {view.resultCrew
-            .slice(0, 8)
-            .map((unit) => {
+        {groups.map((group) => (
+          <section className="result-crew-group" key={group.title} aria-label={group.title}>
+            <h3>{group.title} <span>({group.units.length})</span></h3>
+            {group.units.length === 0 && <p>No crew in this group.</p>}
+            <div className="final-crew">
+            {group.units.map((unit) => {
               const definition = view.selectedDefinitionByUnit.get(unit.id);
               const itemNames = unit.items.map(
                 (itemId) => view.itemsById.get(itemId)?.name ?? titleCase(itemId),
@@ -2209,7 +2223,7 @@ export function ResultsScreen({
                   }`}
                 >
                   <CrewPortrait
-                    src={definition?.portrait}
+                    src={unit.portrait ?? definition?.portrait}
                     name={unit.name}
                     color={definition?.color ?? cssColor(unit.contentId)}
                   />
@@ -2221,7 +2235,9 @@ export function ResultsScreen({
                 </article>
               );
             })}
-        </div>
+            </div>
+          </section>
+        ))}
         <div className="results-actions">
           <button type="button" className="pixel-button primary compact" onClick={onNew}>
             NEW VOYAGE

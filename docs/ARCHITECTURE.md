@@ -43,9 +43,21 @@ preferred sheet for each visible unit; legacy sheets load only after failure.
 ## Persistence and determinism
 
 Canonical state is plain JSON data. Schema versions 1–6 have committed migration
-fixtures. Closing during combat saves the pre-battle state; continuing
-regenerates the same result from its seed. Regatta checkpoints persist explicit
-positions, steering targets, and ticks.
+fixtures. New combat checkpoints save the current canonical state, including
+immutable battle results and persistent battle-time purchases/merges. Loading
+does not advance the phase again. `replayBattle: true` invokes only the legacy
+compatibility path. Regatta checkpoints persist explicit positions, steering
+targets, and ticks; Recruitment checkpoints retain reserved offers and RNG.
+
+Optional schema-6 `PlayerState.finalLineup` retains the frozen battle-start
+deployment and the bench at voyage end for eliminated players and the winner.
+It is presentation metadata captured before elimination clears the roster;
+it never changes combat, pool returns, or the existing `finalCrew` field used
+by historical analytics. Deployment traits come from the frozen fighters.
+The two groups describe different instants: a merged persistent unit can have
+changed since combat started. Totals count the cards and equipment shown, not
+a new ownership/economy metric. Missing deployment metadata remains unknown;
+the UI displays the available saved roster without inferring a battle lineup.
 
 `hashMatchState` canonicalizes object keys before hashing. It is useful for
 replay and soak comparisons, not security or authentication.
