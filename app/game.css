@@ -3718,6 +3718,25 @@ details.trait-building {
   font: 900 9px/1 "Courier New", monospace;
 }
 
+.result-crew-group {
+  width: 100%;
+  min-width: 0;
+  text-align: left;
+}
+
+.result-crew-group h3 {
+  margin: 12px 0 0;
+  color: var(--gold);
+  font: 900 11px/1.5 "Courier New", monospace;
+}
+
+.result-crew-group > p,
+.results-panel > .result-lineup-note {
+  margin: 10px 0;
+  color: #9db5b1;
+  font: 700 11px/1.5 "Courier New", monospace;
+}
+
 .final-crew {
   display: grid;
   width: 100%;
@@ -3753,9 +3772,7 @@ details.trait-building {
 
 .final-crew-card strong,
 .final-crew-card small {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .final-crew-card strong {

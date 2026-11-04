@@ -214,7 +214,7 @@ No concept qualifies for a direct source port because content models, economy se
 - Option 3 preserves current production coverage while adding a narrowly separate future tool for deterministic combat questions.
 - No smaller Option 4 provides both emergent economy coverage and controlled benchmark stability without conflating responsibilities.
 
-Architecture is locked at the role boundary, not at current weights: adaptive bot tuning waits until P2/P3 stabilize. Scripted benchmark implementation is not authorized by this audit.
+Architecture is locked at the role boundary, not at current weights. P2/P3 have since completed; the first P1B candidate was rejected and the subsequent diagnostic has merged. Scripted benchmark implementation is not authorized by this audit.
 
 ## 14. Roadmap Ordering
 
@@ -222,11 +222,11 @@ Architecture is locked at the role boundary, not at current weights: adaptive bo
 
 **P2/P3:** Economy / Progression and Match Flow / Pacing PAC-first research and audits — complete.
 
-Next: **merge this production-soak population normalization**.
+The population normalization and the ensuing normalized pre-P4 baseline are complete. P4 items/crafting, P11 recruitment and P12 named PvE presentation have also completed. P13 records the later final production-state 50-seed baseline; it does not replace the historical 1,000-seed snapshots.
 
-Then: **run a new authoritative broad production baseline**.
+The first P1B progression candidate was rejected. PR #58 merged the [bot progression diagnostic](P1B_BOT_PROGRESSION_DIAGNOSTIC.md) at `918d16b88e182ac9c81d05c73deb651824d51df8`, preserving the original production policy. These reports, rather than the original P2/P4 todo list, form the current tuning handoff.
 
-After that measurement: **decide whether P1B adaptive bot recalibration is actually needed or whether to proceed with P4 Items / Treasure / Form Accessibility research and audit**.
+B01 completes the final crew presentation and updates current documentation. A separately assigned B02 would add the local codex/team-planning tools; a replacement P1B candidate still needs an evidence-backed architecture decision.
 
 No bot tuning, economy change, captain-damage change or unit-balance work follows automatically; each requires separate approval.
 
@@ -234,6 +234,4 @@ Smoker is frozen as a watch item. The previously proposed Smoker trait-state dia
 
 ## 15. Exactly One Next Task
 
-**P2 — PAC-first Economy / Progression research and architecture audit.** Inspect targeted pinned PAC economy/progression behavior, classify direct/adapted/reference/reject ideas, map deterministic/local/future-server fit and lock the P2 architecture before any economy implementation.
-
-Do not implement P2, tune bots or run a production simulation in this PR.
+After B01 review, **B02 — local codex and team-planning tools** is the next recommended batch, subject to a separate task. For future bot work, explain skipped high-cost offers and item/form paths before selecting another candidate. This documentation update starts neither task and authorizes no new measurement.

@@ -85,8 +85,11 @@ reopened from Settings. Starting a new voyage while a save exists requires
 explicit confirmation.
 
 After each combat, a compact outcome notice reports victory, defeat, or draw,
-Captain damage, and remaining team health. The final results screen preserves
-the crew's names, stars, held treasure, and active bonds.
+Captain damage, and remaining team health. The final results screen shows every
+member of the last deployed crew, including nine-unit lineups, separately from
+the reserve at voyage end. Names, stars, forms, equipment and the deployed
+crew's bonds are preserved. Older saves without a final deployment record show
+an explicitly unclassified saved crew.
 
 ## Architecture
 
@@ -102,9 +105,11 @@ the crew's names, stars, held treasure, and active bonds.
   views, while IndexedDB access, clocks, tutorials, audio, and diagnostics stay
   outside the domain.
 - The active match is stored in IndexedDB. Small accessibility and audio
-  settings are stored in localStorage. Closing during battle resumes from the
-  stable pre-battle state and seed; closing during a Bounty Regatta resumes the
-  last complete 50 ms simulation checkpoint.
+  settings are stored in localStorage. Battle checkpoints preserve the current
+  canonical state and immutable combat result, including battle-time economy
+  actions. Only legacy `replayBattle` saves use the compatibility replay path.
+  Closing during a Bounty Regatta resumes the last complete 50 ms checkpoint;
+  Voyage Recruitment preserves pending offers and shared-pool reservations.
 - All artwork is bundled under `public/assets`; Web Audio effects are generated
   locally. Gameplay makes no network requests.
 

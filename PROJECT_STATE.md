@@ -23,10 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-P1B Bot Progression Diagnostic is complete on `task/p1b-bot-progression-diagnostic` from exact base `339d65de5941a923f6745e4765efb2950d5e56fe`. Opt-in immutable observation of the existing bot turn produced exactly one 50-seed diagnostic report without changing default production behavior, state, RNG or gameplay-derived P13 metrics. GameContent remains `1.31.0`, save schema remains 6, and no tuning is implemented. The next task is architecture/review of the evidence before any separately approved replacement candidate.
+B01 result presentation and current-product documentation are complete and locally verified; [PR #59](https://github.com/KarmaKami994/onepiece-autochess/pull/59) records the integration handoff from `codex/b01-results-completion`, based on `918d16b88e182ac9c81d05c73deb651824d51df8` (merged PR #58). Results retain the complete frozen last deployment and a separate end-of-voyage reserve; legacy saves use a labelled unclassified roster. P4/P11/P12 and the behavior-neutral P1B diagnostic are complete; the first tuning candidate remains rejected. GameContent is `1.31.0`, schema 6; no tuning is introduced.
 
 ## Last Completed Work
 
+- 2026-11-04 — B01 / PR #59: optional schema-6 `finalLineup` captures frozen fighters and reserve for eliminated players and the winner without reinterpreting `finalCrew` analytics. Results show every card, forms/items and deployed-only bonds; old saves remain explicitly unclassified, including a duplicate-free winner fallback. Updated current crafting, battle-save, P11/P12, P7-art and bot-roadmap documentation, and published the prior analysis/batch plan with B01 completion marked. Initial implementation commit `1c7bd9bf5b9cf440acba8cd5355c19887535b4ed`. Material files: `game/types.ts`, `game/engine.ts`, `app/selectors.ts`, `app/screens/GameScreens.tsx`, `app/game.css`, `tests/results-lineup.test.ts`, `e2e/results.spec.ts`, README, product/architecture/bot/form/P4 documents, `docs/B01_RESULTS_COMPLETION.md`, `docs/OFFENE_FEATURES_PAC_ABGLEICH.md`, `docs/TASK_BATCHES_PAC_AUSBAU.md`, `PROJECT_STATE.md`.
 - 2026-09-15 — P1B Bot Progression Diagnostic: added disabled-by-default immutable observation around the real `runBotTurn`, opt-in `--bot-diagnostics` production-soak aggregation, behavioral-equivalence tests, one official `production-0`–`production-49` report, and a facts/inferences/limitations analysis. The report completed 50/50 with zero crashes and exactly matched all P13 gameplay-derived metrics; SHA-256 `4cbdcb8a3e6ad4907e767b2663431c5b08d3181faf60fd74458d38cb194dbdf3`. No bot policy, content, schema, tuning or baseline was changed. Material files: `game/engine.ts`, `scripts/run_production_soak.ts`, `tests/game/bot-progression-diagnostics.test.ts`, the raw report, `docs/P1B_BOT_PROGRESSION_DIAGNOSTIC.md`, and `PROJECT_STATE.md`.
 - 2026-09-15 — PR #57 review correction: rejected the P1B round-target/XP-budget candidate and reverted all production behavior, version assertions, and candidate-only tests to exact base `67a0e26dd6d2b9ebf84c12c597574750dff6bc21`. Retained the exact POST raw report as historical rejected-experiment evidence and rewrote its interpretation. No P1B tuning is production policy or merged. Material branch delta: the raw report, `docs/P1B_ADAPTIVE_BOT_TUNING.md`, and `PROJECT_STATE.md` only.
 - 2026-09-14 — P13 Final Production Baseline from exact `b2bada40ab52488423425bb4fda1abb851717fa9`: one unchanged-harness 50-seed run completed 50/50 matches with zero crashes, 34–47 rounds (40.06 average), 24.926 paced / 34.941 full-clock minutes. Raw report and SHA-256 are pinned above. The full-clock 20–30-minute target is false; other existing target booleans are true. These are directional signals before P1B, not tuning authority. Material files: raw report, `docs/P13_FINAL_PRODUCTION_BASELINE.md`, `PROJECT_STATE.md` only.
@@ -90,6 +91,13 @@ P1B Bot Progression Diagnostic is complete on `task/p1b-bot-progression-diagnost
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+B01 result completion:
+
+- PASS — typecheck; lint; focused result/selector/save/match-flow/Robin/Luffy tests (6 files / 75 tests); full unit suite (61 files / 797 tests).
+- PASS — focused Browser E2E plus the existing complete-voyage flow: 8/8 across 1280×720 and 1920×1080; result screenshots inspected. The Windows owned-server teardown needed targeted cleanup after all assertions passed; Playwright then exited 0.
+- PASS — production build (`npm run build` through the installed npm CLI). Normal GitHub CI remains the PR merge gate.
+- NOT RUN — local production aggregate, 1,000-seed soak or new baseline. Content/schema and historical raw reports are unchanged; normal CI smoke remains regression-only.
 
 P1B Bot Progression Diagnostic:
 
@@ -692,6 +700,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- B01 changes final-result presentation only: complete last deployed crew, separate reserve, frozen form/equipment retention and deployed-only bonds. Optional `finalLineup` is reporting metadata; existing `finalCrew` ownership semantics and gameplay remain unchanged. Older saves show an unclassified roster instead of guessed battle/bench roles.
 - P1B diagnostics add no default production behavior change. A supplied observer receives deeply frozen, detached end-of-turn facts from commands the unchanged bot policy already executed; the production-soak report includes diagnostics only with `--bot-diagnostics`. No observer data enters `MatchState`, saves, command decisions or RNG.
 - PR #57 changes no production behavior after review correction. The rejected P1B target-level/XP-budget policy and its tests/version changes are fully reverted; GameContent remains `1.31.0` and schema 6. Its raw POST report is historical evidence, not production policy.
 - P13 changes no production behavior or harness instrumentation. The raw 50-seed measurement and documentation are its only artifacts; GameContent `1.31.0` and schema 6 remain fixed.
@@ -750,6 +759,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- None for B01 product scope. The host's npm shim still targets a missing roaming CLI, so installed Node/package entrypoints run verification. The known Windows Playwright teardown hung after 8/8 assertions; stopping only its verified Vinext server allowed a successful exit. The frozen last deployment and the end-of-voyage bench are explicitly different instants; displayed totals describe cards/equipment, not a new ownership metric.
 - None in product scope for P1B diagnostics. The first full-suite attempt exceeded Vitest's default five-second timeout only in the newly added test that runs two production matches; that test's timeout was narrowly set to 20 seconds and the focused and full suites then passed. No production behavior or E2E assertion changed.
 - P1B candidate was rejected in review because its high-cost-access objective failed. The branch was intentionally converted to documentation-only instead of retuning; no additional soak or second candidate was run.
 - None for P13. Exactly one 50-seed official baseline was run and no balancing, bot heuristic, content/config, save, stage, RNG, combat, economy, harness, or gameplay change was made.
@@ -808,6 +818,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- B01 legacy saves cannot recover an exact deployment if it was never recorded. The UI labels this gap rather than inferring a lineup or bonds; it also handles legacy battle logs without frozen item arrays. No gameplay defect or balance conclusion is inferred from this presentation work.
 - P1B diagnostics rule out the roster-size guard as the measured progression bottleneck (0 stops in 12,241 preparations). XP stops were reserve-limited 58.9% and budget-limited 36.5%; all 400 players reached L7, but only 342 reached L8 and 91 L9. Cost-5 offers appeared in 3.6% of eligible shop slots and 32.2% of eligible preparations; personality offer-to-buy conversion varied from 8.5% to 55.1%. The observer does not distinguish affordability, reserve, receive/replacement legality, scoring or competing-purchase reasons for a skipped visible offer, so another policy must not be selected from conversion totals alone.
 - The rejected P1B candidate passed its original stability gates but failed its objective: cost-4/5 player-board presence fell 259/102→178/54 and final-board presences fell 429/128→274/68, while Nami/Robin presence rose 164/153→180/157. The existing reports lack intermediate level/roster traces, so a targeted bot-progression diagnostic is required before another candidate. No production tuning follows from this historical experiment. Smoker remains frozen/watch.
 - P13's 50-match report is directional evidence, not balance proof: all hard gates passed, but full-clock duration averaged 34.941 minutes versus the existing 20–30-minute target, while paced duration was 24.926 minutes. Frequent Nami/Robin final-board presence with below-band conditional results and low observed 5-cost offer frequency are P1B investigation candidates, not automatic weight or unit-value changes. Gear 4's zero observed transitions rests on only four 3★ Luffy final boards. The recorded P12 asset permission attestations do not independently establish chain of title; rights review remains necessary beyond the existing recorded scope.
@@ -850,6 +861,7 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
+- B01 preserves the original frozen battle-start crew even after legal battle-time merges, and snapshots the reserve before elimination clears it. `finalCrew` keeps its historical all-owned meaning. The optional presentation field needs no schema/version bump; old saves remain unknown rather than backfilled with fabricated deployment data.
 - P1B measurement uses one optional observer on the real bot-turn authority. It is disabled by default, receives detached deeply frozen facts only after existing actions execute, and cannot add RNG draws, commands, state/save fields or control flow. The diagnostic identifies reserve/budget-limited upper-level progression, narrow cost-5 exposure and personality-dependent conversion as review inputs, not an automatic tuning prescription.
 - The first P1B target-level/XP-budget candidate is rejected and not production policy. Its report remains immutable historical evidence. A targeted diagnostic must precede any separately approved replacement candidate; there is no automatic bot, unit, item, economy, or Smoker tuning.
 - P11 adapts PAC's round-10/20 non-combat portal slots into local Voyage Recruitment, not PAC Portal Carousel. Offers are separate persisted state and explicit shared-pool reservations; serialized RNG, existing bot scoring and schema 6 remain authoritative. No networking, new roster or item system was introduced.
@@ -873,7 +885,7 @@ Final current-roster high-cost identity pack:
 - P4 adopts the PAC core craftable architecture: ten components, all 55 unordered self-inclusive recipes, automatic second-component crafting, completed-item uniqueness and cap three. General behavior identities are direct; flat units/missing primitives, existing-trait candidates, names/assets/tooltips and local deterministic early acquisition are adapted. Post-20 cadence and later PvE are reference only; unrelated item families and backend/Pokémon-specific systems are rejected. Proposed trait-item mappings remain pending ChatGPT approval, and no non-obvious scaled value is locked.
 - P3 Match Flow / Pacing selects Option 3: keep the current deterministic domain architecture and adapt selected PAC principles. Keep the phase graph, preparation timing, 45-second battle cap, carousel sequencing, early PvE rounds, ghosts, remaining-team-health timeout winner and current draw semantics. Same-round elimination ordering is corrected; P3B implements an ADAPTED PORT of global encounter-count/recency pairing with local seeded deterministic ties and asymmetric ghost scoring. Captain damage remains ADAPT LATER / MEASURE FIRST, and late PAC PvE/event cadence remains P4 REFERENCE ONLY. Future server multiplayer moves deadline authority server-side without changing domain rules.
 - P2 Economy / Progression selects Architecture Option 1: keep the current deterministic authoritative finite-pool economy and treat values as the measurement baseline, not permanent locks. PAC liquid start values and normal interest/XP/odds/shop/buy/bench behavior are direct or adapted parity, but PAC also has a Stage-0 starter plus component opening grant; that cross-cutting difference and PAC's partial evolved-unit sell pricing are REFERENCE ONLY. No transactional defect requires implementation. Economy tuning waits for P3; per-unit pool scaling and full-refund selling remain KEEP / MEASURE.
-- P11 and P12 are complete; P13 pins one exact-base 50-seed production measurement and hands off directional, confounded signals. P1B Bot Tuning is the next separately authorized phase; no bot or other balance change is authorized by this report alone. Smoker remains frozen/watch.
+- P11/P12 and P13 measurement are complete. The first P1B candidate was rejected; PR #58 completed the subsequent diagnostic. Any replacement policy still requires a separately approved decision based on those bounded, confounded measurements. Smoker remains frozen/watch.
 - Bot architecture uses two distinct future roles: adaptive match bots remain the production-meta/local-opponent class using real domain systems and command intents; a PAC-inspired scripted benchmark-bot concept may later provide authored deterministic combat setups but cannot replace adaptive production bots. PAC Mongo/Firebase/Colyseus/community/Discord infrastructure is rejected. Architecture Option 3 is locked; adaptive tuning waits until P2/P3 stabilize.
 - The authoritative pre-P4 comparison point is `docs/analysis/normalized-pre-p4-baseline-1000.json` measured at `cff9c4caed9b09fd64a915908589decc84f02cc8`. Historical snapshots are not rewritten or treated as normalized measurements.
 - PR #31 historically selected targeted diagnostics because aggregate evidence could not justify another Smoker nerf. Subsequent roadmap review superseded that immediate diagnostic; White Blow remains 180 at 1400ms with line, knockback, Navy and Guardian, and Smoker is now frozen as a watch item.
@@ -892,15 +904,15 @@ Final current-roster high-cost identity pack:
 - Add no multiplayer infrastructure yet.
 - Keep a shared deterministic game domain.
 - Defense Pierce is transient per-ability mitigation behavior, not a persistent Defense mutation, status or debuff.
-- Base-roster expansion is complete at 30 units and 6/7/6/7/4 by cost. Pack F added the Emperor origin for Shanks/Blackbeard; its single two-unit tier grants +8% team health and +8% team attack through existing team-wide trait semantics.
-- The Character Form System foundation and Robin, Luffy and Chopper production pilots are complete; the next bounded work is the separate post-forms assessment.
+- The base-roster expansion historically reached 30 units; P9 subsequently expanded it to 34 at 6/8/7/8/5 by cost. P6 superseded the original Emperor-tier values; current content is authoritative.
+- The Character Form System foundation, Robin/Luffy/Chopper pilots and subsequent post-forms assessment are complete. P7 supplies their presentation assets.
 - Character forms remain separate from stars and shop/pool identity. Robin and Luffy are persistent production pilots; Chopper is the first battle-temporary production pilot.
 - All future Codex work must be bounded and branch/PR based.
 - ChatGPT decides architecture and prioritization; Codex executes requested tasks.
 
 ## Next Recommended Task
 
-Review and lock the architecture of a replacement P1B candidate against the completed diagnostic. Preserve a deliberate reroll channel and investigate high-cost offer rejection before implementation; do not automatically tune bots, units, items, economy or Smoker.
+After B01 review, B02 (local codex and team-planning tools) is the next recommended batch, requiring its own task. Future P1B work still needs skipped-offer/item/form diagnostics and an approved replacement architecture; do not automatically begin B02 or tune bots, units, items, economy or Smoker.
 
 ## Codex Update Contract
 

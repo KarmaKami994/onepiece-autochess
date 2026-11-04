@@ -217,6 +217,8 @@ export type MatchView = {
   inventory: ChoiceView[];
   boardUnits: BoardUnit[];
   resultCrew: BoardUnit[];
+  resultLineup: { deployed: BoardUnit[]; reserve: BoardUnit[] } | null;
+  resultTraits: TraitView[];
   traits: TraitView[];
   standings: StandingView[];
   opponent: StandingView | null;
@@ -580,7 +582,7 @@ function enrichUnitView(
   };
 }
 
-function itemHealth(instance: UnitInstance, content: GameContent): number {
+function itemHealth(instance: Pick<UnitInstance, "items">, content: GameContent): number {
   return instance.items.reduce((sum, itemId) => {
     const item = content.items.find((candidate) => candidate.id === itemId);
     return (
@@ -595,7 +597,7 @@ function itemHealth(instance: UnitInstance, content: GameContent): number {
 }
 
 function planningMaxHp(
-  instance: UnitInstance,
+  instance: Pick<UnitInstance, "definitionId" | "formId" | "star" | "items">,
   content: GameContent,
 ): number {
   const definition = resolveUnitDefinition(
@@ -1329,10 +1331,22 @@ function finalCrewUnits(
   content: GameContent,
 ): BoardUnit[] {
   if (player.finalCrew.length === 0) {
-    return board.units.filter((unit) => unit.team === "player");
+    return resultCrewUnits(Object.values(player.units), player, board, content, "final");
   }
-  return player.finalCrew.map((instance, index) => {
-    const formId = resolvePersistentFormId(instance, content) ?? undefined;
+  return resultCrewUnits(player.finalCrew, player, board, content, "final");
+}
+
+function resultCrewUnits(
+  units: readonly Pick<UnitInstance, "id" | "definitionId" | "formId" | "star" | "items">[],
+  player: PlayerState,
+  board: { views: Map<string, ShopUnitView> },
+  content: GameContent,
+  prefix: string,
+): BoardUnit[] {
+  return units.map((instance, index) => {
+    const formId = prefix === "deployed"
+      ? instance.formId
+      : resolvePersistentFormId(instance, content) ?? undefined;
     const view = enrichUnitView(
       definitionView(
         instance.definitionId,
@@ -1342,7 +1356,7 @@ function finalCrewUnits(
       player,
       content,
     );
-    const id = `final:${instance.id}`;
+    const id = `${prefix}:${instance.id}`;
     const maxHp = planningMaxHp(instance, content);
     board.views.set(id, view);
     return {
@@ -1358,7 +1372,7 @@ function finalCrewUnits(
       y: content.config.boardHeight - 1,
       slot: index,
       star: instance.star,
-      items: instance.items.slice(0, 3),
+      items: [...instance.items],
       hp: maxHp,
       maxHp,
       portrait: view.token,
@@ -1561,6 +1575,12 @@ export function selectMatchView(
             : state.phase === "voyage-choice"
               ? "RECRUITMENT"
             : "VOYAGE ENDED";
+  const resultLineup = player.finalLineup
+    ? {
+        deployed: resultCrewUnits(player.finalLineup.deployed, player, board, content, "deployed"),
+        reserve: resultCrewUnits(player.finalLineup.reserve, player, board, content, "reserve"),
+      }
+    : null;
   return {
     playerId: player.id,
     phase: state.phase,
@@ -1585,6 +1605,10 @@ export function selectMatchView(
     ),
     boardUnits: board.units,
     resultCrew: finalCrewUnits(player, board, content),
+    resultLineup,
+    resultTraits: player.finalLineup
+      ? createTraitViews(getActiveTraitsForUnits(player.finalLineup.deployed, content), content)
+      : [],
     traits: traitViews(player, content),
     standings,
     opponent,

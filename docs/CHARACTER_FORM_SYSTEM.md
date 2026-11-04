@@ -87,6 +87,10 @@ resources, statuses and action timing. A generic `unit-transform` event records
 the battle-local identity for immutable result playback, save/resume and
 spectating. Persistent `UnitInstance` state remains base Chopper.
 
-Monster Point has no art override and uses Chopper's existing assets plus a
-text transformation cue. The Robin, Luffy and Chopper pilots add no form-choice
-UI, form command or generic trigger/duration framework.
+The original Monster Point pilot used Chopper's base assets and a text cue.
+P7 subsequently added dedicated portraits, tokens and board overlays for all
+four production forms; the base animation sheets are still reused. See
+[P7 visual integration](P7_MAJOR_ASSET_PRODUCTION.md). The Robin, Luffy and
+Chopper pilots add no form-choice UI, form command or generic trigger/duration
+framework. B01 result snapshots preserve the last deployment's frozen form
+identity independently of the persistent reserve and legacy form reconciliation.

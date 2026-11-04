@@ -1,5 +1,11 @@
 # P4 Core Item System Architecture Audit
 
+Current status (B01 handoff): P4C and all 55 recipe outputs are implemented.
+P7 supplies all 65 item icons and the four form visual sets; P5/P10 supersede
+the early acquisition schedule below. GameContent is now `1.31.0`, schema 6.
+The original audit and per-phase implementation sections remain historical
+records of their stated base/version, not a current todo list.
+
 ## 1. Executive Decision
 
 Adopt the PAC core craftable-item architecture as the locked P4 direction: **10 components**, every unordered component pair including self-pairs, therefore **55 completed items**, automatic crafting when a second component is equipped to a component-bearing unit, and a maximum of **three completed items per unit**. Preserve PAC's combat-role identities, but express them with One Piece names, presentation and the current deterministic portable domain.
@@ -342,7 +348,7 @@ Normal PvE victories at rounds 1/2/3/9/14/19 and carousels at 4/12/17 now draw f
 
 Directly equipping a redundant trait grant fails without inventory mutation. Crafting the same result remains successful: both components are consumed and the completed result moves to inventory. Star merges likewise return grants made redundant by the merged unit's resolved native/form traits without crafting or deletion. Bots use the same recipe and redundancy rules, including crafting at the three-slot cap.
 
-Selectors expose component/completed kind, granted trait, completed recipe components and all ten canonical pair outcomes for a component. Keyboard focus and hover reveal semantic recipe details and a selected-holder craft preview. The legacy eight-column bounty sheet is used only for its known IDs; all other items use the deterministic icon/color fallback without aliasing to column zero. P4 is complete; final authored item art remains deferred until after P6.
+Selectors expose component/completed kind, granted trait, completed recipe components and all ten canonical pair outcomes for a component. Keyboard focus and hover reveal semantic recipe details and a selected-holder craft preview. The legacy eight-column bounty sheet is used only for its known IDs; all other items use the deterministic icon/color fallback without aliasing to column zero. P4 is complete. The item art deferred at P4C was subsequently delivered by P7.
 
 ## 9. Missing Primitive Audit
 
@@ -429,7 +435,7 @@ Local carousels align at rounds 4/12/17, use explicit RNG, offer 5–9 choices, 
 - Trigger ordering must be explicit when death, resurrection, shield depletion, on-damage and on-kill occur in one tick.
 - Special Defense adds a second mitigation axis and therefore needs a narrow formula decision, not a copy of PAC's entire damage model.
 - Bot item handling is recipe-aware and trait-aware but does not add speculative tuning for delayed or conditional effects.
-- Generic procedural bounty presentation covers non-sheet IDs; final authored item art remains deferred until after P6.
+- Generic procedural bounty presentation covers non-sheet IDs; P7 supplies the completed item-icon inventory.
 - Smoker remains frozen/watch. P4 does not authorize bot, economy, captain-damage or unit balance changes.
 
 ## 14. Bounded Implementation Decomposition
