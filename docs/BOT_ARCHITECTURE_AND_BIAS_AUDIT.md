@@ -231,8 +231,13 @@ B01 completes the final crew presentation and updates current documentation. B02
 B05-A now adds actual offer-rejection/replacement and equip/craft/form receipts
 to the optional observer, with bounded report examples and exact seed-0 PRE
 regression. See [the diagnostic and candidate approval handoff](B05_BOT_DECISION_DIAGNOSTIC.md).
-There is no new aggregate measurement or production tuning in A. B's single
-late spare-gold XP proposal is not approved; C remains a separate item/form decision.
+There is no new aggregate measurement or production tuning in A. PR #63 merged
+with green CI as `7b7b07abbc6f14c9c8ce54d223909da209210f98`. The owner then
+approved exactly one late spare-gold XP evaluation. Its POST failed the locked
+cost-5 representation gates, so behavior/version/tests were reverted to A;
+see [B05-B's rejected evaluation](B05_LATE_SPARE_XP_EVALUATION.md). Item/form
+policy stays unchanged. This completes the approved evaluation, not a successful
+progression improvement or authority for another candidate.
 
 No bot tuning, economy change, captain-damage change or unit-balance work follows automatically; each requires separate approval.
 
@@ -240,4 +245,7 @@ Smoker is frozen as a watch item. The previously proposed Smoker trait-state dia
 
 ## 15. Exactly One Next Task
 
-After B02 review, **B03 — combat analysis, effect readability and audio** is the next recommended batch, subject to a separate task. For future bot work, explain skipped high-cost offers and item/form paths before selecting another candidate. This documentation update starts neither task and authorizes no new measurement.
+Review B05-B's retained rejection evidence. B02–B04 and B05-A are merged; the
+approved single progression evaluation is complete with production unchanged.
+Any further progression/item policy requires a separate evidence-backed decision.
+No B06, new candidate, tuning or measurement starts automatically.

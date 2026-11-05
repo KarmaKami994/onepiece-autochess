@@ -1166,8 +1166,8 @@ describe("P4B7 compatibility contracts", () => {
     state.players[0].inventory = [...P4B7_IDS];
     const restored = deserializeMatch(serializeMatch(state));
     expect(restored.players[0].inventory).toEqual([...P4B7_IDS]);
-    expect(DEFAULT_CONTENT.version).toBe("1.32.0");
-    expect(restored.contentVersion).toBe("1.32.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.31.0");
+    expect(restored.contentVersion).toBe("1.31.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(restored.schemaVersion).toBe(6);
 

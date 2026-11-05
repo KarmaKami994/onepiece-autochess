@@ -120,11 +120,14 @@ des Projekteigners nach erfolgreicher CI zusammengeführt werden.
 
 ## B05 — Bot-Diagnose und gezielte Entscheidungsverbesserung
 
-Lieferung A ist am 2026-11-05 auf `codex/b05-bot-decision-diagnostics` umgesetzt:
-[`B05_BOT_DECISION_DIAGNOSTIC.md`](B05_BOT_DECISION_DIAGNOSTIC.md). B/C sind
-nicht als umgesetzt freigegeben; der konkrete B-Vorschlag und seine einmalige
-Messung benötigen die nachstehende Architektur-/Review-Entscheidung. Kein neuer
-aggregierter Lauf und keine Produktions-Policy-Änderung in A.
+Lieferung A ist am 2026-11-05 mit grüner CI über PR #63 gemergt:
+[`B05_BOT_DECISION_DIAGNOSTIC.md`](B05_BOT_DECISION_DIAGNOSTIC.md). Der danach
+ausdrücklich freigegebene B-Kandidat wurde genau einmal über 50 Seeds bewertet
+und wegen verfehlter Cost-5-Gates verworfen; Verhalten, Version und Tests sind
+auf A zurückgenommen. [Auswertung und unveränderte Evidenz](B05_LATE_SPARE_XP_EVALUATION.md).
+Die Bewertung ist abgeschlossen, eine erfolgreiche Progressionsverbesserung wird
+nicht behauptet. C behält die bisherige Item-/Form-Policy ohne neue Änderung bei;
+ein weiterer Kandidat benötigt getrennte Evidenz/Freigabe. Kein B06-Start.
 
 **Ziel:** Die Bots verbessern sich anhand erklärter Entscheidungen; der Erfolg wird an tatsächlich eingesetzten Teams gemessen.
 

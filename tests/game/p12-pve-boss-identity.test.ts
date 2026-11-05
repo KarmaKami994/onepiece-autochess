@@ -48,7 +48,7 @@ function mechanics(ability: object) {
 
 describe("P12 named PvE encounters", () => {
   it("keeps the eight encounter rounds and exact boss/faction compositions", () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.32.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.31.0");
     for (const [round, name, expectedIds] of waves) {
       const stage = getStageDefinition(round);
       expect(stage.kind).toBe("pve");

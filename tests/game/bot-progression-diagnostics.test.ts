@@ -6,7 +6,6 @@ import {
   createMatch,
   runBotTurn,
   serializeMatch,
-  hashGameContent,
   type BotTurnDiagnostic,
 } from "../../game";
 import { runProductionSoak } from "../../scripts/run_production_soak";
@@ -146,13 +145,8 @@ describe("bot progression diagnostics", () => {
       contentHash: string; configHash: string;
       botProgressionDiagnostics: { rawPreparations: NonNullable<typeof botProgressionDiagnostics>["rawPreparations"] };
     };
-    // The approved behavior version changes; all authored values stay exact PRE.
-    expect(hashGameContent({ ...DEFAULT_CONTENT, version: "1.31.0" })).toBe(historical.contentHash);
+    expect(diagnostic.contentHash).toBe(historical.contentHash);
     expect(diagnostic.configHash).toBe(historical.configHash);
-    const rows = botProgressionDiagnostics?.rawPreparations ?? [];
-    const firstLateRound = Math.min(...rows.filter((row) => row.lateXp.successfulPurchases > 0).map((row) => row.round));
-    expect(firstLateRound).toBeGreaterThan(1);
-    const untouchedPrefix = rows.filter((row) => row.round < firstLateRound).map(({ lateXp, ...preparation }) => { expect(lateXp.successfulPurchases).toBe(0); return preparation; });
-    expect(untouchedPrefix).toEqual(historical.botProgressionDiagnostics.rawPreparations.filter((preparation) => preparation.seed === "production-0" && preparation.round < firstLateRound));
+    expect(botProgressionDiagnostics?.rawPreparations).toEqual(historical.botProgressionDiagnostics.rawPreparations.filter((preparation) => preparation.seed === "production-0"));
   }, 20_000);
 });
