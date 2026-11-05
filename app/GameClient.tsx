@@ -33,6 +33,7 @@ import {
   writeVoyage,
 } from "./voyagePersistence";
 import { useGameAudio, type SoundName } from "./useGameAudio";
+import { DEFAULT_AUDIO_SETTINGS, normalizeAudioSettings } from "./audioSettings";
 import { useLocalGameSession } from "./useLocalGameSession";
 import { useMatchClock } from "./useMatchClock";
 import {
@@ -84,8 +85,7 @@ const content = engine.CONTENT;
 const SETTINGS_KEY = "grand-line-auto-chess.settings.v1";
 const COMBAT_SPEEDS = [0.5, 1, 2, 4] as const;
 const DEFAULT_SETTINGS: Settings = {
-  muted: false,
-  volume: 0.5,
+  ...DEFAULT_AUDIO_SETTINGS,
   animationSpeed: 1,
   particles: true,
   combatNumbers: true,
@@ -111,6 +111,7 @@ function loadStoredSettings(): Settings {
     return {
       ...DEFAULT_SETTINGS,
       ...parsed,
+      ...normalizeAudioSettings(parsed),
       animationSpeed: COMBAT_SPEEDS.includes(
         parsed.animationSpeed as (typeof COMBAT_SPEEDS)[number],
       )

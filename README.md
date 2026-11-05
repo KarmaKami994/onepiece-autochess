@@ -80,8 +80,11 @@ a separate local library; save drafts before leaving Crew Tools.
 - `L`: lock or unlock the shop.
 - `X`: buy four XP for four gold.
 - `Escape`: close the current overlay.
-- Use the mute control in Settings for the synthesized interface and combat
-  sounds.
+- Open **COMBAT CONTRIBUTIONS** during a battle or planner test for playback-only
+  HP/shield damage, healing and granted shields; switch between the viewed crew
+  and opponent. Totals reset when that combat is replayed or perspective changes.
+- Settings provides master, music and effects volume, mute and two original
+  offline music tracks. Audio starts after interaction and pauses in background.
 
 The first-voyage guide pauses preparation while teaching recruitment,
 deployment, battle, component choice, equipping, and two-component crafting.

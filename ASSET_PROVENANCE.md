@@ -6,6 +6,26 @@ This non-commercial, localhost-only fan prototype has both original generated pr
 
 On `2026-08-14`, the project owner explicitly attested in the project conversation that the initial 17 listed source sheets may be used, adapted, and distributed in this public collaboration repository. Later source additions record their own permission basis in `art/animation-v2/source-matrix.json`. An owner attestation is not independent verification of chain of title; a Sprite Database URL is not treated as permission, and this repository grants no downstream asset license. The MIT license applies to code only. Reuse, redistribution, or commercialization of franchise or imported art requires its own appropriate rights clearance.
 
+## B03 original offline audio
+
+Two original instrumental loops, **Harbor at Dawn** (96 BPM, 20 seconds) and
+**Grand Line Pursuit** (120 BPM, 16 seconds), are project-authored note sequences
+and additive synthesis in `scripts/assets/build_b03_audio.mjs`. They use no
+external melody, recording, sample or PAC asset. Permission basis: original
+generated project audio, contributed for this repository under its terms.
+Run `node scripts/assets/build_b03_audio.mjs` to reproduce the mono PCM16,
+22,050 Hz WAVs. `public/assets/audio/manifest.json` records the exact note/bass
+arrays, generator SHA-256, sizes, duration and generated hashes:
+
+- `public/assets/audio/harbor.wav`: `0b0765db8fc867472161655d4fb15f65bf60f94ec2fbf095b47bb66ceb73544d`
+- `public/assets/audio/pursuit.wav`: `678c07e47e69238fbab8d7ac9e55481a951fab3e50617d0dc7ab493c72160a8f`
+
+Interface and combat cues are original oscillator/envelope definitions in
+`app/useGameAudio.ts`; they are synthesized locally and have no sampled file.
+B03 reuses existing form portraits/tokens/overlays and base animation clips;
+its directional arrows, form accents and labels are code-drawn presentation.
+No existing crew source or derivative is replaced.
+
 ## P12 named PvE encounters
 
 P12 replaces the anonymous combat presentation in the eight PvE waves from rounds 9–40 with named bosses and matching faction enemies. The eight boss atlases use the exact, SHA-pinned local source sheets below; the eight faction minions are original deterministic vector/pixel compositions in `scripts/assets/build_p12_pve_assets.mjs`. Each of the 16 visual bases has a transparent `1024×768` atlas with 46 frames, a static enemy cutout, portrait, and token. Five extra combat-role profiles share their faction base atlas without duplicating image files. Source dimensions, contributor basis, source SHA-256, frame-map method, pivot, and permission note for every base are in `art/animation-v2/source-matrix.json`.

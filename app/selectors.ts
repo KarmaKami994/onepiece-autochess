@@ -996,8 +996,9 @@ function combatEvents(
         }
       : { ...value };
   const events = result.events.flatMap((event, index): CombatFxEvent[] => {
-    if (event.type === "battle-start" || event.type === "battle-end") return [];
+    if (event.type === "battle-start") return [];
     const id = `${state.round}-${index}`;
+    if (event.type === "battle-end") return [{ id, tick: event.tick, kind: "end" }];
     const offsetMs = presentationOffsetByEventIndex.get(index);
     const presentationTiming =
       offsetMs === undefined ? {} : { presentationOffsetMs: offsetMs };
@@ -1142,7 +1143,7 @@ function combatEvents(
         tick: event.tick,
         ...presentationTiming,
         kind: "energy",
-        sourceId: event.unitId,
+        sourceId: event.sourceId ?? event.unitId,
         targetId: event.unitId,
         energyDelta: event.amount,
         energyValue: event.value,

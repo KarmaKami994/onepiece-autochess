@@ -1407,6 +1407,7 @@ export function simulateBattle(
       | "ability-drain"
       | "item"
       | "trait",
+    sourceId?: string,
   ): void => {
     const previous = unit.energy;
     const effectiveAmount =
@@ -1424,6 +1425,7 @@ export function simulateBattle(
       amount: unit.energy - previous,
       value: unit.energy,
       reason,
+      ...(sourceId ? { sourceId } : {}),
     });
   };
 
@@ -2524,7 +2526,7 @@ export function simulateBattle(
           "item",
           "special",
         );
-        changeEnergy(tick, chainTarget, -behavior.energyDrain, "item");
+        changeEnergy(tick, chainTarget, -behavior.energyDrain, "item", source.id);
       }
     }
 
@@ -3400,7 +3402,7 @@ export function simulateBattle(
               alive(unit),
           );
           if (target && target.energy > 0) {
-            changeEnergy(tick, target, -energyDrain, "ability-drain");
+            changeEnergy(tick, target, -energyDrain, "ability-drain", source.id);
           }
         }
       }

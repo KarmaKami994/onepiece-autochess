@@ -71,6 +71,10 @@ Die Nummerierung ist die empfohlene Abarbeitungsreihenfolge. B02 und B03 sind we
 
 ## B03 — Kampfauswertung, Effekte und Audio
 
+Umgesetzt am 2026-11-05 auf `codex/b03-combat-analysis-audio`, aufbauend auf B02
+(PR #60). Definitionen, PAC-Abgleich, Asset-Inventar und Prüfstand:
+[`B03_COMBAT_READABILITY_AUDIO.md`](B03_COMBAT_READABILITY_AUDIO.md).
+
 **Ziel:** Der Spieler versteht, welche Einheit was bewirkt, und kann Kämpfen akustisch und visuell folgen.
 
 **Aufgaben:**
