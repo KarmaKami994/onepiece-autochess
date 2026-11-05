@@ -184,7 +184,10 @@ export function scoreItemForUnit(
   return item.effects.reduce(
     (score, effect) =>
       score +
-      scoreItemEffect(effect, {
+      // Reuse resistance affinity for carriers only; reward scoring is unchanged.
+      scoreItemEffect(effect.kind === "special-defense-flat"
+        ? { kind: "defense-flat", value: effect.value }
+        : effect, {
         hasTrait: (traitId) =>
           getEffectiveUnitTraits(unit, content).includes(traitId),
         hasRanged: definition.stats.range >= 4,

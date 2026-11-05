@@ -25,8 +25,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 B05-A merged through PR #63 with green CI as `7b7b07abbc6f14c9c8ce54d223909da209210f98`. The owner-approved single B evaluation is complete: late spare-gold XP failed its cost-5 gates and was reverted. Branch `codex/b05-late-spare-xp` retains documentation and the exact one POST only; production source/tests match A, GameContent `1.31.0`, schema 6. Item/form policy remains unchanged. No successful progression improvement, second candidate, B06 or new baseline is claimed or started.
 
+2026-11-05 — The owner explicitly approved B05-C's exact carrier-only Special Defense/Guardian rule and focused/normal checks plus one POST. Candidate branch `codex/b05-special-defense-carriers` starts at B05-B documentation head `9650a8be29cd373b6b2896d197afe6348204cc1c` (PR #64 pending). Candidate GameContent `1.32.0`, schema 6; main stays `1.31.0`. The existing Defense affinity is reused only for carrier scoring; reward preference/form mechanics and rejected XP policy remain unchanged. Final checks/one committed-head POST pending; no C merge authorized.
+
 ## Last Completed Work
 
+- 2026-11-05 — B05-C approved candidate: traced zero Special Defense carrier scoring and pinned PAC item assignment, documented exact policy/gates, reused existing Defense/Guardian affinity in the carrier reducer and added eight causal/guard/determinism tests. Updated current-version expectations and the full seed-0 trace golden for the intentional policy change. Material files: `game/scoring.ts`, version only in `game/content.ts`, new carrier test, affected diagnostics/current-version assertions, C/state docs. One POST pending; no reward/form/XP/scoring-weight change.
 - 2026-11-05 — B05-B: evaluated exactly the approved one-extra-XP candidate from clean committed source `103389e0f9ccf47bbc051844cfb44aab688c1d3f` on A merge `7b7b07abbc6f14c9c8ce54d223909da209210f98`; one `production-0`–`production-49` POST completed 50/50, zero crashes. Rejected because cost-5 player-board/final presences fell 102/128→88/102; restored all behavior/version/tests to A. Raw SHA-256 `eaebafa86b28e42e029616ea8cdfbd4c3094f121a724b8c67354cce2cf096d6a` is immutable historical evidence. Material final delta: `docs/B05_LATE_SPARE_XP_EVALUATION.md`, raw POST, B05-A/batch/bot-audit/state documentation. No C policy change or second experiment.
 - 2026-11-05 — B05-A: extended the existing optional frozen observer with real frozen offer rank/score, affordability after earlier purchases, actually evaluated reserve exceptions, receive/merge/replacement guards and command/merge receipts; added equip/craft guard counts, bounded top candidates, inventory/carrier/form before/after facts and bounded report examples. Added causal reproduction tests, exact retained PRE seed-0 preparation regression and separate progression/item approval proposals. Branch `codex/b05-bot-decision-diagnostics`; base `0a43543162d520047cc3c51255ff0d8741a6e223`. Material files: `game/engine.ts`, `game/botDecisionDiagnostics.ts`, production-report integration/summary helper, new and existing diagnostic tests, B05/batch/bot-audit/diagnostic/state docs. No B/C policy change implemented.
 - 2026-11-05 — B04: added automatic phase/checkpoint and immutable battle recording, bounded local replay archive, import/export and read-only round/phase/perspective/speed/pause playback with B03 contributions. Added captain statistics/maxima, seven cosmetic achievements and distinct discovered/owned/deployed/form collections linked to the codex; transactional once-per-voyage credit, retained dedupe ledger, explicit backup restore and independent archive/profile resets. Legacy resumes are labelled partial. Branch `codex/b04-replay-profile`; base `6c8c9ab13eff84c25b572577b33018feb625157a` (B03 PR #61). Material files: Chronicle model/validation/IndexedDB/recorder hook/screen/styles, GameClient/menu/codex integration, Phaser pause, focused unit/browser tests, B04/README/analysis/batch/state docs.
@@ -96,6 +99,13 @@ B05-A merged through PR #63 with green CI as `7b7b07abbc6f14c9c8ce54d223909da209
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+B05-C approved implementation, before measurement:
+
+- PASS — typecheck, lint; initial carrier/decision/formation suites (3 files / 30 tests), final focused carrier/craft/form/diagnostic suites (8 files / 93 tests). Only carrier scores change; observer on/off and repeated traces are equal, fixture RNG unchanged, real equip/craft guards preserved.
+- Locked existing seed-0 unit-regression golden: `3c5341fb`; authored-content hash normalized to retained PRE version and config remain exact. Current-version assertions deliberately advance to `1.32.0`.
+- PASS — full unit suite (68 files / 869 tests), serial file execution without changed assertions/timeouts; PRE and rejected B report SHA-256 values remain exact. No UI, package, schema, engine, item value or metric change.
+- NOT RUN yet — approved single POST. Commit final candidate before that measurement; no PRE rerun, second C POST, 1,000-seed soak or new baseline. Normal CI remains the integration gate.
 
 B05-B approved one-candidate evaluation / rejection:
 
@@ -969,7 +979,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-Review the documentation-only B05-B rejection PR and `docs/B05_LATE_SPARE_XP_EVALUATION.md`. The approved evaluation is complete; any new progression/item policy needs a separate evidence-backed architecture decision. Do not retune this candidate or automatically start B06, unit/item/economy/captain-damage/Smoker work.
+Complete final B05-C checks, commit the exact candidate, run its approved one-POST protocol in `docs/B05_ITEM_AFFINITY_PROPOSAL.md`, then accept/revert strictly on the locked gates and publish the review PR. B05-B stays rejected; no second candidate or automatic B06/tuning. PR #64 retains separate B rejection evidence.
 
 ## Codex Update Contract
 

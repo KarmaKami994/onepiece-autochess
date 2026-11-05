@@ -2633,7 +2633,7 @@ export const GAME_CONFIG: GameConfig = {
 };
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.31.0",
+  version: "1.32.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,
