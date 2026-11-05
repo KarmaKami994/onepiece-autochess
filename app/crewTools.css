@@ -1,0 +1,61 @@
+.crew-tools-screen {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  height: 100vh;
+  padding: 24px max(24px, calc((100vw - 1400px) / 2));
+  overflow: auto;
+  color: #e7d8af;
+  background: linear-gradient(135deg, #092c3a, #04151f);
+  font: 14px/1.5 "Courier New", monospace;
+}
+.tools-header, .reference-card header { display: flex; gap: 16px; align-items: center; justify-content: space-between; }
+.tools-header h1 { margin: 0; color: var(--gold); }
+.tools-header > button { max-width: 220px; }
+.crew-tools-screen h2 { margin: 20px 0 8px; }
+.crew-tools-screen [hidden] { display: none !important; }
+.tools-tabs, .tools-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; margin: 14px 0; }
+.crew-tools-screen label { display: grid; gap: 4px; }
+.crew-tools-screen input, .crew-tools-screen select, .crew-tools-screen button:not(.pixel-button), .reference-card summary, .saved-plans summary {
+  max-width: 100%;
+  min-height: 36px;
+  padding: 7px 9px;
+  border: 1px solid #829c9e;
+  border-radius: 3px;
+  color: #f2e2bb;
+  background: #0c303c;
+  font: inherit;
+}
+.crew-tools-screen label > input, .crew-tools-screen label > select { width: 100%; min-width: 0; }
+.tools-controls > label { flex: 1 1 150px; max-width: 320px; }
+.tools-controls input[type="file"] { width: 280px; }
+.crew-tools-screen button, .crew-tools-screen summary { cursor: pointer; }
+.crew-tools-screen button[aria-pressed="true"] { border-color: #ffe08a; background: #574323; color: #fff4c8; }
+.crew-tools-screen button:disabled { opacity: .55; cursor: not-allowed; }
+.crew-tools-screen :focus-visible { outline: 3px solid #ffe08a; outline-offset: 3px; }
+.reference-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; padding-bottom: 30px; }
+.reference-card { min-width: 0; padding: 16px; border: 1px solid #718b8e; background: #071e29; overflow-wrap: anywhere; }
+.reference-card header { justify-content: start; }
+.reference-card h3 { margin: 0; color: #ffe1a1; font-size: 17px; }
+.reference-card h3 small { display: block; font-size: 13px; }
+.reference-card img { object-fit: contain; image-rendering: pixelated; flex-shrink: 0; }
+.reference-card ul, .planner-bonds, .planner-recaps ul { padding-left: 20px; }
+.reference-card li, .planner-bonds li { margin: 8px 0; }
+.planner-teams, .planner-recaps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin: 20px 0; }
+.team-editor { min-width: 0; padding: 16px; border: 1px solid #718b8e; background: #071e29; }
+.team-editor h3 { margin-top: 0; }
+.planner-grid { display: grid; gap: 4px; }
+.planner-grid button { min-width: 0; height: 64px; overflow-wrap: anywhere; font-size: 11px !important; padding: 3px !important; }
+.planner-roster { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 12px 0; padding: 0; }
+.unit-editor { display: grid; min-width: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 16px 0; border: 1px solid #718b8e; }
+.unit-editor p { grid-column: 1 / -1; margin: 0; }
+.tools-error { padding: 14px 28px; border: 1px solid #ffc582; color: #ffe4cd; background: #572c22; overflow-wrap: anywhere; }
+.saved-plans li { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 8px 0; }
+.planner-battle { margin: 20px 0; }
+.planner-battle > .phaser-stage-frame { position: relative; inset: auto; width: 100%; height: 620px; min-height: 480px; margin: 15px 0; }
+.planner-recaps > section { min-width: 0; overflow-wrap: anywhere; padding: 14px; border: 1px solid #718b8e; }
+.game-shell.high-contrast .crew-tools-screen { color: #fff; }
+@media (max-width: 1350px) {
+  .reference-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .crew-tools-screen { padding: 18px 24px; }
+}

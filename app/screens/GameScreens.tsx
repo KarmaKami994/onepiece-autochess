@@ -99,6 +99,7 @@ export function MainMenu({
   onContinue,
   onSettings,
   onAnimationLab,
+  onCrewTools,
 }: {
   hasSave: boolean;
   saveReady: boolean;
@@ -107,6 +108,7 @@ export function MainMenu({
   onContinue: () => void;
   onSettings: () => void;
   onAnimationLab: () => void;
+  onCrewTools: () => void;
 }) {
   return (
     <section className="menu-screen">
@@ -160,6 +162,10 @@ export function MainMenu({
         <button type="button" className="pixel-button compact" onClick={onAnimationLab}>
           <span className="button-icon">▦</span>
           ANIMATION LAB
+        </button>
+        <button type="button" className="pixel-button compact" disabled={!saveReady} onClick={onCrewTools}>
+          <span className="button-icon">⌘</span>
+          CREW TOOLS
         </button>
       </nav>
       <footer className="menu-footer">

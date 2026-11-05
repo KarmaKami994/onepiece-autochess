@@ -62,6 +62,12 @@ records are in [ASSET_PROVENANCE.md](ASSET_PROVENANCE.md).
 
 ## Controls
 
+Open **CREW TOOLS** from the main menu for the searchable crew/item/bond codex
+and local team planner. Build two crews, inspect bond thresholds, save or
+import/export named plans, and run a seeded combat test using the production
+simulator. These tools never change an active voyage or shared pool. Plans use
+a separate local library; save drafts before leaving Crew Tools.
+
 - Click a crew member and then a highlighted deck/bench cell, or drag directly.
   Amber cells swap occupants; red cells explain illegal capacity moves.
 - `1`–`6`: buy the matching shop offer. Hover or keyboard-focus a poster for

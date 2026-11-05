@@ -4,7 +4,7 @@ Stand: **04.11.2026**. Grundlage: [Offene Features und PAC-Abgleich](OFFENE_FEAT
 
 Dieses Dokument teilt die verbleibenden Anforderungen in **neun größere, zusammenhängende Arbeitspakete** auf. Es ist die Planung für spätere Aufträge; in diesem Schritt wird ausschließlich diese Liste erstellt.
 
-**Fortschritt:** B01 ist implementiert und lokal verifiziert ([PR #59](https://github.com/KarmaKami994/onepiece-autochess/pull/59), [Abschluss](B01_RESULTS_COMPLETION.md)). B02–B09 sind offen; ihre Umsetzung beginnt nur mit einem eigenen Auftrag.
+**Fortschritt:** B01 ist gemerged ([PR #59](https://github.com/KarmaKami994/onepiece-autochess/pull/59), [Abschluss](B01_RESULTS_COMPLETION.md)). B02 ist implementiert ([Abschluss](B02_CODEX_TEAM_PLANNER.md)); Verifikation und Review-Stand stehen in `PROJECT_STATE.md`. B03–B09 sind offen; ihre Umsetzung beginnt nur mit einem eigenen Auftrag.
 
 ## Umfang
 
