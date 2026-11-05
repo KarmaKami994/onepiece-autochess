@@ -126,8 +126,12 @@ ausdrücklich freigegebene B-Kandidat wurde genau einmal über 50 Seeds bewertet
 und wegen verfehlter Cost-5-Gates verworfen; Verhalten, Version und Tests sind
 auf A zurückgenommen. [Auswertung und unveränderte Evidenz](B05_LATE_SPARE_XP_EVALUATION.md).
 Die Bewertung ist abgeschlossen, eine erfolgreiche Progressionsverbesserung wird
-nicht behauptet. C behält die bisherige Item-/Form-Policy ohne neue Änderung bei;
-ein weiterer Kandidat benötigt getrennte Evidenz/Freigabe. Kein B06-Start.
+nicht behauptet. C wurde anschließend separat für genau eine Trägerbewertung
+freigegeben und einmal gemessen; auch dieser Kandidat verfehlte die festgelegten
+Gates und ist vollständig zurückgenommen. [C-Auswertung](B05_ITEM_AFFINITY_PROPOSAL.md).
+Die B05-Diagnose-/Bewertungslieferungen sind abgeschlossen, Produktions-Policy
+und Form-Regeln bleiben unverändert. Ein weiterer Kandidat benötigt getrennte
+Evidenz/Freigabe. Kein B06-Start.
 
 **Ziel:** Die Bots verbessern sich anhand erklärter Entscheidungen; der Erfolg wird an tatsächlich eingesetzten Teams gemessen.
 

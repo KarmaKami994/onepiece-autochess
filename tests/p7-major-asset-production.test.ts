@@ -91,7 +91,7 @@ async function expectFile(relativePath: string): Promise<void> {
 
 describe("P7 major asset production", () => {
   it("completes real static and preferred v2 presentation for all crew", async () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.32.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.31.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(DEFAULT_CONTENT.units).toHaveLength(34);
     expect(DEFAULT_CONTENT.units.some((unit) =>

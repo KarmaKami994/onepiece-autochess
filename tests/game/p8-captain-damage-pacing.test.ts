@@ -556,7 +556,7 @@ describe("P8 battle-result integration", () => {
     const restored = deserializeMatch(serializeMatch(state));
     expect(restored.schemaVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
     expect(restored.schemaVersion).toBe(6);
-    expect(restored.contentVersion).toBe("1.32.0");
+    expect(restored.contentVersion).toBe("1.31.0");
     expect(player(restored, "player-1").recentBattles).toEqual(
       human.recentBattles,
     );

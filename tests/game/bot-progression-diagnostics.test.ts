@@ -4,8 +4,6 @@ import {
   DEFAULT_CONTENT,
   advanceMatchPhase,
   createMatch,
-  hashCanonicalValue,
-  hashGameContent,
   runBotTurn,
   serializeMatch,
   type BotTurnDiagnostic,
@@ -142,13 +140,13 @@ describe("bot progression diagnostics", () => {
       ).reduce((total, bucket) => total + bucket.preparations, 0),
     ).toBe(botProgressionDiagnostics?.preparationCount);
     expect(diagnosticGameplay).toEqual(normalGameplay);
-    // Approved C changes carrier choices: lock its entire seed-0 trace anew,
-    // while proving authored content (apart from version) and config match PRE.
+    // Reuse the retained PRE's exact seed-0 preparations; never rerun or rewrite PRE.
     const historical = JSON.parse(readFileSync("docs/analysis/p1b-bot-progression-diagnostic-50.json", "utf8")) as {
       contentHash: string; configHash: string;
+      botProgressionDiagnostics: { rawPreparations: NonNullable<typeof botProgressionDiagnostics>["rawPreparations"] };
     };
-    expect(hashGameContent({ ...DEFAULT_CONTENT, version: "1.31.0" })).toBe(historical.contentHash);
+    expect(diagnostic.contentHash).toBe(historical.contentHash);
     expect(diagnostic.configHash).toBe(historical.configHash);
-    expect(hashCanonicalValue(botProgressionDiagnostics?.rawPreparations)).toBe("3c5341fb");
+    expect(botProgressionDiagnostics?.rawPreparations).toEqual(historical.botProgressionDiagnostics.rawPreparations.filter((preparation) => preparation.seed === "production-0"));
   }, 20_000);
 });
