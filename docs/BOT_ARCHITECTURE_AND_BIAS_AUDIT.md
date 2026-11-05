@@ -226,7 +226,7 @@ The population normalization and the ensuing normalized pre-P4 baseline are comp
 
 The first P1B progression candidate was rejected. PR #58 merged the [bot progression diagnostic](P1B_BOT_PROGRESSION_DIAGNOSTIC.md) at `918d16b88e182ac9c81d05c73deb651824d51df8`, preserving the original production policy. These reports, rather than the original P2/P4 todo list, form the current tuning handoff.
 
-B01 completes the final crew presentation and updates current documentation. A separately assigned B02 would add the local codex/team-planning tools; a replacement P1B candidate still needs an evidence-backed architecture decision.
+B01 completes the final crew presentation and updates current documentation. B02 adds local codex/team-planning tools and an isolated authored combat test; it does not replace adaptive match bots. A replacement P1B candidate still needs an evidence-backed architecture decision.
 
 No bot tuning, economy change, captain-damage change or unit-balance work follows automatically; each requires separate approval.
 
@@ -234,4 +234,4 @@ Smoker is frozen as a watch item. The previously proposed Smoker trait-state dia
 
 ## 15. Exactly One Next Task
 
-After B01 review, **B02 — local codex and team-planning tools** is the next recommended batch, subject to a separate task. For future bot work, explain skipped high-cost offers and item/form paths before selecting another candidate. This documentation update starts neither task and authorizes no new measurement.
+After B02 review, **B03 — combat analysis, effect readability and audio** is the next recommended batch, subject to a separate task. For future bot work, explain skipped high-cost offers and item/form paths before selecting another candidate. This documentation update starts neither task and authorizes no new measurement.

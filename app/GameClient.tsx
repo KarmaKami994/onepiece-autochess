@@ -12,6 +12,7 @@ import type {
   BoardMove,
 } from "@/components/PhaserBoard";
 import AnimationLab from "@/components/AnimationLab";
+import CrewToolsScreen from "./screens/CrewToolsScreen";
 import {
   DEFAULT_BOARD_SKIN,
   isBoardSkin,
@@ -69,6 +70,7 @@ import "./game.css";
 type Screen =
   | "menu"
   | "animation-lab"
+  | "crew-tools"
   | "settings"
   | "match"
   | "carousel"
@@ -332,7 +334,7 @@ export default function GameClient() {
   }, [engineStateRef, seed]);
 
   useEffect(() => {
-    if (!view || screen === "settings" || screen === "animation-lab") return;
+    if (!view || screen === "settings" || screen === "animation-lab" || screen === "crew-tools") return;
     const syncScreen = window.setTimeout(() => {
       if (view.phase === "game-over" || !view.alive) {
         setScreen("results");
@@ -994,7 +996,7 @@ export default function GameClient() {
         if (tutorialStep === "welcome") return;
         if (screen === "settings") closeSettings();
         else if (screen === "confirm-new") setScreen("menu");
-        else if (screen === "animation-lab") setScreen("menu");
+        else if (screen === "animation-lab" || screen === "crew-tools") setScreen("menu");
         else if (screen === "match" && scoutedPlayerId) {
           returnFromScouting();
         }
@@ -1219,8 +1221,10 @@ export default function GameClient() {
             setScreen("animation-lab");
             playSound("click");
           }}
+          onCrewTools={() => { setScreen("crew-tools"); playSound("click"); }}
         />
       )}
+      {screen === "crew-tools" && <CrewToolsScreen content={content} settings={settings} onBack={() => { setScreen("menu"); playSound("click"); }} />}
       {screen === "animation-lab" && (
         <AnimationLab
           onBack={() => {

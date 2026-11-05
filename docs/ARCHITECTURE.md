@@ -42,6 +42,13 @@ preferred sheet for each visible unit; legacy sheets load only after failure.
 
 ## Persistence and determinism
 
+Crew Tools reads the same content and item/unit descriptions as match views.
+`game/teamPlanner.ts` validates an independent version-1 document and invokes
+the unchanged combat/form/trait functions. `app/plannerStorage.ts` owns its
+bounded local library and JSON transfers; `plannerPresentation.ts` adapts a
+disposable simulated result to existing presentation/recap selectors. The tool
+does not dispatch into an active session or write IndexedDB voyage state.
+
 Canonical state is plain JSON data. Schema versions 1–6 have committed migration
 fixtures. New combat checkpoints save the current canonical state, including
 immutable battle results and persistent battle-time purchases/merges. Loading

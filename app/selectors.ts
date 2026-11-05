@@ -449,7 +449,7 @@ function rarityForCost(cost: number): string {
   return ["Common", "Common", "Rare", "Epic", "Legendary", "Mythic"][cost] ?? "Common";
 }
 
-function baseUnitView(
+export function createUnitReferenceView(
   definition: UnitDefinition | PvEEnemyDefinition,
   content: GameContent,
 ): ShopUnitView {
@@ -514,7 +514,7 @@ function definitionView(
 ): ShopUnitView {
   const playable = resolveUnitDefinition(definitionId, formId, content);
   if (playable) {
-    const view = baseUnitView(playable, content);
+    const view = createUnitReferenceView(playable, content);
     const form = getUnitFormDefinition(formId, content);
     if (form?.baseDefinitionId !== definitionId) return view;
     return {
@@ -526,7 +526,7 @@ function definitionView(
   const enemy = content.enemies.find(
     (candidate) => candidate.id === definitionId,
   );
-  if (enemy) return baseUnitView(enemy, content);
+  if (enemy) return createUnitReferenceView(enemy, content);
   const fallback: PvEEnemyDefinition = {
     id: definitionId,
     name: titleCase(definitionId),
@@ -540,7 +540,7 @@ function definitionView(
     },
     assetPath: `/assets/tokens/${slugify(definitionId)}.png`,
   };
-  return baseUnitView(fallback, content);
+  return createUnitReferenceView(fallback, content);
 }
 
 function ownedCopies(

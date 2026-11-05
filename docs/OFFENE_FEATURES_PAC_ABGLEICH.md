@@ -4,6 +4,8 @@ Stand: **04.11.2026**. Auftrag: den vorhandenen Projektstand mit Pokémon Auto C
 
 **Fortschreibung:** B01 (F01/F06) ist in [PR #59](https://github.com/KarmaKami994/onepiece-autochess/pull/59) implementiert und lokal verifiziert. Ergebnisansicht und aktuelle Produktdokumentation sind damit erledigt; Details stehen im [B01-Abschluss](B01_RESULTS_COMPLETION.md). Die Befunde unten beschreiben den genannten Analysestand vor B01. Die weitere Aufgabenfolge steht in [den Task-Batches](TASK_BATCHES_PAC_AUSBAU.md).
 
+B02 ergänzt F07/F10 mit dem [lokalen Kodex und Teamplaner](B02_CODEX_TEAM_PLANNER.md). Der ursprüngliche Befund bleibt als datierter Vergleich bestehen; aktueller Verifikations-/Review-Stand steht in `PROJECT_STATE.md`.
+
 ## 1. Grundlage und Vorgaben
 
 - Analysiertes Projekt: `KarmaKami994/onepiece-autochess`, lokales `main` und GitHub-`main` auf **`918d16b88e182ac9c81d05c73deb651824d51df8`**. PR #58 mit der Bot-Diagnose ist darin enthalten.

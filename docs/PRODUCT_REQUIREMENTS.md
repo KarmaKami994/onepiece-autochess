@@ -39,5 +39,7 @@ microservices, and public hosting remain outside the current scope.
 P4/P11/P12 are implemented. PR #58 merged the behavior-neutral bot progression
 diagnostic at `918d16b88e182ac9c81d05c73deb651824d51df8`; the first P1B tuning
 candidate remains rejected. B01 completes result presentation and current
-documentation. Further batches need their own bounded task; no bot tuning or
+documentation. B02 adds an offline content codex and isolated team planner,
+with separate local plan files/library and deterministic combat tests. Further
+batches need their own bounded task; no bot tuning or
 new gameplay is implied. Smoker remains frozen/watch.
