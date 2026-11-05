@@ -58,6 +58,8 @@ import {
   getBotFormationBand as botFormationBand,
   getBotPersonality as botPersonality,
   selectDesiredBotUnits as desiredBotUnits,
+  lateBotXpOpportunity,
+  type LateBotXpOpportunity,
   type BotFormationBand,
 } from "./bots";
 
@@ -1728,6 +1730,13 @@ export type BotTurnDiagnostic = {
   readonly purchases: ReadonlyArray<BotProgressionPurchase>;
   readonly offerDecisions: ReadonlyArray<BotOfferDecision>;
   readonly itemDecisions: ReadonlyArray<BotItemDecision>;
+  /** Separate from xp, which continues to describe the original XP loop. */
+  readonly lateXp: {
+    readonly attempts: number;
+    readonly successfulPurchases: number;
+    readonly goldSpent: number;
+    readonly outcome: Exclude<LateBotXpOpportunity, "eligible"> | "purchased" | "command-rejected";
+  };
   readonly xp: {
     readonly attemptBudget: number;
     readonly attempts: number;
@@ -2339,6 +2348,22 @@ export function runBotTurn(
     );
   }
 
+  player = findPlayer(next, playerId);
+  const lateOpportunity = player ? lateBotXpOpportunity(player, personality, content.config,
+    xpPurchases > 0 && xpStopReason === "budget-exhausted" && successfulXpPurchases === xpPurchases) : "not-applicable";
+  const lateXp: { attempts: number; successfulPurchases: number; goldSpent: number; outcome: BotTurnDiagnostic["lateXp"]["outcome"] } = {
+    attempts: 0, successfulPurchases: 0, goldSpent: 0, outcome: lateOpportunity === "eligible" ? "command-rejected" : lateOpportunity,
+  };
+  if (lateOpportunity === "eligible") {
+    const lateResult = applyCommand(next, { type: "BUY_XP" }, { actorPlayerId: playerId }, content);
+    lateXp.attempts = 1;
+    if (lateResult.ok) {
+      next = lateResult.state;
+      lateXp.successfulPurchases = 1;
+      lateXp.goldSpent = content.config.buyXpCost;
+      lateXp.outcome = "purchased";
+    }
+  }
   next = arrangeBotBoard(next, playerId, content);
   next = equipBotInventory(next, playerId, content, diagnostic?.itemDecisions);
   const readyResult = applyCommand(
@@ -2352,6 +2377,7 @@ export function runBotTurn(
   if (observer && diagnostic && finalPlayer) {
     const event: BotTurnDiagnostic = {
       ...diagnostic,
+      lateXp,
       end: botProgressionPlayerSnapshot(finalPlayer, content),
       xp: {
         attemptBudget: xpPurchases,

@@ -3,11 +3,27 @@ import { scoreBotInstance } from "./scoring";
 import type {
   BotPersonality,
   GameContent,
+  GameConfig,
   PlayerState,
   UnitInstance,
 } from "./types";
 
 export type BotFormationBand = "backline" | "frontline" | "flex" | "middle";
+
+export type LateBotXpOpportunity = "eligible" | "not-applicable" | "reserve" | "roster-guard";
+
+/** B05-B: one opportunity AFTER the unchanged shop/XP/reroll sequence. */
+export function lateBotXpOpportunity(
+  player: Pick<PlayerState, "level" | "gold" | "units">,
+  personality: Pick<BotPersonality, "levelAggression" | "economyReserve">,
+  config: Pick<GameConfig, "maxLevel" | "buyXpCost">,
+  originalBudgetCompleted: boolean,
+): LateBotXpOpportunity {
+  if (!originalBudgetCompleted || personality.levelAggression < 0.5 || player.level < 7 || player.level > 8 || player.level >= config.maxLevel) return "not-applicable";
+  if (player.gold - config.buyXpCost < personality.economyReserve) return "reserve";
+  if (Object.keys(player.units).length < player.level) return "roster-guard";
+  return "eligible";
+}
 
 export function getBotPersonality(
   player: PlayerState,

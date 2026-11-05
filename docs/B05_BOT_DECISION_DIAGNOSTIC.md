@@ -3,6 +3,12 @@
 Base: `0a43543162d520047cc3c51255ff0d8741a6e223` (merged B04).
 Branch: `codex/b05-bot-decision-diagnostics`. GameContent `1.31.0`, schema `6`.
 
+Follow-up 2026-11-05: the owner approved merging A and evaluating the exact B
+candidate once. A merged as PR #63 at `7b7b07abbc6f14c9c8ce54d223909da209210f98`.
+The separately scoped [B evaluation](B05_LATE_SPARE_XP_EVALUATION.md) records its
+implementation, one-POST protocol and outcome. The A-era proposal below is
+preserved as the reviewed contract; C policy remains unchanged.
+
 ## Authorized boundary
 
 Delivery A instruments real buy/equip decisions without changing production

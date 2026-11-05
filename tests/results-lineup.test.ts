@@ -124,7 +124,7 @@ describe("final deployed crew and reserve", () => {
     next.round = 40;
     const restored = deserializeMatch(serializeMatch(next));
     expect(restored.schemaVersion).toBe(6);
-    expect(restored.contentVersion).toBe("1.31.0");
+    expect(restored.contentVersion).toBe("1.32.0");
     expect(restored.players[0].finalLineup).toEqual(next.players[0].finalLineup);
     expect(selectMatchView(restored).resultLineup?.deployed).toHaveLength(9);
   });

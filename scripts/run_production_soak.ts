@@ -389,6 +389,9 @@ type HighCostFunnelSummary = {
 
 export type BotProgressionDiagnosticsReport = {
   decisionDiagnostics: BotDecisionDiagnosticsReport;
+  lateXp: { attempts: number; successfulPurchases: number; goldSpent: number; outcomes: Record<string, number> };
+  /** Existing xp describes the original loop; this adds the late action's spend. */
+  allXpGoldSpent: number;
   preparationCount: number;
   levelDistributionByRound: Record<string, Record<string, number>>;
   levelDistributionByPersonality: Record<string, Record<string, number>>;
@@ -600,8 +603,13 @@ export function summarizeBotProgressionDiagnostics(
     ]),
   ) as Record<string, HighCostFunnelSummary>;
   const purchases = { initialBuyPass: 0, postReroll: 0, cost4: 0, cost5: 0 };
+  const lateXp = { attempts: 0, successfulPurchases: 0, goldSpent: 0, outcomes: {} as Record<string, number> };
 
   for (const diagnostic of diagnostics) {
+    lateXp.attempts += diagnostic.lateXp.attempts;
+    lateXp.successfulPurchases += diagnostic.lateXp.successfulPurchases;
+    lateXp.goldSpent += diagnostic.lateXp.goldSpent;
+    lateXp.outcomes[diagnostic.lateXp.outcome] = (lateXp.outcomes[diagnostic.lateXp.outcome] ?? 0) + 1;
     const round = String(diagnostic.round);
     const level = String(diagnostic.end.level);
     const roundLevels = (levelDistributionByRound[round] ??= {});
@@ -678,8 +686,10 @@ export function summarizeBotProgressionDiagnostics(
       byRoundBucket: funnelByRoundBucket,
     },
     decisionDiagnostics: summarizeBotDecisionDiagnostics(diagnostics),
+    lateXp,
+    allXpGoldSpent: xpOverall.goldSpent + lateXp.goldSpent,
     // Keep legacy raw preparation facts; rich decisions have bounded examples above.
-    rawPreparations: diagnostics.map((event) => ({ seed: event.seed, round: event.round, playerId: event.playerId, personalityId: event.personalityId, economyReserve: event.economyReserve, start: event.start, end: event.end, shopSnapshots: event.shopSnapshots, purchases: event.purchases, xp: event.xp, rerolls: event.rerolls })),
+    rawPreparations: diagnostics.map((event) => ({ seed: event.seed, round: event.round, playerId: event.playerId, personalityId: event.personalityId, economyReserve: event.economyReserve, start: event.start, end: event.end, shopSnapshots: event.shopSnapshots, purchases: event.purchases, xp: event.xp, rerolls: event.rerolls, lateXp: event.lateXp })),
   };
 }
 
