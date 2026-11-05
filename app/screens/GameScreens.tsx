@@ -100,6 +100,7 @@ export function MainMenu({
   onSettings,
   onAnimationLab,
   onCrewTools,
+  onChronicle,
 }: {
   hasSave: boolean;
   saveReady: boolean;
@@ -109,6 +110,7 @@ export function MainMenu({
   onSettings: () => void;
   onAnimationLab: () => void;
   onCrewTools: () => void;
+  onChronicle: () => void;
 }) {
   return (
     <section className="menu-screen">
@@ -166,6 +168,10 @@ export function MainMenu({
         <button type="button" className="pixel-button compact" disabled={!saveReady} onClick={onCrewTools}>
           <span className="button-icon">⌘</span>
           CREW TOOLS
+        </button>
+        <button type="button" className="pixel-button compact" disabled={!saveReady} onClick={onChronicle}>
+          <span className="button-icon">▤</span>
+          VOYAGE CHRONICLE
         </button>
       </nav>
       <footer className="menu-footer">

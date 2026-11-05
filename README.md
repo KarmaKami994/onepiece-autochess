@@ -68,6 +68,16 @@ import/export named plans, and run a seeded combat test using the production
 simulator. These tools never change an active voyage or shared pool. Plans use
 a separate local library; save drafts before leaving Crew Tools.
 
+**VOYAGE CHRONICLE** archives completed local captain voyages with read-only
+round/phase playback, pause, speed, perspectives and combat contributions. It also
+contains a cosmetic captain profile, collection linked to the codex, seven
+achievements and personal records. Recording is separate from the active voyage;
+resumed older saves have labelled partial coverage. Imports never count for profile
+credit. Individual replay/archive export/import, explicit profile backup restore
+and separate reset controls are available. Retention is ten replays / 96 MiB;
+oldest recordings are evicted while lifetime credit remains. See
+[the recording contract](docs/B04_REPLAY_PROFILE.md) for limits and compatibility.
+
 - Click a crew member and then a highlighted deck/bench cell, or drag directly.
   Amber cells swap occupants; red cells explain illegal capacity moves.
 - `1`–`6`: buy the matching shop offer. Hover or keyboard-focus a poster for

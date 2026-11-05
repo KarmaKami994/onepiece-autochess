@@ -213,6 +213,7 @@ export type PhaserBoardProps = BoardPayload & {
   particles: boolean;
   combatNumbers: boolean;
   reducedMotion: boolean;
+  paused?: boolean;
   children?: ReactNode;
   onPlaybackReset?: () => void;
   onPlaybackEvent?: (event: CombatFxEvent) => void;
@@ -223,6 +224,7 @@ export type PhaserBoardProps = BoardPayload & {
 };
 
 type SceneBridge = {
+  pausePlayback: (paused: boolean) => void;
   sync: (payload: BoardPayload, forceRebuild?: boolean) => void;
   refreshLayout: (width: number, height: number) => void;
   animateEvents: (
@@ -269,6 +271,7 @@ export default function PhaserBoard({
   particles,
   combatNumbers,
   reducedMotion,
+  paused = false,
   children,
   onPlaybackReset,
   onPlaybackEvent,
@@ -1742,6 +1745,12 @@ export default function PhaserBoard({
             return container;
           }
 
+          pausePlayback(paused: boolean) {
+            this.time.paused = paused;
+            this.anims.globalTimeScale = paused ? 0 : 1;
+            if (paused) this.tweens.pauseAll(); else this.tweens.resumeAll();
+          }
+
           animateEvents(
             events: CombatFxEvent[],
             animationSpeed: number,
@@ -2430,6 +2439,8 @@ export default function PhaserBoard({
     reducedMotion,
   ]);
 
+  useEffect(() => { bridgeRef.current?.pausePlayback(paused); }, [isReady, paused]);
+
   if (failed) {
     return (
       <><CssBoardFallback
@@ -2449,6 +2460,7 @@ export default function PhaserBoard({
     <div
       className="phaser-stage-frame"
       data-phase={phase}
+      data-playback-paused={paused}
       data-event-sequence={eventSequence}
       data-interaction-mode={interactionMode}
       data-board-skin={boardSkin}

@@ -14,9 +14,9 @@ const CATEGORIES: { id: ReferenceCategory; label: string }[] = [
   { id: "status", label: "Status" }, { id: "pve", label: "PvE" }, { id: "rounds", label: "Rounds" },
 ];
 
-function Codex({ content }: { content: GameContent }) {
-  const [category, setCategory] = useState<ReferenceCategory>("crew");
-  const [query, setQuery] = useState("");
+function Codex({ content, initialReference }: { content: GameContent; initialReference?: { category: ReferenceCategory; query: string } }) {
+  const [category, setCategory] = useState<ReferenceCategory>(initialReference?.category ?? "crew");
+  const [query, setQuery] = useState(initialReference?.query ?? "");
   const [cost, setCost] = useState("");
   const [trait, setTrait] = useState("");
   const [kind, setKind] = useState("");
@@ -52,12 +52,12 @@ function Codex({ content }: { content: GameContent }) {
   </section>;
 }
 
-export default function CrewToolsScreen({ content, settings, onBack }: { content: GameContent; settings: Settings; onBack: () => void }) {
+export default function CrewToolsScreen({ content, settings, onBack, initialReference }: { content: GameContent; settings: Settings; onBack: () => void; initialReference?: { category: ReferenceCategory; query: string } }) {
   const [tab, setTab] = useState<"codex" | "planner">("codex");
   return <section className="crew-tools-screen" aria-labelledby="crew-tools-heading">
     <header className="tools-header"><div><span>OFFLINE CREW TOOLS</span><h1 id="crew-tools-heading">CREW TOOLS</h1></div><button type="button" className="pixel-button compact" onClick={onBack}>← TITLE SCREEN</button></header>
     <nav className="tools-tabs" aria-label="Crew tools"><button type="button" aria-pressed={tab === "codex"} onClick={() => setTab("codex")}>CODEX</button><button type="button" aria-pressed={tab === "planner"} onClick={() => setTab("planner")}>TEAM PLANNER</button></nav>
-    <div hidden={tab !== "codex"}><Codex content={content} /></div>
+    <div hidden={tab !== "codex"}><Codex content={content} initialReference={initialReference} /></div>
     <div hidden={tab !== "planner"}><TeamPlannerScreen content={content} settings={settings} visible={tab === "planner"} /></div>
   </section>;
 }

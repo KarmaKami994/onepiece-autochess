@@ -1,0 +1,23 @@
+.profile-records { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.profile-records > div, .achievement-list li, .collection-grid article { padding: 12px; border: 1px solid #709498; background: #071f2a; }
+.profile-records dt { color: #bbd8d5; }
+.profile-records dd { margin: 8px 0 0; font-size: 24px; color: #ffe39a; }
+.achievement-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 0; list-style: none; }
+.achievement-list span { display: block; margin-top: 5px; }
+.achievement-list [data-unlocked="true"] { border-color: #efd080; }
+.chronicle-collection { margin: 28px 0; }
+.chronicle-collection > summary { padding: 12px; border: 1px solid #efd080; cursor: pointer; }
+.collection-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.replay-library { list-style: none; padding: 0; }
+.replay-library li { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px; border-bottom: 1px solid #709498; }
+.replay-library li > div { flex: 1; min-width: 250px; overflow-wrap: anywhere; }
+.replay-viewer { margin: 22px 0; padding: 16px; border: 1px solid #efd080; }
+.replay-board { position: relative; height: 620px; margin: 15px 0; }
+.replay-board .combat-report { left: 12px; top: 12px; width: min(560px, calc(100% - 24px)); }
+.replay-snapshot-details { font-size: 12px; color: #bbd8d5; }
+.chronicle-destructive { margin: 35px 0; padding: 18px; border: 1px solid #e8a198; }
+.chronicle-destructive > button { margin-right: 12px; }
+.chronicle-warning, .chronicle-recording-error { padding: 12px; color: #ffe3a8; background: #392815; border: 1px solid #e4bc71; }
+.chronicle-recording-error { position: fixed; z-index: 90; top: 0; left: 0; max-width: 100%; font-size: 12px; }
+.high-contrast .chronicle-screen { color: #fff; background: #000; }
+@media (max-width: 1000px) { .collection-grid, .profile-records, .achievement-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

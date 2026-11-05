@@ -92,6 +92,11 @@ Umgesetzt am 2026-11-05 auf `codex/b03-combat-analysis-audio`, aufbauend auf B02
 
 ## B04 — Replay-Archiv und lokale Spielerprogression
 
+Umgesetzt am 2026-11-05 auf `codex/b04-replay-profile`, aufbauend auf B03.
+Format, Profil-/Sammlungsregeln, Grenzen und Prüfstand:
+[`B04_REPLAY_PROFILE.md`](B04_REPLAY_PROFILE.md). B02–B04 sollen nach Auftrag
+des Projekteigners nach erfolgreicher CI zusammengeführt werden.
+
 **Ziel:** Abgeschlossene Reisen sind wiederauffindbar, abspielbar und als persönliche Fortschritte sichtbar.
 
 **Lieferung A: Historie und vollständige Replays.**
