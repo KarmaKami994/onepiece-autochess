@@ -23,7 +23,8 @@ function player(value: unknown): value is PlayerState {
   if (value.finalLineup !== undefined && (!object(value.finalLineup) || !array(value.finalLineup.deployed, setupUnit, 48) || !array(value.finalLineup.reserve, unit, 32))) return false;
   const roster = value.units as Record<string, UnitInstance>;
   const board = value.board as Record<string, string>;
-  return Object.entries(roster).every(([id, entry]) => id === entry.id) && Object.entries(board).every(([cell, id]) => /^([0-7]),([0-5])$/.test(cell) && Object.hasOwn(roster, id)) && unique(Object.values(board)) && (value.bench as (string | null)[]).every((id) => id === null || Object.hasOwn(roster, id));
+  const bench = value.bench as (string | null)[];
+  return Object.entries(roster).every(([id, entry]) => id === entry.id) && Object.entries(board).every(([cell, id]) => /^([0-7]),([0-5])$/.test(cell) && Object.hasOwn(roster, id)) && unique([...Object.values(board), ...bench.filter((id): id is string => id !== null)]) && bench.every((id) => id === null || Object.hasOwn(roster, id));
 }
 function snapshot(value: unknown): value is BattleUnitSnapshot {
   return object(value) && text(value.id) && text(value.definitionId) && text(value.teamId) && (value.formId === undefined || text(value.formId)) && typeof value.star === "number" && [1, 2, 3].includes(value.star) && (value.items === undefined || array(value.items, text, 3)) && position(value) && ["hp", "maxHp", "shield", "energy", "maxEnergy", "attack", "defense", "range"].every((key) => number(value[key])) && ["seek", "move", "attack-windup", "attack-recovery", "cast", "stunned", "resurrecting", "dead"].includes(String(value.state));
@@ -70,7 +71,7 @@ export function validateReplay(raw: unknown, content: GameContent): VoyageReplay
     if (!unique(playerIds) || !playerIds.includes(replay.playerId)) throw new Error("Invalid replay captain references.");
     for (const battle of frame.battles) {
       const fighterIds = battle.initialUnits.map((entry) => entry.id);
-      if (!unique(fighterIds) || !playerIds.includes(battle.playerAId) || (battle.playerBId !== null && !playerIds.includes(battle.playerBId)) || battle.finalUnits.some((entry) => !fighterIds.includes(entry.id))) throw new Error("Invalid replay fighter references.");
+      if (!unique(fighterIds) || !unique(battle.finalUnits.map((entry) => entry.id)) || battle.finalUnits.length !== fighterIds.length || !playerIds.includes(battle.playerAId) || (battle.playerBId !== null && !playerIds.includes(battle.playerBId)) || battle.finalUnits.some((entry) => !fighterIds.includes(entry.id))) throw new Error("Invalid replay fighter references.");
       for (const entry of battle.events) {
         for (const key of ["sourceId", "targetId", "unitId"] as const) if (key in entry && entry[key as keyof typeof entry] !== null && entry[key as keyof typeof entry] !== undefined && !fighterIds.includes(String(entry[key as keyof typeof entry]))) throw new Error("Battle event references an unknown fighter.");
         if (entry.type === "cast" && entry.targetIds.some((id) => !fighterIds.includes(id))) throw new Error("Unknown cast target.");
@@ -85,6 +86,8 @@ export function validateReplay(raw: unknown, content: GameContent): VoyageReplay
     for (const frame of replay.frames) {
       const owned = frame.players.flatMap((entry) => [...Object.values(entry.units), ...entry.finalCrew, ...(entry.finalLineup?.deployed ?? []), ...(entry.finalLineup?.reserve ?? [])]);
       if (owned.some((entry) => !crew.has(entry.definitionId) || entry.items.some((id) => !items.has(id)) || (entry.formId && !forms.has(entry.formId)))) throw new Error("Unknown crew, form or item in compatible replay.");
+      if (frame.players.some((entry) => entry.shop.some((id) => id !== null && !crew.has(id)) || entry.inventory.some((id) => !items.has(id))) || Object.values(frame.itemOffers).flat().some((id) => !items.has(id)) || Object.values(frame.recruitOffers).flat().some((id) => !crew.has(id))) throw new Error("Unknown offer or inventory content in compatible replay.");
+      if (frame.battles.some((battle) => battle.events.some((entry) => entry.type === "unit-transform" && !forms.has(entry.toFormId)))) throw new Error("Unknown transformation content.");
       if (frame.battles.flatMap((entry) => [...entry.initialUnits, ...entry.finalUnits]).some((entry) => (!crew.has(entry.definitionId) && !enemies.has(entry.definitionId)) || (entry.items ?? []).some((id) => !items.has(id)) || (entry.formId && !forms.has(entry.formId)))) throw new Error("Unknown battle content.");
     }
   }

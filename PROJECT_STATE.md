@@ -97,7 +97,7 @@ B04 local replay archive/profile/collection is implemented on `codex/b04-replay-
 
 B04 voyage chronicle:
 
-- PASS — typecheck, lint, focused recording/contribution/selector suite (30 tests initially; final Chronicle 14/14), full unit suite (66 files / 843 tests) and production build.
+- PASS — typecheck, lint, focused recording/contribution/selector suite (30 tests initially; final Chronicle 18/18), full unit suite (66 files / 843 tests before four final import-hardening cases) and production build. Final import hardening plus typecheck pass; normal CI validates the resulting 847-test full suite.
 - PASS — corrected Browser E2E run: 10/10 across 1280×720 and 1920×1080. Covers persisted completion, duplicate resumes, collection links, actual playback pause/navigation/perspective/speed, B03 totals/audio, malformed/incompatible imports, archive/profile backup round-trip, independent resets and unchanged active save. Screenshots inspected. Owned Windows server required targeted teardown.
 - PASS — one normal deterministic captain-voyage recording regression: observation preserves state/RNG hashes; complete JSON round-trip validates and stays under its size limit. No game/content/schema/package/asset change.
 - NOT RUN — local aggregate production report, 1,000-seed soak or new baseline. Normal CI remains the integration gate. No B05 work.

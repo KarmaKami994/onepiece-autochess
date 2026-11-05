@@ -71,7 +71,7 @@ importing that infrastructure or changing gameplay.
 ## Verification
 
 - PASS — typecheck, lint, focused recording/contribution/selector tests (initial
-  30/30; final Chronicle suite 14/14), full unit suite 66 files / 843 tests, and
+  30/30; final Chronicle suite 18/18), full unit suite 66 files / 843 tests, and
   production build.
 - PASS — 10 Browser E2E cases across 1280×720 and 1920×1080: automatic local
   completion, durable restart, idempotent counting/deletion/reset, read-only replay
@@ -81,6 +81,10 @@ importing that infrastructure or changing gameplay.
 - One focused integration test records a normally simulated complete captain
   voyage, checks state/RNG hashes after observation, validates the full JSON
   round-trip and verifies the size cap. This is not a new aggregate measurement.
+- Final import hardening also rejects unknown shop/inventory/recruitment IDs and
+  duplicate roster locations before they can reach current-content selectors;
+  the affected 18-test suite and typecheck pass. CI runs the resulting 847-test
+  full suite on the published integration head.
 - The first new browser run used an unsuitable label query for a select. The test
   now uses its actual accessible combobox role; no prior assertion was weakened.
   The known Windows owned-server teardown required targeted cleanup.
