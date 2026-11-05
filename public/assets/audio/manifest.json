@@ -1,0 +1,74 @@
+{
+  "source": "scripts/assets/build_b03_audio.mjs",
+  "sourceSha256": "e56f80057b9023b78e9fc836fff3952231c6a094523fac729e5386cd46f3bee7",
+  "permissionBasis": "Original project-authored note sequences and synthesis; no third-party samples or music copied. Use under the repository terms.",
+  "format": "mono PCM16 WAV, 22050 Hz",
+  "tracks": [
+    {
+      "id": "harbor",
+      "title": "Harbor at Dawn",
+      "bpm": 96,
+      "melody": [
+        69,
+        72,
+        76,
+        72,
+        67,
+        71,
+        74,
+        71,
+        65,
+        69,
+        72,
+        69,
+        67,
+        71,
+        74,
+        76
+      ],
+      "bass": [
+        45,
+        43,
+        41,
+        43
+      ],
+      "path": "/assets/audio/harbor.wav",
+      "durationSeconds": 20,
+      "bytes": 882044,
+      "sha256": "0b0765db8fc867472161655d4fb15f65bf60f94ec2fbf095b47bb66ceb73544d"
+    },
+    {
+      "id": "pursuit",
+      "title": "Grand Line Pursuit",
+      "bpm": 120,
+      "melody": [
+        64,
+        67,
+        71,
+        76,
+        74,
+        71,
+        67,
+        64,
+        62,
+        66,
+        69,
+        74,
+        71,
+        69,
+        66,
+        62
+      ],
+      "bass": [
+        40,
+        40,
+        38,
+        43
+      ],
+      "path": "/assets/audio/pursuit.wav",
+      "durationSeconds": 16,
+      "bytes": 705644,
+      "sha256": "678c07e47e69238fbab8d7ac9e55481a951fab3e50617d0dc7ab493c72160a8f"
+    }
+  ]
+}

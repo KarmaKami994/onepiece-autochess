@@ -1382,6 +1382,23 @@ details.trait-building {
   image-rendering: pixelated;
 }
 
+.combat-report { position: absolute; z-index: 20; top: 42px; left: 200px; width: min(560px, calc(100% - 440px)); max-height: calc(100% - 150px); overflow: auto; color: #f2eee0; background: #061923f5; border: 1px solid #c3a867; font: 12px/1.45 "Courier New", monospace; pointer-events: auto; }
+.combat-report summary { padding: 7px; cursor: pointer; font-weight: bold; color: #ffe0a0; font-size: 10px; }
+.combat-report-content { padding: 0 9px 8px; }
+.combat-event-cue { min-height: 2.8em; color: #d7d8ff; }
+.combat-report-teams { display: flex; gap: 8px; margin: 7px 0; }
+.combat-report button { padding: 5px 8px; border: 1px solid #a6cbd1; color: #e1f6f8; background: #123344; cursor: pointer; }
+.combat-report button[aria-pressed="true"] { border-color: #ffe0a0; color: #ffe0a0; text-decoration: underline; }
+.combat-report-table { overflow-x: auto; }
+.combat-report table { width: 100%; border-collapse: collapse; font-size: 11px; font-variant-numeric: tabular-nums; }
+.combat-report caption { text-align: left; padding: 6px 0; }
+.combat-report th, .combat-report td { padding: 5px 4px; border-bottom: 1px solid #627a83; text-align: right; }
+.combat-report th:first-child { text-align: left; min-width: 130px; }
+.combat-report th small { display: block; color: #c4d9d8; font-weight: normal; font-size: 10px; }
+.combat-report-help { color: #c4d9d8; font-size: 10px; }
+.high-contrast .combat-report { background: #000; color: #fff; border-color: #fff; }
+.planner-battle .combat-report { top: 12px; left: 12px; width: min(560px, calc(100% - 24px)); }
+
 .board-loading {
   position: absolute;
   z-index: 5;

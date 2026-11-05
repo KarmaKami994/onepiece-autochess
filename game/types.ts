@@ -786,6 +786,8 @@ export type BattleEvent =
       type: "energy";
       tick: number;
       unitId: string;
+      /** Optional reporting attribution; absent in legacy battle logs. */
+      sourceId?: string;
       /** Effective signed delta after applying the battle-local Max Energy cap. */
       amount: number;
       /** Energy after this event has been applied. */

@@ -6,7 +6,7 @@ import { createTeamPlan, parseTeamPlan, resolvePlannedUnit, simulateTeamPlan, va
 import { formRequirementText } from "../crewReference";
 import { deleteTeamPlan, downloadTeamPlan, readTeamPlans, storeTeamPlan } from "../plannerStorage";
 import { plannerPresentation } from "../plannerPresentation";
-import PhaserBoard from "../../components/PhaserBoard";
+import BattleBoard from "../../components/BattleBoard";
 import type { Settings } from "./GameScreens";
 
 function TeamEditor({ side, plan, content, update }: { side: "a" | "b"; plan: TeamPlan; content: GameContent; update: (units: PlannedUnit[]) => void }) {
@@ -112,7 +112,7 @@ export function TeamPlannerScreen({ content, settings, visible }: { content: Gam
     {battle && <section className="planner-battle" aria-label="Combat test result">
       <h3>{battle.result.winner === "draw" ? "DRAW" : `TEAM ${battle.result.winner.toUpperCase()} WINS`} · {(battle.result.durationTicks * content.config.combatTickMs / 1000).toFixed(1)}s {battle.result.timedOut ? "· timeout" : ""}</h3>
       <button type="button" onClick={() => setPlayback((current) => current + 1)}>Replay combat test</button>
-      {visible && battle.presentation && <PhaserBoard key={playback} units={battle.presentation.boardUnits} selectedId={null} interactionMode="none" phase="battle" capacity={content.config.maxLevel} boardSkin={settings.boardSkin} combatEvents={battle.presentation.events} eventSequence={playback} speed={settings.animationSpeed} particles={settings.particles} combatNumbers={settings.combatNumbers} reducedMotion={settings.reducedMotion} onMoveUnit={() => false} onSelectUnit={() => undefined} />}
+      {visible && battle.presentation && <BattleBoard audio={settings} key={playback} units={battle.presentation.boardUnits} selectedId={null} interactionMode="none" phase="battle" capacity={content.config.maxLevel} boardSkin={settings.boardSkin} combatEvents={battle.presentation.events} eventSequence={playback} speed={settings.animationSpeed} particles={settings.particles} combatNumbers={settings.combatNumbers} reducedMotion={settings.reducedMotion} onMoveUnit={() => false} onSelectUnit={() => undefined} />}
       <div className="planner-recaps">{[battle.recapA, battle.recapB].map((recap, index) => recap && <section key={index} aria-label={`Team ${index === 0 ? "A" : "B"} test recap`}><h4>TEAM {index === 0 ? "A" : "B"} · {recap.humanTeamHpPercent}% health remaining</h4><ul>{recap.finalCrew.map((unit) => <li key={unit.unitId}>{unit.label}</li>)}</ul></section>)}</div>
     </section>}
   </section>;

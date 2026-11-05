@@ -622,7 +622,27 @@ export function playTelegraphVfx(
   return scope.handle;
 }
 
+/** Arrow communicates resolved source/destination even with motion disabled. */
+export function playDirectedCueVfx(scene: Phaser.Scene, options: CommonVfxOptions & {
+  from: BattleVfxPoint; to: BattleVfxPoint; reducedMotion: boolean;
+}): BattleVfxHandle {
+  const durationMs = scaledDuration(450, options.speed);
+  const scope = createEffectScope(scene, durationMs);
+  const line = scope.add(scene.add.graphics()).setDepth(BATTLE_VFX_DEPTH.overlay);
+  const color = options.color ?? 0xc5a1ff;
+  const angle = Math.atan2(options.to.y - options.from.y, options.to.x - options.from.x);
+  line.lineStyle(5, 0x071a28, 0.95);
+  line.lineBetween(options.from.x, options.from.y, options.to.x, options.to.y);
+  line.lineStyle(2, color, 1);
+  line.lineBetween(options.from.x, options.from.y, options.to.x, options.to.y);
+  for (const side of [-1, 1]) line.lineBetween(options.to.x, options.to.y, options.to.x - Math.cos(angle + side * 0.5) * 12, options.to.y - Math.sin(angle + side * 0.5) * 12);
+  line.strokeCircle(options.from.x, options.from.y, 7);
+  if (!options.reducedMotion) scene.tweens.add({ targets: line, alpha: 0, duration: durationMs });
+  return scope.handle;
+}
+
 export const battleVfx = {
+  directedCue: playDirectedCueVfx,
   slash: playSlashVfx,
   fireProjectile: playFireProjectileVfx,
   smokeBurst: playSmokeBurstVfx,

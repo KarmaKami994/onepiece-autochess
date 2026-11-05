@@ -5,11 +5,13 @@ import {
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
-import PhaserBoard, {
+import {
   type BoardMove,
   type BoardInteractionMode,
   type BoardUnit,
 } from "@/components/PhaserBoard";
+import BattleBoard from "@/components/BattleBoard";
+import { MUSIC_TRACKS, type AudioSettings } from "../audioSettings";
 import PhaserCarousel, {
   type CarouselPresentationSnapshot,
   type CarouselTokenView,
@@ -32,9 +34,7 @@ import {
   type TraitView,
 } from "../selectors";
 
-export type Settings = {
-  muted: boolean;
-  volume: number;
+export type Settings = AudioSettings & {
   animationSpeed: number;
   particles: boolean;
   combatNumbers: boolean;
@@ -481,7 +481,7 @@ export function SettingsScreen({
           <label className="setting-row">
             <span>
               <strong>Master volume</strong>
-              <small>Synthesized local sound effects</small>
+              <small>Local music and sound effects</small>
             </span>
             <input
               type="range"
@@ -502,6 +502,12 @@ export function SettingsScreen({
             checked={settings.muted}
             onChange={(muted) => onChange({ ...settings, muted })}
           />
+          {(["musicVolume", "effectsVolume"] as const).map((key) => <label className="setting-row" key={key}>
+            <span><strong>{key === "musicVolume" ? "Music volume" : "Effects volume"}</strong><small>{key === "musicVolume" ? "Original offline music loops" : "Interface and combat cues"}</small></span>
+            <input type="range" min="0" max="1" step="0.05" value={settings[key]} disabled={settings.muted} onChange={(event) => onChange({ ...settings, [key]: Number(event.target.value) })} />
+            <output>{Math.round(settings[key] * 100)}%</output>
+          </label>)}
+          <label className="setting-row"><span><strong>Music track</strong><small>Starts after interaction; pauses in background</small></span><select value={settings.musicTrack} onChange={(event) => onChange({ ...settings, musicTrack: event.target.value as Settings["musicTrack"] })}>{MUSIC_TRACKS.map((track) => <option key={track.id} value={track.id}>{track.name}</option>)}</select></label>
           <label className="setting-row">
             <span>
               <strong>Battle speed</strong>
@@ -816,7 +822,8 @@ export function MatchScreen({
         data-scouting={scouting ? "true" : "false"}
         data-watching={watching ? "true" : "false"}
       >
-        <PhaserBoard
+        <BattleBoard
+          audio={settings}
           units={tacticalUnits}
           selectedId={selectedUnit?.id ?? null}
           interactionMode={tacticalInteractionMode(

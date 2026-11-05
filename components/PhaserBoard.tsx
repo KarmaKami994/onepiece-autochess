@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   crewAnimationKey,
   crewSheetKey,
@@ -56,6 +56,8 @@ import {
 } from "./boardTokens";
 import {
   combatPresentationStyle,
+  formAccent,
+  movementCue,
   sequentialAbilityHitDelayMs,
 } from "./boardCombatPresentation";
 import { BOARD_SCENE_KEY, createBoardGameConfig } from "./BoardScene";
@@ -121,7 +123,8 @@ export type CombatFxEvent = {
     | "status"
     | "buff"
     | "dodge"
-    | "defeat";
+    | "defeat"
+    | "end";
   sourceId?: string;
   targetId?: string;
   targetIds?: string[];
@@ -202,7 +205,7 @@ export function interactionAllowsDestination(
   return mode === "formation" || (mode === "bench-only" && destination.zone === "bench");
 }
 
-type PhaserBoardProps = BoardPayload & {
+export type PhaserBoardProps = BoardPayload & {
   phase: string;
   combatEvents: CombatFxEvent[];
   eventSequence: number;
@@ -210,6 +213,11 @@ type PhaserBoardProps = BoardPayload & {
   particles: boolean;
   combatNumbers: boolean;
   reducedMotion: boolean;
+  children?: ReactNode;
+  onPlaybackReset?: () => void;
+  onPlaybackEvent?: (event: CombatFxEvent) => void;
+  onPlaybackComplete?: () => void;
+  onPlaybackUnavailable?: () => void;
   onMoveUnit: (move: BoardMove) => boolean;
   onSelectUnit: (unitId: string | null) => void;
 };
@@ -261,6 +269,11 @@ export default function PhaserBoard({
   particles,
   combatNumbers,
   reducedMotion,
+  children,
+  onPlaybackReset,
+  onPlaybackEvent,
+  onPlaybackComplete,
+  onPlaybackUnavailable,
   onMoveUnit,
   onSelectUnit,
 }: PhaserBoardProps) {
@@ -278,6 +291,8 @@ export default function PhaserBoard({
   });
   const moveRef = useRef(onMoveUnit);
   const selectRef = useRef(onSelectUnit);
+  const playbackRef = useRef({ onPlaybackReset, onPlaybackEvent, onPlaybackComplete, onPlaybackUnavailable });
+  playbackRef.current = { onPlaybackReset, onPlaybackEvent, onPlaybackComplete, onPlaybackUnavailable };
   const [isReady, setIsReady] = useState(false);
   const [failed, setFailed] = useState(false);
 
@@ -358,6 +373,7 @@ export default function PhaserBoard({
           private statusLabels = new Map<string, Phaser.GameObjects.Text>();
           private statusExpiries = new Map<string, Map<string, number>>();
           private animationGeneration = 0;
+          private presentedForms = new Map<string, string | undefined>();
           private requestedTextures = new Set<string>();
           private failedTextures = new Set<string>();
           private payload: BoardPayload = latestRef.current;
@@ -643,6 +659,7 @@ export default function PhaserBoard({
             const presentation = combatPresentationStyle(
               contentId,
               event.kind === "attack" ? "attack" : "cast",
+              this.presentedForms.get(sourceUnit.id) ?? sourceUnit.formId,
             );
             if (event.kind === "attack") {
               if (presentation === "fire") {
@@ -1734,6 +1751,8 @@ export default function PhaserBoard({
           ) {
             const speed = Math.max(0.5, animationSpeed);
             const generation = ++this.animationGeneration;
+            this.presentedForms = new Map(this.payload.units.map((unit) => [unit.id, unit.formId]));
+            playbackRef.current.onPlaybackReset?.();
             const setHealth = (
               unitId: string,
               nextHealth: number,
@@ -1927,6 +1946,7 @@ export default function PhaserBoard({
               );
               this.time.delayedCall(delay, () => {
                 if (generation !== this.animationGeneration) return;
+                playbackRef.current.onPlaybackEvent?.(event);
                 const source = event.sourceId
                   ? this.tokenObjects.get(event.sourceId)
                   : undefined;
@@ -1947,6 +1967,7 @@ export default function PhaserBoard({
                 this.payload.units.forEach((unit) => refreshStatuses(unit.id, event.tick));
 
                 if (event.kind === "transform" && source) {
+                  this.presentedForms.set(event.unitId ?? event.sourceId ?? "", event.toFormId);
                   const unitId = event.unitId ?? event.sourceId;
                   if (
                     unitId &&
@@ -1967,6 +1988,7 @@ export default function PhaserBoard({
                     );
                   }
                   showCastName(source, event.label ?? "Monster Point");
+                  battleVfx.telegraph(this, { from: source, targets: [source], shape: "area", color: formAccent(event.toFormId), speed, reducedMotion: reduceMotion });
                   const visual = formVisualDefinition(event.toFormId);
                   if (
                     visual &&
@@ -1993,6 +2015,7 @@ export default function PhaserBoard({
 
                 if (event.kind === "resurrect" && target) {
                   const unitId = event.unitId ?? event.targetId ?? "";
+                  this.presentedForms.set(unitId, event.toFormId);
                   if (
                     unitId &&
                     event.hp !== undefined &&
@@ -2052,6 +2075,9 @@ export default function PhaserBoard({
                   const origin = event.from
                     ? boardCellCenter(event.from.x, event.from.y)
                     : { x: displaced.x, y: displaced.y };
+                  const cue = movementCue(event.movementKind);
+                  showCastName(displaced, cue.label);
+                  battleVfx.directedCue(this, { from: origin, to: destination, color: cue.color, speed, reducedMotion: reduceMotion });
                   this.tweens.killTweensOf(displaced);
                   this.faceUnit(displacedUnitId, destination.x);
 
@@ -2100,6 +2126,8 @@ export default function PhaserBoard({
                   this.faceUnit(event.targetId ?? "", source.x);
                   if (event.kind === "cast") {
                     showCastName(source, event.abilityName);
+                    const formId = this.presentedForms.get(event.sourceId ?? "");
+                    if (formId) battleVfx.telegraph(this, { from: source, targets: [source], shape: "area", color: formAccent(formId), speed, reducedMotion: reduceMotion });
                     battleVfx.telegraph(this, {
                       from: { x: source.x, y: source.y - 4 },
                       targets: (targets.length ? targets : [target]).map((entry) => ({
@@ -2197,6 +2225,10 @@ export default function PhaserBoard({
                       (event.energyDelta ?? event.amount ?? 0);
                     setEnergy(unitId, event.energyValue ?? fallback);
                   }
+                  if (target && (event.energyDelta ?? 0) < 0 && event.reason !== "cast-reset") {
+                    showCastName(target, `−${Math.abs(event.energyDelta ?? 0)} ENERGY`);
+                    if (source && event.sourceId !== event.targetId) battleVfx.directedCue(this, { from: source, to: target, color: 0xb5a4ff, speed, reducedMotion: reduceMotion });
+                  }
                 } else if (target && event.kind === "status") {
                   applyStatus(
                     event.targetId ?? "",
@@ -2274,6 +2306,9 @@ export default function PhaserBoard({
                 ),
               0,
             );
+            this.time.delayedCall(Math.round(maxPresentationTimeMs / speed), () => {
+              if (generation === this.animationGeneration) playbackRef.current.onPlaybackComplete?.();
+            });
             this.time.delayedCall(
               Math.round(maxPresentationTimeMs / speed) + Math.round(720 / speed),
               () => {
@@ -2305,7 +2340,10 @@ export default function PhaserBoard({
         gameRef.current = game;
       } catch (error) {
         console.error("Unable to start the local board renderer", error);
-        if (!cancelled) setFailed(true);
+        if (!cancelled) {
+          setFailed(true);
+          playbackRef.current.onPlaybackUnavailable?.();
+        }
       }
     }
 
@@ -2394,7 +2432,7 @@ export default function PhaserBoard({
 
   if (failed) {
     return (
-      <CssBoardFallback
+      <><CssBoardFallback
         units={units}
         selectedId={selectedId}
         interactionMode={interactionMode}
@@ -2402,7 +2440,7 @@ export default function PhaserBoard({
         boardSkin={boardSkin}
         onMoveUnit={onMoveUnit}
         onSelectUnit={onSelectUnit}
-      />
+      />{children}</>
     );
   }
 
@@ -2437,6 +2475,7 @@ export default function PhaserBoard({
           </li>
         ))}
       </ul>
+      {children}
     </div>
   );
 }

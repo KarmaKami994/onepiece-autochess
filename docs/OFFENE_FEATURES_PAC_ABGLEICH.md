@@ -6,6 +6,8 @@ Stand: **04.11.2026**. Auftrag: den vorhandenen Projektstand mit Pokémon Auto C
 
 B02 ergänzt F07/F10 mit dem [lokalen Kodex und Teamplaner](B02_CODEX_TEAM_PLANNER.md). Der ursprüngliche Befund bleibt als datierter Vergleich bestehen; aktueller Verifikations-/Review-Stand steht in `PROJECT_STATE.md`.
 
+B03 ergänzt F08/F12/O09 mit [wiedergabegebundener Kampfauswertung, gerichteten Effekten und Offline-Audio](B03_COMBAT_READABILITY_AUDIO.md). Auch diese Ergänzung ersetzt keine historischen Befunde oder Balance-Messungen.
+
 ## 1. Grundlage und Vorgaben
 
 - Analysiertes Projekt: `KarmaKami994/onepiece-autochess`, lokales `main` und GitHub-`main` auf **`918d16b88e182ac9c81d05c73deb651824d51df8`**. PR #58 mit der Bot-Diagnose ist darin enthalten.
