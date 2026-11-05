@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
 import {
   DEFAULT_CONTENT,
   advanceMatchPhase,
@@ -139,5 +140,13 @@ describe("bot progression diagnostics", () => {
       ).reduce((total, bucket) => total + bucket.preparations, 0),
     ).toBe(botProgressionDiagnostics?.preparationCount);
     expect(diagnosticGameplay).toEqual(normalGameplay);
+    // Reuse the retained PRE's exact seed-0 preparations; never rerun or rewrite PRE.
+    const historical = JSON.parse(readFileSync("docs/analysis/p1b-bot-progression-diagnostic-50.json", "utf8")) as {
+      contentHash: string; configHash: string;
+      botProgressionDiagnostics: { rawPreparations: NonNullable<typeof botProgressionDiagnostics>["rawPreparations"] };
+    };
+    expect(diagnostic.contentHash).toBe(historical.contentHash);
+    expect(diagnostic.configHash).toBe(historical.configHash);
+    expect(botProgressionDiagnostics?.rawPreparations).toEqual(historical.botProgressionDiagnostics.rawPreparations.filter((preparation) => preparation.seed === "production-0"));
   }, 20_000);
 });

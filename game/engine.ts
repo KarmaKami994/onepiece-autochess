@@ -77,6 +77,7 @@ import {
   scoreItemForPlayer as itemScore,
   scoreItemForUnit,
 } from "./scoring";
+import { botRosterFacts, type BotOfferDecision, type BotItemDecision, type BotItemCandidateDiagnostic, type BotItemBlockReason } from "./botDecisionDiagnostics";
 import type {
   BattleSetupUnit,
   BattleTeam,
@@ -1725,6 +1726,8 @@ export type BotTurnDiagnostic = {
   readonly end: BotProgressionPlayerSnapshot;
   readonly shopSnapshots: ReadonlyArray<BotProgressionShopSnapshot>;
   readonly purchases: ReadonlyArray<BotProgressionPurchase>;
+  readonly offerDecisions: ReadonlyArray<BotOfferDecision>;
+  readonly itemDecisions: ReadonlyArray<BotItemDecision>;
   readonly xp: {
     readonly attemptBudget: number;
     readonly attempts: number;
@@ -1812,6 +1815,7 @@ function botBuyPass(
   content: GameContent,
   purchaseSource?: BotProgressionPurchase["source"],
   purchases?: BotProgressionPurchase[],
+  decisions?: BotOfferDecision[],
 ): MatchState {
   let next = state;
   const player = findPlayer(next, playerId);
@@ -1831,12 +1835,21 @@ function botBuyPass(
       (left, right) =>
         right.score - left.score || left.shopIndex - right.shopIndex,
     );
-  for (const offer of offers) {
+  const earlierPurchases: string[] | undefined = decisions ? [] : undefined;
+  for (const [offerIndex, offer] of offers.entries()) {
     let currentPlayer = findPlayer(next, playerId);
     let stateBeforeReplacement: MatchState | null = null;
     const definition = offer.definitionId
       ? getUnitDefinition(offer.definitionId, content)
       : null;
+    const decision: BotOfferDecision | undefined = decisions && offer.definitionId ? {
+      source: purchaseSource ?? "initial-buy-pass", shopIndex: offer.shopIndex, rank: offerIndex + 1,
+      definitionId: offer.definitionId, cost: definition?.cost ?? null, frozenScore: offer.score,
+      goldAtPassStart: player.gold, goldAtEvaluation: currentPlayer?.gold ?? null, level: currentPlayer?.level ?? null,
+      earlierPurchases: [...(earlierPurchases ?? [])], reservePassed: null, purchaseRule: null,
+      receiving: "not-evaluated", outcome: !currentPlayer ? "missing-player" : !definition ? "unknown-definition" : "unaffordable",
+    } : undefined;
+    if (decision) decisions?.push(decision);
     if (
       !currentPlayer ||
       !definition ||
@@ -1848,10 +1861,22 @@ function botBuyPass(
       currentPlayer.gold - definition.cost >= personality.economyReserve ||
       offer.score >= definition.cost * 25 + 24 ||
       state.round <= 3;
+    if (decision) {
+      decision.reservePassed = currentPlayer.gold - definition.cost >= personality.economyReserve;
+      decision.purchaseRule = decision.reservePassed ? "reserve" : offer.score >= definition.cost * 25 + 24 ? "score-exception" : state.round <= 3 ? "tutorial-exception" : null;
+    }
     if (!shouldBuy) {
+      if (decision) decision.outcome = "reserve-policy";
       continue;
     }
+    if (decision) decision.receiving = currentPlayer.bench.some((id) => id === null) ? "bench-space" : "merge-capacity";
     if (!canReceiveUnit(currentPlayer, definition.id)) {
+      if (decision) {
+        decision.receiving = "blocked";
+        decision.outcome = "no-legal-replacement";
+        decision.replacementCandidates = [];
+        decision.replacementProtectedStars = currentPlayer.bench.filter((id) => id && currentPlayer!.units[id]?.star > 1).length;
+      }
       // A full bench may turn over one stale one-star unit, but only for a
       // clearly stronger, higher-cost offer. The later purchase is rolled back
       // with this snapshot if command legality changes unexpectedly.
@@ -1869,12 +1894,11 @@ function botBuyPass(
             content,
           ),
         }))
-        .filter(
-          (candidate) =>
-            candidate.definition &&
-            candidate.definition.cost < definition.cost &&
-            offer.score >= candidate.score + 20,
-        )
+        .filter((candidate) => {
+          const eligible = Boolean(candidate.definition && candidate.definition.cost < definition.cost && offer.score >= candidate.score + 20);
+          decision?.replacementCandidates?.push({ unitId: candidate.unit.id, cost: candidate.definition?.cost ?? null, score: candidate.score, eligible });
+          return eligible;
+        })
         .sort(
           (left, right) =>
             left.score - right.score ||
@@ -1884,6 +1908,7 @@ function botBuyPass(
       if (!replacement) {
         continue;
       }
+      if (decision) decision.replacementId = replacement.unit.id;
       stateBeforeReplacement = next;
       const sale = applyCommand(
         next,
@@ -1892,15 +1917,18 @@ function botBuyPass(
         content,
       );
       if (!sale.ok) {
+        if (decision) { decision.outcome = "replacement-sale-rejected"; decision.commandError = sale.error.code; }
         continue;
       }
       next = sale.state;
       currentPlayer = findPlayer(next, playerId);
       if (!currentPlayer || !canReceiveUnit(currentPlayer, definition.id)) {
+        if (decision) decision.outcome = "replacement-capacity-rejected";
         next = stateBeforeReplacement;
         continue;
       }
     }
+    const receiptBefore = decision ? { before: botRosterFacts(currentPlayer, definition.id), inventoryBefore: [...currentPlayer.inventory] } : undefined;
     const result = applyCommand(
       next,
       {
@@ -1912,6 +1940,12 @@ function botBuyPass(
     );
     if (result.ok) {
       next = result.state;
+      earlierPurchases?.push(definition.id);
+      if (decision && receiptBefore) {
+        decision.outcome = "purchased";
+        const afterPlayer = findPlayer(next, playerId);
+        if (afterPlayer) decision.receipt = { ...receiptBefore, after: botRosterFacts(afterPlayer, definition.id), inventoryAfter: [...afterPlayer.inventory] };
+      }
       if (purchaseSource && purchases) {
         purchases.push({
           source: purchaseSource,
@@ -1921,7 +1955,10 @@ function botBuyPass(
         });
       }
     } else if (stateBeforeReplacement) {
+      if (decision) { decision.outcome = "purchase-command-rejected"; decision.commandError = result.error.code; }
       next = stateBeforeReplacement;
+    } else if (decision) {
+      decision.outcome = "purchase-command-rejected"; decision.commandError = result.error.code;
     }
   }
   return next;
@@ -2021,10 +2058,12 @@ function botItemCompatibilityScore(
   player: PlayerState,
   personality: BotPersonality,
   content: GameContent,
+  trace?: (fact: Omit<BotItemCandidateDiagnostic, "inventoryIndex">) => void,
 ): number {
   const incomingItem = getItemDefinition(itemId, content);
   const definition = getUnitDefinition(unit.definitionId, content);
   if (!incomingItem || !definition) {
+    trace?.({ itemId, unitId: unit.id, score: null, blockReason: "unknown-content", recipeResultId: null, craftReturnsToInventory: false });
     return Number.NEGATIVE_INFINITY;
   }
   const heldComponentIndex = isComponentItem(incomingItem)
@@ -2045,6 +2084,8 @@ function botItemCompatibilityScore(
     (!isCraft && unit.items.length >= content.config.itemCap) ||
     (!isCraft && item.grantedTraitId && unitHasEffectiveTrait(unit, item.grantedTraitId, content))
   ) {
+    const blockReason: BotItemBlockReason = !item ? "unknown-content" : directDuplicate ? "duplicate-completed" : !isCraft && unit.items.length >= content.config.itemCap ? "slot-cap" : "native-trait";
+    trace?.({ itemId, unitId: unit.id, score: null, blockReason, recipeResultId: resultId, craftReturnsToInventory: false });
     return Number.NEGATIVE_INFINITY;
   }
   const craftReturnsToInventory = Boolean(
@@ -2064,12 +2105,14 @@ function botItemCompatibilityScore(
         content,
       );
   const deployedBonus = locateUnit(player, unit.id)?.zone === "board" ? 40 : 0;
-  return (
+  const score = (
     compatibility * 1_000 +
     itemScore(itemId, player, content) * 10 +
     botInstanceScore(unit, player, personality, content) +
     deployedBonus
   );
+  trace?.({ itemId, unitId: unit.id, score: Number.isFinite(score) ? score : null, blockReason: Number.isFinite(score) ? null : "incompatible-result", recipeResultId: resultId, craftReturnsToInventory });
+  return score;
 }
 
 function unitHasEffectiveTrait(
@@ -2090,6 +2133,7 @@ function equipBotInventory(
   state: MatchState,
   playerId: string,
   content: GameContent,
+  decisions?: BotItemDecision[],
 ): MatchState {
   let next = state;
   while (true) {
@@ -2098,6 +2142,7 @@ function equipBotInventory(
       return next;
     }
     const personality = botPersonality(player, content);
+    const candidateFacts: BotItemCandidateDiagnostic[] | undefined = decisions ? [] : undefined;
     const candidates = player.inventory
       .flatMap((itemId, inventoryIndex) =>
         Object.values(player.units).map((unit) => ({
@@ -2111,6 +2156,7 @@ function equipBotInventory(
             player,
             personality,
             content,
+            candidateFacts ? (fact) => candidateFacts.push({ ...fact, inventoryIndex }) : undefined,
           ),
         })),
       )
@@ -2124,9 +2170,20 @@ function equipBotInventory(
           left.inventoryIndex - right.inventoryIndex,
       );
     const selected = candidates[0];
+    const detail = (candidate: typeof selected) => candidateFacts?.find((fact) => fact.unitId === candidate.unitId && fact.itemId === candidate.itemId && fact.inventoryIndex === candidate.inventoryIndex) ?? null;
+    const diagnostic = decisions ? {
+      inventoryBefore: [...player.inventory], eligibleCandidates: candidates.length,
+      blockedCandidates: (candidateFacts?.length ?? 0) - candidates.length,
+      blockReasons: (candidateFacts ?? []).reduce<Record<string, number>>((counts, fact) => {
+        if (fact.blockReason) { const key = `${fact.itemId}:${fact.blockReason}`; counts[key] = (counts[key] ?? 0) + 1; } return counts;
+      }, {}),
+      topCandidates: candidates.slice(0, 3).flatMap((candidate) => { const fact = detail(candidate); return fact ? [fact] : []; }),
+    } : null;
     if (!selected) {
+      if (diagnostic) decisions?.push({ ...diagnostic, inventoryAfter: [...player.inventory], outcome: Object.keys(player.units).length ? "no-legal-candidate" : "no-carrier", selected: null, before: null, after: null });
       return next;
     }
+    const before = diagnostic ? botRosterFacts(player).find((unit) => unit.id === selected.unitId) ?? null : null;
     const result = applyCommand(
       next,
       {
@@ -2137,6 +2194,11 @@ function equipBotInventory(
       { actorPlayerId: playerId },
       content,
     );
+    if (diagnostic) {
+      const afterPlayer = result.ok ? findPlayer(result.state, playerId) : player;
+      decisions?.push({ ...diagnostic, inventoryAfter: [...(afterPlayer?.inventory ?? player.inventory)], outcome: result.ok ? "equipped" : "command-rejected", selected: detail(selected), before,
+        after: afterPlayer ? botRosterFacts(afterPlayer).find((unit) => unit.id === selected.unitId) ?? null : null, ...(!result.ok ? { commandError: result.error.code } : {}) });
+    }
     if (!result.ok) {
       return next;
     }
@@ -2171,6 +2233,8 @@ export function runBotTurn(
           botProgressionShopSnapshot(initialPlayer, "initial-buy-pass", content),
         ],
         purchases: [] as BotProgressionPurchase[],
+        offerDecisions: [] as BotOfferDecision[],
+        itemDecisions: [] as BotItemDecision[],
       }
     : null;
   let next = cloneMatch(state);
@@ -2180,6 +2244,7 @@ export function runBotTurn(
     content,
     diagnostic ? "initial-buy-pass" : undefined,
     diagnostic?.purchases,
+    diagnostic?.offerDecisions,
   );
   let player = findPlayer(next, playerId);
   if (!player) {
@@ -2270,11 +2335,12 @@ export function runBotTurn(
       content,
       diagnostic ? "post-reroll" : undefined,
       diagnostic?.purchases,
+      diagnostic?.offerDecisions,
     );
   }
 
   next = arrangeBotBoard(next, playerId, content);
-  next = equipBotInventory(next, playerId, content);
+  next = equipBotInventory(next, playerId, content, diagnostic?.itemDecisions);
   const readyResult = applyCommand(
     next,
     { type: "END_PREPARATION" },

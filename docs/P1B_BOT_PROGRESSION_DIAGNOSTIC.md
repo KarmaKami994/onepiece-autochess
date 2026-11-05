@@ -1,5 +1,10 @@
 # P1B — Bot Progression Diagnostic Pass
 
+2026-11-05 follow-up: [B05-A](B05_BOT_DECISION_DIAGNOSTIC.md) extends the optional
+observer with actual purchase/equip reasons and focused item/form receipts. This
+historical report and its raw snapshot remain unchanged; new population rejection
+rates and a replacement tuning candidate have not been measured or approved.
+
 This pass adds opt-in, behavior-neutral instrumentation to explain the progression funnel before another bot-policy candidate is designed. It does not tune bots. Production still uses the original initial buy pass, XP/reroll budgets and guards, post-reroll purchases, scoring, lineup, formation, items and voyage behavior. GameContent remains `1.31.0`; save schema remains `6`.
 
 PAC classification remains locked: **DIRECT:** none; **ADAPTED:** PAC's stage-aware progression rationale becomes local measurement by round; **REFERENCE ONLY:** authored PAC board/power progression; **REJECTED:** scripted board replacement as production AI. The observer instruments the real local shop/economy loop without adding RNG, commands, save state or mutable gameplay references.

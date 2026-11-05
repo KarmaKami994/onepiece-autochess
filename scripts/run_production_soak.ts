@@ -2,6 +2,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { summarizeBotDecisionDiagnostics, type BotDecisionDiagnosticsReport } from "./bot_decision_report";
 import {
   DEFAULT_CONTENT,
   CURRENT_SAVE_SCHEMA_VERSION,
@@ -387,6 +388,7 @@ type HighCostFunnelSummary = {
 };
 
 export type BotProgressionDiagnosticsReport = {
+  decisionDiagnostics: BotDecisionDiagnosticsReport;
   preparationCount: number;
   levelDistributionByRound: Record<string, Record<string, number>>;
   levelDistributionByPersonality: Record<string, Record<string, number>>;
@@ -416,7 +418,7 @@ export type BotProgressionDiagnosticsReport = {
     byPersonality: Record<string, HighCostFunnelSummary>;
     byRoundBucket: Record<string, HighCostFunnelSummary>;
   };
-  rawPreparations: BotTurnDiagnostic[];
+  rawPreparations: Omit<BotTurnDiagnostic, "offerDecisions" | "itemDecisions">[];
 };
 
 export type ProductionSoakOptions = { botDiagnostics?: boolean };
@@ -675,7 +677,9 @@ export function summarizeBotProgressionDiagnostics(
       byPersonality: funnelByPersonality,
       byRoundBucket: funnelByRoundBucket,
     },
-    rawPreparations: diagnostics,
+    decisionDiagnostics: summarizeBotDecisionDiagnostics(diagnostics),
+    // Keep legacy raw preparation facts; rich decisions have bounded examples above.
+    rawPreparations: diagnostics.map((event) => ({ seed: event.seed, round: event.round, playerId: event.playerId, personalityId: event.personalityId, economyReserve: event.economyReserve, start: event.start, end: event.end, shopSnapshots: event.shopSnapshots, purchases: event.purchases, xp: event.xp, rerolls: event.rerolls })),
   };
 }
 

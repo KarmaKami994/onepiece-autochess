@@ -228,6 +228,12 @@ The first P1B progression candidate was rejected. PR #58 merged the [bot progres
 
 B01 completes the final crew presentation and updates current documentation. B02 adds local codex/team-planning tools and an isolated authored combat test; it does not replace adaptive match bots. A replacement P1B candidate still needs an evidence-backed architecture decision.
 
+B05-A now adds actual offer-rejection/replacement and equip/craft/form receipts
+to the optional observer, with bounded report examples and exact seed-0 PRE
+regression. See [the diagnostic and candidate approval handoff](B05_BOT_DECISION_DIAGNOSTIC.md).
+There is no new aggregate measurement or production tuning in A. B's single
+late spare-gold XP proposal is not approved; C remains a separate item/form decision.
+
 No bot tuning, economy change, captain-damage change or unit-balance work follows automatically; each requires separate approval.
 
 Smoker is frozen as a watch item. The previously proposed Smoker trait-state diagnostic is not the immediate roadmap task.
