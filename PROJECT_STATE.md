@@ -23,10 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-B04 local replay archive/profile/collection is implemented on `codex/b04-replay-profile`, based on B03 `6c8c9ab13eff84c25b572577b33018feb625157a`. The owner requested integration of B02/B03/B04 into main after B04 completion and successful CI; merge SHAs are recorded by GitHub history. GameContent remains `1.31.0`, schema 6; replay/profile format 1 uses a separate local IndexedDB database. No gameplay, bot, balance or RNG change.
+B05 delivery A is implemented on `codex/b05-bot-decision-diagnostics` from merged B04 / PR #62 main `0a43543162d520047cc3c51255ff0d8741a6e223`. Optional diagnostics explain real offer/equip/craft/merge decisions without changing policy. B's exact late spare-gold XP proposal awaits architecture approval; C remains a separate evidence/approval gate. B05 as a whole is not complete. GameContent stays `1.31.0`, schema 6; no production tuning, new aggregate or baseline.
 
 ## Last Completed Work
 
+- 2026-11-05 — B05-A: extended the existing optional frozen observer with real frozen offer rank/score, affordability after earlier purchases, actually evaluated reserve exceptions, receive/merge/replacement guards and command/merge receipts; added equip/craft guard counts, bounded top candidates, inventory/carrier/form before/after facts and bounded report examples. Added causal reproduction tests, exact retained PRE seed-0 preparation regression and separate progression/item approval proposals. Branch `codex/b05-bot-decision-diagnostics`; base `0a43543162d520047cc3c51255ff0d8741a6e223`. Material files: `game/engine.ts`, `game/botDecisionDiagnostics.ts`, production-report integration/summary helper, new and existing diagnostic tests, B05/batch/bot-audit/diagnostic/state docs. No B/C policy change implemented.
 - 2026-11-05 — B04: added automatic phase/checkpoint and immutable battle recording, bounded local replay archive, import/export and read-only round/phase/perspective/speed/pause playback with B03 contributions. Added captain statistics/maxima, seven cosmetic achievements and distinct discovered/owned/deployed/form collections linked to the codex; transactional once-per-voyage credit, retained dedupe ledger, explicit backup restore and independent archive/profile resets. Legacy resumes are labelled partial. Branch `codex/b04-replay-profile`; base `6c8c9ab13eff84c25b572577b33018feb625157a` (B03 PR #61). Material files: Chronicle model/validation/IndexedDB/recorder hook/screen/styles, GameClient/menu/codex integration, Phaser pause, focused unit/browser tests, B04/README/analysis/batch/state docs.
 - 2026-11-05 — B03: added event-dispatched per-fighter HP/shield damage, healing/shield grants, received damage, drained Energy and revival counts; shared live/spectated/planner observer resets on replay/speed/perspective and never exposes unseen events. Added actual ability/item drain sources with legacy fallback, labelled directional movement/drain cues, four existing form accents and local music/SFX controls. Two original reproducible WAV loops have source/output hashes. Branch `codex/b03-combat-analysis-audio`; base `4bdd4dbd3eceb88c436752759590361a9c7503a0` (B02 PR #60). Material files: combat event type/attribution, selectors, BattleBoard/report and Phaser/VFX helpers, audio settings/hook, screens/styles, audio generator/manifest/WAVs, two focused unit files, browser coverage, B03/provenance/README/batch/analysis/state docs.
 - 2026-11-05 — B02: added main-menu Crew Tools, searchable crew/item/recipe/bond/form/status/PvE/stage reference, two-team deployment editor, production form/trait validation, deterministic mirrored combat tests and existing Phaser/recap playback. Added a separate bounded local plan library and validated JSON import/export. Main-menu readiness protects keyboard entry; active voyage checkpoints remain byte-identical during tool usage. Branch `codex/b02-codex-team-planner`; base `1a294a9c7f068ac983c94109c95b5ac1c9009427`. Material files: `game/teamPlanner.ts`, application reference/storage/presentation helpers, Crew Tools/Team Planner screens and styles, main-menu/selector integration, two focused unit-test files, `e2e/crew-tools.spec.ts`, `docs/B02_CODEX_TEAM_PLANNER.md`, README and current architecture/product/roadmap/analysis/batch/state documentation.
@@ -94,6 +95,13 @@ B04 local replay archive/profile/collection is implemented on `codex/b04-replay-
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+B05-A decision diagnostics:
+
+- PASS — typecheck, lint, focused diagnostic/form runs (41/41 and 62/62), final new decision suite (14/14). Diagnostics on/off serialize to identical end state/RNG; successful receipts preserve purchase order/source. Current seed-0 legacy facts exactly match the retained PRE with equal content/config hashes.
+- Full suite: 860/861 passed; only existing asset enumeration exceeded its five-second I/O limit while lint also ran. PASS — unchanged asset-test file on focused rerun (8/8, 335 ms). No assertion or timeout changed; normal CI remains the PR gate.
+- PASS — historical diagnostic SHA-256 remains `4cbdcb8a3e6ad4907e767b2663431c5b08d3181faf60fd74458d38cb194dbdf3`; content/scoring/forms/roster/bot policy files and raw reports remain unchanged.
+- NOT RUN locally — Browser E2E (no UI/Phaser behavior affected), separate production smoke, new aggregate/POST, 1,000-seed soak or baseline. Ordinary CI smoke/browser checks remain enabled.
 
 B04 voyage chronicle:
 
@@ -723,6 +731,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- B05-A extends opt-in reporting only. Each visible shop offer and attempted equip can be explained from actual authority inputs/outcomes; reports bound rich examples while preserving legacy raw preparation shape. Default production policy, commands, RNG, rewards, item/form contracts and saves remain unchanged. No B/C tuning is production policy.
 - B04 adds offline Voyage Chronicle, a bounded archive and non-authoritative playback, plus cosmetic profile/collection/achievements/records. Only completed local captain voyages count; imports never credit. Profile reset retains dedupe, and archived-record deletion does not resurrect it on resume. Pre-B04 resumes have partial coverage; incompatible content/config/schema disables playback. Active saves and gameplay remain separate.
 - B03 adds a collapsible playback-only combat meter and clearer semantic source/target cues to live, spectated and planner battles. Offline original music starts after interaction with independent effects/music controls, mute and track selection. Legacy Energy events without a source remain usable and explicitly unattributed; no gameplay/content/save behavior changes.
 - B02 adds offline Crew Tools to the main menu. Plan drafts/library/files live outside the active match; only validated isolated teams reach the unchanged simulator. Codex values use current content and shared item/unit/trait presentation. Production gameplay, saves, rewards, pool and adaptive bots retain their behavior.
@@ -785,6 +794,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- B05 follows its staged approval gate: A is implemented, while an exact B proposal and a separate C recommendation are handed back for approval rather than silently selecting a new policy. No new aggregate measurement was needed for A's focused cases and retained-PRE analysis. One unrelated asset I/O timeout passed unchanged on focused rerun; no existing test was weakened.
 - No B04 scope deviation. Complete replay uses resolved battle events/snapshots and latest per-phase crew/offer checkpoints, rather than adding a command/event-sourcing layer. The first new browser test's select lookup was corrected to the accessible combobox role; no existing assertion changed. The owner separately authorized integration of all current Batch branches after completion.
 - No B03 product deviation. B02 PR #60 was still open, so B03 is a stacked review branch rather than merging B02 without instruction. Browser tests found and fixed a stale-crew reset closure; new test selectors were corrected without weakening existing assertions. An outdated failed run was stopped before the corrected 8/8 run. No external audio or additional form clips were necessary after locking the existing-asset inventory.
 - None for B02 scope. Initial browser checks exposed an early keyboard-entry readiness gap and unsuitable selectors in the newly authored tests; readiness was fixed and selectors use actual accessible combobox roles/explicit coordinate values. All intended cases then passed. The existing Windows Playwright teardown issue was resolved by stopping only the verified owned server. No existing assertion was weakened and no dependency was added.
@@ -847,6 +857,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- B05-A provides mechanisms and fixtures, not population skip-reason rates. Historical PRE has 534 end-of-turn snapshots meeting the proposed B opportunity guards, but that is not a prediction of changed-policy outcomes. Extra late XP can reduce next-turn gold and must pass the specified one-POST representation/stability gates. Current item scoring leaves some newer scalar/passive affinities unvalued; no outcome-backed C policy or form guarantee follows from that code observation.
 - B04 is bounded to ten archive entries / 96 MiB and one 32 MiB draft; oldest archive entries are evicted without erasing profile credit. A 10,000-ID credit ledger prevents duplicate credit, including after resets; quota/format/storage failures are surfaced while gameplay continues. Abrupt shutdown can lose an in-flight same-phase checkpoint (two-second throttle); pre-B04 history cannot be reconstructed. Local imports/backups are not anti-cheat or public records. A future build with different content/config requires its own compatible viewer rather than replay re-simulation.
 - B03 contributions intentionally stop with interrupted/skipped playback and are not archived across screens; a future B04 archive is separate. Old battle logs cannot reconstruct an unrecorded drain source or passive-shield source. Browser autoplay may require a fresh interaction after focus; audio never gates combat. B02 must be integrated before retargeting the stacked B03 PR to main.
 - B02 imports require the current content version; incompatible/corrupt plan libraries are reported without overwriting stored bytes. Drafts must be explicitly saved before leaving the tool. Combat tests are isolated authored setups, not evidence for economic/bot balance. No blocking B02 issue remains after local verification.
@@ -893,6 +904,7 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
+- B05-A records actual guard evaluation: an unaffordable offer gets no fabricated reserve rejection, and rank uses the policy's frozen pass score. Item candidate-pair guards and iteration outcomes have different denominators. Receipts are detached/frozen JSON and never affect command selection. B/C require the batch's distinct architecture approvals; the old target-level experiment remains rejected, Smoker frozen/watch, and historical reports immutable.
 - B04 records presentation checkpoints/events outside MatchState, uses no new command or gameplay RNG, and reuses existing selectors/Phaser/B03 read-only. A separate IndexedDB transaction atomically archives completion and credits the local profile by stable voyage ID. Import provenance is assigned locally, never trusted from files; imported replays never count. Seven locked achievements are cosmetic. Discovered, owned, deployed and reached-form facts stay distinct; no public/online progression is implied.
 - B03 meters consume dispatched presentation events only; effective HP/shield loss excludes overkill, healing excludes overheal, shield grants include unused shields, interception follows the actual recipient, and resurrection/form HP changes are not healing. Existing passive starting shields get no invented source. Optional Energy source attribution is reporting-only and schema-6 compatible. PAC meter/preferences principles are adapted without its server/store stack or remote audio.
 - B02 uses production form reconciliation, distinct-definition traits and `simulateBattle` as authorities. PAC wiki/editor principles are adapted; its network/store/database/scenario stack is not imported. Team-plan format 1 and its 20-plan local library are independent of MatchState/schema 6. Disposable renderer state never enters the local session or IndexedDB voyage persistence.
@@ -947,7 +959,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-B04 is the completed implementation boundary; no further batch is started. B05 diagnostic work requires a separate request and the batch's diagnostic/architecture gates before any tuning candidate; do not automatically start it or tune bots, units, items, economy or Smoker.
+Review B05-A and the exact B policy/one-POST gates in `docs/B05_BOT_DECISION_DIAGNOSTIC.md`. Approve or reject B before implementation; decide C separately from item/form evidence. Do not silently tune another candidate or start B06, unit/item/economy/captain-damage/Smoker work.
 
 ## Codex Update Contract
 
