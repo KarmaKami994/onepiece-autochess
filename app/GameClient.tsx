@@ -13,6 +13,9 @@ import type {
 } from "@/components/PhaserBoard";
 import AnimationLab from "@/components/AnimationLab";
 import CrewToolsScreen from "./screens/CrewToolsScreen";
+import ChronicleScreen from "./screens/ChronicleScreen";
+import { useChronicleRecorder } from "./useChronicleRecorder";
+import type { ReferenceCategory } from "./crewReference";
 import {
   DEFAULT_BOARD_SKIN,
   isBoardSkin,
@@ -72,6 +75,7 @@ type Screen =
   | "menu"
   | "animation-lab"
   | "crew-tools"
+  | "chronicle"
   | "settings"
   | "match"
   | "carousel"
@@ -130,6 +134,8 @@ export default function GameClient() {
   const [screen, setScreen] = useState<Screen>("menu");
   const [returnScreen, setReturnScreen] = useState<Screen>("menu");
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
+  const [codexReference, setCodexReference] = useState<{ category: ReferenceCategory; query: string }>();
+  const { observe: recordChronicle, flush: flushChronicle, error: chronicleError } = useChronicleRecorder(content);
   const settingsReadyRef = useRef(false);
   const {
     state: engineState,
@@ -231,7 +237,8 @@ export default function GameClient() {
     return () => window.clearTimeout(toastTimer);
   }, [toast]);
 
-  const setEngineState = useCallback((next: MatchState) => {
+  const setEngineState = useCallback((next: MatchState, fresh = false) => {
+    recordChronicle(next, fresh);
     engineStateRef.current = next;
     const nextPhase = next.phase;
     const nextView = nextPhase === "carousel" ? null : selectMatchView(next);
@@ -249,7 +256,7 @@ export default function GameClient() {
       );
     }
     setLocalState(next);
-  }, [engineStateRef, setLocalState]);
+  }, [engineStateRef, setLocalState, recordChronicle]);
 
   useEffect(() => {
     const settingsTimer = window.setTimeout(() => {
@@ -335,7 +342,7 @@ export default function GameClient() {
   }, [engineStateRef, seed]);
 
   useEffect(() => {
-    if (!view || screen === "settings" || screen === "animation-lab" || screen === "crew-tools") return;
+    if (!view || screen === "settings" || screen === "animation-lab" || screen === "crew-tools" || screen === "chronicle") return;
     const syncScreen = window.setTimeout(() => {
       if (view.phase === "game-over" || !view.alive) {
         setScreen("results");
@@ -566,7 +573,7 @@ export default function GameClient() {
     try {
       const next = engine.createMatch(freshSeed, content);
       setSeed(freshSeed);
-      setEngineState(next);
+      setEngineState(next, true);
       setSelectedUnitId(null);
       setScoutedPlayerId(null);
       setScreen("match");
@@ -997,7 +1004,7 @@ export default function GameClient() {
         if (tutorialStep === "welcome") return;
         if (screen === "settings") closeSettings();
         else if (screen === "confirm-new") setScreen("menu");
-        else if (screen === "animation-lab" || screen === "crew-tools") setScreen("menu");
+        else if (screen === "animation-lab" || screen === "crew-tools" || screen === "chronicle") setScreen("menu");
         else if (screen === "match" && scoutedPlayerId) {
           returnFromScouting();
         }
@@ -1222,10 +1229,13 @@ export default function GameClient() {
             setScreen("animation-lab");
             playSound("click");
           }}
-          onCrewTools={() => { setScreen("crew-tools"); playSound("click"); }}
+          onCrewTools={() => { setCodexReference(undefined); setScreen("crew-tools"); playSound("click"); }}
+          onChronicle={() => { void flushChronicle().then(() => setScreen("chronicle")); playSound("click"); }}
         />
       )}
-      {screen === "crew-tools" && <CrewToolsScreen content={content} settings={settings} onBack={() => { setScreen("menu"); playSound("click"); }} />}
+      {screen === "crew-tools" && <CrewToolsScreen content={content} settings={settings} initialReference={codexReference} onBack={() => { setScreen("menu"); playSound("click"); }} />}
+      {screen === "chronicle" && <ChronicleScreen content={content} settings={settings} onBack={() => setScreen("menu")} onCodex={(category, query) => { setCodexReference({ category, query }); setScreen("crew-tools"); }} />}
+      {chronicleError && <p className="chronicle-recording-error" role="status">Chronicle: {chronicleError}</p>}
       {screen === "animation-lab" && (
         <AnimationLab
           onBack={() => {

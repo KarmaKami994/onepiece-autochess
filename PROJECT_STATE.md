@@ -23,10 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-B03 combat contributions, readable effects and offline audio are implemented on `codex/b03-combat-analysis-audio`, based on completed B02 head `4bdd4dbd3eceb88c436752759590361a9c7503a0`. B02 PR #60 is still separate; B03 targets its branch for an isolated stacked review. GameContent remains `1.31.0`, save schema remains 6. No combat rule, RNG, balance or bot policy changes; only optional drain-source reporting extends domain events.
+B04 local replay archive/profile/collection is implemented on `codex/b04-replay-profile`, based on B03 `6c8c9ab13eff84c25b572577b33018feb625157a`. The owner requested integration of B02/B03/B04 into main after B04 completion and successful CI; merge SHAs are recorded by GitHub history. GameContent remains `1.31.0`, schema 6; replay/profile format 1 uses a separate local IndexedDB database. No gameplay, bot, balance or RNG change.
 
 ## Last Completed Work
 
+- 2026-11-05 — B04: added automatic phase/checkpoint and immutable battle recording, bounded local replay archive, import/export and read-only round/phase/perspective/speed/pause playback with B03 contributions. Added captain statistics/maxima, seven cosmetic achievements and distinct discovered/owned/deployed/form collections linked to the codex; transactional once-per-voyage credit, retained dedupe ledger, explicit backup restore and independent archive/profile resets. Legacy resumes are labelled partial. Branch `codex/b04-replay-profile`; base `6c8c9ab13eff84c25b572577b33018feb625157a` (B03 PR #61). Material files: Chronicle model/validation/IndexedDB/recorder hook/screen/styles, GameClient/menu/codex integration, Phaser pause, focused unit/browser tests, B04/README/analysis/batch/state docs.
 - 2026-11-05 — B03: added event-dispatched per-fighter HP/shield damage, healing/shield grants, received damage, drained Energy and revival counts; shared live/spectated/planner observer resets on replay/speed/perspective and never exposes unseen events. Added actual ability/item drain sources with legacy fallback, labelled directional movement/drain cues, four existing form accents and local music/SFX controls. Two original reproducible WAV loops have source/output hashes. Branch `codex/b03-combat-analysis-audio`; base `4bdd4dbd3eceb88c436752759590361a9c7503a0` (B02 PR #60). Material files: combat event type/attribution, selectors, BattleBoard/report and Phaser/VFX helpers, audio settings/hook, screens/styles, audio generator/manifest/WAVs, two focused unit files, browser coverage, B03/provenance/README/batch/analysis/state docs.
 - 2026-11-05 — B02: added main-menu Crew Tools, searchable crew/item/recipe/bond/form/status/PvE/stage reference, two-team deployment editor, production form/trait validation, deterministic mirrored combat tests and existing Phaser/recap playback. Added a separate bounded local plan library and validated JSON import/export. Main-menu readiness protects keyboard entry; active voyage checkpoints remain byte-identical during tool usage. Branch `codex/b02-codex-team-planner`; base `1a294a9c7f068ac983c94109c95b5ac1c9009427`. Material files: `game/teamPlanner.ts`, application reference/storage/presentation helpers, Crew Tools/Team Planner screens and styles, main-menu/selector integration, two focused unit-test files, `e2e/crew-tools.spec.ts`, `docs/B02_CODEX_TEAM_PLANNER.md`, README and current architecture/product/roadmap/analysis/batch/state documentation.
 - 2026-11-04 — B01 / PR #59: optional schema-6 `finalLineup` captures frozen fighters and reserve for eliminated players and the winner without reinterpreting `finalCrew` analytics. Results show every card, forms/items and deployed-only bonds; old saves remain explicitly unclassified, including a duplicate-free winner fallback. Updated current crafting, battle-save, P11/P12, P7-art and bot-roadmap documentation, and published the prior analysis/batch plan with B01 completion marked. Initial implementation commit `1c7bd9bf5b9cf440acba8cd5355c19887535b4ed`. Material files: `game/types.ts`, `game/engine.ts`, `app/selectors.ts`, `app/screens/GameScreens.tsx`, `app/game.css`, `tests/results-lineup.test.ts`, `e2e/results.spec.ts`, README, product/architecture/bot/form/P4 documents, `docs/B01_RESULTS_COMPLETION.md`, `docs/OFFENE_FEATURES_PAC_ABGLEICH.md`, `docs/TASK_BATCHES_PAC_AUSBAU.md`, `PROJECT_STATE.md`.
@@ -93,6 +94,13 @@ B03 combat contributions, readable effects and offline audio are implemented on 
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+B04 voyage chronicle:
+
+- PASS — typecheck, lint, focused recording/contribution/selector suite (30 tests initially; final Chronicle 14/14), full unit suite (66 files / 843 tests) and production build.
+- PASS — corrected Browser E2E run: 10/10 across 1280×720 and 1920×1080. Covers persisted completion, duplicate resumes, collection links, actual playback pause/navigation/perspective/speed, B03 totals/audio, malformed/incompatible imports, archive/profile backup round-trip, independent resets and unchanged active save. Screenshots inspected. Owned Windows server required targeted teardown.
+- PASS — one normal deterministic captain-voyage recording regression: observation preserves state/RNG hashes; complete JSON round-trip validates and stays under its size limit. No game/content/schema/package/asset change.
+- NOT RUN — local aggregate production report, 1,000-seed soak or new baseline. Normal CI remains the integration gate. No B05 work.
 
 B03 combat readability/audio:
 
@@ -715,6 +723,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- B04 adds offline Voyage Chronicle, a bounded archive and non-authoritative playback, plus cosmetic profile/collection/achievements/records. Only completed local captain voyages count; imports never credit. Profile reset retains dedupe, and archived-record deletion does not resurrect it on resume. Pre-B04 resumes have partial coverage; incompatible content/config/schema disables playback. Active saves and gameplay remain separate.
 - B03 adds a collapsible playback-only combat meter and clearer semantic source/target cues to live, spectated and planner battles. Offline original music starts after interaction with independent effects/music controls, mute and track selection. Legacy Energy events without a source remain usable and explicitly unattributed; no gameplay/content/save behavior changes.
 - B02 adds offline Crew Tools to the main menu. Plan drafts/library/files live outside the active match; only validated isolated teams reach the unchanged simulator. Codex values use current content and shared item/unit/trait presentation. Production gameplay, saves, rewards, pool and adaptive bots retain their behavior.
 - B01 changes final-result presentation only: complete last deployed crew, separate reserve, frozen form/equipment retention and deployed-only bonds. Optional `finalLineup` is reporting metadata; existing `finalCrew` ownership semantics and gameplay remain unchanged. Older saves show an unclassified roster instead of guessed battle/bench roles.
@@ -776,6 +785,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- No B04 scope deviation. Complete replay uses resolved battle events/snapshots and latest per-phase crew/offer checkpoints, rather than adding a command/event-sourcing layer. The first new browser test's select lookup was corrected to the accessible combobox role; no existing assertion changed. The owner separately authorized integration of all current Batch branches after completion.
 - No B03 product deviation. B02 PR #60 was still open, so B03 is a stacked review branch rather than merging B02 without instruction. Browser tests found and fixed a stale-crew reset closure; new test selectors were corrected without weakening existing assertions. An outdated failed run was stopped before the corrected 8/8 run. No external audio or additional form clips were necessary after locking the existing-asset inventory.
 - None for B02 scope. Initial browser checks exposed an early keyboard-entry readiness gap and unsuitable selectors in the newly authored tests; readiness was fixed and selectors use actual accessible combobox roles/explicit coordinate values. All intended cases then passed. The existing Windows Playwright teardown issue was resolved by stopping only the verified owned server. No existing assertion was weakened and no dependency was added.
 - None for B01 product scope. The host's npm shim still targets a missing roaming CLI, so installed Node/package entrypoints run verification. The known Windows Playwright teardown hung after 8/8 assertions; stopping only its verified Vinext server allowed a successful exit. The frozen last deployment and the end-of-voyage bench are explicitly different instants; displayed totals describe cards/equipment, not a new ownership metric.
@@ -837,6 +847,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- B04 is bounded to ten archive entries / 96 MiB and one 32 MiB draft; oldest archive entries are evicted without erasing profile credit. A 10,000-ID credit ledger prevents duplicate credit, including after resets; quota/format/storage failures are surfaced while gameplay continues. Abrupt shutdown can lose an in-flight same-phase checkpoint (two-second throttle); pre-B04 history cannot be reconstructed. Local imports/backups are not anti-cheat or public records. A future build with different content/config requires its own compatible viewer rather than replay re-simulation.
 - B03 contributions intentionally stop with interrupted/skipped playback and are not archived across screens; a future B04 archive is separate. Old battle logs cannot reconstruct an unrecorded drain source or passive-shield source. Browser autoplay may require a fresh interaction after focus; audio never gates combat. B02 must be integrated before retargeting the stacked B03 PR to main.
 - B02 imports require the current content version; incompatible/corrupt plan libraries are reported without overwriting stored bytes. Drafts must be explicitly saved before leaving the tool. Combat tests are isolated authored setups, not evidence for economic/bot balance. No blocking B02 issue remains after local verification.
 - B01 legacy saves cannot recover an exact deployment if it was never recorded. The UI labels this gap rather than inferring a lineup or bonds; it also handles legacy battle logs without frozen item arrays. No gameplay defect or balance conclusion is inferred from this presentation work.
@@ -882,6 +893,7 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
+- B04 records presentation checkpoints/events outside MatchState, uses no new command or gameplay RNG, and reuses existing selectors/Phaser/B03 read-only. A separate IndexedDB transaction atomically archives completion and credits the local profile by stable voyage ID. Import provenance is assigned locally, never trusted from files; imported replays never count. Seven locked achievements are cosmetic. Discovered, owned, deployed and reached-form facts stay distinct; no public/online progression is implied.
 - B03 meters consume dispatched presentation events only; effective HP/shield loss excludes overkill, healing excludes overheal, shield grants include unused shields, interception follows the actual recipient, and resurrection/form HP changes are not healing. Existing passive starting shields get no invented source. Optional Energy source attribution is reporting-only and schema-6 compatible. PAC meter/preferences principles are adapted without its server/store stack or remote audio.
 - B02 uses production form reconciliation, distinct-definition traits and `simulateBattle` as authorities. PAC wiki/editor principles are adapted; its network/store/database/scenario stack is not imported. Team-plan format 1 and its 20-plan local library are independent of MatchState/schema 6. Disposable renderer state never enters the local session or IndexedDB voyage persistence.
 - B01 preserves the original frozen battle-start crew even after legal battle-time merges, and snapshots the reserve before elimination clears it. `finalCrew` keeps its historical all-owned meaning. The optional presentation field needs no schema/version bump; old saves remain unknown rather than backfilled with fabricated deployment data.
@@ -935,7 +947,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-Review/integrate B02 then B03. B04 (local replay archive/progression) is the next batch only after a separate request. Future P1B work still needs skipped-offer/item/form diagnostics and approved architecture; do not automatically begin B04 or tune bots, units, items, economy or Smoker.
+B04 is the completed implementation boundary; no further batch is started. B05 diagnostic work requires a separate request and the batch's diagnostic/architecture gates before any tuning candidate; do not automatically start it or tune bots, units, items, economy or Smoker.
 
 ## Codex Update Contract
 
