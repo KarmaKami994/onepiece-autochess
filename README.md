@@ -129,6 +129,11 @@ an explicitly unclassified saved crew.
   actions. Only legacy `replayBattle` saves use the compatibility replay path.
   Closing during a Bounty Regatta resumes the last complete 50 ms checkpoint;
   Voyage Recruitment preserves pending offers and shared-pool reservations.
+  Preparation/recruitment clock checkpoints exclude offline time; battles resume
+  as full immutable replays. Pause, settings and hidden tabs stop the voyage.
+- [B06 pacing](docs/B06_PAC_PACING.md) uses the pinned PAC phase limits, a
+  three-second completed-round display and 23-second recruitment timeout.
+  Auto-continue battles is configurable; Ready and Skip remain available.
 - All artwork is bundled under `public/assets`; Web Audio effects are generated
   locally. Gameplay makes no network requests.
 

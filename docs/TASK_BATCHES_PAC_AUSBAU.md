@@ -163,6 +163,14 @@ Dieses Paket hat **drei Lieferungen**, damit Ursachen und Folgen einzelner Polic
 
 ## B06 — Reales Pacing und Wartezeiten
 
+2026-11-06: B06 umgesetzt und lokal geprüft auf `codex/b06-pac-pacing`; der Eigentümer erlaubt die
+1:1-PAC-Zeiten. [Zeit-/Pause-/Resume-Vertrag](B06_PAC_PACING.md). Vorhandene
+Domain-Zeiten bleiben exakt; Anwendungsuhren, Ergebnisanzeige und Recruitment-
+Deadline sind umgesetzt. Typecheck/Lint, 887 Unit-Tests, Build sowie fokussierte
+Browserfälle in beiden Desktop-Größen bestehen. Normale CI bleibt Review-Gate.
+20–30 Minuten bleiben eine Schätzung für zügiges Spiel, keine behauptete
+gemessene Spieldauer. Kein B07.
+
 **Ziel:** Eine Reise hat ein bewusst definiertes Zeitbudget und vermeidet unnötige Wartezeit.
 
 **Aufgaben:**

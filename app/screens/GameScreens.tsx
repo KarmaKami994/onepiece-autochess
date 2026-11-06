@@ -11,6 +11,7 @@ import {
   type BoardUnit,
 } from "@/components/PhaserBoard";
 import BattleBoard from "@/components/BattleBoard";
+import PhaseClockDisplay from "../PhaseClockDisplay";
 import { MUSIC_TRACKS, type AudioSettings } from "../audioSettings";
 import PhaserCarousel, {
   type CarouselPresentationSnapshot,
@@ -36,6 +37,7 @@ import {
 
 export type Settings = AudioSettings & {
   animationSpeed: number;
+  autoContinueBattle: boolean;
   particles: boolean;
   combatNumbers: boolean;
   reducedMotion: boolean;
@@ -517,7 +519,7 @@ export function SettingsScreen({
           <label className="setting-row">
             <span>
               <strong>Battle speed</strong>
-              <small>Controls board event animations</small>
+              <small>Playback only; changing visual options restarts the battle replay</small>
             </span>
             <select
               value={settings.animationSpeed}
@@ -534,6 +536,13 @@ export function SettingsScreen({
               <option value={4}>Storm speed · 4×</option>
             </select>
           </label>
+          <SettingToggle
+            label="Auto-continue battles"
+            note="Continue after playback and the 3-second result; off waits for your Continue order"
+            checked={settings.autoContinueBattle}
+            onChange={(autoContinueBattle) => onChange({ ...settings, autoContinueBattle })}
+          />
+          <p className="pacing-help">The voyage pauses in settings and while the browser is hidden. Returning preserves your remaining preparation time. Ready starts combat early.</p>
           <fieldset className="map-skin-setting">
             <legend>
               <strong>Battlefield</strong>
@@ -659,9 +668,14 @@ function SettingToggle({
 }
 
 export function MatchScreen({
+  hidden,
   view,
   timer,
   phaseDuration,
+  clockLabel,
+  clockPaused,
+  manualPaused,
+  onTogglePause,
   settings,
   selectedUnit,
   selectedDefinition,
@@ -684,9 +698,14 @@ export function MatchScreen({
   onAdvance,
   onSettings,
 }: {
+  hidden: boolean;
   view: MatchView;
   timer: number;
   phaseDuration: number;
+  clockLabel: string;
+  clockPaused: boolean;
+  manualPaused: boolean;
+  onTogglePause: () => void;
   settings: Settings;
   selectedUnit?: BoardUnit;
   selectedDefinition?: ShopUnitView;
@@ -723,7 +742,6 @@ export function MatchScreen({
     ? scoutedStanding?.traits ?? []
     : battlePresentation?.traits ?? view.traits;
   const tacticalCapacity = scoutedStanding?.level ?? view.capacity;
-  const warning = timer <= 8;
   const playerCrewCount = view.boardUnits.filter(
     (unit) => unit.team === "player",
   ).length;
@@ -767,7 +785,7 @@ export function MatchScreen({
   }
 
   return (
-    <section className="match-screen">
+    <section className="match-screen" hidden={hidden}>
       <header className="match-topbar">
         <div className="round-medallion">
           <span>STAGE</span>
@@ -796,17 +814,13 @@ export function MatchScreen({
             <span>Lv. {(scoutedStanding ?? view.opponent)?.level}</span>
           )}
         </div>
-        <div
-          className={`phase-clock ${warning ? "is-warning" : ""}`}
-          aria-label={`${view.phaseLabel}, ${timer} seconds remaining`}
-        >
-          <span>
-            {planning && tutorialStep ? "PAUSED" : view.phaseLabel}
-          </span>
-          <strong>{timer.toString().padStart(2, "0")}</strong>
-          <i style={{ "--timer": `${Math.max(0, timer) / Math.max(1, phaseDuration)}` } as CSSProperties} />
-        </div>
+        <PhaseClockDisplay timer={timer} duration={phaseDuration} label={clockLabel} />
         <div className="topbar-tools">
+          <button type="button" className="icon-button" onClick={onTogglePause}
+            aria-label={manualPaused ? "Resume voyage" : "Pause voyage"} aria-pressed={manualPaused}
+            disabled={tutorialStep !== null} title={manualPaused ? "Resume voyage" : "Pause voyage"}>
+            {manualPaused ? "▶" : "Ⅱ"}
+          </button>
           <span className={`save-indicator ${saveStatus}`}>
             {saveStatus === "saving" ? "WRITING LOG…" : saveStatus === "saved" ? "LOG SAVED" : "LOCAL"}
           </span>
@@ -843,6 +857,7 @@ export function MatchScreen({
           combatEvents={scouting ? [] : battlePresentation?.events ?? view.events}
           eventSequence={battlePresentation?.eventSequence ?? view.eventSequence}
           speed={settings.animationSpeed}
+          paused={clockPaused || timer === 0}
           particles={settings.particles}
           combatNumbers={settings.combatNumbers}
           reducedMotion={settings.reducedMotion}
@@ -929,7 +944,7 @@ export function MatchScreen({
           {!planning && (
             <div className="combat-hud" aria-label="Combat presentation controls">
               <span className="combat-hud-label" aria-live="polite">
-                AUTO COMBAT
+                {timer === 0 ? "ROUND COMPLETE" : `PLAYBACK · ${settings.animationSpeed}×`}
               </span>
               <label>
                 <span>SPEED</span>
@@ -1112,7 +1127,7 @@ export function MatchScreen({
             onClick={onAdvance}
             data-tooltip={planning ? "End preparation early" : "Resolve battle"}
           >
-            <span>{planning ? "START BATTLE" : "SKIP ANIMATION"}</span>
+            <span>{planning ? "START BATTLE" : timer === 0 ? "CONTINUE" : "SKIP ANIMATION"}</span>
             <small>{planning ? "READY!" : "RESOLVE NOW"}</small>
           </button>
         </div>
@@ -2067,10 +2082,22 @@ export function CarouselScreen({
 export function VoyageRecruitmentScreen({
   round,
   recruits,
+  timer,
+  phaseDuration,
+  clockLabel,
+  manualPaused,
+  onTogglePause,
+  onSettings,
   onChoose,
 }: {
   round: number;
   recruits: ShopUnitView[];
+  timer: number;
+  phaseDuration: number;
+  clockLabel: string;
+  manualPaused: boolean;
+  onTogglePause: () => void;
+  onSettings: () => void;
   onChoose: (id: string) => void;
 }) {
   return (
@@ -2080,6 +2107,12 @@ export function VoyageRecruitmentScreen({
         <span className="eyebrow">VOYAGE CHOICE · ROUND {round}</span>
         <h2>{round === 10 ? "GRAND LINE RECRUITMENT" : "NEW WORLD RECRUITMENT"}</h2>
         <p>Choose one crewmate. A full bench converts the recruit to its gold value unless it can combine.</p>
+        <div className="recruitment-clock-controls">
+          <PhaseClockDisplay timer={timer} duration={phaseDuration} label={clockLabel} />
+          <button type="button" className="text-button" aria-pressed={manualPaused} onClick={onTogglePause}>{manualPaused ? "Resume voyage" : "Pause voyage"}</button>
+          <button type="button" className="text-button" onClick={onSettings}>Open settings</button>
+        </div>
+        <p className="pacing-help">23 seconds to choose. At zero, the Log Pose auto-picks using your crew fit. Pausing keeps your offers reserved.</p>
       </header>
       <div className="reward-cards">
         {recruits.map((recruit, index) => (

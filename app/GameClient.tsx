@@ -39,6 +39,7 @@ import { useGameAudio, type SoundName } from "./useGameAudio";
 import { DEFAULT_AUDIO_SETTINGS, normalizeAudioSettings } from "./audioSettings";
 import { useLocalGameSession } from "./useLocalGameSession";
 import { useMatchClock } from "./useMatchClock";
+import { isTimedPhase, readPhaseClockCheckpoint, type PhaseClockCheckpoint } from "./phaseClock";
 import {
   deriveTutorialStep,
   useTutorial,
@@ -91,6 +92,7 @@ const COMBAT_SPEEDS = [0.5, 1, 2, 4] as const;
 const DEFAULT_SETTINGS: Settings = {
   ...DEFAULT_AUDIO_SETTINGS,
   animationSpeed: 1,
+  autoContinueBattle: true,
   particles: true,
   combatNumbers: true,
   reducedMotion: false,
@@ -116,6 +118,7 @@ function loadStoredSettings(): Settings {
       ...DEFAULT_SETTINGS,
       ...parsed,
       ...normalizeAudioSettings(parsed),
+      autoContinueBattle: typeof parsed.autoContinueBattle === "boolean" ? parsed.autoContinueBattle : true,
       animationSpeed: COMBAT_SPEEDS.includes(
         parsed.animationSpeed as (typeof COMBAT_SPEEDS)[number],
       )
@@ -163,6 +166,9 @@ export default function GameClient() {
     "idle",
   );
   const saveWriteChainRef = useRef<Promise<void>>(Promise.resolve());
+  const [pacingPaused, setPacingPaused] = useState(false);
+  const [restoredClock, setRestoredClock] = useState<PhaseClockCheckpoint | null>(null);
+  const clockCheckpointRef = useRef<() => PhaseClockCheckpoint | null>(() => null);
   const lastCarouselCheckpointRef = useRef(0);
   const playSound = useGameAudio(settings);
   const [stableMatchView, setStableMatchView] = useState<MatchView | null>(null);
@@ -198,7 +204,9 @@ export default function GameClient() {
   );
   const activePhase = view?.phase;
   const activeRound = view?.round;
-  const activeBattleDuration = view?.battleDurationSeconds ?? 45;
+  const activeBattleDuration = engineState?.phase === "battle"
+    ? Math.max(0, ...engineState.lastResults.map(result => result.durationTicks * content.config.combatTickMs / 1_000))
+    : 45;
 
   const returnFromScouting = useCallback(() => {
     setScoutedPlayerId(null);
@@ -294,7 +302,7 @@ export default function GameClient() {
       if (isCarousel) lastCarouselCheckpointRef.current = Date.now();
       setSaveStatus("saving");
       const updatedAt = Date.now();
-      const envelope = createVoyageSaveEnvelope(engineState, seed, updatedAt);
+      const envelope = createVoyageSaveEnvelope(engineState, seed, updatedAt, clockCheckpointRef.current());
       saveWriteChainRef.current = saveWriteChainRef.current
         .catch(() => undefined)
         .then(() => writeVoyage(envelope));
@@ -310,7 +318,7 @@ export default function GameClient() {
         });
     }, delay);
     return () => window.clearTimeout(saveTimer);
-  }, [engineState, seed]);
+  }, [engineState, seed, screen, pacingPaused]);
 
   useEffect(() => {
     const checkpointActivePhase = () => {
@@ -318,12 +326,12 @@ export default function GameClient() {
       if (
         !current ||
         !seed ||
-        (current.phase !== "battle" && current.phase !== "carousel")
+        (!isTimedPhase(current.phase) && current.phase !== "carousel")
       ) {
         return;
       }
       const updatedAt = Date.now();
-      const envelope = createVoyageSaveEnvelope(current, seed, updatedAt);
+      const envelope = createVoyageSaveEnvelope(current, seed, updatedAt, clockCheckpointRef.current());
       const checkpointWrite = writeVoyage(envelope);
       saveWriteChainRef.current = Promise.all([
         saveWriteChainRef.current.catch(() => undefined),
@@ -335,11 +343,15 @@ export default function GameClient() {
     };
     document.addEventListener("visibilitychange", onVisibilityChange);
     window.addEventListener("pagehide", checkpointActivePhase);
+    const checkpointTimer = window.setInterval(() => {
+      if (!document.hidden && ["match", "carousel", "voyage-recruitment"].includes(screen)) checkpointActivePhase();
+    }, 5_000);
     return () => {
       document.removeEventListener("visibilitychange", onVisibilityChange);
       window.removeEventListener("pagehide", checkpointActivePhase);
+      window.clearInterval(checkpointTimer);
     };
-  }, [engineStateRef, seed]);
+  }, [engineStateRef, seed, screen]);
 
   useEffect(() => {
     if (!view || screen === "settings" || screen === "animation-lab" || screen === "crew-tools" || screen === "chronicle") return;
@@ -494,6 +506,7 @@ export default function GameClient() {
       }
 
       setEngineState(next);
+      if (next.phase !== currentPhase) setPacingPaused(false);
       if (currentPhase === "preparation") {
         showToast("info", "SET SAIL", "Cannons ready — battle begins!");
       } else if (resolvedOutcome) {
@@ -557,21 +570,29 @@ export default function GameClient() {
       advanceRef.current();
     }
   }, [activePhase, activeRound, engineStateRef]);
-  const { timer, phaseDuration } = useMatchClock({
+  const { timer, phaseDuration, paused: clockPaused, label: clockLabel, checkpoint: clockCheckpoint } = useMatchClock({
     screen,
+    seed,
     phase: engineState?.phase,
     round: activeRound,
     battleDurationSeconds: activeBattleDuration,
     animationSpeed: settings.animationSpeed,
+    replayKey: `${settings.animationSpeed}:${settings.particles}:${settings.combatNumbers}:${settings.reducedMotion}`,
     tutorialActive: tutorialStep !== null,
+    manualPaused: pacingPaused,
+    autoContinueBattle: settings.autoContinueBattle,
+    checkpoint: restoredClock,
     content,
     onExpire: expireCurrentPhase,
   });
+  useEffect(() => { clockCheckpointRef.current = clockCheckpoint; }, [clockCheckpoint]);
 
   const startVoyage = useCallback(() => {
     const freshSeed = `grand-line-${Date.now().toString(36)}`;
     try {
       const next = engine.createMatch(freshSeed, content);
+      setRestoredClock(null);
+      setPacingPaused(false);
       setSeed(freshSeed);
       setEngineState(next, true);
       setSelectedUnitId(null);
@@ -636,6 +657,9 @@ export default function GameClient() {
           return;
         }
         const restored = restoreVoyageState(saved, content);
+        const savedClock = readPhaseClockCheckpoint(saved.phaseClock, restored);
+        setRestoredClock(savedClock);
+        setPacingPaused(savedClock?.paused ?? false);
         setSeed(saved.seed);
         setEngineState(restored);
         setScoutedPlayerId(null);
@@ -836,6 +860,7 @@ export default function GameClient() {
 
   const chooseVoyageRecruit = useCallback((definitionId: string) => {
     if (!view || view.phase !== "voyage-choice") return;
+    setPacingPaused(false);
     issueCommand(
       { type: "CHOOSE_VOYAGE_RECRUIT", definitionId },
       "reward",
@@ -1010,6 +1035,7 @@ export default function GameClient() {
         }
         else if (screen === "match") openSettings("match");
         else if (screen === "carousel") openSettings("carousel");
+        else if (screen === "voyage-recruitment") openSettings("voyage-recruitment");
         return;
       }
       const key = event.key.toLowerCase();
@@ -1262,11 +1288,16 @@ export default function GameClient() {
           onClearDiagnostics={clearLocalDiagnostics}
         />
       )}
-      {screen === "match" && view && (
+      {(screen === "match" || (screen === "settings" && returnScreen === "match")) && view && (
         <MatchScreen
+          hidden={screen !== "match"}
           view={view}
           timer={timer}
           phaseDuration={phaseDuration}
+          clockLabel={clockLabel}
+          clockPaused={clockPaused}
+          manualPaused={pacingPaused}
+          onTogglePause={() => setPacingPaused(current => !current)}
           settings={settings}
           selectedUnit={selectedUnit}
           selectedDefinition={selectedDefinition}
@@ -1352,6 +1383,12 @@ export default function GameClient() {
         <VoyageRecruitmentScreen
           round={view.round}
           recruits={view.voyageRecruits}
+          timer={timer}
+          phaseDuration={phaseDuration}
+          clockLabel={clockLabel}
+          manualPaused={pacingPaused}
+          onTogglePause={() => setPacingPaused(current => !current)}
+          onSettings={() => openSettings("voyage-recruitment")}
           onChoose={chooseVoyageRecruit}
         />
       )}
