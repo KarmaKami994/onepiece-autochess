@@ -236,8 +236,11 @@ with green CI as `7b7b07abbc6f14c9c8ce54d223909da209210f98`. The owner then
 approved exactly one late spare-gold XP evaluation. Its POST failed the locked
 cost-5 representation gates, so behavior/version/tests were reverted to A;
 see [B05-B's rejected evaluation](B05_LATE_SPARE_XP_EVALUATION.md). Item/form
-policy stays unchanged. This completes the approved evaluation, not a successful
-progression improvement or authority for another candidate.
+policy stays unchanged. C's subsequently approved single Special Defense carrier
+evaluation also failed its locked non-regression gates and was reverted; see
+[the C evaluation](B05_ITEM_AFFINITY_PROPOSAL.md). B05's diagnostic/evaluation
+deliveries are complete without successful production tuning or authority for
+another candidate.
 
 No bot tuning, economy change, captain-damage change or unit-balance work follows automatically; each requires separate approval.
 
@@ -245,7 +248,7 @@ Smoker is frozen as a watch item. The previously proposed Smoker trait-state dia
 
 ## 15. Exactly One Next Task
 
-Review B05-B's retained rejection evidence. B02–B04 and B05-A are merged; the
-approved single progression evaluation is complete with production unchanged.
+Review B05-B/C's retained rejection evidence. B02–B04 and B05-A are merged; the
+separately approved progression/carrier evaluations are complete with production unchanged.
 Any further progression/item policy requires a separate evidence-backed decision.
 No B06, new candidate, tuning or measurement starts automatically.

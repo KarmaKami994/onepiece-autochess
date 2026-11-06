@@ -143,6 +143,12 @@ do not retune a second candidate. A new baseline is not authorized.
 
 ### C — separate item/form decision
 
+Subsequent continuation: the owner approved one carrier-only Special Defense
+affinity candidate and one POST on 2026-11-05. Focused cases passed, but three
+locked representation gates failed; behavior/version/tests were reverted.
+See [the exact C evaluation and retained evidence](B05_ITEM_AFFINITY_PROPOSAL.md).
+The following recommendation records A's original handoff.
+
 The reproduced legality/crafting/retention/form-lock paths work as specified.
 Recommendation: retain the current item/form policy for this candidate; do not
 manufacture a change or force transformations. Use the new reason counts and
@@ -166,6 +172,7 @@ reviewable; no item/form weights or policy are changed in A.
   the PR gate, including its ordinary smoke/browser checks.
 
 **Status: A merged with green CI; B's approved one-candidate evaluation complete,
-rejected and reverted. C's existing policy is retained without a new rule or
-measurement. No successful progression improvement is claimed; a future policy
-requires separate evidence/approval. No B06 work starts here.**
+rejected and reverted. C's separately approved single evaluation is also complete,
+rejected and reverted; production remains unchanged. B05's diagnostic/evaluation
+deliveries are complete without a successful tuning claim. A future policy needs
+separate evidence/approval; no B06 work starts here.**

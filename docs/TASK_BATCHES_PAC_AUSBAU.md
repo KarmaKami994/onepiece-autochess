@@ -126,8 +126,12 @@ ausdrücklich freigegebene B-Kandidat wurde genau einmal über 50 Seeds bewertet
 und wegen verfehlter Cost-5-Gates verworfen; Verhalten, Version und Tests sind
 auf A zurückgenommen. [Auswertung und unveränderte Evidenz](B05_LATE_SPARE_XP_EVALUATION.md).
 Die Bewertung ist abgeschlossen, eine erfolgreiche Progressionsverbesserung wird
-nicht behauptet. C behält die bisherige Item-/Form-Policy ohne neue Änderung bei;
-ein weiterer Kandidat benötigt getrennte Evidenz/Freigabe. Kein B06-Start.
+nicht behauptet. C wurde anschließend separat für genau eine Trägerbewertung
+freigegeben und einmal gemessen; auch dieser Kandidat verfehlte die festgelegten
+Gates und ist vollständig zurückgenommen. [C-Auswertung](B05_ITEM_AFFINITY_PROPOSAL.md).
+Die B05-Diagnose-/Bewertungslieferungen sind abgeschlossen, Produktions-Policy
+und Form-Regeln bleiben unverändert. Ein weiterer Kandidat benötigt getrennte
+Evidenz/Freigabe. Kein B06-Start.
 
 **Ziel:** Die Bots verbessern sich anhand erklärter Entscheidungen; der Erfolg wird an tatsächlich eingesetzten Teams gemessen.
 
@@ -158,6 +162,14 @@ Dieses Paket hat **drei Lieferungen**, damit Ursachen und Folgen einzelner Polic
 **Abgrenzung:** Der frühere abgelehnte Target-Level-Kandidat wird nicht vorausgesetzt. Unit-/Item-/Trait-Werte, Shop-Odds, Pool, Economy-Grundwerte und Smoker werden für diesen Bot-Auftrag nicht getunt. Eine neue Vergleichsmessung darf nicht unbemerkt spätere Content-Erweiterungen enthalten.
 
 ## B06 — Reales Pacing und Wartezeiten
+
+2026-11-06: B06 umgesetzt und lokal geprüft auf `codex/b06-pac-pacing`; der Eigentümer erlaubt die
+1:1-PAC-Zeiten. [Zeit-/Pause-/Resume-Vertrag](B06_PAC_PACING.md). Vorhandene
+Domain-Zeiten bleiben exakt; Anwendungsuhren, Ergebnisanzeige und Recruitment-
+Deadline sind umgesetzt. Typecheck/Lint, 887 Unit-Tests, Build sowie fokussierte
+Browserfälle in beiden Desktop-Größen bestehen. Normale CI bleibt Review-Gate.
+20–30 Minuten bleiben eine Schätzung für zügiges Spiel, keine behauptete
+gemessene Spieldauer. Kein B07.
 
 **Ziel:** Eine Reise hat ein bewusst definiertes Zeitbudget und vermeidet unnötige Wartezeit.
 

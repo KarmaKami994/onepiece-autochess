@@ -902,9 +902,14 @@ kbd {
   overflow: hidden;
 }
 
+.match-screen[hidden] { display: none; }
+.recruitment-clock-controls { display: flex; justify-content: center; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 14px; }
+.pacing-help { color: #b7c8c9; font-size: 12px; line-height: 1.5; }
+
 .phase-clock span {
+  max-width: 110px;
   color: #d4bc88;
-  font: 900 11px/1 "Courier New", monospace;
+  font: 900 11px/1.2 "Courier New", monospace;
   letter-spacing: 0.1em;
 }
 

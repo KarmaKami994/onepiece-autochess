@@ -2429,6 +2429,7 @@ export default function PhaserBoard({
       combatNumbers,
       reducedMotion,
     );
+    bridgeRef.current?.pausePlayback(paused);
   }, [
     combatEvents,
     eventSequence,
@@ -2437,6 +2438,7 @@ export default function PhaserBoard({
     particles,
     combatNumbers,
     reducedMotion,
+    paused,
   ]);
 
   useEffect(() => { bridgeRef.current?.pausePlayback(paused); }, [isReady, paused]);
