@@ -1,77 +1,100 @@
-import { useEffect, useMemo, useState } from "react";
-import { getStageDefinition } from "@/game";
-import type { GameContent, MatchPhase } from "@/game";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import type { GameContent, MatchPhase } from "../game/types";
+import { elapseClock, initialClockRemaining, isTimedPhase, phaseClockBudget, type PhaseClockCheckpoint } from "./phaseClock";
 
 type MatchClockOptions = {
   screen: string;
+  seed: string;
   phase: MatchPhase | undefined;
   round: number | undefined;
   battleDurationSeconds: number;
   animationSpeed: number;
+  replayKey: string;
   tutorialActive: boolean;
+  manualPaused: boolean;
+  autoContinueBattle: boolean;
+  checkpoint: PhaseClockCheckpoint | null;
   content: GameContent;
   onExpire: () => void;
 };
 
 export function useMatchClock(options: MatchClockOptions) {
-  const duration = useMemo(() => {
-    if (!options.phase || !options.round) return 30;
-    const stage = getStageDefinition(options.round, options.content);
-    return options.phase === "battle"
-      ? Math.min(
-          stage.battleSeconds,
-          Math.max(
-            1,
-            Math.ceil(
-              options.battleDurationSeconds / Math.max(0.5, options.animationSpeed),
-            ),
-          ),
-        )
-      : stage.preparationSeconds;
-  }, [
-    options.animationSpeed,
-    options.battleDurationSeconds,
-    options.content,
-    options.phase,
-    options.round,
-  ]);
-  const [timer, setTimer] = useState(duration);
-  const [phaseDuration, setPhaseDuration] = useState(duration);
+  const budget = phaseClockBudget(options.phase, options.round, options.battleDurationSeconds, options.animationSpeed, options.content);
+  const identity = `${options.seed}:${options.round}:${options.phase}`;
+  const replay = options.phase === "battle" ? options.replayKey : "";
+  const key = `${identity}:${replay}:${budget.durationMs}`;
+  const currentKey = useRef(key);
+  const latest = useRef(options);
+  useLayoutEffect(() => {
+    currentKey.current = key;
+    latest.current = options;
+  }, [key, options]);
+  const live = useRef({ key: "", durationMs: 0, remainingMs: 0, expired: false });
+  const [display, setDisplay] = useState({ key: "", remainingMs: 0, hidden: false });
 
   useEffect(() => {
-    const reset = window.setTimeout(() => {
-      setTimer(duration);
-      setPhaseDuration(duration);
-    }, 0);
-    return () => window.clearTimeout(reset);
-  }, [duration, options.screen]);
+    const phase = options.phase;
+    const durationMs = budget.durationMs;
+    live.current = {
+      key, durationMs, expired: false,
+      remainingMs: isTimedPhase(phase)
+        ? initialClockRemaining(durationMs, { seed: options.seed, round: options.round ?? 1, phase }, options.checkpoint)
+        : 0,
+    };
+    let previous = performance.now();
+    let expiry = 0;
+    const paused = () => {
+      const current = latest.current;
+      const expectedScreen = current.phase === "voyage-choice" ? "voyage-recruitment" : "match";
+      return document.hidden || current.screen !== expectedScreen || current.manualPaused ||
+        (current.phase === "preparation" && current.tutorialActive);
+    };
+    const publish = () => setDisplay(current => {
+      const remainingMs = live.current.remainingMs;
+      return current.key === key && current.hidden === document.hidden && Math.ceil(current.remainingMs / 1_000) === Math.ceil(remainingMs / 1_000)
+        ? current : { key, remainingMs, hidden: document.hidden };
+    });
+    const update = () => {
+      const now = performance.now();
+      live.current.remainingMs = elapseClock(live.current.remainingMs, now - previous, paused());
+      previous = now;
+      publish();
+      const current = latest.current;
+      if (!paused() && !live.current.expired && !expiry && durationMs > 0 && live.current.remainingMs === 0 &&
+        (current.phase !== "battle" || current.autoContinueBattle)) {
+        expiry = window.setTimeout(() => {
+          expiry = 0;
+          if (currentKey.current !== key || live.current.key !== key || paused() || live.current.expired ||
+            (latest.current.phase === "battle" && !latest.current.autoContinueBattle)) return;
+          live.current.expired = true;
+          latest.current.onExpire();
+        }, 0);
+      }
+    };
+    const visibility = () => { previous = performance.now(); publish(); };
+    const initial = window.setTimeout(update, 0);
+    const interval = window.setInterval(update, 100);
+    document.addEventListener("visibilitychange", visibility);
+    return () => {
+      window.clearTimeout(initial); window.clearTimeout(expiry); window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", visibility);
+    };
+  }, [key, budget.durationMs, options.checkpoint, options.phase, options.round, options.seed]);
 
-  useEffect(() => {
-    if (
-      options.screen !== "match" ||
-      !options.phase ||
-      (options.phase === "preparation" && options.tutorialActive) ||
-      (options.phase !== "preparation" && options.phase !== "battle")
-    ) {
-      return;
-    }
-    const interval = window.setInterval(() => {
-      setTimer((remaining) => {
-        if (remaining <= 1) {
-          window.clearInterval(interval);
-          window.setTimeout(options.onExpire, 0);
-          return 0;
-        }
-        return remaining - 1;
-      });
-    }, 1_000);
-    return () => window.clearInterval(interval);
-  }, [
-    options.onExpire,
-    options.phase,
-    options.screen,
-    options.tutorialActive,
-  ]);
-
-  return { timer, phaseDuration } as const;
+  const checkpoint = useCallback((): PhaseClockCheckpoint | null => {
+    const current = latest.current;
+    if (!isTimedPhase(current.phase) || live.current.key !== currentKey.current || live.current.durationMs <= 0) return null;
+    return { seed: current.seed, round: current.round ?? 1, phase: current.phase,
+      durationMs: live.current.durationMs, remainingMs: live.current.remainingMs, paused: current.manualPaused };
+  }, []);
+  const expectedScreen = options.phase === "voyage-choice" ? "voyage-recruitment" : "match";
+  const paused = display.hidden || options.screen !== expectedScreen || options.manualPaused ||
+    (options.phase === "preparation" && options.tutorialActive);
+  const remainingMs = display.key === key ? display.remainingMs : budget.durationMs;
+  const timer = Math.ceil(remainingMs / 1_000);
+  const label = options.phase === "preparation" && options.tutorialActive ? "LESSON PAUSED" : paused ? "PAUSED" :
+    options.phase === "battle" && timer === 0 && !options.autoContinueBattle ? "CONTINUE" :
+      options.phase === "battle" && budget.victoryMs > 0 && remainingMs <= budget.victoryMs ? "ROUND COMPLETE" :
+        options.phase === "voyage-choice" ? "RECRUITMENT" : options.phase === "battle" ? "BATTLE" : "PREPARE";
+  return { timer, phaseDuration: Math.ceil(budget.durationMs / 1_000), paused, label, checkpoint } as const;
 }
