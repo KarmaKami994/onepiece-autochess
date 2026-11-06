@@ -1,5 +1,6 @@
 import { DEFAULT_CONTENT, getStageDefinition } from "./content";
 import { neutralBattleEnvironment, readBattleEnvironment } from "./battleEnvironment";
+import { FOOD_STOCK_CAP, getFoodDefinition, isFoodReceipt, isPreparedMeal } from "./food";
 import { regenerateBattleResults, resolveLegacyCarousel } from "./engine";
 import { reconcileProductionFormProgression } from "./forms";
 import { CURRENT_SAVE_SCHEMA_VERSION } from "./schema";
@@ -214,6 +215,28 @@ export function migrateMatchState(
     : {};
   mutable.pendingRecruitmentRoutes = isRecord(mutable.pendingRecruitmentRoutes) ? mutable.pendingRecruitmentRoutes : {};
   mutable.pendingHarborOffers = isRecord(mutable.pendingHarborOffers) ? mutable.pendingHarborOffers : {};
+  // Additive schema-6 defaults; never regenerate offers or re-consume a meal.
+  const savedPlayers: unknown[] = Array.isArray(mutable.players) ? mutable.players : [];
+  for (const rawPlayer of savedPlayers) {
+    if (!isRecord(rawPlayer)) throw new Error("Invalid saved player.");
+    rawPlayer.foodInventory ??= [];
+    if (!Array.isArray(rawPlayer.foodInventory) || rawPlayer.foodInventory.length > FOOD_STOCK_CAP ||
+      !rawPlayer.foodInventory.every(id => typeof id === "string" && getFoodDefinition(id, content))) throw new Error("Invalid saved food stock.");
+    if (rawPlayer.pendingMeal !== undefined && (!isPreparedMeal(rawPlayer.pendingMeal) ||
+      !getFoodDefinition(rawPlayer.pendingMeal.foodId, content) || rawPlayer.pendingMeal.round !== mutable.round)) throw new Error("Invalid saved prepared meal.");
+  }
+  mutable.battleMeals ??= {};
+  mutable.foodHistory ??= [];
+  const playerIds = new Set(savedPlayers.flatMap(player => isRecord(player) && typeof player.id === "string" ? [player.id] : []));
+  if (!isRecord(mutable.battleMeals) || Object.entries(mutable.battleMeals).some(([playerId, meal]) =>
+    !playerIds.has(playerId) || !isPreparedMeal(meal) || meal.round !== mutable.round || !getFoodDefinition(meal.foodId, content))) throw new Error("Invalid saved battle meals.");
+  if (!Array.isArray(mutable.foodHistory) || mutable.foodHistory.length > 128 || mutable.foodHistory.some(receipt =>
+    !isFoodReceipt(receipt) || !playerIds.has(receipt.playerId) || !getFoodDefinition(receipt.foodId, content)) ||
+    new Set(mutable.foodHistory.map(receipt => isFoodReceipt(receipt) ? receipt.id : "")).size !== mutable.foodHistory.length) throw new Error("Invalid saved food receipts.");
+  for (const offers of Object.values(mutable.pendingHarborOffers)) {
+    if (!Array.isArray(offers) || offers.some(offer => !isRecord(offer) ||
+      (offer.kind === "food" && (!getFoodDefinition(String(offer.foodId), content) || !isFiniteNumber(offer.goldCost) || offer.goldCost < 0)))) throw new Error("Invalid saved harbor food offer.");
+  }
   const environment = mutable.battleEnvironment === undefined ? neutralBattleEnvironment() :
     readBattleEnvironment(mutable.battleEnvironment, content.config.boardWidth, content.config.boardHeight);
   if (!environment) throw new Error("Invalid saved battle environment.");

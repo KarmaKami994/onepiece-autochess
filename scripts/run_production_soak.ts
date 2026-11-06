@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { summarizeBotDecisionDiagnostics, type BotDecisionDiagnosticsReport } from "./bot_decision_report";
 import { emptyBattleConditions, observeBattleConditions } from "./battle_condition_report";
+import { summarizeFood } from "./food_report";
 import {
   DEFAULT_CONTENT,
   CURRENT_SAVE_SCHEMA_VERSION,
@@ -26,6 +27,7 @@ import {
   type MatchBattleResult,
   type MatchState,
   type VoyageChoiceReceipt,
+  type FoodReceipt,
   type PlayerState,
   type StageDefinition,
   type UnitFormLifecycle,
@@ -291,6 +293,7 @@ export type CaptainDamagePacingReport = CaptainDamageSummary & {
 };
 
 export type ProductionSoakReport = {
+  food: ReturnType<typeof summarizeFood>;
   battleConditions: ReturnType<typeof emptyBattleConditions>;
   voyageChoices: ReturnType<typeof summarizeVoyageChoices>;
   generatedAt: string;
@@ -1519,6 +1522,7 @@ export function runProductionSoak(
 
   const rounds: number[] = [];
   const voyageReceipts: VoyageChoiceReceipt[] = [];
+  const foodReceipts: FoodReceipt[] = [];
   const b07ChoiceBudget = { starter: 0, harbor: 0 };
   const fullClockSeconds: number[] = [];
   const pacedSeconds: number[] = [];
@@ -1856,6 +1860,7 @@ export function runProductionSoak(
       }
       completeMatches += 1;
       voyageReceipts.push(...state.voyageChoiceHistory);
+      foodReceipts.push(...(state.foodHistory ?? []));
       for (const traitId of traitsReachedInMatch) {
         increment(traitMatchReach, traitId);
       }
@@ -2346,6 +2351,7 @@ export function runProductionSoak(
     averageFullClockMinutes,
     averagePacedMinutes,
     voyageChoices: summarizeVoyageChoices(voyageReceipts, b07ChoiceBudget),
+    food: summarizeFood(foodReceipts),
     battleConditions,
     battleCount,
     timeoutRate: timeouts / Math.max(1, battleCount),

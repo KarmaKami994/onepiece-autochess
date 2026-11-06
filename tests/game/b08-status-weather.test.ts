@@ -162,7 +162,7 @@ describe("B08 weather, cells and integration", () => {
   });
 
   it("uses only authored PvE environments, without changing topology/rewards or early/PvP weather", () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.33.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.34.0");
     expect(DEFAULT_CONTENT.stages.filter(stage => stage.kind === "pve").map(stage => stage.round)).toEqual([1, 2, 3, 9, 14, 19, 24, 28, 32, 36, 40]);
     expect(DEFAULT_CONTENT.stages.filter(stage => stage.battleEnvironment).map(stage => stage.round)).toEqual([14, 28, 32]);
     for (const round of [14, 28, 32]) {

@@ -4423,3 +4423,17 @@ details.trait-building {
     transition-duration: 0.01ms !important;
   }
 }
+.galley-tray { padding: 10px; border: 1px solid #bd9656; border-radius: 8px; background: #17212a; color: #eee3ca; }
+.galley-tray h3 { margin: 0 0 6px; font-size: .82rem; }
+.galley-tray small { float: right; }
+.galley-tray p { font-size: .7rem; line-height: 1.4; margin: 6px 0; }
+.galley-tray label { display: grid; gap: 4px; font-size: .75rem; }
+.galley-tray select { width: 100%; min-width: 0; color: inherit; background: #202e39; padding: 5px; }
+.galley-stock { display: grid; gap: 5px; margin-top: 7px; }
+.galley-stock button { display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: center; gap: 3px 7px; text-align: left; color: inherit; background: #293540; border: 1px solid #bd9656; border-radius: 5px; padding: 5px; }
+.galley-stock button img { grid-row: span 2; }
+.galley-stock strong { font-size: .75rem; }
+.galley-stock span { font-size: .68rem; }
+.galley-stock button:disabled { opacity: .6; cursor: not-allowed; }
+.galley-stock button:focus-visible, .galley-tray select:focus-visible { outline: 2px solid #ffd16a; outline-offset: 2px; }
+.battle-meals { display: flex; flex-wrap: wrap; gap: 4px 12px; color: #f0d093; font-size: .7rem; }

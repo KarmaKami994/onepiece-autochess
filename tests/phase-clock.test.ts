@@ -14,7 +14,7 @@ describe("B06 pinned PAC budgets", () => {
       expect(phaseClockBudget("preparation", round, 45, 4, DEFAULT_CONTENT)).toEqual({ durationMs: (overrides[round] ?? 30) * 1_000, victoryMs: 0 });
     }
     expect(DEFAULT_CONTENT.config.combatTickMs * DEFAULT_CONTENT.config.combatMaxTicks).toBe(45_000);
-    expect(DEFAULT_CONTENT.version).toBe("1.33.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.34.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 

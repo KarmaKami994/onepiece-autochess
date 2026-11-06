@@ -10,6 +10,7 @@ import "../crewTools.css";
 
 const CATEGORIES: { id: ReferenceCategory; label: string }[] = [
   { id: "crew", label: "Crew" }, { id: "items", label: "Items & recipes" },
+  { id: "food", label: "Food & galley" },
   { id: "traits", label: "Bonds" }, { id: "forms", label: "Forms" },
   { id: "status", label: "Status" }, { id: "pve", label: "PvE" }, { id: "rounds", label: "Rounds" },
   { id: "voyage", label: "Voyage choices" },

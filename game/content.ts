@@ -2645,16 +2645,23 @@ export const RECRUITMENT_ROUTES: GameContent["recruitmentRoutes"] = [
 ];
 
 export const HARBOR_ENCOUNTERS: GameContent["harborEncounters"] = [
-  { id: "usopp-supplies", name: "Usopp's Supply Stop", portraitUnitId: "usopp", rounds: [16, 21], goldCost: 0, offerCount: 3 },
-  { id: "franky-workshop", name: "Franky's Workshop", portraitUnitId: "franky", rounds: [18, 23], goldCost: 2, offerCount: 2 },
+  { id: "usopp-supplies", name: "Usopp's Supply Stop", portraitUnitId: "usopp", rounds: [16, 21], goldCost: 0, offerCount: 3, foodOffer: true },
+  { id: "franky-workshop", name: "Franky's Workshop", portraitUnitId: "franky", rounds: [18, 23], goldCost: 2, offerCount: 2, foodOffer: true },
+];
+
+export const FOOD_DEFINITIONS: NonNullable<GameContent["foods"]> = [
+  { id: "sea-king-bento", name: "Sea-King Bento", description: "+10% Max HP for the next battle only.", assetPath: "/assets/food/sea-king-bento.svg", effects: [{ kind: "max-health-percent", value: 10 }] },
+  { id: "cola-tonic", name: "Cola Tonic", description: "+15 starting Energy for the next battle only, capped at Max Energy.", assetPath: "/assets/food/cola-tonic.svg", effects: [{ kind: "starting-energy", value: 15 }] },
+  { id: "pirate-curry", name: "Pirate Curry", description: "+10% Attack for the next battle only.", assetPath: "/assets/food/pirate-curry.svg", effects: [{ kind: "attack-percent", value: 10 }] },
 ];
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.33.0",
+  version: "1.34.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,
   items: ITEM_DEFINITIONS,
+  foods: FOOD_DEFINITIONS,
   itemRecipes: ITEM_RECIPES,
   acquirableItemIds: ACQUIRABLE_ITEM_IDS,
   enemies: PVE_ENEMY_DEFINITIONS,

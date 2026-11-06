@@ -442,6 +442,7 @@ export interface GameContent {
   forms: UnitFormDefinition[];
   traits: TraitDefinition[];
   items: ItemDefinition[];
+  foods?: FoodDefinition[];
   itemRecipes: Record<string, string>;
   acquirableItemIds: string[];
   enemies: PvEEnemyDefinition[];
@@ -467,13 +468,30 @@ export interface HarborEncounterDefinition {
   rounds: number[];
   goldCost: number;
   offerCount: number;
+  foodOffer?: boolean;
 }
 
-export interface HarborOffer { id: string; itemId: string; goldCost: number }
+export type FoodEffect = Extract<TraitEffect, { kind: "max-health-percent" | "attack-percent" | "starting-energy" }>;
+export interface FoodDefinition {
+  id: string;
+  name: string;
+  description: string;
+  assetPath: string;
+  effects: FoodEffect[];
+}
+export interface PreparedMeal { id: string; foodId: string; unitId: string; round: number }
+export interface FoodReceipt {
+  id: string; round: number; playerId: string; foodId: string;
+  kind: "received" | "served" | "applied" | "expired";
+  unitId?: string; goldPaid?: number;
+}
+export type HarborOffer =
+  | { id: string; kind?: "item"; itemId: string; goldCost: number }
+  | { id: string; kind: "food"; foodId: string; goldCost: number };
 export interface VoyageChoiceReceipt {
   round: number; playerId: string; kind: "starter" | "recruitment" | "harbor";
   choiceId: string; paidGold: number; convertedGold: number; skipped: boolean;
-  definitionId?: string; itemId?: string; encounterId?: string; routeId?: string;
+  definitionId?: string; itemId?: string; foodId?: string; encounterId?: string; routeId?: string;
 }
 
 export interface UnitInstance {
@@ -517,6 +535,8 @@ export interface PlayerState {
   shop: Array<string | null>;
   shopLocked: boolean;
   inventory: string[];
+  foodInventory?: string[];
+  pendingMeal?: PreparedMeal;
   finalCrew: UnitInstance[];
   // Presentation-only snapshot; absent in legacy saves whose deployment is unknown.
   finalLineup?: {
@@ -627,6 +647,8 @@ export interface MatchState {
   pendingRecruitmentRoutes: Record<string, string>;
   pendingHarborOffers: Record<string, HarborOffer[]>;
   voyageChoiceHistory: VoyageChoiceReceipt[];
+  foodHistory?: FoodReceipt[];
+  battleMeals?: Record<string, PreparedMeal>;
   carouselChoices: CarouselChoice[];
   carouselSession: CarouselSessionState | null;
   winnerId: string | null;
@@ -651,6 +673,7 @@ export type GameCommand =
       to: UnitDestination;
     }
   | { type: "SELL_UNIT"; unitId: string }
+  | { type: "USE_FOOD"; unitId: string; foodId: string }
   | {
       type: "EQUIP_ITEM";
       unitId: string;
@@ -690,6 +713,7 @@ export type CommandErrorCode =
   | "ITEM_DUPLICATE"
   | "ITEM_TRAIT_DUPLICATE"
   | "ITEM_NOT_FOUND"
+  | "INVALID_FOOD_USE"
   | "ITEM_RECIPE_NOT_FOUND"
   | "MAX_LEVEL"
   | "NOT_ENOUGH_GOLD"
@@ -719,6 +743,7 @@ export interface BattleSetupUnit {
   id: string;
   definitionId: string;
   formId?: string;
+  foodId?: string;
   star: StarLevel;
   items: string[];
   position: Position;
@@ -744,6 +769,7 @@ export interface BattleUnitSnapshot {
   id: string;
   definitionId: string;
   formId?: string;
+  foodId?: string;
   teamId: string;
   star: StarLevel;
   items?: string[];

@@ -80,7 +80,7 @@ describe("additive Energy Drain reporting", () => {
     const legacy = structuredClone(state);
     for (const entry of legacy.lastResults[0].events) if (entry.type === "energy") delete entry.sourceId;
     expect(selectBattlePresentation(legacy, b.id)?.events.find((entry) => entry.kind === "energy" && entry.reason === "ability-drain")).toMatchObject({ sourceId: "b-fighter", targetId: "b-fighter" });
-    expect(DEFAULT_CONTENT.version).toBe("1.33.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.34.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 

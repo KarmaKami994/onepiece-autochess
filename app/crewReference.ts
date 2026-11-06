@@ -5,7 +5,7 @@ import { createItemView, createUnitReferenceView, titleCase } from "./selectors"
 import { resolvePlannedUnit } from "../game/teamPlanner";
 import { FIELD_HELP, WEATHER_HELP } from "./battleEnvironmentPresentation";
 
-export type ReferenceCategory = "crew" | "items" | "traits" | "forms" | "status" | "pve" | "rounds" | "voyage" | "environment";
+export type ReferenceCategory = "crew" | "items" | "food" | "traits" | "forms" | "status" | "pve" | "rounds" | "voyage" | "environment";
 export type ReferenceEntry = {
   id: string; category: ReferenceCategory; name: string; description: string;
   imagePath?: string; details: string[]; traits: string[]; cost?: number; kind?: string;
@@ -91,6 +91,12 @@ export function crewReference(content: GameContent, star: StarLevel = 1): Refere
         ...(view.recipeResults?.map((recipe) => `${item.name} + ${recipe.componentName} → ${recipe.resultName}`) ?? [])],
     });
   }
+  for (const food of content.foods ?? []) entries.push({ id: food.id, category: "food", name: food.name, description: food.description,
+    imagePath: food.assetPath, traits: [], kind: "consumable", details: [
+      "Harbor supplies: Usopp R16/21 free; Franky R18/23 costs 2 gold. Food replaces one component option, not an extra reward.",
+      "Galley capacity: 3 portions. During preparation, serve one meal to a deployed crew member. Consumes the portion immediately; no equipment slot or crafting recipe.",
+      "One meal per preparation, next battle only. Selling, benching or merging away the recipient before battle forfeits it. Replays do not consume another portion.",
+    ] });
   for (const trait of content.traits) entries.push({
     id: trait.id, category: "traits", name: trait.name, description: trait.description, traits: [trait.id],
     details: trait.tiers.map((tier) => `${tier.required} distinct crew · ${tier.effectScope ?? "team"}: ${tier.label}. ${tier.effects.map(describeTraitEffect).join("; ")}${tier.behaviors?.length ? `; ${tier.behaviors.map(describeTraitBehavior).join("; ")}` : ""}`),
@@ -131,9 +137,9 @@ export function crewReference(content: GameContent, star: StarLevel = 1): Refere
     details: ["Three distinct reserved offers; skip is free. Full bench converts the reserved copy to normal gold value.", "23 seconds; tutorial lessons pause the clock. Legacy preparations never receive another starter."] });
   for (const route of content.recruitmentRoutes) entries.push({ id: route.id, category: "voyage", name: route.name, description: "R10/R20 origin-focused recruitment with an open-sea wildcard.", traits: route.traits, kind: "recruitment",
     details: ["Distinct owned definitions choose the route; up to two focused seeds, then an unrestricted primary-band fill.", ...route.unitIds.map(id => content.units.find(unit => unit.id === id)?.name ?? id), "Primary cost band is exhausted before lower-band fallback; all offered copies are reserved."] });
-  for (const encounter of content.harborEncounters) entries.push({ id: encounter.id, category: "voyage", name: encounter.name, description: encounter.goldCost ? "Optional component supplies; sail on free." : "Choose one component gift, or sail on.", traits: [], kind: encounter.goldCost ? "trade" : "gift",
+  for (const encounter of content.harborEncounters) entries.push({ id: encounter.id, category: "voyage", name: encounter.name, description: encounter.goldCost ? "Optional component or food supplies; sail on free." : "Choose one component or food gift, or sail on.", traits: [], kind: encounter.goldCost ? "trade" : "gift",
     imagePath: content.units.find(unit => unit.id === encounter.portraitUnitId)?.assetPath,
-    details: [`Rounds ${encounter.rounds.join(" / ")}; ${encounter.goldCost} gold per chosen component.`, "Normal round preparation and combat still follow; no extra income or PvE replacement.", `Harbor budget: ${content.voyageTiming.harborBaseSeconds}s + ${content.voyageTiming.harborPerPlayerSeconds}s per living captain; settings/background pause.`] });
+    details: [`Rounds ${encounter.rounds.join(" / ")}; ${encounter.goldCost} gold per chosen supply.`, `${encounter.offerCount} options total; ${encounter.foodOffer ? "one food option, remaining components" : "components"}. Full galley disables food without charging gold.`, "Normal round preparation and combat still follow; no extra income or PvE replacement.", `Harbor budget: ${content.voyageTiming.harborBaseSeconds}s + ${content.voyageTiming.harborPerPlayerSeconds}s per living captain; settings/background pause.`] });
   return entries;
 }
 

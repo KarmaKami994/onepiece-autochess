@@ -323,7 +323,7 @@ describe("P5 item, bot, and save compatibility", () => {
     human(state).inventory = ["black-blade", "jet-dial"];
     const restored = deserializeMatch(serializeMatch(state));
     expect(restored.schemaVersion).toBe(CURRENT_SAVE_SCHEMA_VERSION);
-    expect(restored.contentVersion).toBe("1.33.0");
+    expect(restored.contentVersion).toBe("1.34.0");
     expect(human(restored).inventory).toEqual(["black-blade", "jet-dial"]);
     const next = advanceMatchPhase(restored);
     expect(next).toMatchObject({ round: 22, phase: "carousel", stageId: "new-world-exchange" });
@@ -331,7 +331,7 @@ describe("P5 item, bot, and save compatibility", () => {
   });
 
   it("keeps current GameContent 1.32.0 and save schema 6", () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.33.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.34.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 });

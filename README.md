@@ -143,7 +143,17 @@ an explicitly unclassified saved crew.
   Freeze, Sleep and Locked, authored Rain/Snow and marked Charged Deck/Frost Patch
   cells. Configuration is saved with frozen battles and available in the codex,
   isolated planner and Chronicle. Content `1.33.0`, save schema `6`.
-  B08 verification is **NOT RUN** at the owner's request; PR/CI is deferred.
+  B08 local verification is **NOT RUN** at the owner's request. PR #70 was
+  subsequently squash-merged by explicit instruction; its CI was not inspected.
+- [B09 food](docs/B09_FOOD_CONSUMABLES.md) adds three one-battle meals in a
+  separate three-portion galley. Usopp/Franky replace one component option with
+  food, preserving option counts/prices and P10 rewards. Serve one deployed
+  fighter per preparation; sale, benching or merging away that instance forfeits
+  the portion. Frozen battle meals survive save/replay without a second use.
+  Food has a separate codex, planner choice, history and acquisition/use counts;
+  all 65 equipment items / 55 recipes remain. Content `1.34.0`, schema `6`.
+  Original food icons: `npm run assets:food`; reproducible inputs/output hashes
+  in `art/ui-icons/food-provenance.json`. B09 checks await owner approval.
 - All artwork is bundled under `public/assets`; Web Audio effects are generated
   locally. Gameplay makes no network requests.
 
