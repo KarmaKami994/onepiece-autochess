@@ -26,7 +26,7 @@ Pinned reference: `keldaanCommunity/pokemonAutoChess@a3fa225e11f49c07e8ac7bdf262
 
 ## Verification / handoff
 
-Implementation is prepared, unverified. The owner declined B08 verification; the bounded B09 verification request is pending. No local test/typecheck/lint/build/browser/asset-validation or production run has been executed. New regression specifications are NOT RUN until permission is granted. No new aggregate, baseline or 1,000-seed soak.
+Implementation source `6233c7170bc449cb24f4c4ba834b05f251f05835` is committed/pushed on `codex/b09-food-consumables`, unverified. The owner declined B08 verification; the bounded B09 verification request is pending. No local test/typecheck/lint/build/browser/asset-validation or production run has been executed. New regression specifications are NOT RUN until permission is granted. No new aggregate, baseline or 1,000-seed soak.
 
 Authored coverage: deterministic harbour replacement/prices/pool, full stock and invalid commands, one-battle effects/expiry, consumed merge recipient, Phoenix, save/regeneration, legacy offers/backfill, bot reserve/serving, replay validation and separate report counts, planner meal legality, icon provenance and browser keyboard/reload/full-stock/codex cases. Existing B07 content control explicitly clears B09 food definitions/options while retaining its historical content hash and exact diagnostic expectations.
 
