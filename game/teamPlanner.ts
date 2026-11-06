@@ -2,6 +2,7 @@ import { DEFAULT_CONTENT } from "./content";
 import { reconcileProductionFormProgression, resolveUnitDefinition } from "./forms";
 import { getActiveTraitsForUnits } from "./traits";
 import { simulateBattle } from "./combat";
+import { getFoodDefinition } from "./food";
 import type { BattleEnvironment, BattleSetupUnit, BattleTeam, GameContent, UnitInstance } from "./types";
 import { neutralBattleEnvironment, readBattleEnvironment } from "./battleEnvironment";
 
@@ -27,7 +28,7 @@ export function createTeamPlan(content: GameContent = DEFAULT_CONTENT): TeamPlan
 export function resolvePlannedUnit(unit: PlannedUnit, content: GameContent = DEFAULT_CONTENT): PlannedUnit {
   const instance: UnitInstance = { ...unit, items: [...unit.items], acquiredOrder: 0 };
   reconcileProductionFormProgression(instance, content);
-  return { id: unit.id, definitionId: unit.definitionId, star: unit.star, ...(instance.formId ? { formId: instance.formId } : {}), items: [...instance.items], position: { ...unit.position } };
+  return { id: unit.id, definitionId: unit.definitionId, star: unit.star, ...(instance.formId ? { formId: instance.formId } : {}), ...(unit.foodId ? { foodId: unit.foodId } : {}), items: [...instance.items], position: { ...unit.position } };
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -56,6 +57,7 @@ export function validateTeamPlan(value: unknown, content: GameContent = DEFAULT_
     }
     const ids = new Set<string>();
     const cells = new Set<string>();
+    let meals = 0;
     for (const [index, raw] of rawUnits.entries()) {
       const at = `${label}, unit ${index + 1}`;
       if (!isRecord(raw)) { errors.push(`${at}: invalid unit.`); continue; }
@@ -65,6 +67,11 @@ export function validateTeamPlan(value: unknown, content: GameContent = DEFAULT_
         errors.push(`${at}: unit ID must be unique and contain only letters, digits, _ or -.`); continue;
       }
       ids.add(raw.id);
+      if (raw.foodId !== undefined) {
+        if (typeof raw.foodId !== "string" || !getFoodDefinition(raw.foodId, content)) errors.push(`${at}: unknown food.`);
+        meals += 1;
+        if (meals > 1) errors.push(`${label}: only one meal per battle.`);
+      }
       if (raw.star !== 1 && raw.star !== 2 && raw.star !== 3) { errors.push(`${at}: stars must be 1, 2 or 3.`); continue; }
       if (!isRecord(raw.position) || !Number.isInteger(raw.position.x) || !Number.isInteger(raw.position.y) ||
         typeof raw.position.x !== "number" || typeof raw.position.y !== "number" ||
@@ -90,6 +97,7 @@ export function validateTeamPlan(value: unknown, content: GameContent = DEFAULT_
         id: raw.id, definitionId: definition.id, star: raw.star, items: [...items],
         position: { x: raw.position.x, y: raw.position.y },
         ...(typeof raw.formId === "string" ? { formId: raw.formId } : {}),
+        ...(typeof raw.foodId === "string" ? { foodId: raw.foodId } : {}),
       };
       if (unit.formId) {
         // Production reconciliation is the unlock authority; try each catalyst first

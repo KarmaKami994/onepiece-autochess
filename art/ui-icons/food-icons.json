@@ -1,0 +1,9 @@
+{
+  "author": "One Piece Auto Chess project",
+  "permission": "Original project-authored vector artwork; no external sheet, tracing or downloaded image.",
+  "foods": [
+    { "id": "sea-king-bento", "name": "Sea-King Bento", "motif": "bento", "accent": "#66c5af" },
+    { "id": "cola-tonic", "name": "Cola Tonic", "motif": "bottle", "accent": "#e55761" },
+    { "id": "pirate-curry", "name": "Pirate Curry", "motif": "curry", "accent": "#f0ba4d" }
+  ]
+}

@@ -77,6 +77,7 @@ export type BoardUnit = {
   id: string;
   contentId: string;
   formId?: string;
+  foodId?: string;
   name: string;
   shortName: string;
   color: number;

@@ -3,6 +3,7 @@ import {
   getItemDefinition,
 } from "./content";
 import { getUnitFormDefinition, resolveUnitDefinition } from "./forms";
+import { getFoodDefinition } from "./food";
 import { hashSeed, nextRandom } from "./rng";
 import { hasBattleEnvironment, neutralBattleEnvironment, readBattleEnvironment } from "./battleEnvironment";
 import {
@@ -92,6 +93,7 @@ interface MutableBattleUnit {
   id: string;
   definitionId: string;
   formId?: string;
+  foodId?: string;
   teamId: string;
   star: 1 | 2 | 3;
   items: string[];
@@ -393,6 +395,7 @@ function createMutableUnits(
       id: setup.id,
       definitionId: setup.definitionId,
       ...(definition.formId ? { formId: definition.formId } : {}),
+      ...(setup.foodId && getFoodDefinition(setup.foodId, content) ? { foodId: setup.foodId } : {}),
       teamId: team.id,
       star: setup.star,
       items: resolvedItemIds,
@@ -573,6 +576,7 @@ function createMutableUnits(
         applyTraitEffect(unit, grant.effect);
       }
     }
+    for (const effect of getFoodDefinition(unit.foodId ?? "", content)?.effects ?? []) applyTraitEffect(unit, effect);
     unit.periodicItemBehaviors = unit.itemBehaviors.flatMap((behavior) => {
       if (
         behavior.kind !== "periodic-ability-power-energy" &&
@@ -1337,6 +1341,7 @@ function toSnapshot(unit: MutableBattleUnit): BattleUnitSnapshot {
     id: unit.id,
     definitionId: unit.definitionId,
     ...(unit.formId ? { formId: unit.formId } : {}),
+    ...(unit.foodId ? { foodId: unit.foodId } : {}),
     teamId: unit.teamId,
     star: unit.star,
     items: [...unit.items],

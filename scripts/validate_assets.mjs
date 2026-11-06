@@ -128,6 +128,17 @@ for (const form of DEFAULT_CONTENT.forms) {
   await validateSvg(path.join(publicRoot, "assets", "forms", form.id, "overlay.svg"));
 }
 for (const status of statusSpecs.statuses) await validateSvg(path.join(publicRoot, "assets", "status", `${status.id}.svg`));
+const foodProvenance = JSON.parse(await readFile(path.join(root, "art/ui-icons/food-provenance.json"), "utf8"));
+if (await sha256(path.join(root, foodProvenance.sourcePath)) !== foodProvenance.sourceSha256 ||
+  await sha256(path.join(root, foodProvenance.generatorPath)) !== foodProvenance.generatorSha256) throw new Error("Food provenance inputs changed");
+const foodIds = (DEFAULT_CONTENT.foods ?? []).map(food => food.id).sort();
+if (JSON.stringify(foodProvenance.outputs.map(output => output.id).sort()) !== JSON.stringify(foodIds) ||
+  JSON.stringify((await readdir(path.join(publicRoot, "assets/food"))).sort()) !== JSON.stringify(foodIds.map(id => `${id}.svg`))) throw new Error("Food icons must match the food catalogue exactly");
+for (const output of foodProvenance.outputs) {
+  const food = DEFAULT_CONTENT.foods?.find(food => food.id === output.id);
+  if (food?.assetPath !== `/${output.path.replace(/^public\//, "")}` || await sha256(path.join(root, output.path)) !== output.sha256) throw new Error(`Food icon provenance mismatch: ${output.id}`);
+  await validateSvg(path.join(root, output.path));
+}
 
 for (const entry of sourceMatrix.entries) {
   const source = path.join(root, entry.source.localPath);

@@ -1370,6 +1370,10 @@ export default function GameClient() {
             )
           }
           onSellSelected={sellSelected}
+          onServeFood={(foodId) => {
+            if (scoutedPlayerId || !selectedUnitId) return;
+            issueCommand({ type: "USE_FOOD", unitId: selectedUnitId, foodId }, "reward", "Meal served for the next battle.");
+          }}
           onEquipItem={(itemId) => {
             if (scoutedPlayerId) return;
             if (!selectedUnitId) return;

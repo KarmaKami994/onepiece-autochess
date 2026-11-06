@@ -7,6 +7,7 @@ import {
   getActiveTraitsForUnits,
   getEffectiveUnitTraits,
   getStageDefinition,
+  getUnitDefinition,
   getUnitFormDefinition,
   isComponentItem,
   resolveItemRecipe,
@@ -14,6 +15,7 @@ import {
   resolveUnitDefinition,
 } from "@/game";
 import { presentBattleEnvironment } from "./battleEnvironmentPresentation";
+import { FOOD_STOCK_CAP, canReceiveFood, getFoodDefinition, mealForUnit } from "../game/food";
 import type {
   BattleEnvironment,
   ActiveTrait,
@@ -179,6 +181,9 @@ export type ChoiceView = {
   claimedAtTick?: number | null;
 };
 
+export type FoodView = { id: string; name: string; description: string; imagePath: string; count: number };
+export type GalleyView = { stock: FoodView[]; capacity: number; meal: { name: string; target: string } | null };
+
 export type CarouselEventView = {
   id: string;
   tick: number;
@@ -220,6 +225,7 @@ export type MatchView = {
   shop: Array<ShopUnitView | null>;
   inventory: ChoiceView[];
   boardUnits: BoardUnit[];
+  galley: GalleyView;
   resultCrew: BoardUnit[];
   resultLineup: { deployed: BoardUnit[]; reserve: BoardUnit[] } | null;
   resultTraits: TraitView[];
@@ -229,7 +235,7 @@ export type MatchView = {
   choices: ChoiceView[];
   voyageRecruits: ShopUnitView[];
   recruitmentRoute: string | null;
-  harbor: { name: string; portrait: string; offers: Array<ChoiceView & { goldCost: number; disabled: boolean }> } | null;
+  harbor: { name: string; portrait: string; offers: Array<{ id: string; name: string; description: string; imagePath: string; icon: string; isFood: boolean; goldCost: number; disabled: boolean; disabledReason: string | null }> } | null;
   carouselSession: CarouselSessionView | null;
   selectedDefinitionByUnit: Map<string, ShopUnitView>;
   itemsById: Map<string, ChoiceView>;
@@ -713,6 +719,7 @@ function buildBoardUnits(
         slot: Math.max(0, benchSlot),
         star: instance.star,
         items: instance.items.slice(0, 3),
+        ...(mealForUnit(owner.pendingMeal, instance.id) ? { foodId: owner.pendingMeal?.foodId } : {}),
         hp: maxHp,
         maxHp,
         shield: 0,
@@ -755,6 +762,7 @@ function buildBoardUnits(
       Object.assign(existing, {
         contentId: snapshot.definitionId,
         formId: snapshot.formId,
+        foodId: snapshot.foodId,
         name: enriched.name,
         shortName: enriched.shortName,
         color: hashColor(snapshot.definitionId),
@@ -777,6 +785,7 @@ function buildBoardUnits(
       id: snapshot.id,
       contentId: snapshot.definitionId,
       ...(snapshot.formId ? { formId: snapshot.formId } : {}),
+      ...(snapshot.foodId ? { foodId: snapshot.foodId } : {}),
       name: enriched.name,
       shortName: enriched.shortName,
       color: hashColor(snapshot.definitionId),
@@ -1559,8 +1568,20 @@ export function selectMatchView(
   );
   const encounter = getHarborEncounter(state.round, content);
   const harbor = encounter ? { name: encounter.name, portrait: definitionView(encounter.portraitUnitId, content).portrait,
-    offers: (state.pendingHarborOffers[player.id] ?? []).map(offer => ({ ...createItemView(offer.itemId, content), id: offer.id,
-      goldCost: offer.goldCost, disabled: player.gold < offer.goldCost })) } : null;
+    offers: (state.pendingHarborOffers[player.id] ?? []).map(offer => {
+      const food = offer.kind === "food" ? getFoodDefinition(offer.foodId, content) : null;
+      const item = offer.kind !== "food" ? createItemView(offer.itemId, content) : null;
+      const disabledReason = player.gold < offer.goldCost ? "Not enough gold" : offer.kind === "food" && !canReceiveFood(player) ? "Galley stock is full (3 portions)" : null;
+      return { id: offer.id, name: food?.name ?? item?.name ?? "Unknown supply", description: food?.description ?? item?.description ?? "",
+        imagePath: food?.assetPath ?? item?.imagePath ?? "", icon: item?.icon ?? "♨", isFood: offer.kind === "food",
+        goldCost: offer.goldCost, disabled: !!disabledReason, disabledReason };
+    }) } : null;
+  const pendingMeal = player.pendingMeal ?? state.battleMeals?.[player.id];
+  const galley: GalleyView = { capacity: FOOD_STOCK_CAP, stock: [...new Set(player.foodInventory ?? [])].flatMap(id => {
+    const food = getFoodDefinition(id, content);
+    return food ? [{ id, name: food.name, description: food.description, imagePath: food.assetPath, count: player.foodInventory?.filter(entry => entry === id).length ?? 0 }] : [];
+  }), meal: pendingMeal ? { name: getFoodDefinition(pendingMeal.foodId, content)?.name ?? pendingMeal.foodId,
+    target: player.units[pendingMeal.unitId] ? getUnitDefinition(player.units[pendingMeal.unitId].definitionId, content)?.name ?? "Crew" : "departed crew (portion forfeited)" } : null };
   const carouselSlice =
     state.phase === "carousel" ? selectCarouselView(state, content) : null;
   const events = combatEvents(state, player.id, content);
@@ -1621,6 +1642,7 @@ export function selectMatchView(
       (itemId) => itemsById.get(itemId) ?? createItemView(itemId, content),
     ),
     boardUnits: board.units,
+    galley,
     resultCrew: finalCrewUnits(player, board, content),
     resultLineup,
     resultTraits: player.finalLineup

@@ -139,6 +139,7 @@ describe("B07 harbor economy and save/replay", () => {
     expect(getHarborEncounter(round, DEFAULT_CONTENT)).not.toBeNull();
     expect(harborDurationSeconds(8, DEFAULT_CONTENT)).toBe(37);
     const offer = state.pendingHarborOffers[player.id][0]; const gold = player.gold; const xp = player.xp;
+    if (offer.kind === "food") throw new Error("First harbor option must remain a component.");
     const inventory = [...player.inventory]; const next = choose(state, { type: "CHOOSE_HARBOR_OFFER", choiceId: offer.id });
     expect(next.phase).toBe("preparation"); expect(next.round).toBe(round);
     expect(next.players[0].gold).toBe(gold - offer.goldCost); expect(next.players[0].xp).toBe(xp);
@@ -171,7 +172,11 @@ describe("B07 harbor economy and save/replay", () => {
       expect(player.gold).toBe(getBotPersonality(player, content).economyReserve);
     }
     const gift = harbor(16); expect(harbor(16)).toEqual(gift);
-    for (const offers of Object.values(gift.pendingHarborOffers)) expect(new Set(offers.map(offer => offer.itemId)).size).toBe(3);
+    for (const offers of Object.values(gift.pendingHarborOffers)) {
+      expect(new Set(offers.map(offer => offer.kind === "food" ? offer.foodId : offer.itemId)).size).toBe(3);
+      expect(offers.filter(offer => offer.kind === "food")).toHaveLength(1);
+      expect(offers.filter(offer => offer.kind !== "food")).toHaveLength(2);
+    }
   });
 
   it("round-trips in-flight choices exactly and does not inject choices into legacy preparation saves", () => {
