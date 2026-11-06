@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import type { BattleEnvironment } from "../game/types";
+import { neutralBattleEnvironment, readBattleEnvironment } from "../game/battleEnvironment";
 import {
   crewAnimationKey,
   crewSheetKey,
@@ -121,6 +123,7 @@ export type CombatFxEvent = {
     | "shield"
     | "energy"
     | "status"
+    | "status-end"
     | "buff"
     | "dodge"
     | "defeat"
@@ -160,6 +163,7 @@ export type CombatFxEvent = {
 };
 
 type BoardPayload = {
+  environment?: BattleEnvironment;
   units: BoardUnit[];
   selectedId: string | null;
   interactionMode: BoardInteractionMode;
@@ -185,6 +189,8 @@ export function preservesActiveBattleTimeline(
     JSON.stringify(deployedUnits(current.units)) ===
       JSON.stringify(deployedUnits(next.units)) &&
     current.boardSkin === next.boardSkin
+    && JSON.stringify(readBattleEnvironment(current.environment ?? neutralBattleEnvironment(), 8, 6)) ===
+      JSON.stringify(readBattleEnvironment(next.environment ?? neutralBattleEnvironment(), 8, 6))
   );
 }
 
@@ -259,6 +265,7 @@ function presentedStatusId(statusId: string) {
 }
 
 export default function PhaserBoard({
+  environment,
   units,
   selectedId,
   interactionMode,
@@ -285,6 +292,7 @@ export default function PhaserBoard({
   const bridgeRef = useRef<SceneBridge | null>(null);
   const animatedSequenceRef = useRef<string | null>(null);
   const latestRef = useRef<BoardPayload>({
+    environment,
     units,
     selectedId,
     interactionMode,
@@ -300,6 +308,7 @@ export default function PhaserBoard({
   const [failed, setFailed] = useState(false);
 
   latestRef.current = {
+    environment,
     units,
     selectedId,
     interactionMode,
@@ -326,6 +335,7 @@ export default function PhaserBoard({
         );
 
         class GrandLineBoard extends Phaser.Scene implements SceneBridge {
+          private fieldLayer?: Phaser.GameObjects.Container;
           private mapLayer?: Phaser.GameObjects.Container;
           private mapBackdrop?: Phaser.GameObjects.Image;
           private ambientLayer?: Phaser.GameObjects.Container;
@@ -1088,6 +1098,27 @@ export default function PhaserBoard({
             }
           }
 
+          private drawFields(environment?: BattleEnvironment) {
+            this.fieldLayer?.destroy(true);
+            this.fieldLayer = undefined;
+            if (!environment?.fields.length) return;
+            const layer = this.add.container(0, 0).setDepth(3);
+            this.fieldLayer = layer;
+            for (const field of environment.fields) {
+              const color = field.kind === "charged-deck" ? 0xf1d462 : 0x91def4;
+              for (const cell of field.cells) {
+                const point = boardCellCenter(cell.x, cell.y);
+                const mark = this.add.graphics();
+                mark.fillStyle(color, .18);
+                mark.fillRoundedRect(point.x - CELL_W / 2 + 3, point.y - CELL_H / 2 + 3, CELL_W - 6, CELL_H - 6, 4);
+                mark.lineStyle(2, 0xffffff, .9);
+                mark.strokeRoundedRect(point.x - CELL_W / 2 + 3, point.y - CELL_H / 2 + 3, CELL_W - 6, CELL_H - 6, 4);
+                const label = this.add.text(point.x - CELL_W / 2 + 6, point.y - CELL_H / 2 + 4, field.kind === "charged-deck" ? "ϟ" : "❄", { fontSize: "17px", color: "#ffffff", stroke: "#10202a", strokeThickness: 3 });
+                layer.add([mark, label]);
+              }
+            }
+          }
+
           sync(payload: BoardPayload, forceRebuild = false) {
             if (
               !forceRebuild &&
@@ -1113,6 +1144,7 @@ export default function PhaserBoard({
               }
             }
             this.payload = payload;
+            this.drawFields(payload.environment);
             if (!this.tokenLayer) return;
             this.requestAnimationTextures(payload.units);
             this.requestPortraitTextures(payload.units);
@@ -1804,7 +1836,7 @@ export default function PhaserBoard({
                         ? "🔥"
                         : status === "stun"
                           ? "✦"
-                          : "◆",
+                          : ["poison", "freeze", "sleep", "locked"].includes(status) ? statusVisual(status).fallbackGlyph : "◆",
                     )
                     .join(" ");
                   label.setText(symbols).setVisible(Boolean(symbols));
@@ -1826,6 +1858,7 @@ export default function PhaserBoard({
               );
             };
             const statusIcon = (status: string) => {
+              if (["poison", "freeze", "sleep", "locked"].includes(status)) return statusVisual(status).fallbackGlyph;
               if (status === "burn") return "🔥";
               if (status === "stun") return "✦";
               if (status === "emergency-shield" || status.includes("protect")) {
@@ -2238,6 +2271,9 @@ export default function PhaserBoard({
                     showCastName(target, `−${Math.abs(event.energyDelta ?? 0)} ENERGY`);
                     if (source && event.sourceId !== event.targetId) battleVfx.directedCue(this, { from: source, to: target, color: 0xb5a4ff, speed, reducedMotion: reduceMotion });
                   }
+                } else if (target && event.kind === "status-end") {
+                  this.statusExpiries.get(event.targetId ?? "")?.delete(event.status ?? "");
+                  refreshStatuses(event.targetId ?? "", event.tick);
                 } else if (target && event.kind === "status") {
                   applyStatus(
                     event.targetId ?? "",
@@ -2399,6 +2435,7 @@ export default function PhaserBoard({
 
   useEffect(() => {
     bridgeRef.current?.sync({
+      environment,
       units,
       selectedId,
       interactionMode,
@@ -2406,7 +2443,7 @@ export default function PhaserBoard({
       capacity,
       boardSkin,
     });
-  }, [units, selectedId, interactionMode, phase, capacity, boardSkin]);
+  }, [units, selectedId, interactionMode, phase, capacity, boardSkin, environment]);
 
   useEffect(() => {
     const animationKey = `${eventSequence}:${speed}:${Number(particles)}:${Number(combatNumbers)}:${Number(reducedMotion)}`;
@@ -2446,6 +2483,7 @@ export default function PhaserBoard({
   if (failed) {
     return (
       <><CssBoardFallback
+        environment={environment}
         units={units}
         selectedId={selectedId}
         interactionMode={interactionMode}
@@ -2466,6 +2504,8 @@ export default function PhaserBoard({
       data-event-sequence={eventSequence}
       data-interaction-mode={interactionMode}
       data-board-skin={boardSkin}
+      data-weather={environment?.weather ?? "neutral"}
+      data-field-count={environment?.fields.length ?? 0}
     >
       {!isReady && (
         <div className="board-loading" aria-live="polite">
@@ -2489,12 +2529,14 @@ export default function PhaserBoard({
           </li>
         ))}
       </ul>
+      <ul className="sr-only" aria-label="Board field cells">{environment?.fields.flatMap(field => field.cells.map(cell => <li key={`${field.kind}:${cell.x}:${cell.y}`}>{field.kind}, column {cell.x + 1}, row {cell.y + 1}</li>))}</ul>
       {children}
     </div>
   );
 }
 
 function CssBoardFallback({
+  environment,
   units,
   selectedId,
   interactionMode,
@@ -2505,6 +2547,7 @@ function CssBoardFallback({
 }: Pick<
   PhaserBoardProps,
   | "units"
+  | "environment"
   | "selectedId"
   | "interactionMode"
   | "capacity"
@@ -2525,11 +2568,13 @@ function CssBoardFallback({
           const x = index % 8;
           const y = Math.floor(index / 8);
           const unit = boardUnits.find((item) => item.x === x && item.y === y);
+          const fields = environment?.fields.filter(field => field.cells.some(cell => cell.x === x && cell.y === y)) ?? [];
           return (
             <button
               type="button"
               key={`${x}-${y}`}
               className="css-board-cell"
+              data-field={fields.map(field => field.kind).join(" ")}
               disabled={
                 interactionMode !== "formation" ||
                 y < 3 ||
@@ -2549,8 +2594,9 @@ function CssBoardFallback({
                   });
                 }
               }}
-              aria-label={`Column ${x + 1}, row ${y + 1}${unit ? `: ${unit.name}` : ""}`}
+              aria-label={`Column ${x + 1}, row ${y + 1}${unit ? `: ${unit.name}` : ""}${fields.map(field => `, ${field.kind}`).join("")}`}
             >
+              {fields.map(field => <small key={field.kind}>{field.kind === "charged-deck" ? "ϟ" : "❄"}</small>)}
               {unit && (
                 <span
                   className={`css-token ${selectedId === unit.id ? "is-selected" : ""}`}

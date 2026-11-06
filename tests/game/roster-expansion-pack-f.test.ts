@@ -239,7 +239,7 @@ describe("Roster Expansion Pack F content", () => {
         power: 190,
         targeting: "nearest-enemy",
         pattern: "all-enemies",
-        stunMs: 700,
+        freezeMs: 700,
         castAnimationMs: 650,
       },
       assetPath: "/assets/characters/kuzan.png",
@@ -332,7 +332,7 @@ describe("Roster Expansion Pack F content", () => {
       ),
     ).toEqual([6, 8, 7, 8, 5]);
     expect(DEFAULT_CONTENT.traits).toHaveLength(13);
-    expect(DEFAULT_CONTENT.version).toBe("1.32.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.33.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
 
     const state = createMatch("pack-f-pool", DEFAULT_CONTENT);
@@ -492,7 +492,7 @@ describe("Emperor origin", () => {
 });
 
 describe("Kuzan Ice Age", () => {
-  it("damages every enemy normally, stuns survivors, and replays deterministically", () => {
+  it("damages every enemy normally, Freezes survivors for B08, and replays deterministically", () => {
     const content = clonedContent();
     configureCombatant(content, "kuzan", { range: 10 });
     configureCombatant(content, "chopper", { defense: 40 });
@@ -515,8 +515,8 @@ describe("Kuzan Ice Age", () => {
       { targetId: "b-global", amount: 190 },
     ]);
     expect(statuses(first, "kuzan")).toMatchObject([
-      { targetId: "a-near", status: "stun", durationTicks: 7 },
-      { targetId: "b-global", status: "stun", durationTicks: 7 },
+      { targetId: "a-near", status: "freeze", durationTicks: 7 },
+      { targetId: "b-global", status: "freeze", durationTicks: 7 },
     ]);
     expect(displacements(first, "kuzan")).toHaveLength(0);
     expect(

@@ -5,6 +5,7 @@ import PhaserBoard, { type PhaserBoardProps, type CombatFxEvent } from "./Phaser
 import { createCombatReport, recordCombatEvent } from "./combatReport";
 import { useGameAudio } from "../app/useGameAudio";
 import { combatSound, DEFAULT_AUDIO_SETTINGS, type AudioSettings } from "../app/audioSettings";
+import { BattleEnvironmentLegend } from "./BattleEnvironmentLegend";
 
 /** A playback observer only: neither meters nor audio feed the simulation. */
 export default function BattleBoard({ audio = DEFAULT_AUDIO_SETTINGS, ...props }: PhaserBoardProps & { audio?: AudioSettings }) {
@@ -27,6 +28,7 @@ export default function BattleBoard({ audio = DEFAULT_AUDIO_SETTINGS, ...props }
   const unavailable = useCallback(() => setReport((current) => ({ ...current, cue: "Visual playback unavailable; totals are not revealed." })), []);
   const ordered = report.units.filter((unit) => unit.team === team).sort((a, b) => (b.hpDamage + b.shieldDamage) - (a.hpDamage + a.shieldDamage) || a.id.localeCompare(b.id));
   return <PhaserBoard {...props} onPlaybackReset={reset} onPlaybackEvent={event} onPlaybackComplete={complete} onPlaybackUnavailable={unavailable}>
+    <BattleEnvironmentLegend environment={props.environment} />
     {(props.phase === "battle" || report.elapsedMs > 0) && <details className="combat-report" aria-label="Combat contributions" data-complete={report.complete} data-elapsed-ms={report.elapsedMs}>
       <summary>COMBAT CONTRIBUTIONS · {report.complete ? "FINAL" : "PLAYBACK"} · {(report.elapsedMs / 1000).toFixed(1)}s</summary>
       <div className="combat-report-content">

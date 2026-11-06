@@ -843,6 +843,7 @@ export function MatchScreen({
         data-watching={watching ? "true" : "false"}
       >
         <BattleBoard
+          environment={battlePresentation?.environment ?? view.environment}
           audio={settings}
           units={tacticalUnits}
           selectedId={selectedUnit?.id ?? null}

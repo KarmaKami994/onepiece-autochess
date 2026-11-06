@@ -5,6 +5,7 @@ import {
   getUnitDefinition,
 } from "./content";
 import { simulateBattle } from "./combat";
+import { stageBattleEnvironment } from "./battleEnvironment";
 import {
   getAcquirableItems,
   isComponentItem,
@@ -178,6 +179,7 @@ export function createMatch(
     round: 1,
     phase: "preparation",
     stageId: firstStage.id,
+    battleEnvironment: stageBattleEnvironment(1, content),
     players: Array.from(
       { length: content.config.playerCount },
       (_, index) => createPlayer(index, content),
@@ -478,6 +480,7 @@ function simulateExistingPvpPairings(
       teamB,
       {
         seed: `${state.seed}:r${state.round}:p${pairingIndex}`,
+        environment: state.battleEnvironment,
         recordEvents: content.config.recordBattleEvents ?? true,
       },
       content,
@@ -502,6 +505,7 @@ function simulateExistingPvpPairings(
       playerADamage: result.winner === "b" ? damage : 0,
       playerBDamage:
         result.winner === "a" && pairing.playerBId ? damage : 0,
+      ...(result.environment ? { environment: result.environment } : {}),
       durationTicks: result.durationTicks,
       events: result.events,
       initialUnits: result.initialUnits,
@@ -523,6 +527,7 @@ function simulatePveRound(
       enemyTeam,
       {
         seed: `${state.seed}:pve:${state.round}:${player.id}`,
+        environment: state.battleEnvironment,
         recordEvents: content.config.recordBattleEvents ?? true,
       },
       content,
@@ -543,6 +548,7 @@ function simulatePveRound(
       timedOut: result.timedOut,
       playerADamage: lossDamage,
       playerBDamage: 0,
+      ...(result.environment ? { environment: result.environment } : {}),
       durationTicks: result.durationTicks,
       events: result.events,
       initialUnits: result.initialUnits,
@@ -1425,6 +1431,7 @@ function beginNextRound(
   state.carouselSession = null;
   const stage = getStageDefinition(state.round, content);
   state.stageId = stage.id;
+  state.battleEnvironment = stageBattleEnvironment(state.round, content);
   for (const player of state.players.filter((candidate) => candidate.alive)) {
     const interest = Math.min(
       content.config.maxInterest,

@@ -4,6 +4,7 @@ import {
 } from "./content";
 import { getUnitFormDefinition, resolveUnitDefinition } from "./forms";
 import { hashSeed, nextRandom } from "./rng";
+import { hasBattleEnvironment, neutralBattleEnvironment, readBattleEnvironment } from "./battleEnvironment";
 import {
   getActiveTraitBehaviorGrants,
   getActiveTraitEffectGrants,
@@ -11,6 +12,7 @@ import {
 } from "./traits";
 import type {
   AbilityDefinition,
+  AdditionalStatusKind,
   BattleEvent,
   BattleOptions,
   BattleResult,
@@ -136,6 +138,14 @@ interface MutableBattleUnit {
   burnNextTick: number;
   burnPower: number;
   burnSourceId: string | null;
+  poisonUntilTick: number;
+  poisonNextTick: number;
+  poisonStacks: number;
+  poisonSourceId: string | null;
+  freezeUntilTick: number;
+  sleepUntilTick: number;
+  lockedUntilTick: number;
+  unlockedRange: number;
   lastDamagerId: string | null;
   state: BattleUnitState;
   ability: AbilityDefinition | null;
@@ -445,6 +455,14 @@ function createMutableUnits(
       burnNextTick: 0,
       burnPower: 0,
       burnSourceId: null,
+      poisonUntilTick: 0,
+      poisonNextTick: 0,
+      poisonStacks: 0,
+      poisonSourceId: null,
+      freezeUntilTick: 0,
+      sleepUntilTick: 0,
+      lockedUntilTick: 0,
+      unlockedRange: 0,
       lastDamagerId: null,
       state: "seek",
       ability: definition.ability,
@@ -814,10 +832,12 @@ function transformBattleUnit(
     0,
     unit.specialDefense + specialDefenseDelta,
   );
-  unit.range = Math.max(
+  const transformedRange = Math.max(
     0,
-    unit.range + transformed.stats.range - base.stats.range,
+    (unit.lockedUntilTick > 0 ? unit.unlockedRange : unit.range) + transformed.stats.range - base.stats.range,
   );
+  if (unit.lockedUntilTick > 0) { unit.unlockedRange = transformedRange; unit.range = 1; }
+  else unit.range = transformedRange;
   unit.formId = form.id;
   unit.ability = transformed.ability;
   return true;
@@ -1067,6 +1087,7 @@ function chooseStep(
   units: MutableBattleUnit[],
   content: GameContent,
 ): Position | null {
+  if (source.lockedUntilTick > 0) return null;
   if (distance(source, target) <= source.range) {
     return null;
   }
@@ -1178,6 +1199,7 @@ function chooseKnockbackDestination(
   units: MutableBattleUnit[],
   content: GameContent,
 ): Position | null {
+  if (target.lockedUntilTick > 0) return null;
   const dx = target.x - source.x;
   const dy = target.y - source.y;
   const horizontal = dx === 0
@@ -1222,6 +1244,7 @@ function choosePullDestination(
   units: MutableBattleUnit[],
   content: GameContent,
 ): Position | null {
+  if (target.lockedUntilTick > 0) return null;
   const dx = source.x - target.x;
   const dy = source.y - target.y;
   const horizontal = dx === 0
@@ -1264,6 +1287,7 @@ function firstLungeDestination(
   units: MutableBattleUnit[],
   content: GameContent,
 ): Position | null {
+  if (source.lockedUntilTick > 0) return null;
   const occupied = new Set(
     units
       .filter(occupiesBoardCell)
@@ -1336,6 +1360,9 @@ export function simulateBattle(
   options: BattleOptions,
   content: GameContent = DEFAULT_CONTENT,
 ): BattleResult {
+  const environment = options.environment === undefined ? neutralBattleEnvironment() :
+    readBattleEnvironment(options.environment, content.config.boardWidth, content.config.boardHeight);
+  if (!environment) throw new Error("Invalid battle environment.");
   let rngState = hashSeed(options.seed);
   const nextBattleRandom = (): number => {
     const random = nextRandom(rngState);
@@ -1406,7 +1433,8 @@ export function simulateBattle(
       | "cast-reset"
       | "ability-drain"
       | "item"
-      | "trait",
+      | "trait"
+      | "environment",
     sourceId?: string,
   ): void => {
     const previous = unit.energy;
@@ -1614,6 +1642,36 @@ export function simulateBattle(
       durationTicks,
     });
   };
+
+  const statusUntil = (unit: MutableBattleUnit, kind: AdditionalStatusKind): number =>
+    kind === "poison" ? unit.poisonUntilTick : kind === "freeze" ? unit.freezeUntilTick :
+      kind === "sleep" ? unit.sleepUntilTick : unit.lockedUntilTick;
+  const endAdditionalStatus = (tick: number, unit: MutableBattleUnit, kind: AdditionalStatusKind): void => {
+    if (statusUntil(unit, kind) === 0) return;
+    if (kind === "poison") {
+      unit.poisonUntilTick = 0; unit.poisonNextTick = 0; unit.poisonStacks = 0; unit.poisonSourceId = null;
+    } else if (kind === "freeze") unit.freezeUntilTick = 0;
+    else if (kind === "sleep") unit.sleepUntilTick = 0;
+    else { unit.lockedUntilTick = 0; unit.range = unit.unlockedRange; unit.unlockedRange = 0; }
+    emit({ type: "status-end", tick, targetId: unit.id, status: kind });
+  };
+  const applyAdditionalStatus = (tick: number, sourceId: string, target: MutableBattleUnit, kind: AdditionalStatusKind, durationMs: number): void => {
+    if (!alive(target) || hasRuneProtect(target, tick) || !Number.isFinite(durationMs) || durationMs <= 0 ||
+      (kind !== "poison" && statusUntil(target, kind) > tick)) return;
+    const durationTicks = Math.max(1, Math.ceil(durationMs * (kind === "freeze" && environment.weather === "snow" ? 1.3 : 1) / content.config.combatTickMs));
+    if (kind === "poison") {
+      if (target.poisonStacks === 0) target.poisonNextTick = tick + Math.ceil(1_000 / content.config.combatTickMs);
+      target.poisonStacks = Math.min(3, target.poisonStacks + 1);
+      target.poisonUntilTick = Math.max(target.poisonUntilTick, tick + durationTicks);
+      target.poisonSourceId = sourceId;
+    } else if (kind === "freeze") target.freezeUntilTick = tick + durationTicks;
+    else if (kind === "sleep") target.sleepUntilTick = tick + durationTicks;
+    else { target.unlockedRange = target.range; target.range = 1; target.lockedUntilTick = tick + durationTicks; }
+    emit({ type: "status", tick, sourceId, targetId: target.id, status: kind, durationTicks,
+      ...(kind === "poison" ? { stacks: target.poisonStacks } : {}) });
+  };
+  const additionalActionBlocked = (unit: MutableBattleUnit, tick: number): boolean =>
+    unit.freezeUntilTick > tick || unit.sleepUntilTick > tick;
 
   const applyHeal = (
     tick: number,
@@ -1841,7 +1899,7 @@ export function simulateBattle(
       applyBlind(tick, holder, enemy, behavior.statusMs);
     }
     applyShield(tick, holder, holder, behavior.shield);
-    const destination = chooseEscapeDestination(holder);
+    const destination = holder.lockedUntilTick > tick ? null : chooseEscapeDestination(holder);
     if (!destination) {
       return;
     }
@@ -1873,7 +1931,7 @@ export function simulateBattle(
     source: MutableBattleUnit | null,
     target: MutableBattleUnit,
     rawAmount: number,
-    damageKind: "attack" | "ability" | "burn" | "item",
+    damageKind: "attack" | "ability" | "burn" | "poison" | "item",
     damageType: DamageType,
     defensePiercePercent = 0,
     options: {
@@ -2100,6 +2158,10 @@ export function simulateBattle(
         shieldDamage,
         damageKind,
       });
+      if (target.sleepUntilTick > tick) {
+        target.sleepUntilTick = Math.max(tick, target.sleepUntilTick - Math.ceil(300 / content.config.combatTickMs));
+        if (target.sleepUntilTick <= tick) endAdditionalStatus(tick, target, "sleep");
+      }
       if (!options.suppressDamagedEnergy) {
         changeEnergy(tick, target, 5, "damaged");
       }
@@ -2877,6 +2939,8 @@ export function simulateBattle(
       unit.burnNextTick = 0;
       unit.burnPower = 0;
       unit.burnSourceId = null;
+      unit.poisonUntilTick = 0; unit.poisonNextTick = 0; unit.poisonStacks = 0; unit.poisonSourceId = null;
+      unit.freezeUntilTick = 0; unit.sleepUntilTick = 0; unit.lockedUntilTick = 0; unit.unlockedRange = 0;
       unit.lastDamagerId = null;
       unit.resurrectAtTick = 0;
       unit.state = "seek";
@@ -3053,9 +3117,30 @@ export function simulateBattle(
 
   let endTick = 0;
   let timedOut = false;
+  const fieldLastCell = new Map<string, string>();
+  const frostReadyTick = new Map<string, number>();
+  const secondTicks = Math.max(1, Math.ceil(1_000 / content.config.combatTickMs));
   for (let tick = 1; tick <= maxTicks; tick += 1) {
     endTick = tick;
     processResurrections(tick);
+    for (const unit of units) {
+      if (!alive(unit)) { fieldLastCell.delete(unit.id); continue; }
+      if (unit.freezeUntilTick > tick && tick <= unit.burnUntilTick) unit.freezeUntilTick -= 1;
+      for (const kind of ["freeze", "sleep", "locked"] as const) {
+        if (statusUntil(unit, kind) > 0 && statusUntil(unit, kind) <= tick) endAdditionalStatus(tick, unit, kind);
+      }
+      if (tick % secondTicks === 0 && environment.weather === "rain") changeEnergy(tick, unit, 3, "environment", "environment:rain");
+      const cell = positionKey(unit.x, unit.y);
+      for (const field of environment.fields) {
+        if (!field.cells.some(point => point.x === unit.x && point.y === unit.y)) continue;
+        if (field.kind === "charged-deck" && tick % secondTicks === 0) changeEnergy(tick, unit, 3, "environment", "environment:charged-deck");
+        if (field.kind === "frost-patch" && fieldLastCell.get(unit.id) !== cell && tick >= (frostReadyTick.get(unit.id) ?? 0)) {
+          applyAdditionalStatus(tick, "environment:frost-patch", unit, "freeze", 1_000);
+          frostReadyTick.set(unit.id, tick + Math.ceil(2_000 / content.config.combatTickMs));
+        }
+      }
+      fieldLastCell.set(unit.id, cell);
+    }
     for (const unit of units) {
       if (!alive(unit)) {
         continue;
@@ -3116,6 +3201,13 @@ export function simulateBattle(
         applyDamage(tick, source, unit, unit.burnPower, "burn", "special");
         unit.burnNextTick = tick + Math.round(1_000 / content.config.combatTickMs);
       }
+      if (alive(unit) && unit.poisonStacks > 0 && tick <= unit.poisonUntilTick && tick >= unit.poisonNextTick) {
+        const source = units.find(candidate => candidate.id === unit.poisonSourceId) ?? null;
+        const power = Math.max(1, Math.floor(unit.maxHp * unit.poisonStacks / 100)) * (environment.weather === "rain" ? 0.7 : 1);
+        applyDamage(tick, source, unit, power, "poison", "true", 0, { suppressDamagedEnergy: true });
+        unit.poisonNextTick += secondTicks;
+      }
+      if (unit.poisonUntilTick > 0 && tick >= unit.poisonUntilTick) endAdditionalStatus(tick, unit, "poison");
     }
     processDeaths(tick);
 
@@ -3158,7 +3250,7 @@ export function simulateBattle(
       if (!alive(source)) {
         continue;
       }
-      if (tick < source.stunUntilTick) {
+      if (tick < source.stunUntilTick || additionalActionBlocked(source, tick)) {
         source.state = "stunned";
         continue;
       }
@@ -3168,6 +3260,7 @@ export function simulateBattle(
       source.state = "seek";
       if (
         source.ability &&
+        !(source.lockedUntilTick > tick && hasSignatureMechanic(source.ability, "lunge")) &&
         source.energy >= source.maxEnergy &&
         !hasItemBehavior(source, "cannot-cast-energy-attacks")
       ) {
@@ -3215,13 +3308,18 @@ export function simulateBattle(
       }
     }
 
-    for (const intent of intents.filter(
+    for (const queuedIntent of intents.filter(
       (candidate): candidate is CastIntent => candidate.kind === "cast",
     )) {
-      const source = units.find((unit) => unit.id === intent.sourceId);
-      if (!source || !source.ability) {
+      const source = units.find((unit) => unit.id === queuedIntent.sourceId);
+      if (!source || !source.ability || additionalActionBlocked(source, tick) ||
+        (source.lockedUntilTick > tick && hasSignatureMechanic(source.ability, "lunge"))) {
         continue;
       }
+      const intent = source.lockedUntilTick > tick
+        ? { ...queuedIntent, targetIds: abilityTargets(source, units, content).map(unit => unit.id) }
+        : queuedIntent;
+      if (!intent.targetIds.length) continue;
       const abilityDefinition = source.ability;
       source.nextActionTick =
         tick +
@@ -3367,6 +3465,10 @@ export function simulateBattle(
               target,
               abilityDefinition.stunMs,
             );
+          }
+          for (const [kind, duration] of [["poison", abilityDefinition.poisonDurationMs], ["freeze", abilityDefinition.freezeMs],
+            ["sleep", abilityDefinition.sleepMs], ["locked", abilityDefinition.lockMs]] as const) {
+            if (duration !== undefined) applyAdditionalStatus(tick, source.id, target, kind, duration);
           }
           if (
             target.hp > 0 &&
@@ -3516,7 +3618,8 @@ export function simulateBattle(
     )) {
       const source = units.find((unit) => unit.id === intent.sourceId);
       const target = units.find((unit) => unit.id === intent.targetId);
-      if (!source || !target) {
+      if (!source || !target || additionalActionBlocked(source, tick) ||
+        (source.lockedUntilTick > tick && distance(source, target) > source.range)) {
         continue;
       }
       source.nextActionTick = tick + source.attackIntervalTicks;
@@ -3683,7 +3786,7 @@ export function simulateBattle(
       (candidate): candidate is MoveIntent => candidate.kind === "move",
     )) {
       const source = units.find((unit) => unit.id === intent.sourceId);
-      if (!source || !alive(source)) {
+      if (!source || !alive(source) || additionalActionBlocked(source, tick) || source.lockedUntilTick > tick) {
         continue;
       }
       const destinationKey = `${intent.to.x},${intent.to.y}`;
@@ -3743,5 +3846,6 @@ export function simulateBattle(
     events,
     initialUnits,
     finalUnits: units.map(toSnapshot),
+    ...(hasBattleEnvironment(environment) ? { environment } : {}),
   };
 }

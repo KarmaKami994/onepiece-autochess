@@ -1,11 +1,11 @@
-import { createMatch, getStageDefinition, hashCanonicalValue, hashGameContent, type GameContent, type MatchState, type PlayerState, type MatchBattleResult, type MatchPhase, type HarborOffer, type VoyageChoiceReceipt } from "../game";
+import { createMatch, getStageDefinition, hashCanonicalValue, hashGameContent, type GameContent, type MatchState, type PlayerState, type MatchBattleResult, type MatchPhase, type HarborOffer, type VoyageChoiceReceipt, type BattleEnvironment } from "../game";
 
 export const REPLAY_FORMAT = "grand-line-voyage-replay";
 export const MAX_REPLAY_BYTES = 32 * 1024 * 1024;
 export const MAX_ARCHIVE_BYTES = 96 * 1024 * 1024;
 export const MAX_ARCHIVE_RECORDS = 10;
 export type CollectionFacts = { crewDiscovered: string[]; crewOwned: string[]; crewDeployed: string[]; itemsDiscovered: string[]; itemsOwned: string[]; itemsDeployed: string[]; formsReached: string[] };
-export type ReplayFrame = { round: number; phase: MatchPhase; stageId: string; players: PlayerState[]; battles: MatchBattleResult[]; itemOffers: Record<string, string[]>; recruitOffers: Record<string, string[]>; harborOffers?: Record<string, HarborOffer[]>; recruitmentRoutes?: Record<string, string> };
+export type ReplayFrame = { round: number; phase: MatchPhase; stageId: string; players: PlayerState[]; battles: MatchBattleResult[]; itemOffers: Record<string, string[]>; recruitOffers: Record<string, string[]>; harborOffers?: Record<string, HarborOffer[]>; recruitmentRoutes?: Record<string, string>; environment?: BattleEnvironment };
 export type VoyageReplay = {
   format: typeof REPLAY_FORMAT; formatVersion: 1; id: string; seed: string; startedAt: number; completedAt: number | null;
   contentVersion: string; contentHash: string; configHash: string; schemaVersion: number; playerId: string;
@@ -44,7 +44,7 @@ export function observeVoyage(replay: VoyageReplay, state: MatchState, now: numb
   const index = replay.frames.findIndex((frame) => frame.round === state.round && frame.phase === state.phase);
   const previous = replay.frames[index];
   const frame: ReplayFrame = { round: state.round, phase: state.phase, stageId: state.stageId, players: structuredClone(state.players),
-    battles: state.phase === "battle" ? previous?.battles ?? structuredClone(state.lastResults) : [], itemOffers: structuredClone(state.pendingItemChoices), recruitOffers: structuredClone(state.pendingVoyageRecruitOffers), harborOffers: structuredClone(state.pendingHarborOffers), recruitmentRoutes: structuredClone(state.pendingRecruitmentRoutes) };
+    battles: state.phase === "battle" ? previous?.battles ?? structuredClone(state.lastResults) : [], itemOffers: structuredClone(state.pendingItemChoices), recruitOffers: structuredClone(state.pendingVoyageRecruitOffers), harborOffers: structuredClone(state.pendingHarborOffers), recruitmentRoutes: structuredClone(state.pendingRecruitmentRoutes), environment: structuredClone(state.battleEnvironment) };
   const frames = [...replay.frames];
   if (index < 0) frames.push(frame); else frames[index] = frame;
   const peaks = { round: Math.max(replay.peaks.round, player.alive || replay.peaks.round === 0 ? state.round : 0), level: Math.max(replay.peaks.level, player.level), gold: Math.max(replay.peaks.gold, player.gold), deployed: Math.max(replay.peaks.deployed, fighters.length, Object.keys(player.board).length) };
@@ -54,7 +54,7 @@ export function observeVoyage(replay: VoyageReplay, state: MatchState, now: numb
 /** Disposable read-only adapter. No recorded data enters the active session. */
 export function replayFrameState(replay: VoyageReplay, frame: ReplayFrame, content: GameContent): MatchState {
   if (!replayCompatible(replay, content)) throw new Error("Replay content/config/schema differs from this build. Export or delete it; playback is disabled.");
-  return { ...createMatch("replay-view-only", content), seed: replay.seed, round: frame.round, phase: frame.phase, stageId: frame.stageId,
+  return { ...createMatch("replay-view-only", content), seed: replay.seed, round: frame.round, phase: frame.phase, stageId: frame.stageId, battleEnvironment: frame.environment,
     players: frame.players, winnerId: frame.players.find((player) => player.placement === 1)?.id ?? null, lastResults: frame.battles, pairings: frame.battles.map((battle) => ({ playerAId: battle.playerAId, playerBId: battle.playerBId, ghostOfPlayerId: battle.ghostOfPlayerId })), pendingItemChoices: frame.itemOffers, pendingVoyageRecruitOffers: frame.recruitOffers, pendingHarborOffers: frame.harborOffers ?? {}, pendingRecruitmentRoutes: frame.recruitmentRoutes ?? {} };
 }
 export function replayStageName(frame: ReplayFrame, content: GameContent): string { return frame.phase === "starter-choice" ? "First Crew" : frame.phase === "harbor-choice" ? content.harborEncounters.find(encounter => encounter.rounds.includes(frame.round))?.name ?? "Harbor" : getStageDefinition(frame.round, content).name; }

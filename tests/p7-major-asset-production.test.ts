@@ -91,7 +91,7 @@ async function expectFile(relativePath: string): Promise<void> {
 
 describe("P7 major asset production", () => {
   it("completes real static and preferred v2 presentation for all crew", async () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.32.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.33.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(DEFAULT_CONTENT.units).toHaveLength(34);
     expect(DEFAULT_CONTENT.units.some((unit) =>
@@ -158,14 +158,14 @@ describe("P7 major asset production", () => {
     }
   });
 
-  it("pins the cumulative content contract after the B07 voyage choices", () => {
+  it("pins the cumulative content contract after B08 status/weather", () => {
     const normalized = JSON.stringify(DEFAULT_CONTENT, (key, value) =>
       ["version", "assetPath", "presentation"].includes(key)
         ? undefined
         : value,
     );
     expect(createHash("sha256").update(normalized).digest("hex"))
-      .toBe("bcdbf36e2e35255b8a213b19d9cd47663bbfbca925211a4955b5ce52d7bd3b69");
+      .toBe("7946a123016fdcceeb1e2f3b01fe4fb74f5db118fd53f1c3b33befa5f246cbed");
   });
 
   it("maps all 65 item identities and preserves recipes and glyph fallback", async () => {
@@ -206,7 +206,7 @@ describe("P7 major asset production", () => {
       imagePath: "",
       fallbackGlyph: "◆",
     });
-    expect(Object.keys(STATUS_VISUALS)).toHaveLength(8);
+    expect(Object.keys(STATUS_VISUALS)).toHaveLength(12);
     expect(Object.keys(FORM_VISUALS)).toHaveLength(4);
     for (const form of DEFAULT_CONTENT.forms) {
       const visual = formVisualDefinition(form.id);

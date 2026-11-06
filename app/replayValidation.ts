@@ -1,4 +1,5 @@
 import type { BattleEvent, BattleUnitSnapshot, GameContent, PlayerState, UnitInstance } from "../game";
+import { readBattleEnvironment } from "../game/battleEnvironment";
 import { ACHIEVEMENTS, MAX_REPLAY_BYTES, REPLAY_FORMAT, replayCompatible, type CaptainProfile, type CollectionFacts, type VoyageReplay } from "./chronicle";
 
 const object = (value: unknown): value is Record<string, unknown> => value !== null && typeof value === "object" && !Array.isArray(value);
@@ -43,12 +44,13 @@ function event(value: unknown): value is BattleEvent {
     case "attack": return ids("sourceId", "targetId") && typeof value.critical === "boolean";
     case "cast": return ids("sourceId", "abilityId") && strings(value.targetIds);
     case "ability-hit": return ids("sourceId", "targetId", "abilityId") && integer(value.hitIndex) && integer(value.hitCount) && value.hitIndex >= 1 && value.hitIndex <= value.hitCount && typeof value.finisher === "boolean";
-    case "damage": return ids("sourceId", "targetId") && nums("amount", "healthDamage", "shieldDamage") && ["attack", "ability", "burn", "item"].includes(String(value.damageKind));
-    case "energy": return ids("unitId") && (value.sourceId === undefined || text(value.sourceId)) && typeof value.amount === "number" && Number.isFinite(value.amount) && nums("value") && ["attack", "damaged", "cast-reset", "ability-drain", "item", "trait"].includes(String(value.reason));
+    case "damage": return ids("sourceId", "targetId") && nums("amount", "healthDamage", "shieldDamage") && ["attack", "ability", "burn", "poison", "item"].includes(String(value.damageKind));
+    case "energy": return ids("unitId") && (value.sourceId === undefined || text(value.sourceId)) && typeof value.amount === "number" && Number.isFinite(value.amount) && nums("value") && ["attack", "damaged", "cast-reset", "ability-drain", "item", "trait", "environment"].includes(String(value.reason));
     case "dodge": return ids("sourceId", "targetId");
     case "buff": return ids("sourceId", "targetId") && nums("amount", "value") && value.stat === "attack" && value.reason === "stacking-attack";
     case "heal": case "shield": return ids("sourceId", "targetId") && nums("amount");
-    case "status": return ids("sourceId", "targetId") && integer(value.durationTicks) && ["stun", "burn", "wound", "resistance-reduction", "protect", "rune-protect", "blind", "paralysis", "emergency-shield"].includes(String(value.status));
+    case "status": return ids("sourceId", "targetId") && integer(value.durationTicks) && (value.stacks === undefined || (integer(value.stacks) && value.stacks >= 1 && value.stacks <= 3)) && ["stun", "burn", "wound", "resistance-reduction", "protect", "rune-protect", "blind", "paralysis", "emergency-shield", "poison", "freeze", "sleep", "locked"].includes(String(value.status));
+    case "status-end": return ids("targetId") && ["poison", "freeze", "sleep", "locked"].includes(String(value.status));
     case "death": return ids("unitId") && nullableText(value.sourceId);
     default: return false;
   }
@@ -57,15 +59,16 @@ const collectionKeys = ["crewDiscovered", "crewOwned", "crewDeployed", "itemsDis
 function collection(value: unknown): value is CollectionFacts { return object(value) && collectionKeys.every((key) => strings(value[key]) && unique(value[key] as string[])); }
 
 export function validateReplay(raw: unknown, content: GameContent): VoyageReplay {
+  const validEnvironment = (value: unknown) => value === undefined || readBattleEnvironment(value, content.config.boardWidth, content.config.boardHeight) !== null;
   if (!object(raw) || raw.format !== REPLAY_FORMAT || raw.formatVersion !== 1 || !text(raw.id) || !text(raw.seed) || !text(raw.playerId) || !text(raw.contentVersion) || !text(raw.contentHash) || !text(raw.configHash) || !integer(raw.schemaVersion) || !number(raw.startedAt) || !(raw.completedAt === null || number(raw.completedAt)) || typeof raw.fromStart !== "boolean" || !collection(raw.collection)) throw new Error("Unsupported or malformed voyage replay.");
-  const battle = (value: unknown) => object(value) && text(value.playerAId) && nullableText(value.playerBId) && nullableText(value.ghostOfPlayerId) && nullableText(value.winnerId) && typeof value.timedOut === "boolean" && integer(value.playerADamage) && integer(value.playerBDamage) && integer(value.durationTicks) && value.durationTicks <= 100_000 && array(value.initialUnits, snapshot, 48) && array(value.finalUnits, snapshot, 48) && array(value.events, event, 100_000);
+  const battle = (value: unknown) => object(value) && validEnvironment(value.environment) && text(value.playerAId) && nullableText(value.playerBId) && nullableText(value.ghostOfPlayerId) && nullableText(value.winnerId) && typeof value.timedOut === "boolean" && integer(value.playerADamage) && integer(value.playerBDamage) && integer(value.durationTicks) && value.durationTicks <= 100_000 && array(value.initialUnits, snapshot, 48) && array(value.finalUnits, snapshot, 48) && array(value.events, event, 100_000);
   const harborOffer = (value: unknown) => object(value) && text(value.id) && text(value.itemId) && integer(value.goldCost);
   const receipt = (value: unknown) => object(value) && integer(value.round) && value.round >= 1 && text(value.playerId) &&
     ["starter", "recruitment", "harbor"].includes(String(value.kind)) && text(value.choiceId) && integer(value.paidGold) && integer(value.convertedGold) && typeof value.skipped === "boolean" &&
     ["definitionId", "itemId", "encounterId", "routeId"].every(key => value[key] === undefined || text(value[key]));
   const frame = (value: unknown) => object(value) && integer(value.round) && value.round >= 1 && value.round <= 200 && ["preparation", "battle", "item-choice", "voyage-choice", "starter-choice", "harbor-choice", "carousel", "game-over"].includes(String(value.phase)) && text(value.stageId) && array(value.players, player, 8) && value.players.length > 0 && dictionary(value.itemOffers, strings, 8) && dictionary(value.recruitOffers, strings, 8) && array(value.battles, battle, 8) &&
     (value.harborOffers === undefined || dictionary(value.harborOffers, offers => array(offers, harborOffer, 3), 8)) &&
-    (value.recruitmentRoutes === undefined || dictionary(value.recruitmentRoutes, text, 8));
+    (value.recruitmentRoutes === undefined || dictionary(value.recruitmentRoutes, text, 8)) && validEnvironment(value.environment);
   if (raw.choiceHistory !== undefined && !array(raw.choiceHistory, receipt, 64)) throw new Error("Invalid voyage choice receipts.");
   if (!array(raw.frames, frame, 1000) || !raw.frames.length) throw new Error("Invalid replay checkpoints or battle events.");
   // The complete structural checks above narrow every field consumed by the viewer.
@@ -74,13 +77,28 @@ export function validateReplay(raw: unknown, content: GameContent): VoyageReplay
   const frameIds = replay.frames.map((frame) => `${frame.round}:${frame.phase}`);
   if (!unique(frameIds) || replay.frames.some((frame, index) => index > 0 && frame.round < replay.frames[index - 1].round)) throw new Error("Replay checkpoints are duplicated or unordered.");
   for (const frame of replay.frames) {
+    if (frame.environment !== undefined) {
+      const environment = readBattleEnvironment(frame.environment, content.config.boardWidth, content.config.boardHeight);
+      if (!environment) throw new Error("Invalid recorded environment.");
+      frame.environment = environment;
+    }
+    for (const battle of frame.battles) if (battle.environment !== undefined) {
+      const environment = readBattleEnvironment(battle.environment, content.config.boardWidth, content.config.boardHeight);
+      if (!environment) throw new Error("Invalid recorded battle environment.");
+      battle.environment = environment;
+    }
     const playerIds = frame.players.map((entry) => entry.id);
     if (!unique(playerIds) || !playerIds.includes(replay.playerId)) throw new Error("Invalid replay captain references.");
     for (const battle of frame.battles) {
       const fighterIds = battle.initialUnits.map((entry) => entry.id);
       if (!unique(fighterIds) || !unique(battle.finalUnits.map((entry) => entry.id)) || battle.finalUnits.length !== fighterIds.length || !playerIds.includes(battle.playerAId) || (battle.playerBId !== null && !playerIds.includes(battle.playerBId)) || battle.finalUnits.some((entry) => !fighterIds.includes(entry.id))) throw new Error("Invalid replay fighter references.");
       for (const entry of battle.events) {
-        for (const key of ["sourceId", "targetId", "unitId"] as const) if (key in entry && entry[key as keyof typeof entry] !== null && entry[key as keyof typeof entry] !== undefined && !fighterIds.includes(String(entry[key as keyof typeof entry]))) throw new Error("Battle event references an unknown fighter.");
+        const environmentSource =
+          (entry.type === "status" && entry.status === "freeze" && entry.sourceId === "environment:frost-patch" && battle.environment?.fields.some(field => field.kind === "frost-patch")) ||
+          (entry.type === "energy" && entry.reason === "environment" &&
+            ((entry.sourceId === "environment:rain" && battle.environment?.weather === "rain") ||
+              (entry.sourceId === "environment:charged-deck" && battle.environment?.fields.some(field => field.kind === "charged-deck"))));
+        for (const key of ["sourceId", "targetId", "unitId"] as const) if (!(key === "sourceId" && environmentSource) && key in entry && entry[key as keyof typeof entry] !== null && entry[key as keyof typeof entry] !== undefined && !fighterIds.includes(String(entry[key as keyof typeof entry]))) throw new Error("Battle event references an unknown fighter.");
         if (entry.type === "cast" && entry.targetIds.some((id) => !fighterIds.includes(id))) throw new Error("Unknown cast target.");
       }
     }

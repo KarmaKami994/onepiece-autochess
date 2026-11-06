@@ -2,10 +2,12 @@ import { DEFAULT_CONTENT } from "./content";
 import { reconcileProductionFormProgression, resolveUnitDefinition } from "./forms";
 import { getActiveTraitsForUnits } from "./traits";
 import { simulateBattle } from "./combat";
-import type { BattleSetupUnit, BattleTeam, GameContent, UnitInstance } from "./types";
+import type { BattleEnvironment, BattleSetupUnit, BattleTeam, GameContent, UnitInstance } from "./types";
+import { neutralBattleEnvironment, readBattleEnvironment } from "./battleEnvironment";
 
 export type PlannedUnit = BattleSetupUnit;
 export type TeamPlan = {
+  environment?: BattleEnvironment;
   format: "grand-line-team-plan";
   version: 1;
   contentVersion: string;
@@ -18,7 +20,7 @@ export type PlanValidation = { ok: true; plan: TeamPlan } | { ok: false; errors:
 export function createTeamPlan(content: GameContent = DEFAULT_CONTENT): TeamPlan {
   return {
     format: "grand-line-team-plan", version: 1, contentVersion: content.version,
-    name: "My crew plan", seed: "crew-practice-1", teams: { a: [], b: [] },
+    name: "My crew plan", seed: "crew-practice-1", teams: { a: [], b: [] }, environment: neutralBattleEnvironment(),
   };
 }
 
@@ -43,6 +45,8 @@ export function validateTeamPlan(value: unknown, content: GameContent = DEFAULT_
   if (typeof value.seed !== "string" || !value.seed.trim() || value.seed.length > 128) errors.push("Seed must contain 1–128 characters.");
   if (!isRecord(value.teams)) return { ok: false, errors: [...errors, "Two teams (a and b) are required."] };
   const teams: TeamPlan["teams"] = { a: [], b: [] };
+  const environment = value.environment === undefined ? undefined : readBattleEnvironment(value.environment, content.config.boardWidth, content.config.boardHeight);
+  if (environment === null) errors.push("Invalid battle weather or field cells.");
   for (const side of ["a", "b"] as const) {
     const rawUnits = value.teams[side];
     const label = `Team ${side.toUpperCase()}`;
@@ -108,6 +112,7 @@ export function validateTeamPlan(value: unknown, content: GameContent = DEFAULT_
   return { ok: true, plan: {
     format: "grand-line-team-plan", version: 1, contentVersion: content.version,
     name: String(value.name).trim(), seed: String(value.seed), teams,
+    ...(environment ? { environment } : {}),
   } };
 }
 
@@ -134,5 +139,5 @@ export function simulateTeamPlan(value: unknown, content: GameContent = DEFAULT_
   };
   const teamA = team("a");
   const teamB = team("b");
-  return { ok: true as const, plan, teamA, teamB, result: simulateBattle(teamA, teamB, { seed: plan.seed, recordEvents: true }, content) };
+  return { ok: true as const, plan, teamA, teamB, result: simulateBattle(teamA, teamB, { seed: plan.seed, recordEvents: true, environment: plan.environment }, content) };
 }

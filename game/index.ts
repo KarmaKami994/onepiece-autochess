@@ -15,6 +15,7 @@ export * from "./economy";
 export * from "./roster";
 export * from "./voyageRecruitment";
 export * from "./voyageEncounters";
+export * from "./battleEnvironment";
 export * from "./carousel";
 export * from "./matchFlow";
 export * from "./bots";
