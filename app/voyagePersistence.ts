@@ -6,6 +6,7 @@ import {
   type GameContent,
   type MatchState,
 } from "../game";
+import { readPhaseClockCheckpoint, type PhaseClockCheckpoint } from "./phaseClock";
 
 export type VoyageSaveEnvelope = {
   state: unknown;
@@ -14,12 +15,14 @@ export type VoyageSaveEnvelope = {
   schemaVersion?: number;
   contentVersion?: string;
   replayBattle?: boolean;
+  phaseClock?: PhaseClockCheckpoint;
 };
 
 export function createVoyageSaveEnvelope(
   state: MatchState,
   seed: string,
   updatedAt: number,
+  clock?: PhaseClockCheckpoint | null,
 ): VoyageSaveEnvelope {
   return {
     state,
@@ -28,6 +31,7 @@ export function createVoyageSaveEnvelope(
     schemaVersion: CURRENT_SAVE_SCHEMA_VERSION,
     contentVersion: state.contentVersion,
     replayBattle: false,
+    ...(clock && readPhaseClockCheckpoint(clock, state) ? { phaseClock: clock } : {}),
   };
 }
 

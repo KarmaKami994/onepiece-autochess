@@ -7,9 +7,10 @@ Branch: `codex/b05-bot-decision-diagnostics`. GameContent `1.31.0`, schema `6`.
 
 Delivery A instruments real buy/equip decisions without changing production
 policy. The batch explicitly requires separate approval of a progression candidate
-(B) and evidenced item/form changes (C). No replacement candidate is currently
-approved; the rejected P1B round-target policy stays rejected. Completing A does
-not mark all of B05 complete or authorize a second tuning experiment.
+(B) and evidenced item/form changes (C). The owner subsequently approved merging
+A and evaluating B once. That evaluation failed its locked cost-5 gates and was
+reverted; see [the retained result](B05_LATE_SPARE_XP_EVALUATION.md). The rejected
+P1B round-target policy also stays rejected. No second candidate is authorized.
 
 ## Locked observation and measurement contract
 
@@ -105,14 +106,21 @@ This is a code-level affinity blind spot, not evidence of an item value bug or a
 population outcome deficit. These focused cases establish legal behavior, not
 how often catalysts/overflow or a different carrier would matter in matches.
 
-### Proposed B — approval required, NOT implemented
+### B — approved once, evaluated and REJECTED
+
+The following is the historical locked proposal. The owner approved it on
+2026-11-05; its one POST failed the cost-5 gates (102→88 players; 128→102 final
+presences). Production behavior/version/tests are restored to A. PR #63 merged
+as `7b7b07abbc6f14c9c8ce54d223909da209210f98`; the measured candidate source is
+`103389e0f9ccf47bbc051844cfb44aab688c1d3f`. The linked evaluation records exact
+provenance, supporting observations and the unchanged raw POST.
 
 **One late spare-gold XP action**, after the entire unchanged initial buy/XP/
 reroll/post-reroll-buy sequence and before formation/equip:
 
 1. Personality `levelAggression >= 0.5`.
 2. Original XP budget fully succeeded and stopped as `budget-exhausted`.
-3. Current level is at least 7 and below max; roster-size guard passes.
+3. Current level is 7 or 8 and below max; roster-size guard passes.
 4. The existing XP command is legal and preserves `economyReserve`.
 5. Issue at most **one** additional `BUY_XP` through `applyCommand`.
 
@@ -123,8 +131,8 @@ It preserves this turn's existing shop decisions but can reduce next-turn gold,
 so regression remains possible. An approved behavioral candidate would use
 GameContent `1.32.0`, schema `6`, with no unit/item/economy/config value change.
 
-Before implementation, approve this exact policy and the single POST protocol
-above. Proposed success gates: 50/50 complete, zero crashes/invariant failures,
+The approved single POST protocol used these success gates: 50/50 complete,
+zero crashes/invariant failures,
 paced estimate 20–30 min, existing 65%-winner and every-trait booleans true;
 cost-4/5 player-board counts each at least **259/102**, final-board counts each
 at least **429/128**, with at least one of those four counts strictly higher.
@@ -134,6 +142,12 @@ If a gate fails, reject/revert the candidate and retain its one POST as evidence
 do not retune a second candidate. A new baseline is not authorized.
 
 ### C — separate item/form decision
+
+Subsequent continuation: the owner approved one carrier-only Special Defense
+affinity candidate and one POST on 2026-11-05. Focused cases passed, but three
+locked representation gates failed; behavior/version/tests were reverted.
+See [the exact C evaluation and retained evidence](B05_ITEM_AFFINITY_PROPOSAL.md).
+The following recommendation records A's original handoff.
 
 The reproduced legality/crafting/retention/form-lock paths work as specified.
 Recommendation: retain the current item/form policy for this candidate; do not
@@ -157,5 +171,8 @@ reviewable; no item/form weights or policy are changed in A.
   new aggregate diagnostic/POST, production soak or baseline. Normal CI remains
   the PR gate, including its ordinary smoke/browser checks.
 
-**Status: A implemented; B not approved/implemented/measured; C unchanged pending
-separate evidence/decision. B05 as a whole is not marked complete.**
+**Status: A merged with green CI; B's approved one-candidate evaluation complete,
+rejected and reverted. C's separately approved single evaluation is also complete,
+rejected and reverted; production remains unchanged. B05's diagnostic/evaluation
+deliveries are complete without a successful tuning claim. A future policy needs
+separate evidence/approval; no B06 work starts here.**
