@@ -32,4 +32,15 @@ Authored coverage: deterministic harbour replacement/prices/pool, full stock and
 
 PASS: final typecheck/lint/build, asset/provenance validation, whitespace inspection, focused 78/78 and affected regressions 54/54. Local full suite executed once: 945/949; the four inherited B08 foundation failures were corrected and rerun in the focused set. These were stale 8→12 status counts, a healer choosing itself before damage, and P9's old projection needing the existing hash-verified pre-B08 content control. The historical P9 hash and current Kuzan assertions remain unchanged. No second full local run; normal CI runs the complete final suite.
 
-PASS: final Food browser 6/6 at both desktop sizes, plus existing harbor/tools 12/12. Initial combined run 16/18 found the Enter shortcut collision; corrected without relaxing assertions/timeouts. Both screenshots and three icons inspected. Normalized content contract `6bf4b1a2b130dc9699b047926be72a60587f6275d315713f0c32a9e128198613` passes. Main remains B08; [PR #71](https://github.com/KarmaKami994/onepiece-autochess/pull/71) publishes verified implementation `1438f03b7c9b611582293c94a374dbd5911ca47a` with subsequent metadata only. Its [exact-head CI checks](https://github.com/KarmaKami994/onepiece-autochess/pull/71/checks) are the remote integration result. No B09 merge, separate local production run, aggregate/baseline or 1,000-seed soak.
+PASS: final Food browser 6/6 at both desktop sizes, plus existing harbor/tools 12/12. Initial combined run 16/18 found the Enter shortcut collision; corrected without relaxing assertions/timeouts. Both screenshots and three icons inspected. Normalized content contract `6bf4b1a2b130dc9699b047926be72a60587f6275d315713f0c32a9e128198613` passes. Main remains B08; [PR #71](https://github.com/KarmaKami994/onepiece-autochess/pull/71) carries the implementation and verification corrections. Its [exact-head CI checks](https://github.com/KarmaKami994/onepiece-autochess/pull/71/checks) are the remote integration result. No B09 merge, separate local production run, aggregate/baseline or 1,000-seed soak.
+
+CI #177 on `58a6f94` passed 949/949 normal and coverage tests, asset checks,
+50-match smoke (50 complete / zero crashes), build and dependency review.
+Coverage's existing 30-second audit timeout passed on one unchanged job retry.
+Its Browser E2E found two inherited B08 disclosure clicks intercepted by the
+left rail. Scoped overlay CSS now places weather inside the board's free area
+and Food below playback controls. Local affected weather/Food/report/voyage
+set: 19/20 initially, then the unchanged failed voyage case passed once in
+isolation. Final Food placement 2/2, with a non-overlap assertion and inspected
+screenshots at both sizes. No gameplay/config/timeout/assertion was relaxed.
+The final CSS head is validated by normal PR CI; no further local tests.

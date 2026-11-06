@@ -39,7 +39,13 @@ test("harbor food survives reload, serves accessibly once and remains frozen thr
   await page.reload(); await page.getByRole("button", { name: /CONTINUE/i }).click();
   await expect(galley.getByRole("status")).toContainText(food.name); await expect(galley.getByRole("button")).toHaveCount(0);
   await page.getByRole("button", { name: /START BATTLE/ }).click();
+  await expect(page.getByLabel("Battle meals")).toBeVisible();
   await expect(page.getByLabel("Battle meals")).toContainText(food.name);
+  const mealBounds = await page.getByLabel("Battle meals").boundingBox();
+  const controlsBounds = await page.getByLabel("Combat presentation controls").boundingBox();
+  expect(mealBounds).not.toBeNull(); expect(controlsBounds).not.toBeNull();
+  expect(mealBounds!.y).toBeGreaterThanOrEqual(controlsBounds!.y + controlsBounds!.height);
+  await page.screenshot({ path: `tmp/b09-battle-meals-${testInfo.project.name}.png`, fullPage: true });
   await expect.poll(async () => ((await readVoyageFixture(page))?.state as MatchState | undefined)?.foodHistory?.filter(receipt => receipt.playerId === "player-1" && receipt.kind === "applied").length).toBe(1);
   const saved = (await readVoyageFixture(page))!.state as MatchState;
   await page.reload(); await page.getByRole("button", { name: /CONTINUE/i }).click();

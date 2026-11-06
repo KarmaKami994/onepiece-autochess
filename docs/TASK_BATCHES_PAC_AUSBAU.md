@@ -265,6 +265,12 @@ Typecheck/Lint/Build/Assets, fokussierte 78/78 plus betroffene 54/54 und Food-E2
 Lauf fand vier übernommene B08-Testgrundlagenfehler (945/949), die gezielt
 korrigiert wurden. Normale PR-CI prüft die finale Gesamtsuite; kein lokaler
 Produktionslauf oder neuer Messbericht. Noch nicht gemergt.
+CI #177 bestätigte 949/949 Unit-/Coverage-Tests, Assets, 50/50 normalen Smoke
+ohne Crash und Build. Zwei übernommene Wetter-Klickfälle erforderten eine enge
+CSS-Korrektur außerhalb der linken Leiste; Food liegt nun unter den Reglern.
+Betroffene Browserfälle bestanden nach einer unveränderten Wiederholung des
+bestehenden Reiseablauffalls; finale Food-Platzierung 2/2. PR #71 bleibt das
+Review-/CI-Gate; keine weiteren lokalen Tests oder Gameplay-Änderungen.
 
 **Ziel:** Ein zusammenhängender One-Piece-Food-Mechanismus erweitert die Reise mit verständlicher Beschaffung, Verwendung und Wirkung.
 

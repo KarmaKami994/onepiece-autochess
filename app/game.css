@@ -909,6 +909,7 @@ kbd {
 .battle-environment { position: absolute; top: 8px; left: 8px; z-index: 8; max-width: min(340px, 65%); padding: 7px 10px; border: 2px solid #c5e6eb; background: #092631ee; color: #eff8e9; font: 700 11px/1.5 monospace; }
 .battle-environment summary { cursor: pointer; }
 .battle-environment p { margin: 6px 0; }
+.match-body .battle-environment { top: 76px; left: 200px; }
 .css-board-cell[data-field="charged-deck"] { box-shadow: inset 0 0 0 2px #f1d462; }
 .css-board-cell[data-field*="frost-patch"] { box-shadow: inset 0 0 0 2px #91def4; }
 .harbor-screen .reward-card:disabled, .starter-recruitment-screen .reward-card:disabled { opacity: .5; cursor: not-allowed; filter: grayscale(.8); }
@@ -4436,4 +4437,5 @@ details.trait-building {
 .galley-stock span { font-size: .68rem; }
 .galley-stock button:disabled { opacity: .6; cursor: not-allowed; }
 .galley-stock button:focus-visible, .galley-tray select:focus-visible { outline: 2px solid #ffd16a; outline-offset: 2px; }
-.battle-meals { display: flex; flex-wrap: wrap; gap: 4px 12px; color: #f0d093; font-size: .7rem; }
+.battle-meals { position: absolute; z-index: 8; top: 42px; right: 12px; max-width: 220px; display: flex; flex-wrap: wrap; gap: 4px 12px; padding: 4px 6px; color: #f0d093; background: #092631ee; border: 1px solid #bd9656; font-size: .7rem; pointer-events: none; }
+.match-body .battle-meals { top: 76px; right: 230px; }
