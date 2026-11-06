@@ -3,6 +3,7 @@ import { execFileSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { summarizeBotDecisionDiagnostics, type BotDecisionDiagnosticsReport } from "./bot_decision_report";
+import { emptyBattleConditions, observeBattleConditions } from "./battle_condition_report";
 import {
   DEFAULT_CONTENT,
   CURRENT_SAVE_SCHEMA_VERSION,
@@ -290,6 +291,7 @@ export type CaptainDamagePacingReport = CaptainDamageSummary & {
 };
 
 export type ProductionSoakReport = {
+  battleConditions: ReturnType<typeof emptyBattleConditions>;
   voyageChoices: ReturnType<typeof summarizeVoyageChoices>;
   generatedAt: string;
   gitSha: string;
@@ -1565,6 +1567,7 @@ export function runProductionSoak(
     transformedPlayerBattleBoards: 0,
   };
   const combatReadability = emptyCombatReadability();
+  const battleConditions = emptyBattleConditions();
   const traitActivations: MutableCounter = {};
   const traitTierActivations: MutableCounter = {};
   const traitMaxTier: MutableCounter = {};
@@ -1740,6 +1743,7 @@ export function runProductionSoak(
           fullSeconds += battleSeconds;
           paced += battleSeconds;
           for (const result of state.lastResults) {
+            observeBattleConditions(battleConditions, result);
             battleCount += 1;
             if (result.timedOut) timeouts += 1;
             if (result.winnerId === null) draws += 1;
@@ -2342,6 +2346,7 @@ export function runProductionSoak(
     averageFullClockMinutes,
     averagePacedMinutes,
     voyageChoices: summarizeVoyageChoices(voyageReceipts, b07ChoiceBudget),
+    battleConditions,
     battleCount,
     timeoutRate: timeouts / Math.max(1, battleCount),
     drawRate: draws / Math.max(1, battleCount),

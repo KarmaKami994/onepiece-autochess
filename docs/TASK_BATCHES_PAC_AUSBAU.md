@@ -187,6 +187,8 @@ gemessene Spieldauer. B06 ist über PR #68/#65/#64 in main `93b1874` integriert.
 
 ## B07 — Startwahl, Recruitment und Hafenbegegnungen
 
+Gemergt als PR #69 / `d70b3c1`; vollständige CI 172 am B07-Head erfolgreich.
+
 2026-11-06: A/B auf `codex/b07-voyage-events` umgesetzt und nach Freigabe lokal
 geprüft: Typecheck/Lint, 903 Unit-Tests, Build/Assets, 22 korrigierte Browserfälle
 sowie sechs Tutorial-/Chronicle-Fälle. Normale GitHub-CI bleibt Review-Gate.
@@ -219,6 +221,15 @@ separat ausgewiesen; keine neue Baseline oder B08/B09-Implementierung.
 **Abgrenzung:** Keine zusätzlichen Spielmodi und keine zufällig eingeschobenen PvE-Ersatzrunden. Neue Entscheidungen wirken im regulären lokalen Match.
 
 ## B08 — Status, Wetter und Board-Effekte
+
+2026-11-06: auf `codex/b08-status-weather` implementierter, **ungeprüfter** Kandidat.
+Der vor Code festgelegte [Regelvertrag](B08_STATUS_WEATHER_CONTRACT.md) begrenzt
+den Umfang auf vier Statusarten, Rain/Snow und zwei Felder in R14/R28/R32;
+Kuzan und drei benannte PvE-Bosse sind die konkreten Fähigkeitsträger.
+Save/Replay, Kodex, Teamplaner, Darstellung, Quellenzähler sowie Unit-/Browser-
+Testfälle sind ergänzt. Der Eigentümer hat den vorgeschlagenen Prüfumfang
+ausdrücklich abgelehnt: keine B08-Prüfläufe und vorerst kein CI-auslösender PR.
+Kein B09, Bot-/Wirtschaftstuning oder neuer Produktionsbericht.
 
 **Ziel:** Die Kampfbasis unterstützt ein ausgewähltes, verständliches Set zusätzlicher Mechaniken mit passender One-Piece-Identität.
 
@@ -262,7 +273,7 @@ separat ausgewiesen; keine neue Baseline oder B08/B09-Implementierung.
 - Jeder konkrete Auftrag startet mit dem dann aktuellen freigegebenen `main` und einer sauberen, begrenzten Task-Branch; die heutige SHA ist die Planungsgrundlage, nicht die starre Basis aller späteren Batches.
 - PAC-Codebezüge verwenden die belegten Quellen aus der [Analyse](OFFENE_FEATURES_PAC_ABGLEICH.md#9-pac-quellen-am-geprüften-commit). Vor neuer System-/Gameplay-Arbeit wird der betroffene PAC-Ablauf gezielt geprüft und die Einordnung direct/adapted/reference/reject festgehalten. Die angegebene Nutzungserlaubnis bleibt dokumentiert; tatsächliche Übernahmen erhalten Quellen-/Lizenzhinweise.
 - Diagnose-/Review-Schritte in B05 sowie die neuen Regelverträge in B06–B09 müssen vor den davon abhängigen Implementierungen konkret feststehen. Dieses Dokument enthält keine erfundenen fertigen Balancewerte oder freigegebenen Formeln.
-- GameContent ist mit B07 `1.32.0`; Schema bleibt `6`. UI-/Dokumentationsarbeit erhält keine unnötigen Versionserhöhungen. Künftige Gameplay-Batches bekommen einen bewusst beschlossenen Content-Versionsstand; vorhandene Match-Saves bleiben kompatibel, additive Backfills werden bevorzugt. Ein separates Replay-/Profilformat wird nicht mit dem Match-Schema verwechselt.
+- GameContent ist mit B07 `1.32.0`; der ungeprüfte B08-Kandidat ist `1.33.0`; Schema bleibt `6`. UI-/Dokumentationsarbeit erhält keine unnötigen Versionserhöhungen. Künftige Gameplay-Batches bekommen einen bewusst beschlossenen Content-Versionsstand; vorhandene Match-Saves bleiben kompatibel, additive Backfills werden bevorzugt. Ein separates Replay-/Profilformat wird nicht mit dem Match-Schema verwechselt.
 - Lokal/offline, deterministische Domain, bestehende Accessibility und kleine typisierte Funktionen gelten für alle Pakete. Vorhandene Tests bleiben wirksam; historische Raw-Reports und Hashes bleiben unverändert. Smoker bleibt frozen/watch.
 - Verifikation wird pro Lieferung nach Wirkung begrenzt: Typecheck/Lint und betroffene Tests; volle Suite bei mehreren Domain-/Application-Modulen; Browser-E2E bei UI-/Phaser-Verhalten. Keine Wiederholung vollständiger Prüfungen nach jeder kleinen Dateiänderung.
 - Aggregierte Vergleiche oder Produktionsläufe benötigen einen ausdrücklich festgelegten Umfang. Es gibt keinen automatischen 1.000-Seed-Soak und keine neue autoritative Baseline aus dieser Planung. Normaler CI-Smoke bleibt Crash-/Regressionsprüfung, keine alleinige Balancefreigabe.

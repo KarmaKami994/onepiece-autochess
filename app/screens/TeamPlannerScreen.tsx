@@ -8,6 +8,8 @@ import { deleteTeamPlan, downloadTeamPlan, readTeamPlans, storeTeamPlan } from "
 import { plannerPresentation } from "../plannerPresentation";
 import BattleBoard from "../../components/BattleBoard";
 import type { Settings } from "./GameScreens";
+import { FIELD_HELP, WEATHER_HELP } from "../battleEnvironmentPresentation";
+import type { BoardFieldKind, WeatherKind } from "../../game";
 
 function TeamEditor({ side, plan, content, update }: { side: "a" | "b"; plan: TeamPlan; content: GameContent; update: (units: PlannedUnit[]) => void }) {
   const units = plan.teams[side];
@@ -84,6 +86,20 @@ export function TeamPlannerScreen({ content, settings, visible }: { content: Gam
   return <section aria-labelledby="planner-heading">
     <h2 id="planner-heading">TEAM PLANNER</h2>
     <p>Build two isolated crews. No shop, pool, active voyage or production bot is changed. Temporary forms trigger through the normal combat rules.</p>
+    <fieldset className="tools-controls"><legend>Battle environment</legend>
+      <label>Weather<select value={plan.environment?.weather ?? "neutral"} onChange={event => change({ ...plan,
+        environment: { fields: plan.environment?.fields ?? [], weather: event.target.value as WeatherKind } })}>
+        {(["neutral", "rain", "snow"] as const).map(weather => <option key={weather} value={weather}>{weather.toUpperCase()}</option>)}
+      </select></label>
+      <p>{WEATHER_HELP[plan.environment?.weather ?? "neutral"]}</p>
+      {(["charged-deck", "frost-patch"] as const).map((kind: BoardFieldKind) => <label key={kind}><input type="checkbox"
+        checked={plan.environment?.fields.some(field => field.kind === kind) ?? false} onChange={event => {
+          const fields = (plan.environment?.fields ?? []).filter(field => field.kind !== kind);
+          const authored = content.stages.flatMap(stage => stage.battleEnvironment?.fields ?? []).find(field => field.kind === kind);
+          if (event.target.checked && authored) fields.push(structuredClone(authored));
+          change({ ...plan, environment: { weather: plan.environment?.weather ?? "neutral", fields } });
+        }} />{FIELD_HELP[kind]}</label>)}
+    </fieldset>
     <div className="tools-controls"><label>Plan name<input maxLength={80} value={plan.name} onChange={(event) => change({ ...plan, name: event.target.value })} /></label><label>Combat seed<input maxLength={128} value={plan.seed} onChange={(event) => change({ ...plan, seed: event.target.value })} /></label>
       <button type="button" disabled={!validation.ok} onClick={() => {
         try { setSaved(storeTeamPlan(window.localStorage, plan, content)); setError(""); setNotice("Plan saved locally. Saving the same name replaces its previous version."); }
@@ -112,7 +128,7 @@ export function TeamPlannerScreen({ content, settings, visible }: { content: Gam
     {battle && <section className="planner-battle" aria-label="Combat test result">
       <h3>{battle.result.winner === "draw" ? "DRAW" : `TEAM ${battle.result.winner.toUpperCase()} WINS`} · {(battle.result.durationTicks * content.config.combatTickMs / 1000).toFixed(1)}s {battle.result.timedOut ? "· timeout" : ""}</h3>
       <button type="button" onClick={() => setPlayback((current) => current + 1)}>Replay combat test</button>
-      {visible && battle.presentation && <BattleBoard audio={settings} key={playback} units={battle.presentation.boardUnits} selectedId={null} interactionMode="none" phase="battle" capacity={content.config.maxLevel} boardSkin={settings.boardSkin} combatEvents={battle.presentation.events} eventSequence={playback} speed={settings.animationSpeed} particles={settings.particles} combatNumbers={settings.combatNumbers} reducedMotion={settings.reducedMotion} onMoveUnit={() => false} onSelectUnit={() => undefined} />}
+      {visible && battle.presentation && <BattleBoard audio={settings} environment={battle.presentation.environment} key={playback} units={battle.presentation.boardUnits} selectedId={null} interactionMode="none" phase="battle" capacity={content.config.maxLevel} boardSkin={settings.boardSkin} combatEvents={battle.presentation.events} eventSequence={playback} speed={settings.animationSpeed} particles={settings.particles} combatNumbers={settings.combatNumbers} reducedMotion={settings.reducedMotion} onMoveUnit={() => false} onSelectUnit={() => undefined} />}
       <div className="planner-recaps">{[battle.recapA, battle.recapB].map((recap, index) => recap && <section key={index} aria-label={`Team ${index === 0 ? "A" : "B"} test recap`}><h4>TEAM {index === 0 ? "A" : "B"} · {recap.humanTeamHpPercent}% health remaining</h4><ul>{recap.finalCrew.map((unit) => <li key={unit.unitId}>{unit.label}</li>)}</ul></section>)}</div>
     </section>}
   </section>;

@@ -64,6 +64,10 @@ export function traitVisual(traitId: string): VisualDefinition {
 }
 
 export const STATUS_VISUALS = {
+  poison: { imagePath: "/assets/status/poison.svg", fallbackGlyph: "☠", color: "#b77ce2" },
+  freeze: { imagePath: "/assets/status/freeze.svg", fallbackGlyph: "❄", color: "#8edaf4" },
+  sleep: { imagePath: "/assets/status/sleep.svg", fallbackGlyph: "Z", color: "#c1b0ee" },
+  locked: { imagePath: "/assets/status/locked.svg", fallbackGlyph: "▣", color: "#e3c29b" },
   stun: { imagePath: "/assets/status/stun.svg", fallbackGlyph: "✦", color: "#f2cf55" },
   burn: { imagePath: "/assets/status/burn.svg", fallbackGlyph: "♦", color: "#f0643f" },
   wound: { imagePath: "/assets/status/wound.svg", fallbackGlyph: "!", color: "#d84747" },

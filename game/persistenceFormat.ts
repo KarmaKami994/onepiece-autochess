@@ -1,4 +1,5 @@
 import { DEFAULT_CONTENT, getStageDefinition } from "./content";
+import { neutralBattleEnvironment, readBattleEnvironment } from "./battleEnvironment";
 import { regenerateBattleResults, resolveLegacyCarousel } from "./engine";
 import { reconcileProductionFormProgression } from "./forms";
 import { CURRENT_SAVE_SCHEMA_VERSION } from "./schema";
@@ -213,6 +214,10 @@ export function migrateMatchState(
     : {};
   mutable.pendingRecruitmentRoutes = isRecord(mutable.pendingRecruitmentRoutes) ? mutable.pendingRecruitmentRoutes : {};
   mutable.pendingHarborOffers = isRecord(mutable.pendingHarborOffers) ? mutable.pendingHarborOffers : {};
+  const environment = mutable.battleEnvironment === undefined ? neutralBattleEnvironment() :
+    readBattleEnvironment(mutable.battleEnvironment, content.config.boardWidth, content.config.boardHeight);
+  if (!environment) throw new Error("Invalid saved battle environment.");
+  mutable.battleEnvironment = environment;
   mutable.voyageChoiceHistory = Array.isArray(mutable.voyageChoiceHistory) ? mutable.voyageChoiceHistory : [];
   if (
     typeof mutable.seed !== "string" || typeof mutable.round !== "number" ||

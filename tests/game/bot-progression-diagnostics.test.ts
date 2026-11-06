@@ -5,11 +5,13 @@ import {
   advanceMatchPhase,
   createMatch,
   hashCanonicalValue,
+  hashGameContent,
   runBotTurn,
   serializeMatch,
   type BotTurnDiagnostic,
 } from "../../game";
 import { runProductionSoak } from "../../scripts/run_production_soak";
+import { b07ReferenceContent } from "../fixtures/b07-content";
 
 describe("bot progression diagnostics", () => {
   it("is observationally identical with the observer disabled or enabled", () => {
@@ -141,17 +143,26 @@ describe("bot progression diagnostics", () => {
       ).reduce((total, bucket) => total + bucket.preparations, 0),
     ).toBe(botProgressionDiagnostics?.preparationCount);
     expect(diagnosticGameplay).toEqual(normalGameplay);
-    // B07 adds real opening/harbor choices. Preserve PRE as historical evidence,
-    // prove its authored content is unchanged and pin the new full seed-0 trace.
+    // B08 intentionally changes authored combat. Retain the exact B07 trace as
+    // a hash-verified neutral-content control, alongside current-content observer equality.
     const historical = JSON.parse(readFileSync("docs/analysis/p1b-bot-progression-diagnostic-50.json", "utf8")) as {
       contentHash: string; configHash: string;
       botProgressionDiagnostics: { rawPreparations: NonNullable<typeof botProgressionDiagnostics>["rawPreparations"] };
     };
-    const { recruitmentRoutes, harborEncounters, voyageTiming, ...legacyContent } = DEFAULT_CONTENT;
+    const reference = b07ReferenceContent();
+    expect(hashGameContent(reference)).toBe("58e78178");
+    const { recruitmentRoutes, harborEncounters, voyageTiming, ...legacyContent } = reference;
     expect(recruitmentRoutes.length + harborEncounters.length + voyageTiming.recruitmentSeconds).toBeGreaterThan(0);
     expect(hashCanonicalValue({ ...legacyContent, version: "1.31.0" })).toBe(historical.contentHash);
     expect(diagnostic.configHash).toBe(historical.configHash);
-    expect(botProgressionDiagnostics?.rawPreparations).toHaveLength(252);
-    expect(hashCanonicalValue(botProgressionDiagnostics?.rawPreparations)).toBe("6e648b36");
+    const production = { ...DEFAULT_CONTENT };
+    try {
+      Object.assign(DEFAULT_CONTENT, reference);
+      const control = runProductionSoak(1, { botDiagnostics: true }).botProgressionDiagnostics;
+      expect(control?.rawPreparations).toHaveLength(252);
+      expect(hashCanonicalValue(control?.rawPreparations)).toBe("6e648b36");
+    } finally {
+      Object.assign(DEFAULT_CONTENT, production);
+    }
   }, 20_000);
 });

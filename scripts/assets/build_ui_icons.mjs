@@ -85,6 +85,10 @@ function motif(name, color) {
     helm: `<path ${fill} d="M18 51c0-25 13-39 30-39s30 14 30 39v32H61V59H35v24H18z"/><path d="M48 12v47M25 42h46" stroke="#fff" stroke-opacity=".45" stroke-width="5"/>`,
     null: `<circle ${stroke} cx="48" cy="49" r="34"/><path ${stroke} d="m24 25 48 48"/>`,
     hat: `<path ${fill} d="M24 42c2-21 12-31 24-31s22 10 24 31l18 12c-20 19-64 19-84 0z"/><path d="M20 49h56" stroke="#d14b3f" stroke-width="7"/>`,
+    poison: `<path ${fill} d="M23 46a25 25 0 1 1 50 0v20H60v14H36V66H23z"/><circle cx="37" cy="46" r="7" fill="#101827"/><circle cx="59" cy="46" r="7" fill="#101827"/><path ${stroke} d="m20 79 56-44M20 35l56 44"/>`,
+    snowflake: `<path ${stroke} d="M48 12v72M17 30l62 36M17 66l62-36M36 18l12 12 12-12M36 78l12-12 12 12M18 43l16-4-4-16M66 77l-4-16 16-4M18 53l16 4-4 16M66 19l-4 16 16 4"/>`,
+    sleep: `<path ${stroke} d="M16 25h32L16 55h32M55 48h26L55 73h26M23 73h21L23 87h21"/>`,
+    lock: `<rect x="21" y="42" width="54" height="42" rx="5" ${fill}/><path ${stroke} d="M31 42V28a17 17 0 0 1 34 0v14"/><circle cx="48" cy="59" r="6" fill="#101827"/><path d="M48 63v10" stroke="#101827" stroke-width="6"/>`,
   };
   return shared[name] ?? `<path ${fill} d="m48 12 35 38-35 38-35-38z"/><circle cx="48" cy="50" r="12" fill="#fff" fill-opacity=".55"/>`;
 }

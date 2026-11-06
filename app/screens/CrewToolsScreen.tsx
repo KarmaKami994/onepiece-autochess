@@ -13,6 +13,7 @@ const CATEGORIES: { id: ReferenceCategory; label: string }[] = [
   { id: "traits", label: "Bonds" }, { id: "forms", label: "Forms" },
   { id: "status", label: "Status" }, { id: "pve", label: "PvE" }, { id: "rounds", label: "Rounds" },
   { id: "voyage", label: "Voyage choices" },
+  { id: "environment", label: "Weather & fields" },
 ];
 
 function Codex({ content, initialReference }: { content: GameContent; initialReference?: { category: ReferenceCategory; query: string } }) {

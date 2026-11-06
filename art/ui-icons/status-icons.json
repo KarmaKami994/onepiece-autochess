@@ -1,6 +1,10 @@
 {
   "schemaVersion": 1,
   "statuses": [
+    { "id": "poison", "name": "Poison", "motif": "poison", "color": "#b77ce2", "fallbackGlyph": "☠" },
+    { "id": "freeze", "name": "Freeze", "motif": "snowflake", "color": "#8edaf4", "fallbackGlyph": "❄" },
+    { "id": "sleep", "name": "Sleep", "motif": "sleep", "color": "#c1b0ee", "fallbackGlyph": "Z" },
+    { "id": "locked", "name": "Locked", "motif": "lock", "color": "#e3c29b", "fallbackGlyph": "▣" },
     { "id": "stun", "name": "Stun", "motif": "stars", "color": "#f2cf55", "fallbackGlyph": "✦" },
     { "id": "burn", "name": "Burn", "motif": "flame", "color": "#f0643f", "fallbackGlyph": "♦" },
     { "id": "wound", "name": "Wound", "motif": "slash", "color": "#d84747", "fallbackGlyph": "!" },

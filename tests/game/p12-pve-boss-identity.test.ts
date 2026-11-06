@@ -48,7 +48,7 @@ function mechanics(ability: object) {
 
 describe("P12 named PvE encounters", () => {
   it("keeps the eight encounter rounds and exact boss/faction compositions", () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.32.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.33.0");
     for (const [round, name, expectedIds] of waves) {
       const stage = getStageDefinition(round);
       expect(stage.kind).toBe("pve");
@@ -57,7 +57,7 @@ describe("P12 named PvE encounters", () => {
     }
   });
 
-  it("changes visual and ability identity without changing the existing PvE combat profiles", () => {
+  it("keeps inherited PvE profiles plus exactly the three documented B08 status additions", () => {
     expect(DEFAULT_CONTENT.enemies).toHaveLength(29);
     const abilityIds = new Set<string>();
     for (const [id, sourceId] of Object.entries(sourceProfiles)) {
@@ -66,7 +66,8 @@ describe("P12 named PvE encounters", () => {
       expect(enemy, id).toBeDefined();
       expect(source, sourceId).toBeDefined();
       expect(enemy?.stats).toEqual(source?.stats);
-      expect(mechanics(enemy!.ability!)).toEqual(mechanics(source!.ability!));
+      const b08 = id === "magellan" ? { poisonDurationMs: 3_000 } : id === "caesar-clown" ? { sleepMs: 1_500 } : id === "pica" ? { lockMs: 2_000 } : {};
+      expect(mechanics(enemy!.ability!)).toEqual({ ...mechanics(source!.ability!), ...b08 });
       expect(enemy?.ability?.id).toBe(`${id}-signature`);
       expect(enemy?.ability?.name).not.toBe(source?.ability?.name);
       abilityIds.add(enemy!.ability!.id);

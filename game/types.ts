@@ -83,6 +83,10 @@ export interface AbilityDefinition {
   stunMs?: number;
   burnPower?: number;
   burnDurationMs?: number;
+  poisonDurationMs?: number;
+  freezeMs?: number;
+  sleepMs?: number;
+  lockMs?: number;
 }
 
 export interface UnitDefinition {
@@ -381,7 +385,16 @@ export interface StageDefinition {
   itemReward?: StageItemRewardDefinition;
   carouselItemKind?: ItemKind;
   voyageRecruitCost?: 4 | 5;
+  battleEnvironment?: BattleEnvironment;
 }
+
+export type WeatherKind = "neutral" | "rain" | "snow";
+export type BoardFieldKind = "charged-deck" | "frost-patch";
+export interface BattleEnvironment {
+  weather: WeatherKind;
+  fields: { kind: BoardFieldKind; cells: Position[] }[];
+}
+export type AdditionalStatusKind = "poison" | "freeze" | "sleep" | "locked";
 
 export interface BotPersonality {
   id: string;
@@ -582,6 +595,7 @@ export interface CarouselSessionState {
 }
 
 export interface MatchBattleResult {
+  environment?: BattleEnvironment;
   playerAId: string;
   playerBId: string | null;
   ghostOfPlayerId: string | null;
@@ -596,6 +610,7 @@ export interface MatchBattleResult {
 }
 
 export interface MatchState {
+  battleEnvironment?: BattleEnvironment;
   schemaVersion: number;
   contentVersion: string;
   seed: string;
@@ -813,7 +828,7 @@ export type BattleEvent =
       amount: number;
       healthDamage: number;
       shieldDamage: number;
-      damageKind: "attack" | "ability" | "burn" | "item";
+      damageKind: "attack" | "ability" | "burn" | "poison" | "item";
     }
   | {
       type: "energy";
@@ -831,7 +846,8 @@ export type BattleEvent =
         | "cast-reset"
         | "ability-drain"
         | "item"
-        | "trait";
+        | "trait"
+        | "environment";
     }
   | {
       type: "dodge";
@@ -877,9 +893,12 @@ export type BattleEvent =
         | "rune-protect"
         | "blind"
         | "paralysis"
+        | AdditionalStatusKind
         | "emergency-shield";
       durationTicks: number;
+      stacks?: number;
     }
+  | { type: "status-end"; tick: number; targetId: string; status: AdditionalStatusKind }
   | {
       type: "unit-resurrect";
       tick: number;
@@ -902,12 +921,14 @@ export type BattleEvent =
     };
 
 export interface BattleOptions {
+  environment?: BattleEnvironment;
   seed: string | number;
   maxTicks?: number;
   recordEvents?: boolean;
 }
 
 export interface BattleResult {
+  environment?: BattleEnvironment;
   winner: "a" | "b" | "draw";
   winnerId: string | null;
   timedOut: boolean;

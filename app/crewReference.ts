@@ -3,8 +3,9 @@ import type { AbilityDefinition, GameContent, StarLevel, UnitStats } from "../ga
 import { STATUS_VISUALS } from "../components/gameVisualManifest";
 import { createItemView, createUnitReferenceView, titleCase } from "./selectors";
 import { resolvePlannedUnit } from "../game/teamPlanner";
+import { FIELD_HELP, WEATHER_HELP } from "./battleEnvironmentPresentation";
 
-export type ReferenceCategory = "crew" | "items" | "traits" | "forms" | "status" | "pve" | "rounds" | "voyage";
+export type ReferenceCategory = "crew" | "items" | "traits" | "forms" | "status" | "pve" | "rounds" | "voyage" | "environment";
 export type ReferenceEntry = {
   id: string; category: ReferenceCategory; name: string; description: string;
   imagePath?: string; details: string[]; traits: string[]; cost?: number; kind?: string;
@@ -31,7 +32,7 @@ export function abilityReference(ability: AbilityDefinition | undefined, star: S
   return [
     `${ability.name}: ${ability.description}`,
     `${titleCase(ability.effect)} · ${ability.effect === "damage" ? ability.damageType ?? "special" : "support"} · ${titleCase(ability.targeting)} · ${titleCase(ability.pattern)} · power ${Math.floor(ability.power * content.config.starAbilityBasisPoints[star - 1] / 10_000)} at ${star}★; cast animation ${ability.castAnimationMs} ms.`,
-    ...["energyDrain", "defensePiercePercent", "stunMs", "burnPower", "burnDurationMs", "hits"].flatMap((key) => {
+    ...["energyDrain", "defensePiercePercent", "stunMs", "burnPower", "burnDurationMs", "poisonDurationMs", "freezeMs", "sleepMs", "lockMs", "hits"].flatMap((key) => {
       const value = ability[key as keyof AbilityDefinition];
       return typeof value === "number" ? [`${titleCase(key.replace(/[A-Z]/g, (letter) => ` ${letter}`))}: ${value}`] : [];
     }),
@@ -42,6 +43,10 @@ export function abilityReference(ability: AbilityDefinition | undefined, star: S
 }
 
 const STATUS_HELP: Record<keyof typeof STATUS_VISUALS, string> = {
+  poison: "Poison: 1% Max HP per stack each second, up to 3 stacks; duration from source. True damage respects Shields/Protect, gives no damaged-Energy; Rain reduces damage 30%. Rune Protect blocks application.",
+  freeze: "Freeze prevents actions without making the target immune or immovable. No refresh while active; Burn accelerates thaw ×2, Snow extends new Freeze ×1.3. Rune Protect blocks application.",
+  sleep: "Sleep prevents actions; each effective damage hit reduces remaining Sleep by 300 ms. No refresh while active. Rune Protect blocks application.",
+  locked: "Locked prevents moving, Lunge, Escape and forced displacement; range is 1. Attacks and other casts remain legal in range. No refresh while active; original range returns on expiry. Rune Protect blocks application.",
   stun: "Stun prevents the affected unit from acting until its duration expires.",
   burn: "Burn applies periodic damage for the duration specified by its source.",
   wound: "Wound blocks incoming healing. Its duration and source remain battle-local.",
@@ -65,6 +70,14 @@ export function crewReference(content: GameContent, star: StarLevel = 1): Refere
         `Bonds: ${unit.traits.map((id) => content.traits.find((trait) => trait.id === id)?.name ?? id).join(", ")}`,
         ...content.forms.filter((form) => form.baseDefinitionId === unit.id).map((form) => `${form.name}: ${formRequirementText(form.id)}`)],
     };
+  });
+  for (const weather of ["neutral", "rain", "snow"] as const) entries.push({
+    id: `weather-${weather}`, category: "environment", name: `${titleCase(weather)} weather`, description: WEATHER_HELP[weather], traits: [],
+    details: [`Sources: ${content.stages.filter(stage => stage.battleEnvironment?.weather === weather).map(stage => `R${stage.round} ${stage.name}`).join(", ") || "Default without an authored environment"}.`, "Explicit saved battle data; no random weather draw. Available in the isolated team planner."],
+  });
+  for (const kind of ["charged-deck", "frost-patch"] as const) entries.push({
+    id: kind, category: "environment", name: titleCase(kind), description: FIELD_HELP[kind], traits: [],
+    details: content.stages.flatMap(stage => (stage.battleEnvironment?.fields ?? []).filter(field => field.kind === kind).map(field => `R${stage.round} ${stage.name}: ${field.cells.map(cell => `${cell.x + 1}/${cell.y + 1}`).join(", ")} (column/row).`)),
   });
   for (const item of content.items) {
     const view = createItemView(item.id, content);

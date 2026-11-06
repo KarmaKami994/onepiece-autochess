@@ -13,7 +13,9 @@ import {
   resolvePersistentFormId,
   resolveUnitDefinition,
 } from "@/game";
+import { presentBattleEnvironment } from "./battleEnvironmentPresentation";
 import type {
+  BattleEnvironment,
   ActiveTrait,
   BattleUnitSnapshot,
   GameContent,
@@ -200,6 +202,7 @@ export type CarouselSessionView = {
 };
 
 export type MatchView = {
+  environment: BattleEnvironment;
   playerId: string;
   phase: MatchState["phase"];
   phaseLabel: string;
@@ -245,6 +248,7 @@ export type MatchView = {
 };
 
 export type BattlePresentationView = {
+  environment: BattleEnvironment;
   perspectivePlayerId: string;
   perspectiveName: string;
   opponentName: string;
@@ -1197,6 +1201,7 @@ function combatEvents(
         durationTicks: event.durationTicks,
       }];
     }
+    if (event.type === "status-end") return [{ id, tick: event.tick, kind: "status-end", targetId: event.targetId, status: event.status }];
     if (event.type === "death") {
       return [{
         id,
@@ -1262,6 +1267,7 @@ export function selectBattlePresentation(
 
   return {
     perspectivePlayerId,
+    environment: presentBattleEnvironment(result.environment, !isPlayerA, content.config.boardWidth, content.config.boardHeight),
     perspectiveName: perspectivePlayer.name,
     opponentName: isGhost
       ? `Ghost of ${opponentPlayer?.name ?? "Unknown Captain"}`
@@ -1589,8 +1595,11 @@ export function selectMatchView(
         reserve: resultCrewUnits(player.finalLineup.reserve, player, board, content, "reserve"),
       }
     : null;
+  const environmentResult = state.phase === "battle" ? resultForPlayer(state, player.id) : null;
   return {
     playerId: player.id,
+    environment: presentBattleEnvironment(state.phase === "battle" ? environmentResult?.environment : state.battleEnvironment,
+      environmentResult?.playerBId === player.id, content.config.boardWidth, content.config.boardHeight),
     phase: state.phase,
     phaseLabel,
     alive: player.alive,

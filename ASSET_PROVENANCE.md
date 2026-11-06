@@ -137,6 +137,16 @@ The three new PvE identities are generic, repository-authored vector/pixel compo
 
 P7-authored UI art is generated from the explicit source specifications `art/ui-icons/item-icons.json`, `art/ui-icons/trait-icons.json`, and `art/ui-icons/status-icons.json`. `scripts/assets/build_ui_icons.mjs` emits 65 item SVGs, 13 trait SVGs, eight status SVGs, and portrait/token/overlay SVGs for all four existing forms. The generator also derives the 15 new static identity sets and four QA sheets under `art/qa/`. It uses stable spec order, fixed integer geometry, nearest-neighbor raster operations, no timestamps, no random source, no embedded images, and no network access.
 
+B08 (2026-11-06) extends that project-authored status specification/generator with
+four distinct original vector motifs: Poison, Freeze, Sleep and Locked. Current
+output is twelve status SVGs; the four new files are `public/assets/status/poison.svg`,
+`freeze.svg`, `sleep.svg` and `locked.svg`. The updated trait/status contact sheet is
+`art/qa/p7-trait-status-contact-sheet.png`. No imported sheet pixels, crew assets or
+external source are added. Source authority is the checked-in JSON specification
+and integer SVG paths in the generator, under the existing project-authored basis.
+Generation completed; visual inspection and asset validation are NOT RUN because
+the owner declined B08 verification.
+
 Abbreviations in this section: GB2 = *One Piece: Gigant Battle! 2 - New World*; GB1 = *One Piece: Gigant Battle!*; GPC = *One Piece: Great Pirate Colosseum*.
 
 ## Animation v2 source gate and PvE batch

@@ -138,8 +138,12 @@ an explicitly unclassified saved crew.
   recruit before R1, crew-origin routes at R10/R20, Usopp's component gifts at
   R16/R21 and Franky's optional 2-gold supplies at R18/R23. Choices, prices,
   reservations and clocks resume exactly; each stop always permits a free skip.
-  The codex and Chronicle record these decisions. GameContent is `1.32.0`;
-  save schema remains `6`.
+  The codex and Chronicle record these decisions; B07 introduced content `1.32.0`.
+- [B08 status/weather contract](docs/B08_STATUS_WEATHER_CONTRACT.md) adds Poison,
+  Freeze, Sleep and Locked, authored Rain/Snow and marked Charged Deck/Frost Patch
+  cells. Configuration is saved with frozen battles and available in the codex,
+  isolated planner and Chronicle. Content `1.33.0`, save schema `6`.
+  B08 verification is **NOT RUN** at the owner's request; PR/CI is deferred.
 - All artwork is bundled under `public/assets`; Web Audio effects are generated
   locally. Gameplay makes no network requests.
 
