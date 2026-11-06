@@ -134,6 +134,12 @@ an explicitly unclassified saved crew.
 - [B06 pacing](docs/B06_PAC_PACING.md) uses the pinned PAC phase limits, a
   three-second completed-round display and 23-second recruitment timeout.
   Auto-continue battles is configurable; Ready and Skip remain available.
+- [B07 voyage choices](docs/B07_VOYAGE_CHOICES.md) adds a normal-price first
+  recruit before R1, crew-origin routes at R10/R20, Usopp's component gifts at
+  R16/R21 and Franky's optional 2-gold supplies at R18/R23. Choices, prices,
+  reservations and clocks resume exactly; each stop always permits a free skip.
+  The codex and Chronicle record these decisions. GameContent is `1.32.0`;
+  save schema remains `6`.
 - All artwork is bundled under `public/assets`; Web Audio effects are generated
   locally. Gameplay makes no network requests.
 

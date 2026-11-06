@@ -293,7 +293,7 @@ export function TutorialCoach({
     recruit: {
       eyebrow: "STEP 1 OF 6 · RECRUIT",
       title: "CHOOSE YOUR FIRST CREWMATE",
-      copy: "Click any affordable wanted poster in the Recruitment Dock.",
+      copy: "Choose an affordable First Crew card, or a wanted poster in the Recruitment Dock. Your starter costs its normal 1 gold.",
       hint: "Gold costs are shown in the lower-right of each card.",
     },
     deploy: {
@@ -2080,6 +2080,10 @@ export function CarouselScreen({
 }
 
 export function VoyageRecruitmentScreen({
+  starter = false,
+  route,
+  gold,
+  onSkip,
   round,
   recruits,
   timer,
@@ -2090,6 +2094,10 @@ export function VoyageRecruitmentScreen({
   onSettings,
   onChoose,
 }: {
+  starter?: boolean;
+  route: string | null;
+  gold: number;
+  onSkip: () => void;
   round: number;
   recruits: ShopUnitView[];
   timer: number;
@@ -2101,12 +2109,13 @@ export function VoyageRecruitmentScreen({
   onChoose: (id: string) => void;
 }) {
   return (
-    <section className="choice-screen reward-screen voyage-recruitment-screen">
+    <section className={`choice-screen reward-screen voyage-recruitment-screen ${starter ? "starter-recruitment-screen" : ""}`}>
       <div className="reward-rays" aria-hidden="true" />
       <header className="choice-heading">
         <span className="eyebrow">VOYAGE CHOICE · ROUND {round}</span>
-        <h2>{round === 10 ? "GRAND LINE RECRUITMENT" : "NEW WORLD RECRUITMENT"}</h2>
-        <p>Choose one crewmate. A full bench converts the recruit to its gold value unless it can combine.</p>
+        <h2>{starter ? "CHOOSE YOUR FIRST CREW" : round === 10 ? "GRAND LINE RECRUITMENT" : "NEW WORLD RECRUITMENT"}</h2>
+        <p>{starter ? `A normal 1-gold recruit before Round 1. You have ${gold} gold; no extra starting gold is granted.` : "Choose one crewmate. A full bench converts the recruit to its gold value unless it can combine."}</p>
+        {!starter && <p>RECRUITMENT ROUTE · {route ?? "Saved open-sea offers"} · two focused seeds and an open-sea wildcard when available.</p>}
         <div className="recruitment-clock-controls">
           <PhaseClockDisplay timer={timer} duration={phaseDuration} label={clockLabel} />
           <button type="button" className="text-button" aria-pressed={manualPaused} onClick={onTogglePause}>{manualPaused ? "Resume voyage" : "Pause voyage"}</button>
@@ -2119,6 +2128,7 @@ export function VoyageRecruitmentScreen({
           <button
             type="button"
             className="reward-card"
+            disabled={starter && gold < recruit.cost}
             key={recruit.id}
             style={{ "--choice-color": recruit.color } as CSSProperties}
             onClick={() => onChoose(recruit.id)}
@@ -2128,15 +2138,39 @@ export function VoyageRecruitmentScreen({
             <kbd>{index + 1}</kbd>
             <VisualIcon className="treasure-icon" imagePath={recruit.portrait} fallback={recruit.shortName} />
             <strong>{recruit.name}</strong>
-            <small>{recruit.cost} GOLD VALUE</small>
+            <small>{recruit.cost} {starter ? "GOLD COST" : "GOLD VALUE"}</small>
             <small>{recruit.traitDetails.map((trait) => trait.name).join(" · ")}</small>
             <p><b>{recruit.ability.name}</b> — {recruit.ability.description}</p>
             <span className="choose-label">RECRUIT</span>
           </button>
         ))}
       </div>
+      {starter && <button type="button" className="text-button" onClick={onSkip}>SAIL WITHOUT A STARTER</button>}
     </section>
   );
+}
+
+export function HarborScreen({ harbor, round, gold, timer, phaseDuration, clockLabel, manualPaused, onTogglePause, onSettings, onChoose }: {
+  harbor: NonNullable<MatchView["harbor"]>; round: number; gold: number; timer: number; phaseDuration: number; clockLabel: string;
+  manualPaused: boolean; onTogglePause: () => void; onSettings: () => void; onChoose: (id: string) => void;
+}) {
+  return <section className="choice-screen reward-screen harbor-screen">
+    <div className="reward-rays" aria-hidden="true" />
+    <header className="choice-heading"><span className="eyebrow">HARBOR CALL · ROUND {round} · {gold} GOLD</span>
+      <VisualIcon className="harbor-portrait" imagePath={harbor.portrait} fallback="⚓" />
+      <h2>{harbor.name.toUpperCase()}</h2><p>Choose at most one supply. Sailing on is free. Your normal preparation and battle follow this stop.</p>
+      <div className="recruitment-clock-controls"><PhaseClockDisplay timer={timer} duration={phaseDuration} label={clockLabel} />
+        <button type="button" className="text-button" onClick={onTogglePause} aria-pressed={manualPaused}>{manualPaused ? "Resume voyage" : "Pause voyage"}</button>
+        <button type="button" className="text-button" onClick={onSettings}>Open settings</button></div>
+      <p className="pacing-help">At zero the Log Pose picks a legal crew-fit gift, or skips paid offers that would breach your reserve.</p>
+    </header>
+    <div className="reward-cards">{harbor.offers.map((offer, index) => <button type="button" className="reward-card" key={offer.id}
+      disabled={offer.disabled} onClick={() => onChoose(offer.id)} title={offer.disabled ? "Not enough gold" : undefined}>
+      <kbd>{index + 1}</kbd><VisualIcon className="treasure-icon" imagePath={offer.imagePath} fallback={offer.icon} />
+      <strong>{offer.name}</strong><p>{offer.description}</p><small>{offer.goldCost ? `${offer.goldCost} GOLD` : "FREE GIFT"}</small>
+      <span className="choose-label">{offer.goldCost ? "BUY SUPPLY" : "TAKE GIFT"}</span></button>)}</div>
+    <button type="button" className="text-button" onClick={() => onChoose("skip")}>SAIL ON WITHOUT SUPPLIES</button>
+  </section>;
 }
 
 export function RewardScreen({

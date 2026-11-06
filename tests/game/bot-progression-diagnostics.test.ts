@@ -4,6 +4,7 @@ import {
   DEFAULT_CONTENT,
   advanceMatchPhase,
   createMatch,
+  hashCanonicalValue,
   runBotTurn,
   serializeMatch,
   type BotTurnDiagnostic,
@@ -140,13 +141,17 @@ describe("bot progression diagnostics", () => {
       ).reduce((total, bucket) => total + bucket.preparations, 0),
     ).toBe(botProgressionDiagnostics?.preparationCount);
     expect(diagnosticGameplay).toEqual(normalGameplay);
-    // Reuse the retained PRE's exact seed-0 preparations; never rerun or rewrite PRE.
+    // B07 adds real opening/harbor choices. Preserve PRE as historical evidence,
+    // prove its authored content is unchanged and pin the new full seed-0 trace.
     const historical = JSON.parse(readFileSync("docs/analysis/p1b-bot-progression-diagnostic-50.json", "utf8")) as {
       contentHash: string; configHash: string;
       botProgressionDiagnostics: { rawPreparations: NonNullable<typeof botProgressionDiagnostics>["rawPreparations"] };
     };
-    expect(diagnostic.contentHash).toBe(historical.contentHash);
+    const { recruitmentRoutes, harborEncounters, voyageTiming, ...legacyContent } = DEFAULT_CONTENT;
+    expect(recruitmentRoutes.length + harborEncounters.length + voyageTiming.recruitmentSeconds).toBeGreaterThan(0);
+    expect(hashCanonicalValue({ ...legacyContent, version: "1.31.0" })).toBe(historical.contentHash);
     expect(diagnostic.configHash).toBe(historical.configHash);
-    expect(botProgressionDiagnostics?.rawPreparations).toEqual(historical.botProgressionDiagnostics.rawPreparations.filter((preparation) => preparation.seed === "production-0"));
+    expect(botProgressionDiagnostics?.rawPreparations).toHaveLength(252);
+    expect(hashCanonicalValue(botProgressionDiagnostics?.rawPreparations)).toBe("6e648b36");
   }, 20_000);
 });

@@ -211,6 +211,9 @@ export function migrateMatchState(
   mutable.pendingVoyageRecruitOffers = isRecord(mutable.pendingVoyageRecruitOffers)
     ? mutable.pendingVoyageRecruitOffers
     : {};
+  mutable.pendingRecruitmentRoutes = isRecord(mutable.pendingRecruitmentRoutes) ? mutable.pendingRecruitmentRoutes : {};
+  mutable.pendingHarborOffers = isRecord(mutable.pendingHarborOffers) ? mutable.pendingHarborOffers : {};
+  mutable.voyageChoiceHistory = Array.isArray(mutable.voyageChoiceHistory) ? mutable.voyageChoiceHistory : [];
   if (
     typeof mutable.seed !== "string" || typeof mutable.round !== "number" ||
     typeof mutable.rngState !== "number" || typeof mutable.phase !== "string"

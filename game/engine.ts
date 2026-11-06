@@ -11,7 +11,8 @@ import {
   resolveItemRecipe,
 } from "./items";
 import { selectStageItemReward } from "./itemRewards";
-import { prepareVoyageRecruitOffers, resolveVoyageRecruit } from "./voyageRecruitment";
+import { prepareStarterOffers, prepareVoyageRecruitOffers, resolveVoyageRecruit, skipReservedRecruit } from "./voyageRecruitment";
+import { getHarborEncounter, prepareHarborOffers, resolveHarborOffer } from "./voyageEncounters";
 import {
   reconcileProductionFormProgression,
   resolvePersistentFormId,
@@ -191,6 +192,9 @@ export function createMatch(
     lastResults: [],
     pendingItemChoices: {},
     pendingVoyageRecruitOffers: {},
+    pendingRecruitmentRoutes: {},
+    pendingHarborOffers: {},
+    voyageChoiceHistory: [],
     carouselChoices: [],
     carouselSession: null,
     winnerId: null,
@@ -200,6 +204,13 @@ export function createMatch(
   for (const player of state.players) {
     rollShop(state, player, content);
   }
+  return state;
+}
+
+/** Product entry point; createMatch remains the compatible prepared-match constructor. */
+export function createVoyage(seed: string | number, content: GameContent = DEFAULT_CONTENT): MatchState {
+  const state = createMatch(seed, content);
+  prepareStarterOffers(state, content);
   return state;
 }
 
@@ -802,7 +813,8 @@ function autoChooseBotVoyageRecruits(
 ): void {
   for (const player of state.players.filter((candidate) => candidate.alive && candidate.isBot)) {
     const offers = state.pendingVoyageRecruitOffers[player.id];
-    if (!offers?.length) continue;
+    if (!offers) continue;
+    if (!offers.length) { skipReservedRecruit(state, player); continue; }
     const personality = botPersonality(player, content);
     const selected = [...offers].sort((left, right) =>
       botUnitScore(right, player, personality, content) -
@@ -820,7 +832,8 @@ function autoResolveVoyageRecruits(
   const next = cloneMatch(state);
   for (const [playerId, offers] of Object.entries(next.pendingVoyageRecruitOffers)) {
     const player = findPlayer(next, playerId);
-    if (!player || offers.length === 0) continue;
+    if (!player) continue;
+    if (!offers.length) { skipReservedRecruit(next, player); continue; }
     const personality = botPersonality(player, content);
     const selected = [...offers].sort((left, right) =>
       botUnitScore(right, player, personality, content) -
@@ -830,6 +843,32 @@ function autoResolveVoyageRecruits(
     resolveVoyageRecruit(next, player, selected, content);
   }
   return beginNextRound(next, content);
+}
+
+function resolveOpeningChoices(state: MatchState, content: GameContent, botsOnly: boolean): void {
+  for (const player of state.players.filter(candidate => candidate.alive && (!botsOnly || candidate.isBot))) {
+    const offers = state.pendingVoyageRecruitOffers[player.id];
+    if (!offers) continue;
+    const personality = botPersonality(player, content);
+    const selected = [...offers].sort((left, right) => botUnitScore(right, player, personality, content) -
+      botUnitScore(left, player, personality, content) || left.localeCompare(right))[0];
+    if (!selected || !resolveVoyageRecruit(state, player, selected, content)) skipReservedRecruit(state, player);
+  }
+  if (!Object.keys(state.pendingVoyageRecruitOffers).length) state.phase = "preparation";
+}
+
+function resolveHarborChoices(state: MatchState, content: GameContent, botsOnly: boolean): void {
+  for (const player of state.players.filter(candidate => candidate.alive && (!botsOnly || candidate.isBot))) {
+    const offers = state.pendingHarborOffers[player.id];
+    if (!offers) continue;
+    const personality = botPersonality(player, content);
+    const eligible = offers.filter(offer => !offer.goldCost ||
+      (player.gold - offer.goldCost >= personality.economyReserve && itemScore(offer.itemId, player, content) > 0));
+    const selected = [...eligible].sort((left, right) => itemScore(right.itemId, player, content) -
+      itemScore(left.itemId, player, content) || left.itemId.localeCompare(right.itemId) || left.id.localeCompare(right.id))[0];
+    resolveHarborOffer(state, player, selected?.id ?? "skip", content);
+  }
+  if (!Object.keys(state.pendingHarborOffers).length) state.phase = "preparation";
 }
 
 function createCarouselChoices(
@@ -1380,6 +1419,8 @@ function beginNextRound(
   state.lastResults = [];
   state.pendingItemChoices = {};
   state.pendingVoyageRecruitOffers = {};
+  state.pendingRecruitmentRoutes = {};
+  state.pendingHarborOffers = {};
   state.carouselChoices = [];
   state.carouselSession = null;
   const stage = getStageDefinition(state.round, content);
@@ -1410,6 +1451,10 @@ function beginNextRound(
     return Object.keys(state.pendingVoyageRecruitOffers).length > 0
       ? state
       : beginNextRound(state, content);
+  }
+  if (getHarborEncounter(state.round, content)) {
+    prepareHarborOffers(state, content);
+    return state;
   }
   state.phase = "preparation";
   return state;
@@ -2431,6 +2476,16 @@ export function advanceMatchPhase(
   botObserver?: BotTurnObserver,
 ): MatchState {
   switch (state.phase) {
+    case "starter-choice": {
+      const next = cloneMatch(state);
+      resolveOpeningChoices(next, content, false);
+      return next;
+    }
+    case "harbor-choice": {
+      const next = cloneMatch(state);
+      resolveHarborChoices(next, content, false);
+      return next;
+    }
     case "preparation":
       return beginBattle(
         runAllBotTurns(cloneMatch(state), content, botObserver),
@@ -2514,6 +2569,10 @@ export function applyCommand(
     );
   }
 
+  if ((command.type === "CHOOSE_STARTER_RECRUIT" && state.phase !== "starter-choice") ||
+    (command.type === "CHOOSE_HARBOR_OFFER" && state.phase !== "harbor-choice")) {
+    return commandFailure(state, "WRONG_PHASE", "That voyage decision is not available now.");
+  }
   const currentPlayer = validatePlanningPlayer(state, context);
   if (!currentPlayer) {
     return commandFailure(
@@ -2716,6 +2775,17 @@ export function applyCommand(
       if (Object.keys(next.pendingItemChoices).length === 0) {
         next = beginNextRound(next, content);
       }
+      return { ok: true, state: next };
+    }
+    case "CHOOSE_STARTER_RECRUIT": {
+      const resolved = command.definitionId === null ? skipReservedRecruit(next, player) : resolveVoyageRecruit(next, player, command.definitionId, content);
+      if (!resolved) return commandFailure(state, "INVALID_VOYAGE_RECRUIT", "Choose an affordable offered starter, or sail on.");
+      resolveOpeningChoices(next, content, true);
+      return { ok: true, state: next };
+    }
+    case "CHOOSE_HARBOR_OFFER": {
+      if (!resolveHarborOffer(next, player, command.choiceId, content)) return commandFailure(state, "INVALID_ITEM_CHOICE", "That harbor offer is unavailable or unaffordable.");
+      resolveHarborChoices(next, content, true);
       return { ok: true, state: next };
     }
     case "CHOOSE_VOYAGE_RECRUIT": {

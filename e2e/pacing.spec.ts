@@ -137,7 +137,13 @@ for (const round of [10, 20]) {
     await page.getByRole("button", { name: "Resume voyage", exact: true }).click();
     await page.clock.fastForward(24_000);
     await expect(page.locator(".voyage-recruitment-screen")).toHaveCount(0);
-    await expect(page.locator(".match-screen")).toBeVisible();
+    if (round === 20) {
+      await expect(page.locator(".harbor-screen")).toBeVisible();
+      await expect(page.locator(".harbor-screen")).toContainText("ROUND 21");
+      await expect(page.locator(".harbor-screen button.reward-card")).toHaveCount(3);
+    } else {
+      await expect(page.locator(".match-screen")).toBeVisible();
+    }
     await page.clock.fastForward(500);
     await expect.poll(async () => (await readSave(page)).state).toEqual(expected);
   });

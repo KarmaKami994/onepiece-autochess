@@ -169,7 +169,7 @@ Domain-Zeiten bleiben exakt; Anwendungsuhren, Ergebnisanzeige und Recruitment-
 Deadline sind umgesetzt. Typecheck/Lint, 887 Unit-Tests, Build sowie fokussierte
 Browserfälle in beiden Desktop-Größen bestehen. Normale CI bleibt Review-Gate.
 20–30 Minuten bleiben eine Schätzung für zügiges Spiel, keine behauptete
-gemessene Spieldauer. Kein B07.
+gemessene Spieldauer. B06 ist über PR #68/#65/#64 in main `93b1874` integriert.
 
 **Ziel:** Eine Reise hat ein bewusst definiertes Zeitbudget und vermeidet unnötige Wartezeit.
 
@@ -186,6 +186,16 @@ gemessene Spieldauer. Kein B07.
 **Abgrenzung:** Paarung, Rewards, Rundenfolge, Captain Damage und Kampfwerte sind keine automatischen Pacing-Hebel. B07–B09 erhalten anschließend ein ausgewiesenes zusätzliches Zeitbudget.
 
 ## B07 — Startwahl, Recruitment und Hafenbegegnungen
+
+2026-11-06: A/B auf `codex/b07-voyage-events` umgesetzt und nach Freigabe lokal
+geprüft: Typecheck/Lint, 903 Unit-Tests, Build/Assets, 22 korrigierte Browserfälle
+sowie sechs Tutorial-/Chronicle-Fälle. Normale GitHub-CI bleibt Review-Gate.
+Der [B07-Vertrag](B07_VOYAGE_CHOICES.md) fixiert den bezahlten Cost-1-Starter,
+zwei Herkunftsrouten mit Wildcard, Usopps Gifts R16/R21 und Frankys optionale
+2-Gold-Angebote R18/R23. Angebote, Pool, Gold, Bots, Save/Resume, Tutorial,
+Kodex, Chronicle und Reportquellen sind integriert. Neues maximales Zeitbudget
+bei acht lebenden Spielern: 171 Sekunden vor vorzeitigen Entscheidungen,
+separat ausgewiesen; keine neue Baseline oder B08/B09-Implementierung.
 
 **Ziel:** Die Reise erhält zusätzliche One-Piece-Entscheidungen zwischen den Kämpfen, einschließlich einer klaren Startwahl und interessanter Hafenangebote.
 
@@ -252,7 +262,7 @@ gemessene Spieldauer. Kein B07.
 - Jeder konkrete Auftrag startet mit dem dann aktuellen freigegebenen `main` und einer sauberen, begrenzten Task-Branch; die heutige SHA ist die Planungsgrundlage, nicht die starre Basis aller späteren Batches.
 - PAC-Codebezüge verwenden die belegten Quellen aus der [Analyse](OFFENE_FEATURES_PAC_ABGLEICH.md#9-pac-quellen-am-geprüften-commit). Vor neuer System-/Gameplay-Arbeit wird der betroffene PAC-Ablauf gezielt geprüft und die Einordnung direct/adapted/reference/reject festgehalten. Die angegebene Nutzungserlaubnis bleibt dokumentiert; tatsächliche Übernahmen erhalten Quellen-/Lizenzhinweise.
 - Diagnose-/Review-Schritte in B05 sowie die neuen Regelverträge in B06–B09 müssen vor den davon abhängigen Implementierungen konkret feststehen. Dieses Dokument enthält keine erfundenen fertigen Balancewerte oder freigegebenen Formeln.
-- GameContent ist heute `1.31.0`; Schema ist heute `6`. UI-/Dokumentationsarbeit erhält keine unnötigen Versionserhöhungen. Künftige Gameplay-Batches bekommen einen bewusst beschlossenen Content-Versionsstand; vorhandene Match-Saves bleiben kompatibel, additive Backfills werden bevorzugt. Ein separates Replay-/Profilformat wird nicht mit dem Match-Schema verwechselt.
+- GameContent ist mit B07 `1.32.0`; Schema bleibt `6`. UI-/Dokumentationsarbeit erhält keine unnötigen Versionserhöhungen. Künftige Gameplay-Batches bekommen einen bewusst beschlossenen Content-Versionsstand; vorhandene Match-Saves bleiben kompatibel, additive Backfills werden bevorzugt. Ein separates Replay-/Profilformat wird nicht mit dem Match-Schema verwechselt.
 - Lokal/offline, deterministische Domain, bestehende Accessibility und kleine typisierte Funktionen gelten für alle Pakete. Vorhandene Tests bleiben wirksam; historische Raw-Reports und Hashes bleiben unverändert. Smoker bleibt frozen/watch.
 - Verifikation wird pro Lieferung nach Wirkung begrenzt: Typecheck/Lint und betroffene Tests; volle Suite bei mehreren Domain-/Application-Modulen; Browser-E2E bei UI-/Phaser-Verhalten. Keine Wiederholung vollständiger Prüfungen nach jeder kleinen Dateiänderung.
 - Aggregierte Vergleiche oder Produktionsläufe benötigen einen ausdrücklich festgelegten Umfang. Es gibt keinen automatischen 1.000-Seed-Soak und keine neue autoritative Baseline aus dieser Planung. Normaler CI-Smoke bleibt Crash-/Regressionsprüfung, keine alleinige Balancefreigabe.

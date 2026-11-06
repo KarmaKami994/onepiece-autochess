@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 
 export default function PhaseClockDisplay({ timer, duration, label }: { timer: number; duration: number; label: string }) {
-  const warning = timer > 0 && timer <= 8 && ["PREPARE", "BATTLE", "RECRUITMENT"].includes(label);
+  const warning = timer > 0 && timer <= 8 && ["PREPARE", "BATTLE", "RECRUITMENT", "FIRST CREW", "HARBOR"].includes(label);
   return <div className={`phase-clock ${warning ? "is-warning" : ""}`}
     role="timer" aria-live="off" aria-label={`${label}, ${timer} seconds remaining`} data-clock-label={label}>
     <span>{label}</span>

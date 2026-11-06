@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { GameContent, MatchPhase } from "../game/types";
-import { elapseClock, initialClockRemaining, isTimedPhase, phaseClockBudget, type PhaseClockCheckpoint } from "./phaseClock";
+import { clockScreen, elapseClock, initialClockRemaining, isTimedPhase, phaseClockBudget, type PhaseClockCheckpoint } from "./phaseClock";
 
 type MatchClockOptions = {
   screen: string;
@@ -14,12 +14,13 @@ type MatchClockOptions = {
   manualPaused: boolean;
   autoContinueBattle: boolean;
   checkpoint: PhaseClockCheckpoint | null;
+  alivePlayers: number;
   content: GameContent;
   onExpire: () => void;
 };
 
 export function useMatchClock(options: MatchClockOptions) {
-  const budget = phaseClockBudget(options.phase, options.round, options.battleDurationSeconds, options.animationSpeed, options.content);
+  const budget = phaseClockBudget(options.phase, options.round, options.battleDurationSeconds, options.animationSpeed, options.content, options.alivePlayers);
   const identity = `${options.seed}:${options.round}:${options.phase}`;
   const replay = options.phase === "battle" ? options.replayKey : "";
   const key = `${identity}:${replay}:${budget.durationMs}`;
@@ -45,9 +46,9 @@ export function useMatchClock(options: MatchClockOptions) {
     let expiry = 0;
     const paused = () => {
       const current = latest.current;
-      const expectedScreen = current.phase === "voyage-choice" ? "voyage-recruitment" : "match";
+      const expectedScreen = clockScreen(current.phase);
       return document.hidden || current.screen !== expectedScreen || current.manualPaused ||
-        (current.phase === "preparation" && current.tutorialActive);
+        ((current.phase === "preparation" || current.phase === "starter-choice") && current.tutorialActive);
     };
     const publish = () => setDisplay(current => {
       const remainingMs = live.current.remainingMs;
@@ -87,14 +88,14 @@ export function useMatchClock(options: MatchClockOptions) {
     return { seed: current.seed, round: current.round ?? 1, phase: current.phase,
       durationMs: live.current.durationMs, remainingMs: live.current.remainingMs, paused: current.manualPaused };
   }, []);
-  const expectedScreen = options.phase === "voyage-choice" ? "voyage-recruitment" : "match";
+  const expectedScreen = clockScreen(options.phase);
   const paused = display.hidden || options.screen !== expectedScreen || options.manualPaused ||
-    (options.phase === "preparation" && options.tutorialActive);
+    ((options.phase === "preparation" || options.phase === "starter-choice") && options.tutorialActive);
   const remainingMs = display.key === key ? display.remainingMs : budget.durationMs;
   const timer = Math.ceil(remainingMs / 1_000);
-  const label = options.phase === "preparation" && options.tutorialActive ? "LESSON PAUSED" : paused ? "PAUSED" :
+  const label = (options.phase === "preparation" || options.phase === "starter-choice") && options.tutorialActive ? "LESSON PAUSED" : paused ? "PAUSED" :
     options.phase === "battle" && timer === 0 && !options.autoContinueBattle ? "CONTINUE" :
       options.phase === "battle" && budget.victoryMs > 0 && remainingMs <= budget.victoryMs ? "ROUND COMPLETE" :
-        options.phase === "voyage-choice" ? "RECRUITMENT" : options.phase === "battle" ? "BATTLE" : "PREPARE";
+        options.phase === "starter-choice" ? "FIRST CREW" : options.phase === "harbor-choice" ? "HARBOR" : options.phase === "voyage-choice" ? "RECRUITMENT" : options.phase === "battle" ? "BATTLE" : "PREPARE";
   return { timer, phaseDuration: Math.ceil(budget.durationMs / 1_000), paused, label, checkpoint } as const;
 }

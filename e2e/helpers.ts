@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import path from "node:path";
 import sharp from "sharp";
+import type { VoyageSaveEnvelope } from "../app/voyagePersistence";
 import {
   BOARD_GEOMETRY,
   gameplayCameraFrame,
@@ -10,6 +11,33 @@ import {
 } from "../components/boardGeometry";
 
 const APP_ORIGIN = "http://localhost:3100";
+
+export async function storeVoyageFixture(page: Page, envelope: VoyageSaveEnvelope): Promise<void> {
+  await page.evaluate(async saved => {
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open("grand-line-auto-chess", 1);
+      request.onupgradeneeded = () => request.result.createObjectStore("voyages");
+      request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error);
+    });
+    await new Promise<void>((resolve, reject) => {
+      const transaction = db.transaction("voyages", "readwrite"); transaction.objectStore("voyages").put(saved, "active-voyage");
+      transaction.oncomplete = () => resolve(); transaction.onerror = () => reject(transaction.error);
+    }); db.close();
+  }, envelope);
+}
+
+export async function readVoyageFixture(page: Page): Promise<VoyageSaveEnvelope | undefined> {
+  return page.evaluate(async () => {
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open("grand-line-auto-chess", 1);
+      request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error);
+    });
+    const result = await new Promise<VoyageSaveEnvelope | undefined>((resolve, reject) => {
+      const request = db.transaction("voyages", "readonly").objectStore("voyages").get("active-voyage");
+      request.onsuccess = () => resolve(request.result as VoyageSaveEnvelope | undefined); request.onerror = () => reject(request.error);
+    }); db.close(); return result;
+  });
+}
 
 type QaState = {
   consoleErrors: string[];
@@ -84,6 +112,10 @@ export async function openFreshVoyage(page: Page): Promise<void> {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: /GRAND LINE/i })).toBeVisible();
   await page.getByRole("button", { name: /NEW VOYAGE/i }).click();
+  await expect(page.locator(".starter-recruitment-screen")).toBeVisible();
+  // Preserve the empty-roster shop fixture through the real, legal skip command.
+  // Paid starter acquisition is covered by B07 and the first-voyage tutorial.
+  await page.getByRole("button", { name: "SAIL WITHOUT A STARTER", exact: true }).click();
   await expect(page.locator(".match-screen")).toBeVisible();
 }
 
@@ -96,7 +128,7 @@ export async function openFirstVoyage(page: Page): Promise<void> {
   await page.reload();
   await expect(page.getByRole("heading", { name: /GRAND LINE/i })).toBeVisible();
   await page.getByRole("button", { name: /NEW VOYAGE/i }).click();
-  await expect(page.locator(".match-screen")).toBeVisible();
+  await expect(page.locator(".starter-recruitment-screen")).toBeVisible();
 }
 
 export const BENCH_VIEWPORTS = [
@@ -253,6 +285,11 @@ export async function advanceVisiblePhase(page: Page): Promise<boolean> {
   const result = page.locator(".results-screen");
   if (await result.isVisible()) return false;
 
+  if (await page.locator(".harbor-screen").isVisible()) {
+    const offer = page.locator(".harbor-screen button.reward-card:not([disabled])").first();
+    if (await offer.isVisible()) await offer.click(); else await page.getByRole("button", { name: "SAIL ON WITHOUT SUPPLIES" }).click();
+    return true;
+  }
   const reward = page.locator("button.reward-card").first();
   if (await reward.isVisible()) {
     await reward.click();

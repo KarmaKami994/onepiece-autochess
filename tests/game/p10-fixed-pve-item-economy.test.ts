@@ -68,7 +68,7 @@ describe("P10 fixed cadence and reward content", () => {
       .toEqual(["component", "component", "component", "completed", "completed", "completed"]);
     expect(DEFAULT_CONTENT.items.filter((item) => item.kind === "component")).toHaveLength(10);
     expect(DEFAULT_CONTENT.items.filter((item) => item.kind === "completed")).toHaveLength(55);
-    expect(DEFAULT_CONTENT.version).toBe("1.31.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.32.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 
