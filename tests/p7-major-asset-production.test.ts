@@ -236,7 +236,7 @@ describe("P7 major asset production", () => {
       `public/assets/forms/${id}/overlay.svg`,
     ]));
 
-    expect(files).toHaveLength(65 + 13 + 8 + 12);
+    expect(files).toHaveLength(65 + 13 + 12 + 12);
     for (const file of files) {
       const source = await readFile(path.join(projectRoot, file), "utf8");
       const lower = source.toLowerCase();

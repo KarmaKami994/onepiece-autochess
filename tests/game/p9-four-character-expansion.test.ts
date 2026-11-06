@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { b07ReferenceContent } from "../fixtures/b07-content";
 import {
   CURRENT_SAVE_SCHEMA_VERSION,
   DEFAULT_CONTENT,
@@ -270,7 +271,8 @@ describe("P9 four-character expansion content", () => {
   });
 
   it("preserves the pre-P9 gameplay projection of all 30 existing definitions", () => {
-    const projection = DEFAULT_CONTENT.units
+    // Keep the exact historical anchor; B08's Kuzan Freeze substitution has its own production assertions.
+    const projection = b07ReferenceContent().units
       .filter((unit) => !P9_ID_SET.has(unit.id))
       .map(({ id, cost, traits, stats, ability }) => ({ id, cost, traits, stats, ability }));
     expect(projection).toHaveLength(30);

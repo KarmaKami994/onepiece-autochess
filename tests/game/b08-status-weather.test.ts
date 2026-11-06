@@ -87,7 +87,10 @@ describe("B08 explicit status lifecycle", () => {
   });
 
   it("frozen fighters remain valid healing and forced-movement targets", () => {
-    const healed = fight([caster({ freezeMs: 700 }), victim({ x: 1 }), { id: "b-healer", team: "b", x: 3, y: 0, start: true, ability: { targeting: "lowest-health-ally", effect: "heal", power: 100 } }]).result;
+    // Both intents are selected before damage. Adjacent healing includes the victim
+    // even when the initially full-health primary is the healer itself.
+    const healed = fight([caster({ power: 100, freezeMs: 700 }), victim({ x: 1 }), { id: "b-healer", team: "b", x: 2, y: 0, start: true, ability: { targeting: "lowest-health-ally", pattern: "adjacent", effect: "heal", power: 100 } }]).result;
+    expect(events(healed, "status")).toContainEqual(expect.objectContaining({ targetId: "z-victim", status: "freeze", tick: 1 }));
     expect(events(healed, "heal").some(event => event.targetId === "z-victim" && event.tick === 1)).toBe(true);
     const pushed = fight([caster({ freezeMs: 700 }), { ...caster({ signatureMechanics: [{ kind: "knockback" }] }, "c-push"), y: 1 }, victim({ x: 1 })]).result;
     expect(events(pushed, "unit-displace").some(event => event.unitId === "z-victim" && event.movementKind === "knockback")).toBe(true);

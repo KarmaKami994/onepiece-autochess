@@ -153,7 +153,8 @@ an explicitly unclassified saved crew.
   Food has a separate codex, planner choice, history and acquisition/use counts;
   all 65 equipment items / 55 recipes remain. Content `1.34.0`, schema `6`.
   Original food icons: `npm run assets:food`; reproducible inputs/output hashes
-  in `art/ui-icons/food-provenance.json`. B09 checks await owner approval.
+  in `art/ui-icons/food-provenance.json`. B09 local checks are complete after
+  owner approval; normal PR CI remains the integration gate.
 - All artwork is bundled under `public/assets`; Web Audio effects are generated
   locally. Gameplay makes no network requests.
 

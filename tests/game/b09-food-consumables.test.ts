@@ -137,9 +137,10 @@ describe("B09 one-battle lifecycle", () => {
 
   it("does not stack a meal again on Phoenix resurrection", () => {
     const definition = DEFAULT_CONTENT.units[0];
-    const rules: GameContent = { ...content, units: [{ ...definition, traits: [], stats: { ...definition.stats, health: 100, attack: 1_000, defense: 0, specialDefense: 0, range: 8, attackIntervalMs: 100_000 } }],
+    const fighter = { ...definition, traits: [], stats: { ...definition.stats, health: 100, attack: 1_000, defense: 0, specialDefense: 0, range: 8, attackIntervalMs: 100_000 } };
+    const rules: GameContent = { ...content, units: [fighter, { ...fighter, id: "food-phoenix-target", stats: { ...fighter.stats, attack: 1 } }],
       config: { ...content.config, combatMaxTicks: 25 } };
-    const team = (id: string, food = false): BattleTeam => ({ id, units: [{ id, definitionId: definition.id, star: 1,
+    const team = (id: string, food = false): BattleTeam => ({ id, units: [{ id, definitionId: food ? "food-phoenix-target" : definition.id, star: 1,
       items: food ? ["phoenix-feather"] : [], ...(food ? { foodId: "sea-king-bento" } : {}), position: { x: 0, y: food ? 1 : 0 } }] });
     const result = simulateBattle(team("a"), team("b", true), { seed: "food-phoenix" }, rules);
     const revival = result.events.filter(event => event.type === "unit-resurrect");

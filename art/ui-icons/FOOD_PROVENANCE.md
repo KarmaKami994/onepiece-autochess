@@ -12,6 +12,7 @@ Generation has no timestamp, random value, network request or existing-asset
 rewrite. Runtime files are only `public/assets/food/*.svg`; food is separate
 from the 65 equipment icons and 55 recipes.
 
-Generation was performed on 2026-11-06. Asset parsing, visual inspection and
-validation are NOT RUN pending the owner's verification decision; generation
-alone is not a validation result.
+Generation was performed on 2026-11-06. After explicit owner approval, asset
+parsing/provenance validation and the dedicated asset test passed; all three
+icons were visually inspected. Galley screenshots were inspected at both
+desktop sizes. Generation alone is not the validation result.

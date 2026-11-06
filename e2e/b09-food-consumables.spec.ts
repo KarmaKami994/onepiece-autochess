@@ -35,7 +35,7 @@ test("harbor food survives reload, serves accessibly once and remains frozen thr
   await expect(serve).toBeEnabled(); await serve.focus(); await page.keyboard.press("Enter");
   await expect(galley.getByRole("status")).toContainText(`Served: ${food.name}`);
   await expect.poll(async () => ((await readVoyageFixture(page))?.state as MatchState | undefined)?.players[0].foodInventory?.length).toBe(0);
-  await page.screenshot({ path: `artifacts/b09-galley-${testInfo.project.name}.png`, fullPage: true });
+  await page.screenshot({ path: `tmp/b09-galley-${testInfo.project.name}.png`, fullPage: true });
   await page.reload(); await page.getByRole("button", { name: /CONTINUE/i }).click();
   await expect(galley.getByRole("status")).toContainText(food.name); await expect(galley.getByRole("button")).toHaveCount(0);
   await page.getByRole("button", { name: /START BATTLE/ }).click();

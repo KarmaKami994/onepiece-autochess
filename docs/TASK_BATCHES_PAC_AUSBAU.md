@@ -254,12 +254,17 @@ Kein Bot-/Wirtschaftstuning oder neuer Produktionsbericht.
 
 ## B09 — Food und Verbrauchsitems
 
-2026-11-06: in Umsetzung auf `codex/b09-food-consumables`, Basis B08 `e564e59`.
+2026-11-06: implementiert und lokal geprüft auf `codex/b09-food-consumables`, Basis B08 `e564e59`.
 Der vor Code festgelegte [Vertrag](B09_FOOD_CONSUMABLES.md) begrenzt Food auf
 drei Speisen, separate Vorräte (3 Portionen), eine Mahlzeit je Vorbereitung
 und Wirkung nur im nächsten Kampf. Je Hafen wird eine Komponentenoption
 ersetzt; keine zusätzliche P10-Belohnung oder neue Crafting-Wirtschaft.
-Prüfläufe sind bisher nicht freigegeben; noch kein verifizierter Abschluss.
+Der Eigentümer hat den begrenzten Prüfumfang nachträglich freigegeben.
+Typecheck/Lint/Build/Assets, fokussierte 78/78 plus betroffene 54/54 und Food-E2E
+6/6 in beiden Größen sind grün; Hafen/Tools 12/12. Der einmalige volle lokale
+Lauf fand vier übernommene B08-Testgrundlagenfehler (945/949), die gezielt
+korrigiert wurden. Normale PR-CI prüft die finale Gesamtsuite; kein lokaler
+Produktionslauf oder neuer Messbericht. Noch nicht gemergt.
 
 **Ziel:** Ein zusammenhängender One-Piece-Food-Mechanismus erweitert die Reise mit verständlicher Beschaffung, Verwendung und Wirkung.
 

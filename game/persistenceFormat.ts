@@ -214,7 +214,8 @@ export function migrateMatchState(
     ? mutable.pendingVoyageRecruitOffers
     : {};
   mutable.pendingRecruitmentRoutes = isRecord(mutable.pendingRecruitmentRoutes) ? mutable.pendingRecruitmentRoutes : {};
-  mutable.pendingHarborOffers = isRecord(mutable.pendingHarborOffers) ? mutable.pendingHarborOffers : {};
+  const savedHarborOffers = isRecord(mutable.pendingHarborOffers) ? mutable.pendingHarborOffers : {};
+  mutable.pendingHarborOffers = savedHarborOffers;
   // Additive schema-6 defaults; never regenerate offers or re-consume a meal.
   const savedPlayers: unknown[] = Array.isArray(mutable.players) ? mutable.players : [];
   for (const rawPlayer of savedPlayers) {
@@ -233,7 +234,7 @@ export function migrateMatchState(
   if (!Array.isArray(mutable.foodHistory) || mutable.foodHistory.length > 128 || mutable.foodHistory.some(receipt =>
     !isFoodReceipt(receipt) || !playerIds.has(receipt.playerId) || !getFoodDefinition(receipt.foodId, content)) ||
     new Set(mutable.foodHistory.map(receipt => isFoodReceipt(receipt) ? receipt.id : "")).size !== mutable.foodHistory.length) throw new Error("Invalid saved food receipts.");
-  for (const offers of Object.values(mutable.pendingHarborOffers)) {
+  for (const offers of Object.values(savedHarborOffers)) {
     if (!Array.isArray(offers) || offers.some(offer => !isRecord(offer) ||
       (offer.kind === "food" && (!getFoodDefinition(String(offer.foodId), content) || !isFiniteNumber(offer.goldCost) || offer.goldCost < 0)))) throw new Error("Invalid saved harbor food offer.");
   }
