@@ -14,6 +14,7 @@ export * from "./pairing";
 export * from "./economy";
 export * from "./roster";
 export * from "./voyageRecruitment";
+export * from "./voyageEncounters";
 export * from "./carousel";
 export * from "./matchFlow";
 export * from "./bots";

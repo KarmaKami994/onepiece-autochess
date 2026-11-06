@@ -21,6 +21,7 @@ export function deriveTutorialStep(state: MatchState): TutorialStep | null {
     return null;
   }
   if (state.phase === "game-over") return null;
+  if (state.phase === "harbor-choice" || state.phase === "voyage-choice") return null;
   if (state.phase === "item-choice" || state.phase === "carousel") {
     return "treasure";
   }

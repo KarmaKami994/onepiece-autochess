@@ -1,4 +1,5 @@
 import {
+  getHarborEncounter,
   DEFAULT_CONTENT,
   describeTraitBehavior,
   describeTraitEffect,
@@ -224,6 +225,8 @@ export type MatchView = {
   opponent: StandingView | null;
   choices: ChoiceView[];
   voyageRecruits: ShopUnitView[];
+  recruitmentRoute: string | null;
+  harbor: { name: string; portrait: string; offers: Array<ChoiceView & { goldCost: number; disabled: boolean }> } | null;
   carouselSession: CarouselSessionView | null;
   selectedDefinitionByUnit: Map<string, ShopUnitView>;
   itemsById: Map<string, ChoiceView>;
@@ -1548,6 +1551,10 @@ export function selectMatchView(
   const voyageRecruits = (state.pendingVoyageRecruitOffers[player.id] ?? []).map((id) =>
     enrichUnitView(definitionView(id, content), player, content)
   );
+  const encounter = getHarborEncounter(state.round, content);
+  const harbor = encounter ? { name: encounter.name, portrait: definitionView(encounter.portraitUnitId, content).portrait,
+    offers: (state.pendingHarborOffers[player.id] ?? []).map(offer => ({ ...createItemView(offer.itemId, content), id: offer.id,
+      goldCost: offer.goldCost, disabled: player.gold < offer.goldCost })) } : null;
   const carouselSlice =
     state.phase === "carousel" ? selectCarouselView(state, content) : null;
   const events = combatEvents(state, player.id, content);
@@ -1565,7 +1572,7 @@ export function selectMatchView(
   );
   const winner = standings.find((standing) => standing.id === state.winnerId);
   const phaseLabel =
-    state.phase === "preparation"
+    state.phase === "starter-choice" ? "FIRST CREW" : state.phase === "harbor-choice" ? "HARBOR" : state.phase === "preparation"
       ? "PREPARE"
       : state.phase === "battle"
         ? "BATTLE"
@@ -1615,6 +1622,8 @@ export function selectMatchView(
     opponent,
     choices,
     voyageRecruits,
+    recruitmentRoute: content.recruitmentRoutes.find(route => route.id === state.pendingRecruitmentRoutes[player.id])?.name ?? null,
+    harbor,
     carouselSession: carouselSlice?.carouselSession ?? null,
     selectedDefinitionByUnit: board.views,
     itemsById,

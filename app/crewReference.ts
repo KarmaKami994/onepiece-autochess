@@ -4,7 +4,7 @@ import { STATUS_VISUALS } from "../components/gameVisualManifest";
 import { createItemView, createUnitReferenceView, titleCase } from "./selectors";
 import { resolvePlannedUnit } from "../game/teamPlanner";
 
-export type ReferenceCategory = "crew" | "items" | "traits" | "forms" | "status" | "pve" | "rounds";
+export type ReferenceCategory = "crew" | "items" | "traits" | "forms" | "status" | "pve" | "rounds" | "voyage";
 export type ReferenceEntry = {
   id: string; category: ReferenceCategory; name: string; description: string;
   imagePath?: string; details: string[]; traits: string[]; cost?: number; kind?: string;
@@ -114,6 +114,13 @@ export function crewReference(content: GameContent, star: StarLevel = 1): Refere
         ...(round === 40 ? ["After round 40, unlisted rounds use the normal PvP fallback."] : [])],
     });
   }
+  entries.push({ id: "first-crew", category: "voyage", name: "First Crew", description: "Choose an existing cost-1 starter before Round 1; normal 1-gold price, not extra starting resources.", traits: [], kind: "starter",
+    details: ["Three distinct reserved offers; skip is free. Full bench converts the reserved copy to normal gold value.", "23 seconds; tutorial lessons pause the clock. Legacy preparations never receive another starter."] });
+  for (const route of content.recruitmentRoutes) entries.push({ id: route.id, category: "voyage", name: route.name, description: "R10/R20 origin-focused recruitment with an open-sea wildcard.", traits: route.traits, kind: "recruitment",
+    details: ["Distinct owned definitions choose the route; up to two focused seeds, then an unrestricted primary-band fill.", ...route.unitIds.map(id => content.units.find(unit => unit.id === id)?.name ?? id), "Primary cost band is exhausted before lower-band fallback; all offered copies are reserved."] });
+  for (const encounter of content.harborEncounters) entries.push({ id: encounter.id, category: "voyage", name: encounter.name, description: encounter.goldCost ? "Optional component supplies; sail on free." : "Choose one component gift, or sail on.", traits: [], kind: encounter.goldCost ? "trade" : "gift",
+    imagePath: content.units.find(unit => unit.id === encounter.portraitUnitId)?.assetPath,
+    details: [`Rounds ${encounter.rounds.join(" / ")}; ${encounter.goldCost} gold per chosen component.`, "Normal round preparation and combat still follow; no extra income or PvE replacement.", `Harbor budget: ${content.voyageTiming.harborBaseSeconds}s + ${content.voyageTiming.harborPerPlayerSeconds}s per living captain; settings/background pause.`] });
   return entries;
 }
 

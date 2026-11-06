@@ -91,7 +91,7 @@ async function expectFile(relativePath: string): Promise<void> {
 
 describe("P7 major asset production", () => {
   it("completes real static and preferred v2 presentation for all crew", async () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.31.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.32.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(DEFAULT_CONTENT.units).toHaveLength(34);
     expect(DEFAULT_CONTENT.units.some((unit) =>
@@ -158,14 +158,14 @@ describe("P7 major asset production", () => {
     }
   });
 
-  it("pins the cumulative content contract after the P12 encounter update", () => {
+  it("pins the cumulative content contract after the B07 voyage choices", () => {
     const normalized = JSON.stringify(DEFAULT_CONTENT, (key, value) =>
       ["version", "assetPath", "presentation"].includes(key)
         ? undefined
         : value,
     );
     expect(createHash("sha256").update(normalized).digest("hex"))
-      .toBe("1485fd67999cd7f5a1dae170fd80d155f8f86125b46d85e70b6642f1fe12d180");
+      .toBe("bcdbf36e2e35255b8a213b19d9cd47663bbfbca925211a4955b5ce52d7bd3b69");
   });
 
   it("maps all 65 item identities and preserves recipes and glyph fallback", async () => {

@@ -905,6 +905,9 @@ kbd {
 .match-screen[hidden] { display: none; }
 .recruitment-clock-controls { display: flex; justify-content: center; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 14px; }
 .pacing-help { color: #b7c8c9; font-size: 12px; line-height: 1.5; }
+.harbor-portrait { display: block; width: 64px; height: 64px; object-fit: contain; margin: 8px auto; }
+.harbor-screen .reward-card:disabled, .starter-recruitment-screen .reward-card:disabled { opacity: .5; cursor: not-allowed; filter: grayscale(.8); }
+.harbor-screen .reward-rays, .starter-recruitment-screen .reward-rays { pointer-events: none; }
 
 .phase-clock span {
   max-width: 110px;

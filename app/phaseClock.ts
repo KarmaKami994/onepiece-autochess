@@ -1,9 +1,10 @@
 import { getStageDefinition } from "../game/content";
 import type { GameContent, MatchPhase } from "../game/types";
+import { harborDurationSeconds } from "../game/voyageEncounters";
 
 export const PAC_VICTORY_DELAY_MS = 3_000;
 export const PAC_RECRUITMENT_DURATION_MS = 23_000;
-export type TimedPhase = "preparation" | "battle" | "voyage-choice";
+export type TimedPhase = "preparation" | "battle" | "voyage-choice" | "starter-choice" | "harbor-choice";
 export type ClockIdentity = { seed: string; round: number; phase: MatchPhase };
 export type PhaseClockCheckpoint = ClockIdentity & {
   phase: TimedPhase;
@@ -13,15 +14,20 @@ export type PhaseClockCheckpoint = ClockIdentity & {
 };
 
 export function isTimedPhase(phase: MatchPhase | undefined): phase is TimedPhase {
-  return phase === "preparation" || phase === "battle" || phase === "voyage-choice";
+  return phase === "preparation" || phase === "battle" || phase === "voyage-choice" || phase === "starter-choice" || phase === "harbor-choice";
+}
+
+export function clockScreen(phase: MatchPhase | undefined): string {
+  return phase === "voyage-choice" ? "voyage-recruitment" : phase === "starter-choice" ? "starter-recruitment" : phase === "harbor-choice" ? "harbor" : "match";
 }
 
 export function phaseClockBudget(
   phase: MatchPhase | undefined, round: number | undefined,
-  battleSeconds: number, speed: number, content: GameContent,
+  battleSeconds: number, speed: number, content: GameContent, alivePlayers = 8,
 ): { durationMs: number; victoryMs: number } {
   if (!isTimedPhase(phase) || !round) return { durationMs: 0, victoryMs: 0 };
-  if (phase === "voyage-choice") return { durationMs: PAC_RECRUITMENT_DURATION_MS, victoryMs: 0 };
+  if (phase === "voyage-choice" || phase === "starter-choice") return { durationMs: content.voyageTiming.recruitmentSeconds * 1_000, victoryMs: 0 };
+  if (phase === "harbor-choice") return { durationMs: harborDurationSeconds(alivePlayers, content) * 1_000, victoryMs: 0 };
   const stage = getStageDefinition(round, content);
   if (phase === "preparation") return { durationMs: stage.preparationSeconds * 1_000, victoryMs: 0 };
   const duration = Number.isFinite(battleSeconds) ? Math.max(0, Math.min(stage.battleSeconds, battleSeconds)) : stage.battleSeconds;

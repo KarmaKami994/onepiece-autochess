@@ -43,6 +43,13 @@ for (const round of [10, 20] as const) {
     await expect(recruitment).toContainText("full bench converts the recruit");
     await expect(recruitment.locator("button.reward-card").first()).toContainText("GOLD VALUE");
     await recruitment.locator("button.reward-card").first().click();
+    if (round === 20) {
+      const harbor = page.locator(".harbor-screen");
+      await expect(harbor.getByRole("heading", { name: "USOPP'S SUPPLY STOP" })).toBeVisible();
+      await expect(harbor).toContainText("ROUND 21");
+      await expect(harbor.locator("button.reward-card")).toHaveCount(3);
+      await harbor.locator("button.reward-card").first().click();
+    }
     await expect(page.locator(".match-screen")).toBeVisible();
     await expect(page.locator(".voyage-recruitment-screen")).toHaveCount(0);
   });

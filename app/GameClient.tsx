@@ -60,6 +60,7 @@ import {
   ResultsScreen,
   RewardScreen,
   VoyageRecruitmentScreen,
+  HarborScreen,
   SettingsScreen,
   TutorialCoach,
   type Settings,
@@ -82,6 +83,8 @@ type Screen =
   | "carousel"
   | "reward"
   | "voyage-recruitment"
+  | "starter-recruitment"
+  | "harbor"
   | "results"
   | "confirm-new";
 
@@ -344,7 +347,7 @@ export default function GameClient() {
     document.addEventListener("visibilitychange", onVisibilityChange);
     window.addEventListener("pagehide", checkpointActivePhase);
     const checkpointTimer = window.setInterval(() => {
-      if (!document.hidden && ["match", "carousel", "voyage-recruitment"].includes(screen)) checkpointActivePhase();
+      if (!document.hidden && ["match", "carousel", "voyage-recruitment", "starter-recruitment", "harbor"].includes(screen)) checkpointActivePhase();
     }, 5_000);
     return () => {
       document.removeEventListener("visibilitychange", onVisibilityChange);
@@ -360,6 +363,8 @@ export default function GameClient() {
         setScreen("results");
         return;
       }
+      if (view.phase === "starter-choice") { setScreen("starter-recruitment"); return; }
+      if (view.phase === "harbor-choice") { setScreen("harbor"); return; }
       if (view.phase === "item-choice") {
         if (screen !== "reward") {
           setScreen("reward");
@@ -377,7 +382,7 @@ export default function GameClient() {
         }
         return;
       }
-      if (screen === "reward" || screen === "voyage-recruitment" || screen === "carousel" || screen === "results") {
+      if (screen === "reward" || screen === "voyage-recruitment" || screen === "starter-recruitment" || screen === "harbor" || screen === "carousel" || screen === "results") {
         setScreen("match");
       }
     }, 0);
@@ -582,6 +587,7 @@ export default function GameClient() {
     manualPaused: pacingPaused,
     autoContinueBattle: settings.autoContinueBattle,
     checkpoint: restoredClock,
+    alivePlayers: engineState?.players.filter(player => player.alive).length ?? 8,
     content,
     onExpire: expireCurrentPhase,
   });
@@ -590,14 +596,14 @@ export default function GameClient() {
   const startVoyage = useCallback(() => {
     const freshSeed = `grand-line-${Date.now().toString(36)}`;
     try {
-      const next = engine.createMatch(freshSeed, content);
+      const next = engine.createVoyage(freshSeed, content);
       setRestoredClock(null);
       setPacingPaused(false);
       setSeed(freshSeed);
       setEngineState(next, true);
       setSelectedUnitId(null);
       setScoutedPlayerId(null);
-      setScreen("match");
+      setScreen("starter-recruitment");
       setTutorialStep(
         hasCompletedFirstVoyage() ? null : "welcome",
       );
@@ -868,6 +874,20 @@ export default function GameClient() {
     );
   }, [issueCommand, view]);
 
+  const chooseStarter = useCallback((definitionId: string | null) => {
+    if (tutorialStep !== null && tutorialStep !== "recruit") return;
+    if (!issueCommand({ type: "CHOOSE_STARTER_RECRUIT", definitionId }, "reward", definitionId ? "Your first crewmate is aboard." : "Set sail without a starter.")) return;
+    setPacingPaused(false);
+    const player = engineStateRef.current?.players.find(candidate => !candidate.isBot);
+    const unit = Object.values(player?.units ?? {}).filter(candidate => candidate.definitionId === definitionId)
+      .sort((left, right) => right.acquiredOrder - left.acquiredOrder)[0];
+    setSelectedUnitId(unit?.id ?? null);
+  }, [engineStateRef, issueCommand, tutorialStep]);
+
+  const chooseHarbor = useCallback((choiceId: string) => {
+    if (issueCommand({ type: "CHOOSE_HARBOR_OFFER", choiceId }, "reward", choiceId === "skip" ? "Sailing on." : "Harbor supplies received.")) setPacingPaused(false);
+  }, [issueCommand]);
+
   const setCarouselTarget = useCallback(
     (target: { x: number; y: number }) => {
       if (!view || view.phase !== "carousel") return;
@@ -1036,6 +1056,8 @@ export default function GameClient() {
         else if (screen === "match") openSettings("match");
         else if (screen === "carousel") openSettings("carousel");
         else if (screen === "voyage-recruitment") openSettings("voyage-recruitment");
+        else if (screen === "starter-recruitment") openSettings("starter-recruitment");
+        else if (screen === "harbor") openSettings("harbor");
         return;
       }
       const key = event.key.toLowerCase();
@@ -1050,13 +1072,20 @@ export default function GameClient() {
         }
         return;
       }
-      if (screen === "voyage-recruitment" && view) {
+      if ((screen === "voyage-recruitment" || screen === "starter-recruitment") && view) {
         if (/^[1-3]$/.test(key)) {
           const recruit = view.voyageRecruits[Number(key) - 1];
           if (recruit) {
             event.preventDefault();
-            chooseVoyageRecruit(recruit.id);
+            if (screen === "starter-recruitment") chooseStarter(recruit.id); else chooseVoyageRecruit(recruit.id);
           }
+        }
+        return;
+      }
+      if (screen === "harbor" && view) {
+        if (/^[1-3]$/.test(key)) {
+          const offer = view.harbor?.offers[Number(key) - 1];
+          if (offer && !offer.disabled) { event.preventDefault(); chooseHarbor(offer.id); }
         }
         return;
       }
@@ -1122,6 +1151,8 @@ export default function GameClient() {
     buyUnit,
     chooseReward,
     chooseVoyageRecruit,
+    chooseStarter,
+    chooseHarbor,
     closeSettings,
     issueCommand,
     openSettings,
@@ -1379,8 +1410,12 @@ export default function GameClient() {
           onChoose={chooseReward}
         />
       )}
-      {screen === "voyage-recruitment" && view && (
+      {(screen === "voyage-recruitment" || screen === "starter-recruitment") && view && (
         <VoyageRecruitmentScreen
+          starter={screen === "starter-recruitment"}
+          route={view.recruitmentRoute}
+          gold={view.gold}
+          onSkip={() => chooseStarter(null)}
           round={view.round}
           recruits={view.voyageRecruits}
           timer={timer}
@@ -1388,10 +1423,13 @@ export default function GameClient() {
           clockLabel={clockLabel}
           manualPaused={pacingPaused}
           onTogglePause={() => setPacingPaused(current => !current)}
-          onSettings={() => openSettings("voyage-recruitment")}
-          onChoose={chooseVoyageRecruit}
+          onSettings={() => openSettings(screen === "starter-recruitment" ? "starter-recruitment" : "voyage-recruitment")}
+          onChoose={screen === "starter-recruitment" ? chooseStarter : chooseVoyageRecruit}
         />
       )}
+      {screen === "harbor" && view?.harbor && <HarborScreen harbor={view.harbor} round={view.round} gold={view.gold}
+        timer={timer} phaseDuration={phaseDuration} clockLabel={clockLabel} manualPaused={pacingPaused}
+        onTogglePause={() => setPacingPaused(current => !current)} onSettings={() => openSettings("harbor")} onChoose={chooseHarbor} />}
       {screen === "results" && view && (
         <ResultsScreen
           view={view}

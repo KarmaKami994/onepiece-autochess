@@ -4,6 +4,8 @@ export type MatchPhase =
   | "battle"
   | "item-choice"
   | "voyage-choice"
+  | "starter-choice"
+  | "harbor-choice"
   | "carousel"
   | "game-over";
 export type StageKind = "pve" | "pvp" | "carousel" | "voyage-choice";
@@ -432,7 +434,33 @@ export interface GameContent {
   enemies: PvEEnemyDefinition[];
   stages: StageDefinition[];
   botPersonalities: BotPersonality[];
+  recruitmentRoutes: RecruitmentRouteDefinition[];
+  harborEncounters: HarborEncounterDefinition[];
+  voyageTiming: { recruitmentSeconds: number; harborBaseSeconds: number; harborPerPlayerSeconds: number };
   config: GameConfig;
+}
+
+export interface RecruitmentRouteDefinition {
+  id: string;
+  name: string;
+  traits: string[];
+  unitIds: string[];
+}
+
+export interface HarborEncounterDefinition {
+  id: string;
+  name: string;
+  portraitUnitId: string;
+  rounds: number[];
+  goldCost: number;
+  offerCount: number;
+}
+
+export interface HarborOffer { id: string; itemId: string; goldCost: number }
+export interface VoyageChoiceReceipt {
+  round: number; playerId: string; kind: "starter" | "recruitment" | "harbor";
+  choiceId: string; paidGold: number; convertedGold: number; skipped: boolean;
+  definitionId?: string; itemId?: string; encounterId?: string; routeId?: string;
 }
 
 export interface UnitInstance {
@@ -581,6 +609,9 @@ export interface MatchState {
   lastResults: MatchBattleResult[];
   pendingItemChoices: Record<string, string[]>;
   pendingVoyageRecruitOffers: Record<string, string[]>;
+  pendingRecruitmentRoutes: Record<string, string>;
+  pendingHarborOffers: Record<string, HarborOffer[]>;
+  voyageChoiceHistory: VoyageChoiceReceipt[];
   carouselChoices: CarouselChoice[];
   carouselSession: CarouselSessionState | null;
   winnerId: string | null;
@@ -613,6 +644,8 @@ export type GameCommand =
   | { type: "END_PREPARATION" }
   | { type: "CHOOSE_ITEM"; choiceId: string }
   | { type: "CHOOSE_VOYAGE_RECRUIT"; definitionId: string }
+  | { type: "CHOOSE_STARTER_RECRUIT"; definitionId: string | null }
+  | { type: "CHOOSE_HARBOR_OFFER"; choiceId: string }
   | {
       type: "CAROUSEL_SET_TARGET";
       x: number;

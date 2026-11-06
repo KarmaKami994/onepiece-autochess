@@ -2632,8 +2632,18 @@ export const GAME_CONFIG: GameConfig = {
   recordBattleEvents: true,
 };
 
+export const RECRUITMENT_ROUTES: GameContent["recruitmentRoutes"] = [
+  { id: "navy-headquarters", name: "Navy Headquarters", traits: ["navy"], unitIds: ["kizaru", "kuzan", "akainu", "garp"] },
+  { id: "pirate-alliances", name: "Pirate Alliances", traits: ["straw-hat", "warlord", "supernova", "emperor", "brotherhood", "revolutionary"], unitIds: ["law", "ace", "hancock", "doflamingo", "capone-bege", "mihawk", "shanks", "blackbeard", "whitebeard"] },
+];
+
+export const HARBOR_ENCOUNTERS: GameContent["harborEncounters"] = [
+  { id: "usopp-supplies", name: "Usopp's Supply Stop", portraitUnitId: "usopp", rounds: [16, 21], goldCost: 0, offerCount: 3 },
+  { id: "franky-workshop", name: "Franky's Workshop", portraitUnitId: "franky", rounds: [18, 23], goldCost: 2, offerCount: 2 },
+];
+
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.31.0",
+  version: "1.32.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,
@@ -2643,6 +2653,9 @@ export const DEFAULT_CONTENT: GameContent = {
   enemies: PVE_ENEMY_DEFINITIONS,
   stages: STAGE_DEFINITIONS,
   botPersonalities: BOT_PERSONALITIES,
+  recruitmentRoutes: RECRUITMENT_ROUTES,
+  harborEncounters: HARBOR_ENCOUNTERS,
+  voyageTiming: { recruitmentSeconds: 23, harborBaseSeconds: 21, harborPerPlayerSeconds: 2 },
   config: GAME_CONFIG,
 };
 

@@ -8,7 +8,9 @@ import {
   CURRENT_SAVE_SCHEMA_VERSION,
   CAROUSEL_TICK_MS,
   advanceMatchPhase,
-  createMatch,
+  createVoyage,
+  getHarborEncounter,
+  harborDurationSeconds,
   getActiveTraits,
   getActiveTraitsForUnits,
   getItemDefinition,
@@ -22,6 +24,7 @@ import {
   type BotTurnObserver,
   type MatchBattleResult,
   type MatchState,
+  type VoyageChoiceReceipt,
   type PlayerState,
   type StageDefinition,
   type UnitFormLifecycle,
@@ -287,6 +290,7 @@ export type CaptainDamagePacingReport = CaptainDamageSummary & {
 };
 
 export type ProductionSoakReport = {
+  voyageChoices: ReturnType<typeof summarizeVoyageChoices>;
   generatedAt: string;
   gitSha: string;
   nodeVersion: string;
@@ -688,6 +692,8 @@ const ITEM_ACQUISITION_SOURCES = [
   "pveChoice",
   "supplyChoice",
   "carousel",
+  "harborGift",
+  "harborTrade",
 ] as const;
 
 type ItemAcquisitionSource = (typeof ITEM_ACQUISITION_SOURCES)[number];
@@ -730,6 +736,7 @@ function itemAcquisitionSource(
   stage: StageDefinition,
 ): ItemAcquisitionSource | null {
   if (phase === "carousel") return "carousel";
+  if (phase === "harbor-choice") return getHarborEncounter(stage.round, DEFAULT_CONTENT)?.goldCost ? "harborTrade" : "harborGift";
   const reward = stage.itemReward;
   if (!reward) return null;
   if (phase === "item-choice" && reward.mode === "choice") {
@@ -1482,6 +1489,24 @@ export function normalizeProductionSoakPopulation(
   });
 }
 
+export function summarizeVoyageChoices(receipts: readonly VoyageChoiceReceipt[], budget = { starter: 0, harbor: 0 }) {
+  const byKind = { starter: 0, recruitment: 0, harbor: 0 };
+  const byEncounter: MutableCounter = {};
+  const byRoute: MutableCounter = {};
+  let goldSpent = 0, convertedGold = 0, gifts = 0, purchases = 0, skips = 0;
+  for (const receipt of receipts) {
+    byKind[receipt.kind] += 1;
+    goldSpent += receipt.paidGold;
+    convertedGold += receipt.convertedGold;
+    if (receipt.skipped) skips += 1;
+    if (receipt.encounterId) increment(byEncounter, receipt.encounterId);
+    if (receipt.routeId) increment(byRoute, receipt.routeId);
+    if (receipt.kind === "harbor" && !receipt.skipped) { if (receipt.paidGold) purchases += 1; else gifts += 1; }
+  }
+  return { receiptCount: receipts.length, byKind, byEncounter, byRoute, goldSpent, convertedGold, gifts, purchases, skips,
+    b07AdditionalTimedBudgetSeconds: { ...budget }, legacyClockEstimatesExcludeB07ChoiceBudgets: true };
+}
+
 export function runProductionSoak(
   seedCount = 50,
   options: ProductionSoakOptions = {},
@@ -1491,6 +1516,8 @@ export function runProductionSoak(
   }
 
   const rounds: number[] = [];
+  const voyageReceipts: VoyageChoiceReceipt[] = [];
+  const b07ChoiceBudget = { starter: 0, harbor: 0 };
   const fullClockSeconds: number[] = [];
   const pacedSeconds: number[] = [];
   const characterBoards: MutableCounter = {};
@@ -1594,7 +1621,7 @@ export function runProductionSoak(
 
   for (let seedIndex = 0; seedIndex < seedCount; seedIndex += 1) {
     try {
-      let state = createMatch(`production-${seedIndex}`, DEFAULT_CONTENT);
+      let state = createVoyage(`production-${seedIndex}`, DEFAULT_CONTENT);
       normalizeProductionSoakPopulation(state, seedIndex);
       participantPlayerMatches += state.players.length;
       const matchItemAcquisitions = new Map(
@@ -1619,6 +1646,8 @@ export function runProductionSoak(
       let fullSeconds = 0;
       let paced = 0;
       while (state.phase !== "game-over" && transitions < 400) {
+        if (state.phase === "starter-choice") b07ChoiceBudget.starter += DEFAULT_CONTENT.voyageTiming.recruitmentSeconds;
+        if (state.phase === "harbor-choice") b07ChoiceBudget.harbor += harborDurationSeconds(state.players.filter(player => player.alive).length, DEFAULT_CONTENT);
         if (
           state.players.filter((player) => player.alive).length >= 2 &&
           CAPTAIN_DAMAGE_STAGE_REACH_ROUNDS.some(
@@ -1822,6 +1851,7 @@ export function runProductionSoak(
         );
       }
       completeMatches += 1;
+      voyageReceipts.push(...state.voyageChoiceHistory);
       for (const traitId of traitsReachedInMatch) {
         increment(traitMatchReach, traitId);
       }
@@ -2311,6 +2341,7 @@ export function runProductionSoak(
     averageRounds: average(rounds),
     averageFullClockMinutes,
     averagePacedMinutes,
+    voyageChoices: summarizeVoyageChoices(voyageReceipts, b07ChoiceBudget),
     battleCount,
     timeoutRate: timeouts / Math.max(1, battleCount),
     drawRate: draws / Math.max(1, battleCount),
