@@ -1,5 +1,11 @@
 # B07 — First crew, recruitment routes and harbor encounters
 
+Current B09 extension: Usopp now offers two components plus one food; Franky
+one component plus one food. Total offers, prices, timing and skip remain the
+same. Existing saved component-only offers are retained exactly. The original
+B07 implementation/evidence below describes its historical component-only
+harness; see [B09 food](B09_FOOD_CONSUMABLES.md) for the current lifecycle.
+
 ## Locked local contract
 
 Owner requested merge of all completed work, then B07. PRs #68 → #65 → #64

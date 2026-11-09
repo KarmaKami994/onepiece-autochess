@@ -6,6 +6,7 @@ import { createCombatReport, recordCombatEvent } from "./combatReport";
 import { useGameAudio } from "../app/useGameAudio";
 import { combatSound, DEFAULT_AUDIO_SETTINGS, type AudioSettings } from "../app/audioSettings";
 import { BattleEnvironmentLegend } from "./BattleEnvironmentLegend";
+import { DEFAULT_CONTENT, getFoodDefinition } from "../game";
 
 /** A playback observer only: neither meters nor audio feed the simulation. */
 export default function BattleBoard({ audio = DEFAULT_AUDIO_SETTINGS, ...props }: PhaserBoardProps & { audio?: AudioSettings }) {
@@ -29,6 +30,11 @@ export default function BattleBoard({ audio = DEFAULT_AUDIO_SETTINGS, ...props }
   const ordered = report.units.filter((unit) => unit.team === team).sort((a, b) => (b.hpDamage + b.shieldDamage) - (a.hpDamage + a.shieldDamage) || a.id.localeCompare(b.id));
   return <PhaserBoard {...props} onPlaybackReset={reset} onPlaybackEvent={event} onPlaybackComplete={complete} onPlaybackUnavailable={unavailable}>
     <BattleEnvironmentLegend environment={props.environment} />
+    {props.units.some(unit => unit.zone === "board" && unit.foodId) && <div className="battle-meals" aria-label="Battle meals">
+      {props.units.filter(unit => unit.zone === "board" && unit.foodId).map(unit => <span key={unit.id}>
+        {unit.name}: {getFoodDefinition(unit.foodId ?? "", DEFAULT_CONTENT)?.name ?? unit.foodId} · next-battle meal
+      </span>)}
+    </div>}
     {(props.phase === "battle" || report.elapsedMs > 0) && <details className="combat-report" aria-label="Combat contributions" data-complete={report.complete} data-elapsed-ms={report.elapsedMs}>
       <summary>COMBAT CONTRIBUTIONS · {report.complete ? "FINAL" : "PLAYBACK"} · {(report.elapsedMs / 1000).toFixed(1)}s</summary>
       <div className="combat-report-content">

@@ -1,5 +1,6 @@
 import type { BattleEvent, BattleUnitSnapshot, GameContent, PlayerState, UnitInstance } from "../game";
 import { readBattleEnvironment } from "../game/battleEnvironment";
+import { FOOD_STOCK_CAP, isFoodReceipt, isPreparedMeal } from "../game/food";
 import { ACHIEVEMENTS, MAX_REPLAY_BYTES, REPLAY_FORMAT, replayCompatible, type CaptainProfile, type CollectionFacts, type VoyageReplay } from "./chronicle";
 
 const object = (value: unknown): value is Record<string, unknown> => value !== null && typeof value === "object" && !Array.isArray(value);
@@ -13,7 +14,7 @@ const dictionary = (value: unknown, check: (entry: unknown) => boolean, max = 64
 const position = (value: unknown) => object(value) && integer(value.x) && value.x < 8 && integer(value.y) && value.y < 6;
 const unique = (values: readonly string[]) => new Set(values).size === values.length;
 const unit = (value: unknown): value is UnitInstance => object(value) && text(value.id) && text(value.definitionId) && (value.formId === undefined || text(value.formId)) && typeof value.star === "number" && [1, 2, 3].includes(value.star) && array(value.items, text, 3) && integer(value.acquiredOrder);
-const setupUnit = (value: unknown) => object(value) && unit({ ...value, acquiredOrder: 0 }) && position(value.position);
+const setupUnit = (value: unknown) => object(value) && unit({ ...value, acquiredOrder: 0 }) && (value.foodId === undefined || text(value.foodId)) && position(value.position);
 function player(value: unknown): value is PlayerState {
   if (!object(value) || !text(value.id) || !text(value.name) || !nullableText(value.personalityId)) return false;
   if (!["isBot", "alive", "shopLocked", "ready"].every((key) => typeof value[key] === "boolean")) return false;
@@ -22,13 +23,15 @@ function player(value: unknown): value is PlayerState {
   if (!dictionary(value.units, unit) || !dictionary(value.board, text, 48) || !array(value.bench, nullableText, 32) || !array(value.shop, nullableText, 16) || !strings(value.inventory) || !array(value.finalCrew, unit, 64) || !strings(value.lastOpponents)) return false;
   if (!array(value.recentBattles, (entry) => object(entry) && integer(entry.round) && text(entry.opponentId) && ["win", "loss", "draw"].includes(String(entry.outcome)) && typeof entry.isGhost === "boolean" && integer(entry.captainDamageDealt) && integer(entry.captainDamageTaken), 5)) return false;
   if (value.finalLineup !== undefined && (!object(value.finalLineup) || !array(value.finalLineup.deployed, setupUnit, 48) || !array(value.finalLineup.reserve, unit, 32))) return false;
+  if ((value.foodInventory !== undefined && !array(value.foodInventory, text, FOOD_STOCK_CAP)) ||
+    (value.pendingMeal !== undefined && !isPreparedMeal(value.pendingMeal))) return false;
   const roster = value.units as Record<string, UnitInstance>;
   const board = value.board as Record<string, string>;
   const bench = value.bench as (string | null)[];
   return Object.entries(roster).every(([id, entry]) => id === entry.id) && Object.entries(board).every(([cell, id]) => /^([0-7]),([0-5])$/.test(cell) && Object.hasOwn(roster, id)) && unique([...Object.values(board), ...bench.filter((id): id is string => id !== null)]) && bench.every((id) => id === null || Object.hasOwn(roster, id));
 }
 function snapshot(value: unknown): value is BattleUnitSnapshot {
-  return object(value) && text(value.id) && text(value.definitionId) && text(value.teamId) && (value.formId === undefined || text(value.formId)) && typeof value.star === "number" && [1, 2, 3].includes(value.star) && (value.items === undefined || array(value.items, text, 3)) && position(value) && ["hp", "maxHp", "shield", "energy", "maxEnergy", "attack", "defense", "range"].every((key) => number(value[key])) && ["seek", "move", "attack-windup", "attack-recovery", "cast", "stunned", "resurrecting", "dead"].includes(String(value.state));
+  return object(value) && text(value.id) && text(value.definitionId) && text(value.teamId) && (value.formId === undefined || text(value.formId)) && (value.foodId === undefined || text(value.foodId)) && typeof value.star === "number" && [1, 2, 3].includes(value.star) && (value.items === undefined || array(value.items, text, 3)) && position(value) && ["hp", "maxHp", "shield", "energy", "maxEnergy", "attack", "defense", "range"].every((key) => number(value[key])) && ["seek", "move", "attack-windup", "attack-recovery", "cast", "stunned", "resurrecting", "dead"].includes(String(value.state));
 }
 function event(value: unknown): value is BattleEvent {
   if (!object(value) || !integer(value.tick) || value.tick > 100_000) return false;
@@ -62,14 +65,19 @@ export function validateReplay(raw: unknown, content: GameContent): VoyageReplay
   const validEnvironment = (value: unknown) => value === undefined || readBattleEnvironment(value, content.config.boardWidth, content.config.boardHeight) !== null;
   if (!object(raw) || raw.format !== REPLAY_FORMAT || raw.formatVersion !== 1 || !text(raw.id) || !text(raw.seed) || !text(raw.playerId) || !text(raw.contentVersion) || !text(raw.contentHash) || !text(raw.configHash) || !integer(raw.schemaVersion) || !number(raw.startedAt) || !(raw.completedAt === null || number(raw.completedAt)) || typeof raw.fromStart !== "boolean" || !collection(raw.collection)) throw new Error("Unsupported or malformed voyage replay.");
   const battle = (value: unknown) => object(value) && validEnvironment(value.environment) && text(value.playerAId) && nullableText(value.playerBId) && nullableText(value.ghostOfPlayerId) && nullableText(value.winnerId) && typeof value.timedOut === "boolean" && integer(value.playerADamage) && integer(value.playerBDamage) && integer(value.durationTicks) && value.durationTicks <= 100_000 && array(value.initialUnits, snapshot, 48) && array(value.finalUnits, snapshot, 48) && array(value.events, event, 100_000);
-  const harborOffer = (value: unknown) => object(value) && text(value.id) && text(value.itemId) && integer(value.goldCost);
+  const harborOffer = (value: unknown) => object(value) && text(value.id) && integer(value.goldCost) &&
+    (value.kind === "food" ? text(value.foodId) && value.itemId === undefined :
+      (value.kind === undefined || value.kind === "item") && text(value.itemId) && value.foodId === undefined);
   const receipt = (value: unknown) => object(value) && integer(value.round) && value.round >= 1 && text(value.playerId) &&
     ["starter", "recruitment", "harbor"].includes(String(value.kind)) && text(value.choiceId) && integer(value.paidGold) && integer(value.convertedGold) && typeof value.skipped === "boolean" &&
-    ["definitionId", "itemId", "encounterId", "routeId"].every(key => value[key] === undefined || text(value[key]));
+    ["definitionId", "itemId", "foodId", "encounterId", "routeId"].every(key => value[key] === undefined || text(value[key])) && !(value.itemId && value.foodId);
   const frame = (value: unknown) => object(value) && integer(value.round) && value.round >= 1 && value.round <= 200 && ["preparation", "battle", "item-choice", "voyage-choice", "starter-choice", "harbor-choice", "carousel", "game-over"].includes(String(value.phase)) && text(value.stageId) && array(value.players, player, 8) && value.players.length > 0 && dictionary(value.itemOffers, strings, 8) && dictionary(value.recruitOffers, strings, 8) && array(value.battles, battle, 8) &&
     (value.harborOffers === undefined || dictionary(value.harborOffers, offers => array(offers, harborOffer, 3), 8)) &&
-    (value.recruitmentRoutes === undefined || dictionary(value.recruitmentRoutes, text, 8)) && validEnvironment(value.environment);
+    (value.recruitmentRoutes === undefined || dictionary(value.recruitmentRoutes, text, 8)) &&
+    (value.battleMeals === undefined || dictionary(value.battleMeals, isPreparedMeal, 8)) && validEnvironment(value.environment);
   if (raw.choiceHistory !== undefined && !array(raw.choiceHistory, receipt, 64)) throw new Error("Invalid voyage choice receipts.");
+  if (raw.foodHistory !== undefined && (!array(raw.foodHistory, isFoodReceipt, 128) ||
+    !unique(raw.foodHistory.map(entry => isFoodReceipt(entry) ? entry.id : "")))) throw new Error("Invalid food receipts.");
   if (!array(raw.frames, frame, 1000) || !raw.frames.length) throw new Error("Invalid replay checkpoints or battle events.");
   // The complete structural checks above narrow every field consumed by the viewer.
   const replay = structuredClone(raw) as VoyageReplay;
@@ -108,12 +116,20 @@ export function validateReplay(raw: unknown, content: GameContent): VoyageReplay
     const enemies = new Set(content.enemies.map((entry) => entry.id));
     const items = new Set(content.items.map((entry) => entry.id));
     const forms = new Set(content.forms.map((entry) => entry.id));
+    const foods = new Set((content.foods ?? []).map(entry => entry.id));
+    if (replay.foodHistory?.some(entry => !foods.has(entry.foodId))) throw new Error("Unknown food receipt content.");
+    if (replay.choiceHistory?.some(entry => entry.foodId && !foods.has(entry.foodId))) throw new Error("Unknown food choice content.");
     for (const frame of replay.frames) {
       const owned = frame.players.flatMap((entry) => [...Object.values(entry.units), ...entry.finalCrew, ...(entry.finalLineup?.deployed ?? []), ...(entry.finalLineup?.reserve ?? [])]);
       if (owned.some((entry) => !crew.has(entry.definitionId) || entry.items.some((id) => !items.has(id)) || (entry.formId && !forms.has(entry.formId)))) throw new Error("Unknown crew, form or item in compatible replay.");
+      if (frame.players.some(entry => entry.foodInventory?.some(id => !foods.has(id)) ||
+        (entry.pendingMeal && (!foods.has(entry.pendingMeal.foodId) || entry.pendingMeal.round !== frame.round))) ||
+        Object.values(frame.battleMeals ?? {}).some(meal => !foods.has(meal.foodId) || meal.round !== frame.round) ||
+        Object.values(frame.harborOffers ?? {}).flat().some(offer => offer.kind === "food" ? !foods.has(offer.foodId) : !items.has(offer.itemId)) ||
+        frame.players.some(entry => entry.finalLineup?.deployed.some(unit => unit.foodId && !foods.has(unit.foodId)))) throw new Error("Unknown food or harbor content.");
       if (frame.players.some((entry) => entry.shop.some((id) => id !== null && !crew.has(id)) || entry.inventory.some((id) => !items.has(id))) || Object.values(frame.itemOffers).flat().some((id) => !items.has(id)) || Object.values(frame.recruitOffers).flat().some((id) => !crew.has(id))) throw new Error("Unknown offer or inventory content in compatible replay.");
       if (frame.battles.some((battle) => battle.events.some((entry) => entry.type === "unit-transform" && !forms.has(entry.toFormId)))) throw new Error("Unknown transformation content.");
-      if (frame.battles.flatMap((entry) => [...entry.initialUnits, ...entry.finalUnits]).some((entry) => (!crew.has(entry.definitionId) && !enemies.has(entry.definitionId)) || (entry.items ?? []).some((id) => !items.has(id)) || (entry.formId && !forms.has(entry.formId)))) throw new Error("Unknown battle content.");
+      if (frame.battles.flatMap((entry) => [...entry.initialUnits, ...entry.finalUnits]).some((entry) => (!crew.has(entry.definitionId) && !enemies.has(entry.definitionId)) || (entry.items ?? []).some((id) => !items.has(id)) || (entry.foodId && !foods.has(entry.foodId)) || (entry.formId && !forms.has(entry.formId)))) throw new Error("Unknown battle content.");
     }
   }
   return replay;

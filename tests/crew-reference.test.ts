@@ -8,7 +8,7 @@ import { createItemView, createUnitReferenceView } from "../app/selectors";
 describe("content-driven crew reference", () => {
   it("covers all crew, items, recipes, bonds, forms and PvE without missing presentation assets", () => {
     const entries = crewReference(DEFAULT_CONTENT);
-    for (const [category, expected] of [["crew", 34], ["items", 65], ["traits", 13], ["forms", 4], ["status", 8], ["pve", DEFAULT_CONTENT.enemies.length], ["rounds", 40]] as const) {
+    for (const [category, expected] of [["crew", 34], ["items", 65], ["food", 3], ["traits", 13], ["forms", 4], ["status", 12], ["pve", DEFAULT_CONTENT.enemies.length], ["rounds", 40]] as const) {
       expect(entries.filter((entry) => entry.category === category)).toHaveLength(expected);
     }
     for (const entry of entries) if (entry.imagePath) expect(existsSync(path.join(process.cwd(), "public", entry.imagePath))).toBe(true);

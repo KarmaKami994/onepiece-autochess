@@ -1,0 +1,25 @@
+{
+  "author": "One Piece Auto Chess project",
+  "permission": "Original project-authored vector artwork; no external sheet, tracing or downloaded image.",
+  "sourcePath": "art/ui-icons/food-icons.json",
+  "sourceSha256": "9bc8f8b30573a6deb4870a661daffe736de024a36f9abe60cf367d6613b3a6db",
+  "generatorPath": "scripts/assets/build_food_icons.mjs",
+  "generatorSha256": "e7735f6dc7636e08ebeba8743b611f85df759837992446d6bcd2b11a60c4ca54",
+  "outputs": [
+    {
+      "id": "sea-king-bento",
+      "path": "public/assets/food/sea-king-bento.svg",
+      "sha256": "e839327aa7fd40bae91e2fbc2d6bef37442836e97d9529921da73dcce69d0107"
+    },
+    {
+      "id": "cola-tonic",
+      "path": "public/assets/food/cola-tonic.svg",
+      "sha256": "e4a86dc10243c388fbc06b4e80424df5c11c1286e504f5889175831e974c81f6"
+    },
+    {
+      "id": "pirate-curry",
+      "path": "public/assets/food/pirate-curry.svg",
+      "sha256": "c41d7c16b38b5650d796306c6e1e1efef336d28ff581db9b5fe24688f50288d6"
+    }
+  ]
+}

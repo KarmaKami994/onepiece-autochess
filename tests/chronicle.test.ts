@@ -50,7 +50,7 @@ describe("B04 bounded non-authoritative recording", () => {
     steps[0].players[0].gold = 999;
     expect(replay.frames[0].players[0].gold).not.toBe(999);
     expect(observeVoyage(replay, steps[2], 999)).toBe(replay);
-    expect(DEFAULT_CONTENT.version).toBe("1.33.0"); expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
+    expect(DEFAULT_CONTENT.version).toBe("1.34.0"); expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 
   it("replaces same-phase snapshots but preserves original battle fighters through live economy", () => {

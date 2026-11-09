@@ -14,6 +14,7 @@ import {
 import { selectStageItemReward } from "./itemRewards";
 import { prepareStarterOffers, prepareVoyageRecruitOffers, resolveVoyageRecruit, skipReservedRecruit } from "./voyageRecruitment";
 import { getHarborEncounter, prepareHarborOffers, resolveHarborOffer } from "./voyageEncounters";
+import { canReceiveFood, foodUseError, freezeBattleMeals, mealForUnit, serveFood } from "./food";
 import {
   reconcileProductionFormProgression,
   resolvePersistentFormId,
@@ -100,6 +101,7 @@ import type {
   MatchPhase,
   MatchState,
   PlayerState,
+  PreparedMeal,
   Position,
   UnitDestination,
   UnitInstance,
@@ -156,6 +158,7 @@ function createPlayer(
     shop: Array.from({ length: content.config.shopSize }, () => null),
     shopLocked: false,
     inventory: [],
+    foodInventory: [],
     finalCrew: [],
     ready: false,
     winStreak: 0,
@@ -197,6 +200,8 @@ export function createMatch(
     pendingRecruitmentRoutes: {},
     pendingHarborOffers: {},
     voyageChoiceHistory: [],
+    foodHistory: [],
+    battleMeals: {},
     carouselChoices: [],
     carouselSession: null,
     winnerId: null,
@@ -380,6 +385,7 @@ function playerBattleTeam(
   side: "a" | "b",
   content: GameContent,
   overrideId: string | null = null,
+  meal?: PreparedMeal,
 ): BattleTeam {
   const units: BattleSetupUnit[] = Object.entries(player.board)
     .sort(([left], [right]) => left.localeCompare(right))
@@ -397,6 +403,7 @@ function playerBattleTeam(
           ...(formId ? { formId } : {}),
           star: instance.star,
           items: [...instance.items],
+          ...(mealForUnit(meal, instance.id) ? { foodId: meal?.foodId } : {}),
           position:
             side === "a"
               ? position
@@ -468,12 +475,13 @@ function simulateExistingPvpPairings(
     const ghostTeamId = pairing.playerBId
       ? opponent.id
       : `ghost-${opponent.id}`;
-    const teamA = playerBattleTeam(playerA, "a", content);
+    const teamA = playerBattleTeam(playerA, "a", content, null, state.battleMeals?.[playerA.id]);
     const teamB = playerBattleTeam(
       opponent,
       "b",
       content,
       pairing.playerBId ? null : ghostTeamId,
+      state.battleMeals?.[opponent.id],
     );
     const result = simulateBattle(
       teamA,
@@ -523,7 +531,7 @@ function simulatePveRound(
   for (const player of state.players.filter((candidate) => candidate.alive)) {
     const enemyTeam = pveBattleTeam(state, player.id, content);
     const result = simulateBattle(
-      playerBattleTeam(player, "a", content),
+      playerBattleTeam(player, "a", content, null, state.battleMeals?.[player.id]),
       enemyTeam,
       {
         seed: `${state.seed}:pve:${state.round}:${player.id}`,
@@ -590,6 +598,7 @@ function beginBattle(
     autoChooseBotVoyageRecruits(next, content);
     return next;
   }
+  freezeBattleMeals(next, content);
   if (stage.kind === "pve") {
     simulatePveRound(next, content);
   } else {
@@ -614,6 +623,7 @@ function captureFinalLineup(state: MatchState, player: PlayerState): void {
       ...(unit.formId ? { formId: unit.formId } : {}),
       star: unit.star,
       items: [...(unit.items ?? [])],
+      ...(unit.foodId ? { foodId: unit.foodId } : {}),
       position: { x: unit.x, y: unit.y },
     })),
     reserve: player.bench.flatMap((id) => {
@@ -868,9 +878,13 @@ function resolveHarborChoices(state: MatchState, content: GameContent, botsOnly:
     const offers = state.pendingHarborOffers[player.id];
     if (!offers) continue;
     const personality = botPersonality(player, content);
-    const eligible = offers.filter(offer => !offer.goldCost ||
-      (player.gold - offer.goldCost >= personality.economyReserve && itemScore(offer.itemId, player, content) > 0));
-    const selected = [...eligible].sort((left, right) => itemScore(right.itemId, player, content) -
+    const wantsFood = !(player.foodInventory?.length) && canReceiveFood(player) && Object.values(player.board).some(id =>
+      player.units[id]?.items.some(itemId => getItemDefinition(itemId, content)?.kind === "completed"));
+    const food = wantsFood ? offers.find(offer => offer.kind === "food" && player.gold >= offer.goldCost &&
+      (!offer.goldCost || player.gold - offer.goldCost >= personality.economyReserve)) : undefined;
+    const eligible = offers.filter((offer): offer is Extract<typeof offer, { itemId: string }> => offer.kind !== "food")
+      .filter(offer => !offer.goldCost || (player.gold - offer.goldCost >= personality.economyReserve && itemScore(offer.itemId, player, content) > 0));
+    const selected = food ?? [...eligible].sort((left, right) => itemScore(right.itemId, player, content) -
       itemScore(left.itemId, player, content) || left.itemId.localeCompare(right.itemId) || left.id.localeCompare(right.id))[0];
     resolveHarborOffer(state, player, selected?.id ?? "skip", content);
   }
@@ -1427,6 +1441,7 @@ function beginNextRound(
   state.pendingVoyageRecruitOffers = {};
   state.pendingRecruitmentRoutes = {};
   state.pendingHarborOffers = {};
+  state.battleMeals = {};
   state.carouselChoices = [];
   state.carouselSession = null;
   const stage = getStageDefinition(state.round, content);
@@ -2393,6 +2408,14 @@ export function runBotTurn(
 
   next = arrangeBotBoard(next, playerId, content);
   next = equipBotInventory(next, playerId, content, diagnostic?.itemDecisions);
+  const foodPlayer = findPlayer(next, playerId);
+  const foodId = [...(foodPlayer?.foodInventory ?? [])].sort()[0];
+  const mealTarget = foodPlayer && Object.values(foodPlayer.board).flatMap(id => foodPlayer.units[id] ? [foodPlayer.units[id]] : [])
+    .sort((a, b) => botInstanceScore(b, foodPlayer, personality, content) - botInstanceScore(a, foodPlayer, personality, content) || a.id.localeCompare(b.id))[0];
+  if (foodPlayer && foodId && mealTarget && !foodPlayer.pendingMeal) {
+    const served = applyCommand(next, { type: "USE_FOOD", foodId, unitId: mealTarget.id }, { actorPlayerId: playerId }, content);
+    if (served.ok) next = served.state;
+  }
   const readyResult = applyCommand(
     next,
     { type: "END_PREPARATION" },
@@ -2531,6 +2554,7 @@ function commandAllowedInPhase(
     case "SELL_UNIT":
       return phase === "preparation" || phase === "battle";
     case "EQUIP_ITEM":
+    case "USE_FOOD":
     case "END_PREPARATION":
       return phase === "preparation";
     default:
@@ -2756,6 +2780,12 @@ export function applyCommand(
       player.inventory.splice(inventoryIndex, 1);
       unit.items.push(incomingItem.id);
       reconcileProductionFormProgression(unit, content);
+      return { ok: true, state: next };
+    }
+    case "USE_FOOD": {
+      const error = foodUseError(next, player, command.foodId, command.unitId, content);
+      if (error) return commandFailure(state, "INVALID_FOOD_USE", error);
+      serveFood(next, player, command.foodId, command.unitId, content);
       return { ok: true, state: next };
     }
     case "END_PREPARATION": {

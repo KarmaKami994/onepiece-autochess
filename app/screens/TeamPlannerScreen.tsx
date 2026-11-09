@@ -49,6 +49,11 @@ function TeamEditor({ side, plan, content, update }: { side: "a" | "b"; plan: Te
       {Array.from({ length: content.config.itemCap }, (_, slot) => <label key={slot}>{label} item {slot + 1}<select value={selected.items[slot] ?? ""} onChange={(event) => {
         const items = [...selected.items]; items[slot] = event.target.value; edit({ items: items.filter(Boolean) });
       }}><option value="">Empty</option>{content.items.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.kind}</option>)}</select></label>)}
+      <label>{label} meal<select value={selected.foodId ?? ""} onChange={event => {
+        const foodId = event.target.value || undefined;
+        update(units.map(unit => unit.id === selected.id ? { ...unit, foodId } : { ...unit, foodId: foodId ? undefined : unit.foodId }));
+      }}><option value="">No food</option>{(content.foods ?? []).map(food => <option key={food.id} value={food.id}>{food.name} · {food.description}</option>)}</select></label>
+      <p>One practice meal per team; this does not consume voyage stock.</p>
       <label>{label} column<select value={selected.position.x} onChange={(event) => edit({ position: { ...selected.position, x: Number(event.target.value) } })}>{Array.from({ length: content.config.boardWidth }, (_, x) => <option key={x} value={x}>{x + 1}</option>)}</select></label>
       <label>{label} row<select value={selected.position.y} onChange={(event) => edit({ position: { ...selected.position, y: Number(event.target.value) } })}>{Array.from({ length: content.config.deployRows }, (_, i) => content.config.boardHeight - content.config.deployRows + i).map((y) => <option key={y} value={y}>{y + 1}</option>)}</select></label>
       <button type="button" onClick={() => { update(units.filter((unit) => unit.id !== selected.id)); setSelectedId(null); }}>Remove selected crew from {label}</button>

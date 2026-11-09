@@ -12,6 +12,7 @@ import {
 } from "@/components/PhaserBoard";
 import BattleBoard from "@/components/BattleBoard";
 import PhaseClockDisplay from "../PhaseClockDisplay";
+import { GalleyTray } from "../GalleyTray";
 import { MUSIC_TRACKS, type AudioSettings } from "../audioSettings";
 import PhaserCarousel, {
   type CarouselPresentationSnapshot,
@@ -694,6 +695,7 @@ export function MatchScreen({
   onBuyXp,
   onSellSelected,
   onEquipItem,
+  onServeFood,
   onChangeSettings,
   onAdvance,
   onSettings,
@@ -724,6 +726,7 @@ export function MatchScreen({
   onBuyXp: () => void;
   onSellSelected: () => void;
   onEquipItem: (itemId: string) => void;
+  onServeFood: (foodId: string) => void;
   onChangeSettings: (settings: Settings) => void;
   onAdvance: () => void;
   onSettings: () => void;
@@ -867,6 +870,8 @@ export function MatchScreen({
         />
         <div className="left-rail">
           <TraitsPanel traits={tacticalTraits} />
+          {!observing && <GalleyTray galley={view.galley} units={view.boardUnits} selected={selectedUnit}
+            planning={planning} onSelect={onSelectUnit} onServe={onServeFood} />}
           {scoutedStanding ? (
             <ScoutIntelPanel standing={scoutedStanding} itemsById={view.itemsById} />
           ) : (
@@ -2166,9 +2171,10 @@ export function HarborScreen({ harbor, round, gold, timer, phaseDuration, clockL
       <p className="pacing-help">At zero the Log Pose picks a legal crew-fit gift, or skips paid offers that would breach your reserve.</p>
     </header>
     <div className="reward-cards">{harbor.offers.map((offer, index) => <button type="button" className="reward-card" key={offer.id}
-      disabled={offer.disabled} onClick={() => onChoose(offer.id)} title={offer.disabled ? "Not enough gold" : undefined}>
+      disabled={offer.disabled} onClick={() => onChoose(offer.id)} title={offer.disabledReason ?? undefined}>
       <kbd>{index + 1}</kbd><VisualIcon className="treasure-icon" imagePath={offer.imagePath} fallback={offer.icon} />
-      <strong>{offer.name}</strong><p>{offer.description}</p><small>{offer.goldCost ? `${offer.goldCost} GOLD` : "FREE GIFT"}</small>
+      <strong>{offer.name}</strong><p>{offer.description}</p>{offer.isFood && <p>FOOD · Stored in your galley (3 portions max). One meal for the next battle; no equipment slot.</p>}
+      {offer.disabledReason && <p>{offer.disabledReason}</p>}<small>{offer.goldCost ? `${offer.goldCost} GOLD` : "FREE GIFT"}</small>
       <span className="choose-label">{offer.goldCost ? "BUY SUPPLY" : "TAKE GIFT"}</span></button>)}</div>
     <button type="button" className="text-button" onClick={() => onChoose("skip")}>SAIL ON WITHOUT SUPPLIES</button>
   </section>;

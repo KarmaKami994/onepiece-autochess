@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { b07ReferenceContent } from "../fixtures/b07-content";
 import {
   CURRENT_SAVE_SCHEMA_VERSION,
   DEFAULT_CONTENT,
@@ -220,7 +221,7 @@ describe("P9 four-character expansion content", () => {
         assetPath: "/assets/characters/whitebeard.png",
       },
     } as const;
-    expect(DEFAULT_CONTENT.version).toBe("1.33.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.34.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(DEFAULT_CONTENT.units.filter((unit) => P9_ID_SET.has(unit.id)).map((unit) => unit.id))
       .toEqual(P9_IDS);
@@ -270,7 +271,8 @@ describe("P9 four-character expansion content", () => {
   });
 
   it("preserves the pre-P9 gameplay projection of all 30 existing definitions", () => {
-    const projection = DEFAULT_CONTENT.units
+    // Keep the exact historical anchor; B08's Kuzan Freeze substitution has its own production assertions.
+    const projection = b07ReferenceContent().units
       .filter((unit) => !P9_ID_SET.has(unit.id))
       .map(({ id, cost, traits, stats, ability }) => ({ id, cost, traits, stats, ability }));
     expect(projection).toHaveLength(30);
@@ -470,7 +472,7 @@ describe("P9 economy, items, bots, save, and P8 integration", () => {
       "historical-unknown": 3,
     });
     expect(restored).toMatchObject({
-      contentVersion: "1.33.0",
+      contentVersion: "1.34.0",
       schemaVersion: 6,
       round: 17,
       phase: anchors.phase,

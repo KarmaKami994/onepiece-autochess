@@ -91,7 +91,7 @@ async function expectFile(relativePath: string): Promise<void> {
 
 describe("P7 major asset production", () => {
   it("completes real static and preferred v2 presentation for all crew", async () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.33.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.34.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(DEFAULT_CONTENT.units).toHaveLength(34);
     expect(DEFAULT_CONTENT.units.some((unit) =>
@@ -158,14 +158,14 @@ describe("P7 major asset production", () => {
     }
   });
 
-  it("pins the cumulative content contract after B08 status/weather", () => {
+  it("pins the cumulative content contract after B09 food", () => {
     const normalized = JSON.stringify(DEFAULT_CONTENT, (key, value) =>
       ["version", "assetPath", "presentation"].includes(key)
         ? undefined
         : value,
     );
     expect(createHash("sha256").update(normalized).digest("hex"))
-      .toBe("7946a123016fdcceeb1e2f3b01fe4fb74f5db118fd53f1c3b33befa5f246cbed");
+      .toBe("6bf4b1a2b130dc9699b047926be72a60587f6275d315713f0c32a9e128198613");
   });
 
   it("maps all 65 item identities and preserves recipes and glyph fallback", async () => {
@@ -236,7 +236,7 @@ describe("P7 major asset production", () => {
       `public/assets/forms/${id}/overlay.svg`,
     ]));
 
-    expect(files).toHaveLength(65 + 13 + 8 + 12);
+    expect(files).toHaveLength(65 + 13 + 12 + 12);
     for (const file of files) {
       const source = await readFile(path.join(projectRoot, file), "utf8");
       const lower = source.toLowerCase();
