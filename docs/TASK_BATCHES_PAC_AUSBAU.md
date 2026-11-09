@@ -4,7 +4,7 @@ Stand: **04.11.2026**. Grundlage: [Offene Features und PAC-Abgleich](OFFENE_FEAT
 
 Dieses Dokument teilt die verbleibenden Anforderungen in **neun größere, zusammenhängende Arbeitspakete** auf. Es ist die Planung für spätere Aufträge; in diesem Schritt wird ausschließlich diese Liste erstellt.
 
-**Fortschritt:** B01 ist gemerged ([PR #59](https://github.com/KarmaKami994/onepiece-autochess/pull/59), [Abschluss](B01_RESULTS_COMPLETION.md)). B02 ist implementiert ([Abschluss](B02_CODEX_TEAM_PLANNER.md)); Verifikation und Review-Stand stehen in `PROJECT_STATE.md`. B03–B09 sind offen; ihre Umsetzung beginnt nur mit einem eigenen Auftrag.
+**Fortschritt 09.11.2026:** B01–B09 sind abgearbeitet und gemergt; B05 ist als Diagnose-/Bewertungsauftrag abgeschlossen, beide Tuning-Kandidaten wurden verworfen. B09 / [PR #71](https://github.com/KarmaKami994/onepiece-autochess/pull/71) wurde nach grüner CI #178 als `74cea3577eba98a07911b2d488abd3ece20b373d` squash-gemergt. Details und historische Prüfstände stehen in `PROJECT_STATE.md`. Der neue [Asset-Plan B10–B12](ASSET_STRATEGIE_UND_BATCHES_10_12.md) ist vorbereitet; seine Umsetzung beginnt erst mit einem eigenen Auftrag.
 
 ## Umfang
 
@@ -264,13 +264,14 @@ Typecheck/Lint/Build/Assets, fokussierte 78/78 plus betroffene 54/54 und Food-E2
 6/6 in beiden Größen sind grün; Hafen/Tools 12/12. Der einmalige volle lokale
 Lauf fand vier übernommene B08-Testgrundlagenfehler (945/949), die gezielt
 korrigiert wurden. Normale PR-CI prüft die finale Gesamtsuite; kein lokaler
-Produktionslauf oder neuer Messbericht. Noch nicht gemergt.
+Produktionslauf oder neuer Messbericht. Am 09.11.2026 nach grüner CI #178 über
+PR #71 als `74cea3577eba98a07911b2d488abd3ece20b373d` squash-gemergt.
 CI #177 bestätigte 949/949 Unit-/Coverage-Tests, Assets, 50/50 normalen Smoke
 ohne Crash und Build. Zwei übernommene Wetter-Klickfälle erforderten eine enge
 CSS-Korrektur außerhalb der linken Leiste; Food liegt nun unter den Reglern.
 Betroffene Browserfälle bestanden nach einer unveränderten Wiederholung des
-bestehenden Reiseablauffalls; finale Food-Platzierung 2/2. PR #71 bleibt das
-Review-/CI-Gate; keine weiteren lokalen Tests oder Gameplay-Änderungen.
+bestehenden Reiseablauffalls; finale Food-Platzierung 2/2. Die nachfolgende
+finale CI #178 wurde vollständig grün; keine weitere Gameplay-Änderung.
 
 **Ziel:** Ein zusammenhängender One-Piece-Food-Mechanismus erweitert die Reise mit verständlicher Beschaffung, Verwendung und Wirkung.
 

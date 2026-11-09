@@ -23,10 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-B08 / PR #70 squash-merged at the owner's explicit request into main `e564e59b580a0238e309e61310231649f2b21094`. B09 is published as [PR #71](https://github.com/KarmaKami994/onepiece-autochess/pull/71) on `codex/b09-food-consumables`. Initial checked implementation `1438f03`; CI then required the narrow overlay correction below. Local checks completed after explicit approval; latest exact-head normal CI is recorded in the PR's [checks](https://github.com/KarmaKami994/onepiece-autochess/pull/71/checks). Main content `1.33.0`, B09 `1.34.0`, schema 6. No local aggregate/baseline, soak or tuning; B09 is not merged.
+B01–B09 feature deliveries/evaluations are closed; B05's two tuning candidates remain rejected. B09 / PR #71 was squash-merged on 2026-11-09 as `74cea3577eba98a07911b2d488abd3ece20b373d` after completed green CI #178 on exact head `569edbdf059db6945db2c03f9fdb6105495c1ce9`; local/origin main match that squash. Current task: documentation-only asset strategy and three future batches B10–B12 on `codex/asset-production-strategy`, in `docs/ASSET_STRATEGIE_UND_BATCHES_10_12.md`. Main content `1.34.0`, schema 6. No new asset generation, implementation, test run, tuning or baseline in this planning task.
 
 ## Last Completed Work
 
+- 2026-11-09 — Merged exact B09 head `569edbdf059db6945db2c03f9fdb6105495c1ce9` through PR #71 with completed green CI #178; squash `74cea3577eba98a07911b2d488abd3ece20b373d`. Local main fast-forwarded and equals origin/main. Then prepared the requested fixed asset-production strategy and B10/B11/B12 task batches: standard/pilots, missing character/form/PvE animation, item/Food/UI icon production. Source/metadata/contact-sheet inspection found five 2–4-pose sheets reused over 46 slots and four forms without own body atlases; no new assets created. Material files: new asset strategy, batch-plan progress header/B09 closure, this state. No implementation or new checks/CI for the planning document.
 - 2026-11-06 — CI #177 confirmed 949/949 unit tests, coverage, assets, normal 50-match smoke (50 complete / 0 crashes), build and dependency review; coverage's existing 30-second audit timeout passed on one unchanged job retry. Browser found two B08 weather-disclosure clicks hidden by the left rail. Corrected only overlay CSS; also kept the Food badge below playback controls with a new geometry assertion. Local affected weather/Food/combat-report/full-voyage run: 19/20; unchanged failed voyage case passed once in isolation, and final Food placement 2/2. Both sizes/screenshots inspected. Material files: `app/game.css`, `e2e/b09-food-consumables.spec.ts`, B09/batch/state docs. Final CSS head goes through normal PR CI; no further local tests or gameplay changes.
 - 2026-11-06 — Published verification correction `1438f03b7c9b611582293c94a374dbd5911ca47a`, opened PR #71 against exact B08 main and started owner-approved normal CI. Local/remote branch heads matched and working tree was clean before this metadata update. CI's live exact-head result is linked above; handoff-only metadata does not rerun local checks or alter measured content.
 - 2026-11-06 — Owner-approved B09 verification: fixed saved-offer TypeScript narrowing, escaped JSX apostrophe, food-only native Enter/Space propagation, and lethal Phoenix test fixture. Full suite exposed four previously unverified B08 fixture/count/legacy-anchor issues; corrected those test foundations without changing B08 gameplay, old hashes or weakening assertions. Typecheck/lint/build/assets, focused 78/78 and affected regressions 54/54 PASS; local full run once 945/949 before those four corrections, not repeated. Final Food browser 6/6 plus existing harbor/tools 12/12 in both desktop sizes, screenshots/icons inspected. Material correction files: `app/GalleyTray.tsx`, `game/persistenceFormat.ts`, B09 browser/unit, B08/P9/P7/reference assertions, B09/asset/batch/README/state docs. Normal CI pending publication; no separate production run.
@@ -109,6 +110,12 @@ B08 / PR #70 squash-merged at the owner's explicit request into main `e564e59b58
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+2026-11-09 merge / asset planning:
+
+- PASS — GitHub reported PR #71 merged with expected-head squash; prior CI #178 completed success on `569edbd`. Local `main` and `origin/main` both `74cea3577eba98a07911b2d488abd3ece20b373d`; clean before creating the isolated documentation branch. Merge finalization changed no source files.
+- Source inventory only — read content exports, matrix/atlas metadata, import/export/visual manifests and existing Crew/Item contact sheets; consulted local PixelLab skill and official provider docs. These are planning findings, not new test/asset-validation PASS claims. No PixelLab tool is exposed in the active catalogue; B10 must establish access before using it.
+- NOT RUN — new typecheck/lint/unit/build/E2E/asset-validation/CI for the documentation plan; no gameplay/config/source/asset change. No production run, new baseline or 1,000-seed soak. No B10/B11/B12 execution.
 
 B09 candidate / B08 merge:
 
@@ -797,6 +804,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- Asset strategy task: none. B09 behavior is now merged on main; B10–B12 are a plan only, with current content `1.34.0` / schema 6 preserved.
 - B09 replaces one component option per existing harbor with Bento (+10% Max HP), Cola (+15 starting Energy, capped) or Curry (+10% Attack); no additional option/reward, and existing prices/skip remain. Separate stock cap 3; one preparation meal on a deployed instance, consumed immediately, expires after the next battle or if the recipient is lost/benched before it. Frozen meals make regeneration/ghosts/save/replay consumption-free. Existing equipment/55 recipes/P10 cadence untouched; food-only bot choice/use reuses instance scoring and reserve. Native keyboard serving remains in preparation. Content 1.34.0/schema 6; local checks complete, CI pending.
 - B08 candidate: Poison at 1% Max HP/stack/second (cap 3), Freeze with Burn/Snow interaction, damage-shortened Sleep and movement/displacement/range-1 Locked. Kuzan substitutes 700 ms Freeze for 700 ms Stun; Magellan/Caesar/Pica gain the documented status additions. R14 has Charged Deck, R28 Rain, R32 Snow/Frost Patch; other rounds/PvP stay neutral. Exact environment is frozen/saved, legacy missing data stays neutral for that checkpoint, and rendering remains observational. No new phase/time budget; existing combat cap and economic/bot values remain unchanged. Candidate 1.33.0 / schema 6, unverified.
 - B07 opens the production voyage with three reserved cost-1 choices at normal price (5 gold → 4 + recruit), or free skip. R10/R20 use crew-origin route focus plus an open-band wildcard; legacy offers remain exact. Usopp gives one component at R16/R21; Franky offers an optional 2-gold component at R18/R23. Both return to same-round preparation after once-only choice; bots retain existing scores/reserves. Persisted phases/offers/receipts, clocks, tutorial, codex, Chronicle and report sources are integrated; schema remains 6.
@@ -864,6 +872,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- Asset planning: none. Character/frame/icon generation and production-batch execution were deliberately not started; the requested deliverable is a fixed strategy with three actionable batches. The plan is isolated on its documentation branch and does not start a new PR/CI without a separate publication/check instruction.
 - Normal CI additionally exposed the inherited B08 weather disclosure under the rail; fixed only its scoped CSS, plus the Food badge's related HUD overlap. No gameplay/content/hash/metric/timeout/assertion change. Existing full-voyage assertions were retained through an unchanged isolated retry. Final CI result remains on the exact-head PR checks, not inferred from earlier green steps.
 - B09 verification was explicitly approved after the unverified source handoff. Corrected four inherited B08 test foundations exposed by the one full run: 12 status assets, reachable frozen-heal fixture and hash-anchored historical P9 control. Historical hash and current Kuzan assertions remain strict; no B08 gameplay change. No tests/workflows disabled. No second full local suite or separate aggregate; final complete coverage is delegated to normal CI as approved.
 - B08 verification/publication gate is intentionally deferred after the owner's explicit refusal. No tests/CI were disabled or assertions relaxed. The existing B07 trace is retained as a complete hash-verified control specification, alongside current-content observer equality, rather than inventing an unexecuted new trace or rerunning a production report. No B08 PR is opened while CI execution lacks permission.
@@ -932,6 +941,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- Asset inventory: Koala/Killer/Caesar/Pica/Kaido use only 3/2/4/3/2 detected source poses for 46 output slots; four forms have presentation badges/overlays rather than own body atlases. File completeness does not prove animation quality. Existing item icons are present, but the contact sheet shows contrast/identity/style work (including dark Black Blade). PixelLab's local skill claims availability that the active tools do not provide; the plan keeps manual/local authoring viable and fixes tool access/style at the pilot gate.
 - B09 local blockers found during verification are corrected; normal CI remains the PR integration gate (live checks linked above). Food intentionally changes harbor choice composition and affected combat strength; no aggregate or balance/duration conclusion is available. A meal follows an instance ID, so selling/benching/merging away that instance forfeits it; the UI explains this before use. Previous content-hash replays remain exportable but incompatible, as before. Build retains existing nonfatal chunk-size/static-route classification notices.
 - B08 is unverified: compilation, regression behavior, browser presentation and asset validation have not been established by checks. Source/asset generation must not be reported as PASS verification. The next step requires a new owner instruction permitting the deferred checks; no balance/duration conclusion follows from the candidate.
 - B07 adds up to 171 seconds of explicit choice budgets at eight living captains, before early choices. Reported legacy clock estimates exclude these and label the separate added budget; no human-duration or balance claim follows. New harbor acquisition is intentional, but no aggregate/baseline was requested or generated. Legacy saves never receive retroactive current-round starter/harbor choices; old content-hash replays remain explicitly incompatible.
@@ -1043,7 +1053,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-Complete normal B09 PR CI and review; merge only on a later explicit owner instruction. Do not begin another batch, tuning or a new aggregate/baseline.
+Review the B10–B12 asset plan, then explicitly commission B10's standard and concrete pilots. B09 is merged. Do not start series asset generation, B11/B12, gameplay/tuning or a new baseline automatically.
 
 ## Codex Update Contract
 
