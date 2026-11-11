@@ -80,7 +80,10 @@ export default function AnimationLab({ onBack }: { onBack: () => void }) {
   const definitions = useMemo(
     () => {
       const form = FORM_ANIMATION_MANIFEST[contentId];
-      return getCrewAnimationDefinitions(form?.contentId ?? contentId, form?.formId);
+      const candidates = getCrewAnimationDefinitions(form?.contentId ?? contentId, form?.formId);
+      // Compare a form with its preferred base body. Legacy base variants remain
+      // available under the ordinary crew entry, without a clipped third panel.
+      return form ? candidates.slice(-2) : candidates;
     },
     [contentId],
   );

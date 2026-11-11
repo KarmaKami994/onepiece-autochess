@@ -1,7 +1,7 @@
 # B10 — Produktionsstandard und sechs Piloten
 
 Stand: **11.11.2026**. Basis: `74cea3577eba98a07911b2d488abd3ece20b373d`.
-Branch: `codex/b10-asset-pilots`. **Stil-/Browserabnahme offen.** B11/B12 beginnen erst nach dieser Abnahme.
+Branch: `codex/b10-asset-pilots`. **Lokale technische Prüfung abgeschlossen; Owner-Stilabnahme offen.** B11/B12 beginnen erst nach dieser Abnahme.
 GameContent `1.34.0`, Save Schema `6`; keine Domain-, Timing-, RNG- oder Balanceänderung.
 
 ## Ergebnis und Herkunft
@@ -92,14 +92,42 @@ Der kleine Präsentations-Lookup ergänzt nur diese Kandidaten. Demonio gehört
 ausschließlich zu Robin; unbekannte/fremde Formen behalten die Basis-Fallbacks.
 Die permanente Form ist schon im eingefrorenen Kampfaufbau bekannt; Kampf-Events
 und temporäre Gear-4/Monster-Point-Regeln ändern sich nicht. Kein neues Roster-Preload.
-Animation Lab stellt die Form separat und die früheren Varianten zum Vergleich dar.
+Animation Lab stellt die Form neben den bevorzugten Basiskörper. Die frühere
+v1/v2-Basis bleibt über die gewöhnliche Robin-Auswahl erreichbar; so wird keine
+dritte Vergleichskarte am unteren Viewportrand abgeschnitten. Der Lab-Einstieg
+wartet wie Crew Tools auf abgeschlossene Start-/Save-Initialisierung.
 
-## Abnahme und Grenzen
+## Verifikation und offene Stilabnahme
 
-Lokal autorisierte Asset-Erstellung/Quellenlektüre ist erfolgt. Neue Testfälle
-sind Spezifikationen, bis die separat angefragte B10-Prüfung freigegeben und
-ausgeführt ist. Noch keine Typecheck-/Lint-/Test-/Build-/Browser-/CI-PASS-Aussage.
-Offen: sechs Clips im Lab und eingefrorenen Kampf bei 1280×720 / 1920×1080,
-Fußanker/Überdeckung/Facing/Fallback prüfen und Owner-Stilabnahme festhalten.
-Atlas-Ziel ≤512KiB, begründete Obergrenze für große Piloten 1MiB.
-Keine Freigabe von B11/B12, kein lokaler Produktionslauf, kein neuer Balancebericht.
+Owner-Freigabe für diesen Prüfumfang: **11.11.2026**.
+
+| Prüfung | Ergebnis |
+| --- | --- |
+| Typecheck / Lint | PASS; abschließend geänderte Dateien erneut geprüft. |
+| Fokussierte Unit-/Asset-Tests | PASS, 6 Dateien / 33 Tests einschließlich Content-/Schema-Regression; korrigierter Zwei-Dateien-Lauf 13/13. |
+| Asset-/Provenienz-Validierung | PASS, einschließlich aller 79 Atlanten. |
+| Produktionsbuild | PASS, bestehende nichtfatale Vinext-Hinweise unverändert. |
+| Browser 1280×720 / 1920×1080 | PASS, final 4/4; gezielte tatsächliche Board-Aufnahme zusätzlich 2/2. |
+| Geschützte Pfade / Format | PASS: Domain, Harness, historische Analyse, Original-Sheets und alte Luffy/Koala/Kaido-Atlanten unverändert. |
+| Normale GitHub-CI | Separates Exact-Head-Mergegate; aktueller Status über den Task-PR / [Workflow](https://github.com/KarmaKami994/onepiece-autochess/actions?query=branch%3Acodex%2Fb10-asset-pilots). |
+| Lokale volle Suite / Produktionslauf / Baseline / 1.000-Seed-Soak | NOT RUN; normale CI behält ihre gewöhnlichen Checks und ihren Smoke. |
+
+Gefunden und korrigiert: Sharp führt Trim vor Extract aus, daher materialisiert
+der Test die Zelle zuerst; früher Lab-Klick vor Initialisierung; ein unpassender
+neuer Auswahlfeld-Selektor; abgeschnittene dritte Formkarte. Kein Testtimeout
+oder bestehender Anspruch wurde gelockert. Windows benötigte einen lokalen
+Temp-Cache und Host-Zugriff für den Testserver. Ein unveränderter Asset-I/O-
+Timeout bestand den gezielten Wiederholungslauf.
+
+Echte Browserbilder liegen je unter `art/qa/b10/browser/desktop-1280/` und
+`desktop-1920/`: `koala-lab.png`, `kaido-lab.png`,
+`robin-demonio-fleur-lab.png`, `b10-combat.png`. Die letzte Datei zeigt das
+tatsächlich sichtbare Phaser-Board, nicht den oberen Planner-Bereich.
+Card-Bounds, beide Facings, alle sechs Clips, alte Robin-Varianten und die
+ausschließlich sichtbaren Kampf-Atlanten sind abgesichert. Alle drei Atlanten
+liegen innerhalb des 512KiB-Ziels; Quellposen/Map-Pins/harte Alpha-Kanten sind geprüft.
+
+**Offen bleibt die Owner-Abnahme von Identität, Choreografie und Stil** an den
+Piloten/GIFs; technische Tests ersetzen sie nicht. Noch kein Clip wird deshalb
+im Inventar als owner-abgenommen markiert. Keine automatische Freigabe von
+B11/B12 oder Merge, kein lokaler Produktionslauf und kein neuer Balancebericht.

@@ -47,7 +47,10 @@ describe("B10 frozen art and presentation", () => {
         const poseHashes = new Set<string>();
         for (const frame of frames) {
           expect(frame.sourcePivot).toEqual({ x: frame.sourceRect.x + 64, y: frame.sourceRect.y + 116 });
-          const trimmed = await sharp(body).extract({ left: frame.sourceRect.x, top: frame.sourceRect.y, width: 128, height: 128 }).trim().raw().toBuffer();
+          // Materialize the cell first: Sharp executes trim before extract in a
+          // single pipeline, which would apply board coordinates to a trimmed image.
+          const cell = await sharp(body).extract({ left: frame.sourceRect.x, top: frame.sourceRect.y, width: 128, height: 128 }).png().toBuffer();
+          const trimmed = await sharp(cell).trim().raw().toBuffer();
           poseHashes.add(sha(trimmed));
         }
         // This catches held/translated copies; human clip review still decides

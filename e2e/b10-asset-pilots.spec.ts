@@ -7,9 +7,10 @@ installRuntimeBoundaryChecks();
 test("B10 pilots expose all six clips, both facings and retained variants in Animation Lab", async ({ page }, testInfo) => {
   await page.goto("/");
   await page.getByRole("button", { name: /ANIMATION LAB/ }).click();
+  await expect(page.getByRole("heading", { name: "ANIMATION LAB", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "PAUSE", exact: true }).click();
   for (const id of ["koala", "kaido", "robin-demonio-fleur"]) {
-    await page.getByLabel("CHARACTER", { exact: true }).selectOption(id);
+    await page.getByRole("combobox", { name: "CHARACTER", exact: true }).selectOption(id);
     const preview = page.locator(`.animation-preview-panel[aria-label*="${id}-b10-v2"]`);
     await expect(preview).toBeVisible();
     await expect(preview.locator(".animation-preview-sprite")).toHaveCSS("background-image", new RegExp(`${id}-b10-v2.png`));
@@ -23,10 +24,18 @@ test("B10 pilots expose all six clips, both facings and retained variants in Ani
     await expect(preview.locator(".animation-preview-sprite")).toHaveAttribute("style", /scaleX\(-1\)/);
     await page.getByRole("button", { name: "PLAYER →", exact: true }).click();
     await page.getByRole("button", { name: "IDLE", exact: true }).click();
-    expect(await page.locator(".animation-preview-panel").count()).toBeGreaterThanOrEqual(2);
+    await expect(page.locator(".animation-preview-panel")).toHaveCount(2);
+    const bounds = await preview.boundingBox();
+    const viewport = page.viewportSize();
+    expect(bounds).not.toBeNull();
+    expect(viewport).not.toBeNull();
+    expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(viewport!.height);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     await page.screenshot({ path: testInfo.outputPath(`${id}-lab.png`), fullPage: true });
   }
+  await page.getByRole("combobox", { name: "CHARACTER", exact: true }).selectOption("robin");
+  await expect(page.locator('.animation-preview-panel[aria-label="robin robin preview"]')).toBeVisible();
+  await expect(page.locator('.animation-preview-panel[aria-label="robin robin-v2 preview"]')).toBeVisible();
 });
 
 test("isolated combat loads the visible Koala and Demonio bodies without a roster preload", async ({ page }, testInfo) => {
@@ -50,5 +59,8 @@ test("isolated combat loads the visible Koala and Demonio bodies without a roste
     "/assets/animations/robin-demonio-fleur-b10-v2/robin-demonio-fleur-b10-v2.png",
   ]);
   await expect(result.getByRole("list", { name: "Units on the tactical board" })).toContainText("Demonio Fleur");
-  await page.screenshot({ path: testInfo.outputPath("b10-combat.png"), fullPage: true });
+  const canvas = result.locator("canvas");
+  await canvas.scrollIntoViewIfNeeded();
+  await expect(canvas).toBeInViewport();
+  await canvas.screenshot({ path: testInfo.outputPath("b10-combat.png") });
 });
