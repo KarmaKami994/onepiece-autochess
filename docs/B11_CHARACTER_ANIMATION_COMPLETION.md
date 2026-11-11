@@ -1,7 +1,8 @@
 # B11 — Character, form and PvE animation completion
 
 2026-11-11. Base: B10 squash `45556741eb512454e7f420a42c835ad6e3847c5d`.
-Branch: `codex/b11-character-animation-completion`. Owner requested the B10
+Branch: `codex/b11-character-animation-completion`; [PR #73](https://github.com/KarmaKami994/onepiece-autochess/pull/73), source
+`8fabfb574a64c36c18b9cdae746a8b3114d24c63`. Owner requested the B10
 squash and B11 implementation, accepting its frozen standard/pilots. This is
 presentation work only; GameContent remains **1.34.0**, save schema **6**.
 
@@ -97,7 +98,7 @@ Owner explicitly approved the focused B11 atlas/form/fallback/save/replay/Phoeni
 scope, typecheck/lint, assets, build, both desktop browser sizes and normal PR CI.
 Local results: **168/168 focused tests**, **12/12 browser cases** in both desktop
 sizes, typecheck/lint/assets/build PASS; 137 atlases validated. Normal PR CI
-is pending publication. Results and initial fixture/provenance corrections are
+is the [live PR gate](https://github.com/KarmaKami994/onepiece-autochess/pull/73/checks). Results and initial fixture/provenance corrections are
 recorded in `PROJECT_STATE.md` and the PR. No separate local
 production aggregate, baseline or 1,000-seed soak. No gameplay, unlock/catalyst,
 item/form numbers, bot, economy, RNG or save-format change. No B12 work.
