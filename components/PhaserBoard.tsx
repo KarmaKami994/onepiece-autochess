@@ -303,6 +303,8 @@ export default function PhaserBoard({
   });
   const moveRef = useRef(onMoveUnit);
   const selectRef = useRef(onSelectUnit);
+  const eventsRef = useRef(combatEvents);
+  eventsRef.current = combatEvents;
   const playbackRef = useRef({ onPlaybackReset, onPlaybackEvent, onPlaybackComplete, onPlaybackUnavailable });
   playbackRef.current = { onPlaybackReset, onPlaybackEvent, onPlaybackComplete, onPlaybackUnavailable };
   const [isReady, setIsReady] = useState(false);
@@ -333,6 +335,7 @@ export default function PhaserBoard({
         const initialAssets = resolveInitialBoardAssets(
           latestRef.current.units,
           latestRef.current.boardSkin,
+          eventsRef.current,
         );
 
         class GrandLineBoard extends Phaser.Scene implements SceneBridge {
@@ -359,6 +362,10 @@ export default function PhaserBoard({
             }
           >();
           private unitFacings = new Map<string, BoardFacing>();
+          private unitBodies = new Map<string, {
+            fallbacks: (Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image | Phaser.GameObjects.Text)[];
+            overlay?: Phaser.GameObjects.Image;
+          }>();
           private destinationTargets = new Map<
             string,
             {
@@ -673,7 +680,7 @@ export default function PhaserBoard({
             const presentation = combatPresentationStyle(
               contentId,
               event.kind === "attack" ? "attack" : "cast",
-              this.presentedForms.get(sourceUnit.id) ?? sourceUnit.formId,
+              this.presentedForm(sourceUnit),
             );
             if (event.kind === "attack") {
               if (presentation === "fire") {
@@ -1145,6 +1152,7 @@ export default function PhaserBoard({
               }
             }
             this.payload = payload;
+            this.presentedForms.clear();
             this.drawFields(payload.environment);
             if (!this.tokenLayer) return;
             this.requestAnimationTextures(payload.units);
@@ -1156,6 +1164,7 @@ export default function PhaserBoard({
             this.tokenObjects.clear();
             this.selectionMarkers.clear();
             this.animatedUnitSprites.clear();
+            this.unitBodies.clear();
             this.unitFacings.clear();
             this.resourceBars.clear();
             this.hpState.clear();
@@ -1184,6 +1193,7 @@ export default function PhaserBoard({
             this.tokenObjects.delete(unitId);
             this.selectionMarkers.delete(unitId);
             this.animatedUnitSprites.delete(unitId);
+            this.unitBodies.delete(unitId);
             this.unitFacings.delete(unitId);
             this.resourceBars.delete(unitId);
             this.hpState.delete(unitId);
@@ -1252,7 +1262,7 @@ export default function PhaserBoard({
               textureExists: (key) => this.textures.exists(key),
               requestedKeys: this.requestedTextures,
               failedKeys: this.failedTextures,
-            });
+            }, eventsRef.current);
             if (!pending.length) return;
 
             pending.forEach((definition) => {
@@ -1274,6 +1284,7 @@ export default function PhaserBoard({
                 pending.forEach((definition) =>
                   this.createCrewAnimations(definition),
                 );
+                this.payload.units.forEach(unit => this.refreshUnitBody(unit.id));
                 this.sync(this.payload, this.payload.phase !== "battle");
               },
               this,
@@ -1441,6 +1452,66 @@ export default function PhaserBoard({
             });
           }
 
+          private presentedForm(unit: BoardUnit) {
+            return this.presentedForms.has(unit.id)
+              ? this.presentedForms.get(unit.id)
+              : unit.formId;
+          }
+
+          private refreshUnitBody(unitId: string) {
+            const unit = this.payload.units.find(candidate => candidate.id === unitId);
+            const container = this.tokenObjects.get(unitId);
+            const body = this.unitBodies.get(unitId);
+            if (!unit || !container || !body) return;
+            const formId = this.presentedForm(unit);
+            const definition = [...getCrewAnimationDefinitions(unit.contentId, formId)].reverse()
+              .find(candidate => this.textures.exists(crewSheetKey(candidate.assetKey)));
+            const previous = this.animatedUnitSprites.get(unitId);
+            if (definition && definition.assetKey !== previous?.assetKey) {
+              const states: CrewAnimationState[] = ["idle", "move", "attack", "cast", "hit", "defeat"];
+              const currentKey = previous?.sprite.anims.currentAnim?.key;
+              const state = states.find(candidate => currentKey?.endsWith(`-${candidate}`)) ?? "idle";
+              const progress = previous?.sprite.anims.getProgress() ?? 0;
+              const facing = this.unitFacings.get(unitId) ?? initialBoardFacing(unit.team);
+              const displaySize = unit.zone === "bench" ? Math.round(definition.displaySize * 0.72) : definition.displaySize;
+              const spriteY = unit.zone === "bench" ? Math.round(definition.yOffset * 0.66) : definition.yOffset;
+              const sprite = previous?.sprite ?? this.add.sprite(0, spriteY, crewSheetKey(definition.assetKey), 0);
+              sprite.stop().setTexture(crewSheetKey(definition.assetKey), 0)
+                .setY(spriteY)
+                .setOrigin(mirroredOriginX(definition.originX ?? 0.5, facing), definition.originY ?? 0.5)
+                .setDisplaySize(displaySize, displaySize).setFlipX(facing === "left")
+                .play(crewAnimationKey(definition.assetKey, state));
+              if (previous) sprite.anims.setProgress(progress);
+              else container.addAt(sprite, 1);
+              this.animatedUnitSprites.set(unitId, { assetKey: definition.assetKey, definition, sprite });
+              body.fallbacks.forEach(object => object.setVisible(false));
+              const bar = this.resourceBars.get(unitId);
+              if (bar) {
+                bar.layout = resourceBarLayout({ phase: this.payload.phase, zone: unit.zone, spriteY,
+                  frameHeight: definition.frameHeight, displaySize, originY: definition.originY ?? 0.5,
+                  idleVisualTopPx: definition.idleVisualTopPx });
+                this.statusLabels.get(unitId)?.setY(bar.layout.statusY);
+                this.selectionMarkers.get(unitId)?.setY(bar.layout.visible ? bar.layout.selectionY : Math.floor(bar.layout.visualTopY - 9));
+                this.drawResourceBar(unitId);
+              }
+            }
+            body.overlay?.destroy();
+            body.overlay = undefined;
+            if (formId && !definition?.formId && this.textures.exists(formOverlayKey(formId))) {
+              body.overlay = this.add.image(0, -4, formOverlayKey(formId))
+                .setDisplaySize(unit.zone === "bench" ? 48 : 64, unit.zone === "bench" ? 48 : 64);
+              container.addAt(body.overlay, Math.min(2, container.length));
+            }
+            this.publishPresentedBodies();
+          }
+
+          private publishPresentedBodies() {
+            const stage = hostRef.current?.parentElement;
+            if (stage) stage.dataset.presentedAnimations = JSON.stringify(
+              [...this.animatedUnitSprites].map(([id, value]) => [id, value.assetKey]),
+            );
+          }
+
           private makeToken(unit: BoardUnit, payload: BoardPayload) {
             const position = boardDestinationCenter(unitDestination(unit));
 
@@ -1475,7 +1546,7 @@ export default function PhaserBoard({
             );
             const portraitKey = this.portraitKey(unit);
             const animationDefinition = [
-              ...getCrewAnimationDefinitions(unit.contentId, unit.formId),
+              ...getCrewAnimationDefinitions(unit.contentId, this.presentedForm(unit)),
             ]
               .reverse()
               .find((candidate) =>
@@ -1648,20 +1719,24 @@ export default function PhaserBoard({
             container.add([shadow, fallbackCard, fallbackAccent]);
             if (animatedSprite) container.add(animatedSprite);
             if (portrait) container.add(portrait);
-            const formVisual = formVisualDefinition(unit.formId);
+            const body: { fallbacks: (Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image | Phaser.GameObjects.Text)[]; overlay?: Phaser.GameObjects.Image } = {
+              fallbacks: [fallbackCard, fallbackAccent, initial, ...(portrait ? [portrait] : [])],
+            };
+            this.unitBodies.set(unit.id, body);
+            const formId = this.presentedForm(unit);
+            const formVisual = formVisualDefinition(formId);
             if (
               formVisual &&
               !animationDefinition?.formId &&
-              this.textures.exists(formOverlayKey(unit.formId ?? ""))
+              this.textures.exists(formOverlayKey(formId ?? ""))
             ) {
-              container.add(
-                this.add
-                  .image(0, -4, formOverlayKey(unit.formId ?? ""))
+              body.overlay = this.add
+                  .image(0, -4, formOverlayKey(formId ?? ""))
                   .setDisplaySize(
                     unit.zone === "bench" ? 48 : 64,
                     unit.zone === "bench" ? 48 : 64,
-                  ),
-              );
+                  );
+              container.add(body.overlay);
             }
             container.add([
               initial,
@@ -1776,6 +1851,7 @@ export default function PhaserBoard({
               });
             }
 
+            this.publishPresentedBodies();
             return container;
           }
 
@@ -1795,6 +1871,8 @@ export default function PhaserBoard({
             const speed = Math.max(0.5, animationSpeed);
             const generation = ++this.animationGeneration;
             this.presentedForms = new Map(this.payload.units.map((unit) => [unit.id, unit.formId]));
+            this.payload.units.forEach(unit => this.refreshUnitBody(unit.id));
+            this.requestAnimationTextures(this.payload.units);
             playbackRef.current.onPlaybackReset?.();
             const setHealth = (
               unitId: string,
@@ -2013,6 +2091,7 @@ export default function PhaserBoard({
                 if (event.kind === "transform" && source) {
                   this.presentedForms.set(event.unitId ?? event.sourceId ?? "", event.toFormId);
                   const unitId = event.unitId ?? event.sourceId;
+                  if (unitId) this.refreshUnitBody(unitId);
                   if (
                     unitId &&
                     event.hp !== undefined &&
@@ -2033,18 +2112,6 @@ export default function PhaserBoard({
                   }
                   showCastName(source, event.label ?? "Monster Point");
                   battleVfx.telegraph(this, { from: source, targets: [source], shape: "area", color: formAccent(event.toFormId), speed, reducedMotion: reduceMotion });
-                  const visual = formVisualDefinition(event.toFormId);
-                  if (
-                    visual &&
-                    event.toFormId &&
-                    this.textures.exists(formOverlayKey(event.toFormId))
-                  ) {
-                    source.add(
-                      this.add
-                        .image(0, -4, formOverlayKey(event.toFormId))
-                        .setDisplaySize(64, 64),
-                    );
-                  }
                   if (!reduceMotion) {
                     this.tweens.add({
                       targets: source,
@@ -2060,6 +2127,7 @@ export default function PhaserBoard({
                 if (event.kind === "resurrect" && target) {
                   const unitId = event.unitId ?? event.targetId ?? "";
                   this.presentedForms.set(unitId, event.toFormId);
+                  this.refreshUnitBody(unitId);
                   if (
                     unitId &&
                     event.hp !== undefined &&

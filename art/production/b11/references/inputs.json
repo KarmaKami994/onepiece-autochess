@@ -1,0 +1,152 @@
+[
+  {
+    "id": "killer",
+    "path": "art/production/b11/references/killer-idle.png",
+    "from": "public/assets/animations/killer-v2/killer-v2.png",
+    "frame": 0
+  },
+  {
+    "id": "caesar-clown",
+    "path": "art/production/b11/references/caesar-clown-idle.png",
+    "from": "public/assets/animations/caesar-clown-v2/caesar-clown-v2.png",
+    "frame": 0
+  },
+  {
+    "id": "pica",
+    "path": "art/production/b11/references/pica-idle.png",
+    "from": "public/assets/animations/pica-v2/pica-v2.png",
+    "frame": 0
+  },
+  {
+    "id": "luffy",
+    "path": "art/production/b11/references/luffy-idle.png",
+    "from": "public/assets/animations/luffy-v2/luffy-v2.png",
+    "frame": 0
+  },
+  {
+    "id": "chopper",
+    "path": "art/production/b11/references/chopper-idle.png",
+    "from": "public/assets/animations/chopper-v2/chopper-v2.png",
+    "frame": 0
+  },
+  {
+    "id": "zoro",
+    "path": "art/production/b11/references/zoro-idle.png",
+    "from": "public/assets/animations/zoro-v2/zoro-v2.png",
+    "frame": 0
+  },
+  {
+    "id": "garp",
+    "path": "art/production/b11/references/garp-idle.png",
+    "from": "public/assets/animations/garp-v2/garp-v2.png",
+    "frame": 0
+  },
+  {
+    "id": "capone-bege",
+    "path": "art/production/b11/references/capone-bege-idle.png",
+    "from": "public/assets/animations/capone-bege-v2/capone-bege-v2.png",
+    "frame": 0
+  },
+  {
+    "id": "arlong",
+    "path": "art/production/b11/references/arlong-idle.png",
+    "from": "public/assets/animations/arlong-v2/arlong-v2.png",
+    "frame": 0
+  },
+  {
+    "id": "marine-recruit",
+    "path": "art/production/b11/references/marine-recruit-idle.png",
+    "from": "public/assets/animations/marine-recruit-v2/marine-recruit-v2.png",
+    "frame": 0
+  },
+  {
+    "id": "rifle-marine",
+    "path": "art/production/b11/references/rifle-marine-idle.png",
+    "from": "public/assets/animations/rifle-marine-v2/rifle-marine-v2.png",
+    "frame": 0
+  },
+  {
+    "id": "pirate-raider",
+    "path": "art/production/b11/references/pirate-raider-idle.png",
+    "from": "public/assets/animations/pirate-raider-v2/pirate-raider-v2.png",
+    "frame": 0
+  },
+  {
+    "id": "sea-king",
+    "path": "art/production/b11/references/sea-king-idle.png",
+    "from": "public/assets/animations/sea-king-v2/sea-king-v2.png",
+    "frame": 0
+  },
+  {
+    "id": "pacifista",
+    "path": "art/production/b11/references/pacifista-idle.png",
+    "from": "public/assets/animations/pacifista-v2/pacifista-v2.png",
+    "frame": 0
+  },
+  {
+    "id": "vice-admiral",
+    "path": "art/production/b11/references/vice-admiral-design.png",
+    "from": "public/assets/enemies/vice-admiral.png",
+    "derivation": "nearest-neighbour 128px identity concept; original project-owned source remains unchanged"
+  },
+  {
+    "id": "cipher-pol-agent",
+    "path": "art/production/b11/references/cipher-pol-agent-design.png",
+    "from": "public/assets/enemies/cipher-pol-agent.png",
+    "derivation": "nearest-neighbour 128px identity concept; original project-owned source remains unchanged"
+  },
+  {
+    "id": "seraphim",
+    "path": "art/production/b11/references/seraphim-design.png",
+    "from": "public/assets/enemies/seraphim.png",
+    "derivation": "nearest-neighbour 128px identity concept; original project-owned source remains unchanged"
+  },
+  {
+    "id": "fish-man-raider",
+    "path": "art/production/b11/references/fish-man-raider-design.png",
+    "from": "public/assets/enemies/fish-man-raider.png",
+    "derivation": "nearest-neighbour 128px identity concept; original project-owned source remains unchanged"
+  },
+  {
+    "id": "skypiea-priest",
+    "path": "art/production/b11/references/skypiea-priest-design.png",
+    "from": "public/assets/enemies/skypiea-priest.png",
+    "derivation": "nearest-neighbour 128px identity concept; original project-owned source remains unchanged"
+  },
+  {
+    "id": "cp9-elite",
+    "path": "art/production/b11/references/cp9-elite-design.png",
+    "from": "public/assets/enemies/cp9-elite.png",
+    "derivation": "nearest-neighbour 128px identity concept; original project-owned source remains unchanged"
+  },
+  {
+    "id": "impel-down-guard",
+    "path": "art/production/b11/references/impel-down-guard-design.png",
+    "from": "public/assets/enemies/impel-down-guard.png",
+    "derivation": "nearest-neighbour 128px identity concept; original project-owned source remains unchanged"
+  },
+  {
+    "id": "new-fish-man-officer",
+    "path": "art/production/b11/references/new-fish-man-officer-design.png",
+    "from": "public/assets/enemies/new-fish-man-officer.png",
+    "derivation": "nearest-neighbour 128px identity concept; original project-owned source remains unchanged"
+  },
+  {
+    "id": "punk-hazard-guard",
+    "path": "art/production/b11/references/punk-hazard-guard-design.png",
+    "from": "public/assets/enemies/punk-hazard-guard.png",
+    "derivation": "nearest-neighbour 128px identity concept; original project-owned source remains unchanged"
+  },
+  {
+    "id": "donquixote-officer",
+    "path": "art/production/b11/references/donquixote-officer-design.png",
+    "from": "public/assets/enemies/donquixote-officer.png",
+    "derivation": "nearest-neighbour 128px identity concept; original project-owned source remains unchanged"
+  },
+  {
+    "id": "beast-pirate",
+    "path": "art/production/b11/references/beast-pirate-design.png",
+    "from": "public/assets/enemies/beast-pirate.png",
+    "derivation": "nearest-neighbour 128px identity concept; original project-owned source remains unchanged"
+  }
+]

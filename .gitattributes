@@ -11,6 +11,7 @@
 *.py text eol=lf
 *.svg text eol=lf
 art/production/b10/**/prompt.txt text eol=lf
+art/production/b11/**/prompt.txt text eol=lf
 *.ps1 text eol=crlf
 
 *.png binary

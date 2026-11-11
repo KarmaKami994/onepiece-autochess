@@ -20,6 +20,7 @@
     "assets:ui": "node scripts/assets/build_ui_icons.mjs",
     "assets:food": "node scripts/assets/build_food_icons.mjs",
     "assets:b10": "node scripts/assets/build_b10_assets.mjs",
+    "assets:b11": "node scripts/assets/build_b11_assets.mjs",
     "assets:p12": "node scripts/assets/build_p12_pve_assets.mjs",
     "assets:all": "node scripts/assets/build_ui_icons.mjs --sources-only && node scripts/assets/build_p12_pve_assets.mjs --sources-only && node scripts/build_v2_assets.mjs --skip-editable && node scripts/assets/build_ui_icons.mjs && node scripts/assets/build_p12_pve_assets.mjs --presentation-only && node scripts/assets/build_food_icons.mjs",
     "dev": "vinext dev",

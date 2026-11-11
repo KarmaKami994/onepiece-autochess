@@ -116,7 +116,7 @@ describe("P7 major asset production", () => {
     for (const id of newCrewIds) {
       expect(CREW_ANIMATION_MANIFEST).not.toHaveProperty(id);
       expect(getCrewAnimationDefinitions(id).map((entry) => entry.version))
-        .toEqual(id === "koala" ? ["v2", "v2"] : ["v2"]);
+        .toEqual(["v2", "v2"]);
     }
   });
 
@@ -126,7 +126,7 @@ describe("P7 major asset production", () => {
       [CREW_V2_ANIMATIONS.koby],
     )).toEqual([CREW_V2_ANIMATIONS.koby]);
     expect(getCrewAnimationDefinitions("nami").map((entry) => entry.version))
-      .toEqual(["v1", "v2"]);
+      .toEqual(["v1", "v2", "v2"]);
 
     const initial = resolveInitialBoardAssets(
       [{ contentId: "koby" }, { contentId: "nami" }, { contentId: "koby" }],
@@ -143,7 +143,7 @@ describe("P7 major asset production", () => {
         requestedKeys: new Set(),
         failedKeys: new Set(),
       },
-    )).toEqual([CREW_V2_ANIMATIONS.koby]);
+    )).toEqual([getCrewAnimationDefinitions("koby").at(-1)]);
   });
 
   it("retains complete static and v2 presentation for the original eight PvE identities", async () => {

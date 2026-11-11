@@ -80,16 +80,16 @@ describe("B10 frozen art and presentation", () => {
     expect(animationCandidates("koala").map((definition) => definition.assetKey)).toEqual(["koala-b10-v2", "koala-v2"]);
     expect(animationCandidates("kaido").map((definition) => definition.assetKey)).toEqual(["kaido-b10-v2", "kaido-v2"]);
     const visible = [{ contentId: "robin" }, { contentId: "robin", formId: "robin-demonio-fleur" }, { contentId: "robin", formId: "robin-demonio-fleur" }];
-    expect(resolveInitialBoardAssets(visible, "marine-harbor").animations.map((definition) => definition.assetKey).sort()).toEqual(["robin-demonio-fleur-b10-v2", "robin-v2"]);
+    expect(resolveInitialBoardAssets(visible, "marine-harbor").animations.map((definition) => definition.assetKey).sort()).toEqual(["robin-b11-v2", "robin-demonio-fleur-b10-v2"]);
   });
 
   it("requests a visible form even with a cached base, and falls back after the form fails", () => {
     const units = [{ contentId: "robin", formId: "robin-demonio-fleur" }];
     const formKey = crewSheetKey("robin-demonio-fleur-b10-v2");
-    const status = { textureExists: (key: string) => key === crewSheetKey("robin-v2"), requestedKeys: new Set<string>(), failedKeys: new Set<string>() };
+    const status = { textureExists: (key: string) => key === crewSheetKey("robin-b11-v2"), requestedKeys: new Set<string>(), failedKeys: new Set<string>() };
     expect(resolveMissingAnimationDefinitions(units, status).map((definition) => definition.assetKey)).toEqual(["robin-demonio-fleur-b10-v2"]);
     expect(resolveMissingAnimationDefinitions(units, { ...status, requestedKeys: new Set([formKey]), failedKeys: new Set([formKey]) })).toEqual([]);
-    expect(resolveMissingAnimationDefinitions(units, { ...status, textureExists: () => false, requestedKeys: new Set([formKey]), failedKeys: new Set([formKey]) }).map((definition) => definition.assetKey)).toEqual(["robin-v2"]);
+    expect(resolveMissingAnimationDefinitions(units, { ...status, textureExists: () => false, requestedKeys: new Set([formKey]), failedKeys: new Set([formKey]) }).map((definition) => definition.assetKey)).toEqual(["robin-b11-v2"]);
   });
 
   it("keeps the three icon IDs, glyph fallbacks, standalone SVG budget and frozen output hashes", async () => {

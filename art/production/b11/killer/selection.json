@@ -1,0 +1,186 @@
+{
+  "id": "killer",
+  "kind": "crew",
+  "baseId": "killer",
+  "sourceType": "AI-assisted-body-poses",
+  "scale": 0.5961538461538461,
+  "bodyClass": "normal",
+  "originalSource": {
+    "strategy": "auto-frame-map",
+    "localPath": "art/licensed-reference/great-pirate-colosseum/Killer.png",
+    "sha256": "5c7d3ee4a50ca23638920408374a2715fecaa21dd19e09ec7c061d657f439b7e",
+    "dimensions": {
+      "width": 887,
+      "height": 252
+    },
+    "game": "One Piece: Great Pirate Colosseum",
+    "gameUrl": "https://spritedatabase.net/game/2801",
+    "sheetUrl": "https://spritedatabase.net/file/21141",
+    "fileId": 21141,
+    "sourceCharacterName": "Killer",
+    "contributor": "Grim",
+    "contributorBasis": "Sprite Database file page read 2026-09-11",
+    "frameMap": "auto:connected-components-v1",
+    "derivedFrameMap": "public/assets/animations/killer-v2/killer-v2.json#frames"
+  },
+  "permission": {
+    "status": "confirmed",
+    "note": "Project-owner attestation states that written authorization exists for applicable private/local project use; no downstream asset license is granted."
+  },
+  "reference": "art/licensed-reference/great-pirate-colosseum/Killer.png",
+  "tool": "built-in image_gen; exact model/seed/settings not exposed",
+  "preservedStates": [],
+  "supplementalStates": null,
+  "selections": {
+    "idle": [
+      {
+        "draftPose": 0
+      },
+      {
+        "draftPose": 1
+      },
+      {
+        "draftPose": 2
+      },
+      {
+        "draftPose": 3
+      },
+      {
+        "draftPose": 4
+      },
+      {
+        "draftPose": 0
+      }
+    ],
+    "move": [
+      {
+        "draftPose": 6
+      },
+      {
+        "draftPose": 7
+      },
+      {
+        "draftPose": 8
+      },
+      {
+        "draftPose": 9
+      },
+      {
+        "draftPose": 10
+      },
+      {
+        "draftPose": 11
+      },
+      {
+        "draftPose": 6
+      },
+      {
+        "draftPose": 7
+      }
+    ],
+    "attack": [
+      {
+        "draftPose": 12
+      },
+      {
+        "draftPose": 13
+      },
+      {
+        "draftPose": 14
+      },
+      {
+        "draftPose": 15
+      },
+      {
+        "draftPose": 16
+      },
+      {
+        "draftPose": 16
+      },
+      {
+        "draftPose": 17
+      },
+      {
+        "draftPose": 12
+      }
+    ],
+    "cast": [
+      {
+        "draftPose": 18
+      },
+      {
+        "draftPose": 18
+      },
+      {
+        "draftPose": 19
+      },
+      {
+        "draftPose": 19
+      },
+      {
+        "draftPose": 20
+      },
+      {
+        "draftPose": 20
+      },
+      {
+        "draftPose": 21
+      },
+      {
+        "draftPose": 21
+      },
+      {
+        "draftPose": 22
+      },
+      {
+        "draftPose": 22
+      },
+      {
+        "draftPose": 23
+      },
+      {
+        "draftPose": 18
+      }
+    ],
+    "hit": [
+      {
+        "draftPose": 25
+      },
+      {
+        "draftPose": 26
+      },
+      {
+        "draftPose": 27
+      },
+      {
+        "draftPose": 28
+      }
+    ],
+    "defeat": [
+      {
+        "draftPose": 30
+      },
+      {
+        "draftPose": 31
+      },
+      {
+        "draftPose": 32
+      },
+      {
+        "draftPose": 33
+      },
+      {
+        "draftPose": 34
+      },
+      {
+        "draftPose": 35
+      },
+      {
+        "draftPose": 35
+      },
+      {
+        "draftPose": 35
+      }
+    ]
+  }
+}

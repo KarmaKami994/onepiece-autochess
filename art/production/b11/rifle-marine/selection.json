@@ -1,0 +1,189 @@
+{
+  "id": "rifle-marine",
+  "kind": "pve",
+  "baseId": "rifle-marine",
+  "sourceType": "AI-assisted-body-poses",
+  "scale": 0.49101796407185627,
+  "bodyClass": "normal",
+  "originalSource": {
+    "strategy": "procedural-cutout",
+    "localPath": "public/assets/enemies/rifle-marine.png",
+    "sha256": "4d928c8a57d58c422756ef1f1d2346638fc14a527304a38749103442b9108d61",
+    "dimensions": {
+      "width": 1024,
+      "height": 1536
+    },
+    "game": "Original clean-room PvE cutout",
+    "gameUrl": null,
+    "sheetUrl": null,
+    "contributor": "OpenAI image generation and project-local cleanup",
+    "frameMap": "procedural:static-cutout-v1",
+    "referenceCandidate": {
+      "label": "Marine Rifleman",
+      "game": "One Piece (Game Boy Advance)",
+      "url": "https://spritedatabase.net/file/4039",
+      "contributor": null,
+      "usedInRuntime": false
+    }
+  },
+  "permission": {
+    "status": "project-owned",
+    "note": "The runtime source is the already-provenanced original generated enemy cutout, not the external reference candidate. See ASSET_PROVENANCE.md."
+  },
+  "reference": "art/production/b11/references/rifle-marine-idle.png",
+  "tool": "built-in image_gen; exact model/seed/settings not exposed",
+  "preservedStates": [],
+  "supplementalStates": null,
+  "selections": {
+    "idle": [
+      {
+        "draftPose": 0
+      },
+      {
+        "draftPose": 1
+      },
+      {
+        "draftPose": 2
+      },
+      {
+        "draftPose": 3
+      },
+      {
+        "draftPose": 4
+      },
+      {
+        "draftPose": 0
+      }
+    ],
+    "move": [
+      {
+        "draftPose": 6
+      },
+      {
+        "draftPose": 7
+      },
+      {
+        "draftPose": 8
+      },
+      {
+        "draftPose": 9
+      },
+      {
+        "draftPose": 10
+      },
+      {
+        "draftPose": 11
+      },
+      {
+        "draftPose": 6
+      },
+      {
+        "draftPose": 7
+      }
+    ],
+    "attack": [
+      {
+        "draftPose": 12
+      },
+      {
+        "draftPose": 13
+      },
+      {
+        "draftPose": 14
+      },
+      {
+        "draftPose": 15
+      },
+      {
+        "draftPose": 16
+      },
+      {
+        "draftPose": 16
+      },
+      {
+        "draftPose": 17
+      },
+      {
+        "draftPose": 12
+      }
+    ],
+    "cast": [
+      {
+        "draftPose": 18
+      },
+      {
+        "draftPose": 18
+      },
+      {
+        "draftPose": 19
+      },
+      {
+        "draftPose": 19
+      },
+      {
+        "draftPose": 20
+      },
+      {
+        "draftPose": 20
+      },
+      {
+        "draftPose": 21
+      },
+      {
+        "draftPose": 21
+      },
+      {
+        "draftPose": 22
+      },
+      {
+        "draftPose": 22
+      },
+      {
+        "draftPose": 23
+      },
+      {
+        "draftPose": 18
+      }
+    ],
+    "hit": [
+      {
+        "draftPose": 25
+      },
+      {
+        "draftPose": 26
+      },
+      {
+        "draftPose": 27
+      },
+      {
+        "draftPose": 28
+      }
+    ],
+    "defeat": [
+      {
+        "draftPose": 30
+      },
+      {
+        "draftPose": 31
+      },
+      {
+        "draftPose": 32
+      },
+      {
+        "draftPose": 33
+      },
+      {
+        "draftPose": 34
+      },
+      {
+        "draftPose": 35
+      },
+      {
+        "draftPose": 35
+      },
+      {
+        "draftPose": 35
+      }
+    ]
+  }
+}

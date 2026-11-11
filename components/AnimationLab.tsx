@@ -77,15 +77,18 @@ export default function AnimationLab({ onBack }: { onBack: () => void }) {
   const [speed, setSpeed] = useState(1);
   const [playing, setPlaying] = useState(true);
   const [elapsedMs, setElapsedMs] = useState(0);
+  const [showLegacy, setShowLegacy] = useState(false);
   const definitions = useMemo(
     () => {
       const form = FORM_ANIMATION_MANIFEST[contentId];
       const candidates = getCrewAnimationDefinitions(form?.contentId ?? contentId, form?.formId);
-      // Compare a form with its preferred base body. Legacy base variants remain
-      // available under the ordinary crew entry, without a clipped third panel.
-      return form ? candidates.slice(-2) : candidates;
+      // Two panels fit the existing layout. Keep v1 explicitly selectable for
+      // ordinary crew while comparing the two newest bodies by default.
+      return form ? candidates.slice(-2)
+        : showLegacy && candidates.length > 2 ? [candidates[0], candidates.at(-1)!]
+        : candidates.slice(-2);
     },
-    [contentId],
+    [contentId, showLegacy],
   );
   const primaryDefinition = definitions.at(-1);
   const primaryClip = primaryDefinition?.clips[state];
@@ -141,6 +144,11 @@ export default function AnimationLab({ onBack }: { onBack: () => void }) {
                 </option>
               ))}
             </select>
+          </label>
+
+          <label>
+            <input type="checkbox" checked={showLegacy} onChange={event => setShowLegacy(event.target.checked)} />
+            Compare oldest fallback
           </label>
 
           <fieldset>

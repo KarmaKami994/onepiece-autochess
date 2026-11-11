@@ -3,7 +3,10 @@
 Stand: **09.11.2026**. Basis: B09-Squash `74cea3577eba98a07911b2d488abd3ece20b373d`.
 Plan vom 09.11.; B10 wurde am 11.11.2026 beauftragt. Kandidat, Stilkarte und
 Prüf-/Abnahmestand: [B10_ASSET_PRODUKTION.md](B10_ASSET_PRODUKTION.md).
-B11/B12 bleiben spätere Aufträge.
+B10 wurde am 11.11.2026 über PR #72 als `4555674` squash-gemergt.
+B11 wurde im selben Auftrag freigegeben; Umsetzung und Prüfstand:
+[B11_CHARACTER_ANIMATION_COMPLETION.md](B11_CHARACTER_ANIMATION_COMPLETION.md).
+B12 bleibt ein späterer, gesonderter Auftrag.
 
 ## 1. Ziel und Grenze
 

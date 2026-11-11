@@ -1,0 +1,230 @@
+{
+  "id": "capone-bege",
+  "kind": "crew",
+  "baseId": "capone-bege",
+  "sourceType": "licensed-original-with-missing-clip-supplement",
+  "scale": 1,
+  "bodyClass": "small",
+  "originalSource": {
+    "strategy": "auto-frame-map",
+    "localPath": "art/licensed-reference/gigant-battle-2/CaponeBege.png",
+    "sha256": "47c3814a78435b17d46e7ef6707922e394af49ffb86d8434792b3baa44f03064",
+    "dimensions": {
+      "width": 488,
+      "height": 412
+    },
+    "game": "One Piece: Gigant Battle! 2 - New World",
+    "gameUrl": "https://spritedatabase.net/game/2232",
+    "sheetUrl": "https://spritedatabase.net/file/14848",
+    "fileId": 14848,
+    "sourceCharacterName": "Capone Bege",
+    "contributor": "Maverick PK",
+    "contributorBasis": "Sprite Database file page read 2026-09-11",
+    "frameMap": "auto:connected-components-v1",
+    "derivedFrameMap": "public/assets/animations/capone-bege-v2/capone-bege-v2.json#frames"
+  },
+  "permission": {
+    "status": "confirmed",
+    "note": "Project-owner attestation states that written authorization exists for applicable private/local project use; no downstream asset license is granted."
+  },
+  "reference": "art/production/b11/references/capone-bege-idle.png",
+  "tool": "built-in image_gen; exact model/seed/settings not exposed",
+  "preservedStates": [
+    "idle"
+  ],
+  "supplementalStates": [
+    "move",
+    "attack",
+    "cast",
+    "hit",
+    "defeat"
+  ],
+  "selections": {
+    "idle": [
+      {
+        "candidate": 3,
+        "sourceRect": {
+          "x": 117,
+          "y": 4,
+          "width": 45,
+          "height": 72
+        }
+      },
+      {
+        "candidate": 4,
+        "sourceRect": {
+          "x": 162,
+          "y": 4,
+          "width": 43,
+          "height": 72
+        }
+      },
+      {
+        "candidate": 5,
+        "sourceRect": {
+          "x": 204,
+          "y": 3,
+          "width": 42,
+          "height": 73
+        }
+      },
+      {
+        "candidate": 6,
+        "sourceRect": {
+          "x": 244,
+          "y": 4,
+          "width": 43,
+          "height": 72
+        }
+      },
+      {
+        "candidate": 8,
+        "sourceRect": {
+          "x": 110,
+          "y": 84,
+          "width": 45,
+          "height": 72
+        }
+      },
+      {
+        "candidate": 9,
+        "sourceRect": {
+          "x": 153,
+          "y": 84,
+          "width": 43,
+          "height": 72
+        }
+      }
+    ],
+    "move": [
+      {
+        "draftPose": 6
+      },
+      {
+        "draftPose": 7
+      },
+      {
+        "draftPose": 8
+      },
+      {
+        "draftPose": 9
+      },
+      {
+        "draftPose": 10
+      },
+      {
+        "draftPose": 11
+      },
+      {
+        "draftPose": 6
+      },
+      {
+        "draftPose": 7
+      }
+    ],
+    "attack": [
+      {
+        "draftPose": 12
+      },
+      {
+        "draftPose": 13
+      },
+      {
+        "draftPose": 14
+      },
+      {
+        "draftPose": 15
+      },
+      {
+        "draftPose": 16
+      },
+      {
+        "draftPose": 16
+      },
+      {
+        "draftPose": 17
+      },
+      {
+        "draftPose": 12
+      }
+    ],
+    "cast": [
+      {
+        "draftPose": 18
+      },
+      {
+        "draftPose": 18
+      },
+      {
+        "draftPose": 19
+      },
+      {
+        "draftPose": 19
+      },
+      {
+        "draftPose": 20
+      },
+      {
+        "draftPose": 20
+      },
+      {
+        "draftPose": 21
+      },
+      {
+        "draftPose": 21
+      },
+      {
+        "draftPose": 22
+      },
+      {
+        "draftPose": 22
+      },
+      {
+        "draftPose": 23
+      },
+      {
+        "draftPose": 18
+      }
+    ],
+    "hit": [
+      {
+        "draftPose": 25
+      },
+      {
+        "draftPose": 26
+      },
+      {
+        "draftPose": 27
+      },
+      {
+        "draftPose": 28
+      }
+    ],
+    "defeat": [
+      {
+        "draftPose": 30
+      },
+      {
+        "draftPose": 31
+      },
+      {
+        "draftPose": 32
+      },
+      {
+        "draftPose": 33
+      },
+      {
+        "draftPose": 34
+      },
+      {
+        "draftPose": 35
+      },
+      {
+        "draftPose": 35
+      },
+      {
+        "draftPose": 35
+      }
+    ]
+  }
+}

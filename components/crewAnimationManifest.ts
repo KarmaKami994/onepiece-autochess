@@ -1,3 +1,5 @@
+import { B11_ANIMATION_SOURCES } from "./b11AnimationSources";
+
 export type CrewAnimationState =
   | "idle"
   | "move"
@@ -333,8 +335,39 @@ export const B10_ANIMATION_PILOTS = {
   kaido: b10Pilot(PVE_ANIMATION_MANIFEST.kaido, "kaido", 13),
 } as const;
 
+function b11Definition(
+  base: CrewAnimationDefinition,
+  visualId: string,
+  formId?: string,
+): CrewAnimationDefinition {
+  const assetKey = `${visualId}-b11-v2`;
+  return {
+    ...base,
+    assetKey,
+    sheetPath: `/assets/animations/${assetKey}/${assetKey}.png`,
+    idleVisualTopPx: B11_ANIMATION_SOURCES[visualId].idleVisualTopPx,
+    originX: 64 / 128,
+    originY: 116 / 128,
+    displaySize: formId ? visualId === "luffy-gear-4-boundman" ? 104 : 100
+      : base.contentId === "sabo" ? 76 : base.displaySize,
+    formId,
+  };
+}
+
+export const B11_ANIMATION_MANIFEST: Readonly<Record<string, CrewAnimationDefinition>> = Object.fromEntries(
+  [...Object.values(CREW_V2_ANIMATIONS), ...Object.values(PVE_ANIMATION_MANIFEST)].flatMap(base => {
+    const visualId = base.assetKey.replace(/-v2$/, "");
+    return B11_ANIMATION_SOURCES[visualId]
+      ? [[base.contentId, b11Definition(base, visualId)]]
+      : [];
+  }),
+);
+
 export const FORM_ANIMATION_MANIFEST: Readonly<Record<string, CrewAnimationDefinition>> = {
   "robin-demonio-fleur": b10Pilot(CREW_V2_ANIMATIONS.robin, "robin-demonio-fleur", 17, "robin-demonio-fleur"),
+  "luffy-gear-4-boundman": b11Definition(LUFFY_V2_ANIMATION, "luffy-gear-4-boundman", "luffy-gear-4-boundman"),
+  "luffy-gear-4-snakeman": b11Definition(LUFFY_V2_ANIMATION, "luffy-gear-4-snakeman", "luffy-gear-4-snakeman"),
+  "chopper-monster-point": b11Definition(CREW_V2_ANIMATIONS.chopper, "chopper-monster-point", "chopper-monster-point"),
 };
 
 export const ANIMATION_CONTENT_MANIFEST = {
@@ -343,6 +376,7 @@ export const ANIMATION_CONTENT_MANIFEST = {
   luffy: LUFFY_V2_ANIMATION,
   ...PVE_ANIMATION_MANIFEST,
   ...B10_ANIMATION_PILOTS,
+  ...B11_ANIMATION_MANIFEST,
 } as const satisfies Record<string, CrewAnimationDefinition>;
 
 const CREW_VARIANT_OVERRIDES: Partial<Record<string, CrewAnimationDefinition[]>> = {
@@ -405,6 +439,8 @@ export function getCrewAnimationDefinitions(contentId: string, formId?: string) 
   );
   const pilot = B10_ANIMATION_PILOTS[contentId as keyof typeof B10_ANIMATION_PILOTS];
   if (pilot) candidates.push(pilot);
+  const production = B11_ANIMATION_MANIFEST[contentId];
+  if (production) candidates.push(production);
   const form = formId ? FORM_ANIMATION_MANIFEST[formId] : undefined;
   if (form?.contentId === contentId) candidates.push(form);
   return candidates;

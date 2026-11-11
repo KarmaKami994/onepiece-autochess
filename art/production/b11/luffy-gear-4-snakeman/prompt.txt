@@ -1,0 +1,12 @@
+Create ONE frozen pixel-art ANIMATION AUTHORING DRAFT for MONKEY D. LUFFY — GEAR 4 SNAKEMAN, explicitly a transformed body. Tall athletic silhouette, BLACK long upright spiky hair, BLACK HAKI forearms with RED markings, tan chest/face with scar, yellow/orange torn open vest and RED shorts/sandals matching project base colours, straw hat on back. Leaner than the huge round Boundman. NOT Gear 5, no white hair, no white clothing. Reference gives Luffy identity; do not copy the ordinary thin base sprite unchanged.
+Reference 1 is the character identity / original sheet. Reference 2 is the accepted B10 pixel style ONLY; do not copy its character or clothing.
+Transparent square canvas, exactly 1254 x 1254. EXACT 6 columns x 6 rows, each cell 209 x 209. One isolated complete SAME character in every cell, canonical 3/4 RIGHT facing. Same fixed body scale, bottom-centred anchor, generous margins. Body about 150 pixels tall on this source canvas, later exported at 94px. All weapons/limbs remain inside their own cell.
+Crisp low-resolution pixel clusters, warm dark outline, upper-left light, 3-value ramps; visible at 94px. No smooth illustration, no 3D, no chibi restyling. Stable face, hair, outfit and equipment across all 36 drawings.
+Six GENUINELY DIFFERENT BODY poses per row, no translated/scaled/rotated whole-image copies:
+Row 1 IDLE: six subtle guard/breathing poses, actual elbow/shoulder/knee changes, calm closed loop.
+Row 2 MOVE: six nimble grounded run-cycle poses, real alternating feet/knees, black Haki arms move opposite to stride.
+Row 3 ATTACK: six long Haki-arm straight punch poses: wind up, coil, arm extends RIGHT, curved forearm extension within cell, follow-through, retract.
+Row 4 CAST: six Python-like punch body poses: crouch, fist pulls back, torso rotates, bent elastic arm snakes RIGHT, hand follows through, recover; draw the actual articulated arm, no aura or external punch FX.
+Row 5 HIT: six guarded recoil/torso-compression/arm-response poses, recover.
+Row 6 DEFEAT: six stages stagger, knee buckles, kneel, hand to ground, fall, final resting body. Whole figure remains in its cell.
+No text, grid lines, labels, letters, numbers, background/checkerboard, ground disc/shadow, coloured rim, aura, particles or FX. This is a source draft for subsequent local curation and pixel cleanup, not an unreviewed production atlas.

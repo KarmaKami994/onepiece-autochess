@@ -1,0 +1,12 @@
+Create ONE frozen pixel-art ANIMATION AUTHORING DRAFT for MONKEY D. LUFFY — GEAR 4 BOUNDMAN, an explicitly different transformed body from the small base Luffy reference. Enormous inflated round tan torso, huge BLACK ARMAMENT-HAKI forearms with RED spiral/flame markings, smaller sturdy legs, black upright hair, round determined face, chest scar, straw hat strapped on back. Keep the project's yellow/orange torn open vest and red shorts/sandals colour identity. NOT Gear 5: no white hair/clothes. Fully recognizable as Luffy, not a gorilla or wrestler. Do not redraw ordinary thin base Luffy.
+Reference 1 is the character identity / original sheet. Reference 2 is the accepted B10 pixel style ONLY; do not copy its character or clothing.
+Transparent square canvas, exactly 1254 x 1254. EXACT 6 columns x 6 rows, each cell 209 x 209. One isolated complete SAME character in every cell, canonical 3/4 RIGHT facing. Same fixed body scale, bottom-centred anchor, generous margins. Body about 150 pixels tall on this source canvas, later exported at 100px. All weapons/limbs remain inside their own cell.
+Crisp low-resolution pixel clusters, warm dark outline, upper-left light, 3-value ramps; visible at 100px. No smooth illustration, no 3D, no chibi restyling. Stable face, hair, outfit and equipment across all 36 drawings.
+Six GENUINELY DIFFERENT BODY poses per row, no translated/scaled/rotated whole-image copies:
+Row 1 IDLE: six subtle guard/breathing poses, actual elbow/shoulder/knee changes, calm closed loop.
+Row 2 MOVE: six grounded heavy springy walking/running poses, alternating legs/knees, counterweight of inflated torso, bent black Haki arms; no whole-body bobs as replacement.
+Row 3 ATTACK: six huge Haki-fist punch poses: brace, draw back, coil torso, punch RIGHT, follow-through, retract.
+Row 4 CAST: six Kong-Gun-like body poses: knees compress, Haki arm draws far back, fist rises, arm punches RIGHT, shoulder follows, recover; no aura/steam/impact FX.
+Row 5 HIT: six guarded recoil/torso-compression/arm-response poses, recover.
+Row 6 DEFEAT: six stages stagger, knee buckles, kneel, hand to ground, fall, final resting body. Whole figure remains in its cell.
+No text, grid lines, labels, letters, numbers, background/checkerboard, ground disc/shadow, coloured rim, aura, particles or FX. This is a source draft for subsequent local curation and pixel cleanup, not an unreviewed production atlas.

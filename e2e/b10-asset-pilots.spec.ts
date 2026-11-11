@@ -34,8 +34,10 @@ test("B10 pilots expose all six clips, both facings and retained variants in Ani
     await page.screenshot({ path: testInfo.outputPath(`${id}-lab.png`), fullPage: true });
   }
   await page.getByRole("combobox", { name: "CHARACTER", exact: true }).selectOption("robin");
-  await expect(page.locator('.animation-preview-panel[aria-label="robin robin preview"]')).toBeVisible();
+  await expect(page.locator('.animation-preview-panel[aria-label="robin robin-b11-v2 preview"]')).toBeVisible();
   await expect(page.locator('.animation-preview-panel[aria-label="robin robin-v2 preview"]')).toBeVisible();
+  await page.getByLabel("Compare oldest fallback", { exact: true }).check();
+  await expect(page.locator('.animation-preview-panel[aria-label="robin robin preview"]')).toBeVisible();
 });
 
 test("isolated combat loads the visible Koala and Demonio bodies without a roster preload", async ({ page }, testInfo) => {

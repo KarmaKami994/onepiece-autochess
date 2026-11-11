@@ -1,0 +1,11 @@
+Create ONE frozen pixel-art ANIMATION AUTHORING DRAFT for Generic CIPHER POL AGENT from the existing project-owned design in reference 1. Adult covert government agent, black/navy tailored long coat/suit, white opaque mask with dark eye slits, pale ivory tie/accent, black gloves and boots. Proper detailed adult pixel body and mask; preserve the black/ivory silhouette. Bare fists; no sword, no named boss identity.
+Reference 1 is the OLD project-owned vector concept: preserve its palette, faction marks and equipment, but replace the flat mannequin with a complete shaded game-quality pixel body, facial detail, muscles/folds/feathers/metal where appropriate. Reference 2 is the accepted B10 pixel style ONLY; do not copy Koala's clothes/face.
+Transparent square canvas EXACTLY 1254 x 1254, 6 columns x 6 rows, 209 x 209 cells. One complete SAME character in each cell facing canonical 3/4 RIGHT. Same fixed body scale, bottom-centred anchor, body about 150 source pixels tall for 82px export. Generous clear cell margins; all weapons/limbs/head marks fit. Crisp hard pixel clusters, dark warm outline, upper-left light, 3-value ramps. No smooth illustration, no 3D, no chibi, no flat vector placeholder, no recoloured shared mannequin.
+Six genuinely different BODY poses per row, not shifted/scaled whole-image copies:
+Row 1 IDLE: six subtle guard/breathing poses with real shoulder/elbow/knee changes, closed loop.
+Row 2 MOVE: six real grounded marching/running strides with alternating bent knees/feet and opposing arms; bare fist stays attached to hand, coat or wings follow
+Row 3 ATTACK: six bare fist attack poses: ready, anticipation, draw back, strike RIGHT, follow-through, recover; no painted trails or projectiles
+Row 4 CAST: six masked martial-arts palm body poses: brace, crouch, raise/ready bare fist, arms extend RIGHT, follow-through, recover. Equipment attached to real hands, no particles, aura or external FX
+Row 5 HIT: six guarded torso/arm recoil poses with real compression and recovery.
+Row 6 DEFEAT: six stages stagger, knees buckle, kneel, hand to ground, fall, final resting complete body.
+No text, grid lines, labels, letters, numbers, backdrop/checkerboard, ground shadow/disc, aura, particles or FX. BODY only; identity/equipment unchanged across all 36 drawings. Source draft for local curation and cleanup.

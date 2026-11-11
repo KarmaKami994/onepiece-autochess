@@ -1,0 +1,185 @@
+{
+  "id": "new-fish-man-officer",
+  "kind": "pve",
+  "baseId": "new-fish-man-officer",
+  "sourceType": "AI-assisted-body-poses",
+  "scale": 0.43157894736842106,
+  "bodyClass": "normal",
+  "originalSource": {
+    "strategy": "procedural-cutout",
+    "localPath": "public/assets/enemies/new-fish-man-officer.png",
+    "sha256": "ed7f39d55f360a3306b11a60b190617f55b5d2002313e63b1088fbfb520cdcaf",
+    "dimensions": {
+      "width": 512,
+      "height": 768
+    },
+    "game": "Repository-authored faction minion",
+    "gameUrl": null,
+    "sheetUrl": null,
+    "sourceCharacterName": "New Fish-Man Officer",
+    "contributor": "One Piece Autochess project",
+    "frameMap": "procedural:static-cutout-v1",
+    "derivedFrameMap": "public/assets/animations/new-fish-man-officer-v2/new-fish-man-officer-v2.json#frames"
+  },
+  "permission": {
+    "status": "project-owned",
+    "note": "Locally authored faction minion generated deterministically by scripts/assets/build_p12_pve_assets.mjs; no external sheet pixels are used."
+  },
+  "reference": "art/production/b11/references/new-fish-man-officer-design.png",
+  "accessoryComponents": 1,
+  "tool": "built-in image_gen; exact model/seed/settings not exposed",
+  "preservedStates": [],
+  "supplementalStates": null,
+  "selections": {
+    "idle": [
+      {
+        "draftPose": 0
+      },
+      {
+        "draftPose": 1
+      },
+      {
+        "draftPose": 2
+      },
+      {
+        "draftPose": 3
+      },
+      {
+        "draftPose": 4
+      },
+      {
+        "draftPose": 0
+      }
+    ],
+    "move": [
+      {
+        "draftPose": 6
+      },
+      {
+        "draftPose": 7
+      },
+      {
+        "draftPose": 8
+      },
+      {
+        "draftPose": 9
+      },
+      {
+        "draftPose": 10
+      },
+      {
+        "draftPose": 11
+      },
+      {
+        "draftPose": 6
+      },
+      {
+        "draftPose": 7
+      }
+    ],
+    "attack": [
+      {
+        "draftPose": 12
+      },
+      {
+        "draftPose": 13
+      },
+      {
+        "draftPose": 14
+      },
+      {
+        "draftPose": 15
+      },
+      {
+        "draftPose": 16
+      },
+      {
+        "draftPose": 16
+      },
+      {
+        "draftPose": 17
+      },
+      {
+        "draftPose": 12
+      }
+    ],
+    "cast": [
+      {
+        "draftPose": 18
+      },
+      {
+        "draftPose": 18
+      },
+      {
+        "draftPose": 19
+      },
+      {
+        "draftPose": 19
+      },
+      {
+        "draftPose": 20
+      },
+      {
+        "draftPose": 20
+      },
+      {
+        "draftPose": 21
+      },
+      {
+        "draftPose": 21
+      },
+      {
+        "draftPose": 22
+      },
+      {
+        "draftPose": 22
+      },
+      {
+        "draftPose": 23
+      },
+      {
+        "draftPose": 18
+      }
+    ],
+    "hit": [
+      {
+        "draftPose": 25
+      },
+      {
+        "draftPose": 26
+      },
+      {
+        "draftPose": 27
+      },
+      {
+        "draftPose": 28
+      }
+    ],
+    "defeat": [
+      {
+        "draftPose": 30
+      },
+      {
+        "draftPose": 31
+      },
+      {
+        "draftPose": 32
+      },
+      {
+        "draftPose": 33
+      },
+      {
+        "draftPose": 34
+      },
+      {
+        "draftPose": 35
+      },
+      {
+        "draftPose": 35
+      },
+      {
+        "draftPose": 35
+      }
+    ]
+  }
+}

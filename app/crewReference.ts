@@ -116,7 +116,7 @@ export function crewReference(content: GameContent, star: StarLevel = 1): Refere
   });
   for (const enemy of content.enemies) entries.push({
     id: enemy.id, category: "pve", name: enemy.name, description: "PvE only — never sold in the shop or reserved from the shared crew pool.",
-    imagePath: enemy.assetPath, traits: [],
+    imagePath: createUnitReferenceView(enemy, content).portrait, traits: [],
     details: [statsText(enemy.stats, star, content), ...abilityReference(enemy.ability, star, content),
       `Waves: ${content.stages.filter((stage) => stage.enemyWave?.some((entry) => entry.enemyId === enemy.id)).map((stage) => `R${stage.round} ${stage.name}`).join(", ") || "Legacy combat/save archetype"}`],
   });
