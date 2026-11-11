@@ -105,7 +105,16 @@ B11 variants (affected P9 20/20, typecheck and affected lint PASS). CI #185
 then passed all 959 normal tests; its coverage run hit the new monolithic
 58-package test deadline. The same assertions are now isolated per package
 under the unchanged timeout (B11 62/62). This adds 57 case boundaries, no
-extra package checks or weakened thresholds. No separate local
+extra package checks or weakened thresholds.
+
+CI #186 on source/fixture head `c73300373f1ff8b2c0e26715f9a2a5babd09d0e2`
+passed **1016/1016 unit and coverage tests**, assets, standard **50/50 smoke /
+zero crashes**, build and dependency review. Browser dependency installation
+failed because `azure.archive.ubuntu.com` could not resolve; one unchanged job
+retry failed identically. Remote Browser E2E did not run. This external gate
+remains outstanding despite local 12/12 browser PASS. No workflow workaround,
+manual third retry, extra local aggregate or B11 merge. The final documentation
+handoff can automatically requeue ordinary CI on unchanged implementation. No separate local
 production aggregate, baseline or 1,000-seed soak. No gameplay, unlock/catalyst,
 item/form numbers, bot, economy, RNG or save-format change. No B12 work.
 
