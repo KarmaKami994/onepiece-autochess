@@ -104,12 +104,12 @@ Owner-Freigabe für diesen Prüfumfang: **11.11.2026**.
 | Prüfung | Ergebnis |
 | --- | --- |
 | Typecheck / Lint | PASS; abschließend geänderte Dateien erneut geprüft. |
-| Fokussierte Unit-/Asset-Tests | PASS, 6 Dateien / 33 Tests einschließlich Content-/Schema-Regression; korrigierter Zwei-Dateien-Lauf 13/13. |
+| Fokussierte Unit-/Asset-Tests | PASS, 7 Dateien / 41 Tests einschließlich Content-/Schema-Regression und Ressourcenleisten-Ankern; betroffener Ressourcen-/B10-Lauf 13/13. |
 | Asset-/Provenienz-Validierung | PASS, einschließlich aller 79 Atlanten. |
 | Produktionsbuild | PASS, bestehende nichtfatale Vinext-Hinweise unverändert. |
 | Browser 1280×720 / 1920×1080 | PASS, final 4/4; gezielte tatsächliche Board-Aufnahme zusätzlich 2/2. |
 | Geschützte Pfade / Format | PASS: Domain, Harness, historische Analyse, Original-Sheets und alte Luffy/Koala/Kaido-Atlanten unverändert. |
-| Normale GitHub-CI | Separates Exact-Head-Mergegate; aktueller Status über den Task-PR / [Workflow](https://github.com/KarmaKami994/onepiece-autochess/actions?query=branch%3Acodex%2Fb10-asset-pilots). |
+| Normale GitHub-CI | Separates Exact-Head-Mergegate; aktueller Status über [PR #72](https://github.com/KarmaKami994/onepiece-autochess/pull/72/checks). |
 | Lokale volle Suite / Produktionslauf / Baseline / 1.000-Seed-Soak | NOT RUN; normale CI behält ihre gewöhnlichen Checks und ihren Smoke. |
 
 Gefunden und korrigiert: Sharp führt Trim vor Extract aus, daher materialisiert
@@ -118,6 +118,12 @@ neuer Auswahlfeld-Selektor; abgeschnittene dritte Formkarte. Kein Testtimeout
 oder bestehender Anspruch wurde gelockert. Windows benötigte einen lokalen
 Temp-Cache und Host-Zugriff für den Testserver. Ein unveränderter Asset-I/O-
 Timeout bestand den gezielten Wiederholungslauf.
+
+CI #180 auf `86dec9a` fand bei 953/954 bestandenen Tests noch die veraltete
+63-v2-Anzahl im Ressourcenleisten-Test. B10 ergänzt drei Zuordnungen: Erwartung
+66 plus expliziter Nachweis aller drei Piloten, unverändert vollständiger
+Abgleich jedes Idle-Ankers gegen die Metadaten. Der betroffene lokale Lauf
+bestand 13/13; kein Gameplay-/Asseteingriff und kein lokaler Volllauf dafür.
 
 Echte Browserbilder liegen je unter `art/qa/b10/browser/desktop-1280/` und
 `desktop-1920/`: `koala-lab.png`, `kaido-lab.png`,
