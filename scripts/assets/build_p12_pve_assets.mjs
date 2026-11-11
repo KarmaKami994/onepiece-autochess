@@ -3,6 +3,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
+import { preferredV2AssetKeys } from "./preferred_v2_source.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const PUBLIC = path.join(ROOT, "public", "assets");
@@ -69,11 +70,13 @@ async function buildFactionSources() {
 }
 
 async function buildRuntimePresentation() {
+  const preferred=await preferredV2AssetKeys(ROOT);
   for (const directory of ["enemies", "portraits", "tokens"]) {
     await mkdir(path.join(PUBLIC, directory), { recursive: true });
   }
   for (const id of [...BOSSES, ...Object.keys(FACTIONS)]) {
-    const atlas = await readFile(path.join(PUBLIC, "animations", `${id}-v2`, `${id}-v2.png`));
+    const key=preferred(id);
+    const atlas = await readFile(path.join(PUBLIC, "animations", key, `${key}.png`));
     const idle = await sharp(atlas).extract({ left: 0, top: 0, width: 128, height: 128 }).png().toBuffer();
     const portrait = await fitAsset(idle, 320, 320, 270, 300);
     const token = await fitAsset(idle, 160, 160, 128, 146);

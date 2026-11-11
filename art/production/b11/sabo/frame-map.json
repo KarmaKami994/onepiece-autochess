@@ -1,0 +1,649 @@
+{
+  "schemaVersion": 1,
+  "frames": [
+    {
+      "state": "idle",
+      "poseId": "idle-{\"candidate\":0,\"sourceRect\":{\"x\":46,\"y\":30,\"width\":141,\"height\":139}}",
+      "sourceRect": {
+        "x": 0,
+        "y": 0,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 64,
+        "y": 116
+      }
+    },
+    {
+      "state": "idle",
+      "poseId": "idle-{\"candidate\":4,\"sourceRect\":{\"x\":41,\"y\":212,\"width\":141,\"height\":139}}",
+      "sourceRect": {
+        "x": 128,
+        "y": 0,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 192,
+        "y": 116
+      }
+    },
+    {
+      "state": "idle",
+      "poseId": "idle-{\"candidate\":5,\"sourceRect\":{\"x\":195,\"y\":212,\"width\":139,\"height\":139}}",
+      "sourceRect": {
+        "x": 256,
+        "y": 0,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 320,
+        "y": 116
+      }
+    },
+    {
+      "state": "idle",
+      "poseId": "idle-{\"candidate\":6,\"sourceRect\":{\"x\":350,\"y\":212,\"width\":135,\"height\":141}}",
+      "sourceRect": {
+        "x": 384,
+        "y": 0,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 448,
+        "y": 116
+      }
+    },
+    {
+      "state": "idle",
+      "poseId": "idle-{\"candidate\":7,\"sourceRect\":{\"x\":487,\"y\":212,\"width\":134,\"height\":141}}",
+      "sourceRect": {
+        "x": 512,
+        "y": 0,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 576,
+        "y": 116
+      }
+    },
+    {
+      "state": "idle",
+      "poseId": "idle-{\"candidate\":4,\"sourceRect\":{\"x\":41,\"y\":212,\"width\":141,\"height\":139}}",
+      "sourceRect": {
+        "x": 640,
+        "y": 0,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 704,
+        "y": 116
+      }
+    },
+    {
+      "state": "move",
+      "poseId": "move-{\"candidate\":16,\"sourceRect\":{\"x\":47,\"y\":549,\"width\":137,\"height\":137}}",
+      "sourceRect": {
+        "x": 0,
+        "y": 128,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 64,
+        "y": 244
+      }
+    },
+    {
+      "state": "move",
+      "poseId": "move-{\"candidate\":17,\"sourceRect\":{\"x\":188,\"y\":565,\"width\":112,\"height\":123}}",
+      "sourceRect": {
+        "x": 128,
+        "y": 128,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 192,
+        "y": 244
+      }
+    },
+    {
+      "state": "move",
+      "poseId": "move-{\"candidate\":18,\"sourceRect\":{\"x\":312,\"y\":573,\"width\":106,\"height\":117}}",
+      "sourceRect": {
+        "x": 256,
+        "y": 128,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 320,
+        "y": 244
+      }
+    },
+    {
+      "state": "move",
+      "poseId": "move-{\"candidate\":19,\"sourceRect\":{\"x\":431,\"y\":573,\"width\":104,\"height\":118}}",
+      "sourceRect": {
+        "x": 384,
+        "y": 128,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 448,
+        "y": 244
+      }
+    },
+    {
+      "state": "move",
+      "poseId": "move-{\"candidate\":20,\"sourceRect\":{\"x\":193,\"y\":704,\"width\":98,\"height\":185}}",
+      "sourceRect": {
+        "x": 512,
+        "y": 128,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 576,
+        "y": 244
+      }
+    },
+    {
+      "state": "move",
+      "poseId": "move-{\"candidate\":21,\"sourceRect\":{\"x\":306,\"y\":728,\"width\":106,\"height\":165}}",
+      "sourceRect": {
+        "x": 640,
+        "y": 128,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 704,
+        "y": 244
+      }
+    },
+    {
+      "state": "move",
+      "poseId": "move-{\"candidate\":22,\"sourceRect\":{\"x\":424,\"y\":736,\"width\":121,\"height\":156}}",
+      "sourceRect": {
+        "x": 768,
+        "y": 128,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 832,
+        "y": 244
+      }
+    },
+    {
+      "state": "move",
+      "poseId": "move-{\"candidate\":23,\"sourceRect\":{\"x\":557,\"y\":728,\"width\":122,\"height\":166}}",
+      "sourceRect": {
+        "x": 896,
+        "y": 128,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 960,
+        "y": 244
+      }
+    },
+    {
+      "state": "attack",
+      "poseId": "attack-{\"candidate\":33,\"sourceRect\":{\"x\":475,\"y\":973,\"width\":106,\"height\":114}}",
+      "sourceRect": {
+        "x": 0,
+        "y": 256,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 64,
+        "y": 372
+      }
+    },
+    {
+      "state": "attack",
+      "poseId": "attack-{\"candidate\":34,\"sourceRect\":{\"x\":591,\"y\":981,\"width\":93,\"height\":110}}",
+      "sourceRect": {
+        "x": 128,
+        "y": 256,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 192,
+        "y": 372
+      }
+    },
+    {
+      "state": "attack",
+      "poseId": "attack-{\"candidate\":35,\"sourceRect\":{\"x\":695,\"y\":981,\"width\":94,\"height\":109}}",
+      "sourceRect": {
+        "x": 256,
+        "y": 256,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 320,
+        "y": 372
+      }
+    },
+    {
+      "state": "attack",
+      "poseId": "attack-{\"candidate\":36,\"sourceRect\":{\"x\":56,\"y\":1112,\"width\":124,\"height\":149}}",
+      "sourceRect": {
+        "x": 384,
+        "y": 256,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 448,
+        "y": 372
+      }
+    },
+    {
+      "state": "attack",
+      "poseId": "attack-{\"candidate\":37,\"sourceRect\":{\"x\":474,\"y\":1105,\"width\":122,\"height\":169}}",
+      "sourceRect": {
+        "x": 512,
+        "y": 256,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 576,
+        "y": 372
+      }
+    },
+    {
+      "state": "attack",
+      "poseId": "attack-{\"candidate\":39,\"sourceRect\":{\"x\":595,\"y\":1121,\"width\":118,\"height\":152}}",
+      "sourceRect": {
+        "x": 640,
+        "y": 256,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 704,
+        "y": 372
+      }
+    },
+    {
+      "state": "attack",
+      "poseId": "attack-{\"candidate\":40,\"sourceRect\":{\"x\":836,\"y\":1166,\"width\":162,\"height\":85}}",
+      "sourceRect": {
+        "x": 768,
+        "y": 256,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 832,
+        "y": 372
+      }
+    },
+    {
+      "state": "attack",
+      "poseId": "attack-{\"candidate\":41,\"sourceRect\":{\"x\":1016,\"y\":1159,\"width\":137,\"height\":102}}",
+      "sourceRect": {
+        "x": 896,
+        "y": 256,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 960,
+        "y": 372
+      }
+    },
+    {
+      "state": "cast",
+      "poseId": "cast-{\"candidate\":45,\"sourceRect\":{\"x\":507,\"y\":1333,\"width\":154,\"height\":144}}",
+      "sourceRect": {
+        "x": 0,
+        "y": 384,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 64,
+        "y": 500
+      }
+    },
+    {
+      "state": "cast",
+      "poseId": "cast-{\"candidate\":45,\"sourceRect\":{\"x\":507,\"y\":1333,\"width\":154,\"height\":144}}",
+      "sourceRect": {
+        "x": 128,
+        "y": 384,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 192,
+        "y": 500
+      }
+    },
+    {
+      "state": "cast",
+      "poseId": "cast-{\"candidate\":46,\"sourceRect\":{\"x\":56,\"y\":1499,\"width\":125,\"height\":128}}",
+      "sourceRect": {
+        "x": 256,
+        "y": 384,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 320,
+        "y": 500
+      }
+    },
+    {
+      "state": "cast",
+      "poseId": "cast-{\"candidate\":47,\"sourceRect\":{\"x\":191,\"y\":1507,\"width\":138,\"height\":123}}",
+      "sourceRect": {
+        "x": 384,
+        "y": 384,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 448,
+        "y": 500
+      }
+    },
+    {
+      "state": "cast",
+      "poseId": "cast-{\"candidate\":47,\"sourceRect\":{\"x\":191,\"y\":1507,\"width\":138,\"height\":123}}",
+      "sourceRect": {
+        "x": 512,
+        "y": 384,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 576,
+        "y": 500
+      }
+    },
+    {
+      "state": "cast",
+      "poseId": "cast-{\"candidate\":48,\"sourceRect\":{\"x\":334,\"y\":1499,\"width\":176,\"height\":129}}",
+      "sourceRect": {
+        "x": 640,
+        "y": 384,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 704,
+        "y": 500
+      }
+    },
+    {
+      "state": "cast",
+      "poseId": "cast-{\"candidate\":49,\"sourceRect\":{\"x\":514,\"y\":1499,\"width\":162,\"height\":128}}",
+      "sourceRect": {
+        "x": 768,
+        "y": 384,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 832,
+        "y": 500
+      }
+    },
+    {
+      "state": "cast",
+      "poseId": "cast-{\"candidate\":49,\"sourceRect\":{\"x\":514,\"y\":1499,\"width\":162,\"height\":128}}",
+      "sourceRect": {
+        "x": 896,
+        "y": 384,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 960,
+        "y": 500
+      }
+    },
+    {
+      "state": "cast",
+      "poseId": "cast-{\"candidate\":50,\"sourceRect\":{\"x\":677,\"y\":1491,\"width\":149,\"height\":141}}",
+      "sourceRect": {
+        "x": 1024,
+        "y": 384,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 1088,
+        "y": 500
+      }
+    },
+    {
+      "state": "cast",
+      "poseId": "cast-{\"candidate\":51,\"sourceRect\":{\"x\":836,\"y\":1483,\"width\":139,\"height\":149}}",
+      "sourceRect": {
+        "x": 1152,
+        "y": 384,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 1216,
+        "y": 500
+      }
+    },
+    {
+      "state": "cast",
+      "poseId": "cast-{\"candidate\":51,\"sourceRect\":{\"x\":836,\"y\":1483,\"width\":139,\"height\":149}}",
+      "sourceRect": {
+        "x": 1280,
+        "y": 384,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 1344,
+        "y": 500
+      }
+    },
+    {
+      "state": "cast",
+      "poseId": "cast-{\"candidate\":52,\"sourceRect\":{\"x\":500,\"y\":1637,\"width\":127,\"height\":189}}",
+      "sourceRect": {
+        "x": 1408,
+        "y": 384,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 1472,
+        "y": 500
+      }
+    },
+    {
+      "state": "hit",
+      "poseId": "hit-{\"candidate\":199,\"sourceRect\":{\"x\":240,\"y\":6901,\"width\":117,\"height\":145}}",
+      "sourceRect": {
+        "x": 0,
+        "y": 512,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 64,
+        "y": 628
+      }
+    },
+    {
+      "state": "hit",
+      "poseId": "hit-{\"candidate\":200,\"sourceRect\":{\"x\":376,\"y\":6902,\"width\":103,\"height\":147}}",
+      "sourceRect": {
+        "x": 128,
+        "y": 512,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 192,
+        "y": 628
+      }
+    },
+    {
+      "state": "hit",
+      "poseId": "hit-{\"candidate\":201,\"sourceRect\":{\"x\":493,\"y\":6902,\"width\":107,\"height\":145}}",
+      "sourceRect": {
+        "x": 256,
+        "y": 512,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 320,
+        "y": 628
+      }
+    },
+    {
+      "state": "hit",
+      "poseId": "hit-{\"candidate\":202,\"sourceRect\":{\"x\":113,\"y\":7057,\"width\":108,\"height\":152}}",
+      "sourceRect": {
+        "x": 384,
+        "y": 512,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 448,
+        "y": 628
+      }
+    },
+    {
+      "state": "defeat",
+      "poseId": "defeat-{\"candidate\":213,\"sourceRect\":{\"x\":608,\"y\":7441,\"width\":122,\"height\":99}}",
+      "sourceRect": {
+        "x": 0,
+        "y": 640,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 64,
+        "y": 756
+      }
+    },
+    {
+      "state": "defeat",
+      "poseId": "defeat-{\"candidate\":214,\"sourceRect\":{\"x\":119,\"y\":7591,\"width\":136,\"height\":108}}",
+      "sourceRect": {
+        "x": 128,
+        "y": 640,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 192,
+        "y": 756
+      }
+    },
+    {
+      "state": "defeat",
+      "poseId": "defeat-{\"candidate\":215,\"sourceRect\":{\"x\":268,\"y\":7599,\"width\":154,\"height\":96}}",
+      "sourceRect": {
+        "x": 256,
+        "y": 640,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 320,
+        "y": 756
+      }
+    },
+    {
+      "state": "defeat",
+      "poseId": "defeat-{\"candidate\":216,\"sourceRect\":{\"x\":433,\"y\":7583,\"width\":157,\"height\":115}}",
+      "sourceRect": {
+        "x": 384,
+        "y": 640,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 448,
+        "y": 756
+      }
+    },
+    {
+      "state": "defeat",
+      "poseId": "defeat-{\"candidate\":217,\"sourceRect\":{\"x\":603,\"y\":7590,\"width\":168,\"height\":108}}",
+      "sourceRect": {
+        "x": 512,
+        "y": 640,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 576,
+        "y": 756
+      }
+    },
+    {
+      "state": "defeat",
+      "poseId": "defeat-{\"candidate\":218,\"sourceRect\":{\"x\":140,\"y\":7728,\"width\":105,\"height\":137}}",
+      "sourceRect": {
+        "x": 640,
+        "y": 640,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 704,
+        "y": 756
+      }
+    },
+    {
+      "state": "defeat",
+      "poseId": "defeat-{\"candidate\":228,\"sourceRect\":{\"x\":852,\"y\":8083,\"width\":123,\"height\":88}}",
+      "sourceRect": {
+        "x": 768,
+        "y": 640,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 832,
+        "y": 756
+      }
+    },
+    {
+      "state": "defeat",
+      "poseId": "defeat-{\"candidate\":230,\"sourceRect\":{\"x\":322,\"y\":8118,\"width\":169,\"height\":58}}",
+      "sourceRect": {
+        "x": 896,
+        "y": 640,
+        "width": 128,
+        "height": 128
+      },
+      "sourcePivot": {
+        "x": 960,
+        "y": 756
+      }
+    }
+  ]
+}

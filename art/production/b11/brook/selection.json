@@ -1,0 +1,432 @@
+{
+  "id": "brook",
+  "kind": "crew",
+  "baseId": "brook",
+  "sourceType": "licensed-original-curation",
+  "scale": 0.6391752577319587,
+  "bodyClass": "small",
+  "originalSource": {
+    "strategy": "auto-frame-map",
+    "localPath": "art/licensed-reference/gigant-battle-2/Brook.png",
+    "sha256": "22990b7c8b9bd489f8893b97b4ed819dcdedd5698e40e429639e593dc3d98b2d",
+    "dimensions": {
+      "width": 1408,
+      "height": 4605
+    },
+    "game": "One Piece: Gigant Battle! 2 - New World",
+    "gameUrl": "https://spritedatabase.net/game/2232",
+    "sheetUrl": "https://spritedatabase.net/file/14899",
+    "fileId": 14899,
+    "sourceCharacterName": "Brook",
+    "contributor": "Grim",
+    "contributorBasis": "Sprite Database file page read 2026-09-10",
+    "frameMap": "auto:connected-components-v1",
+    "derivedFrameMap": "public/assets/animations/brook-v2/brook-v2.json#frames"
+  },
+  "permission": {
+    "status": "confirmed",
+    "note": "Project-owner attestation in the Codex project conversation on 2026-09-10 confirms authorization for applicable One Piece assets in this private/local project; no downstream asset license is granted."
+  },
+  "tool": null,
+  "preservedStates": [
+    "idle",
+    "move",
+    "attack",
+    "cast",
+    "hit",
+    "defeat"
+  ],
+  "supplementalStates": null,
+  "selections": {
+    "idle": [
+      {
+        "candidate": 0,
+        "sourceRect": {
+          "x": 1,
+          "y": 8,
+          "width": 49,
+          "height": 94
+        }
+      },
+      {
+        "candidate": 1,
+        "sourceRect": {
+          "x": 64,
+          "y": 9,
+          "width": 51,
+          "height": 94
+        }
+      },
+      {
+        "candidate": 2,
+        "sourceRect": {
+          "x": 122,
+          "y": 10,
+          "width": 53,
+          "height": 93
+        }
+      },
+      {
+        "candidate": 3,
+        "sourceRect": {
+          "x": 177,
+          "y": 8,
+          "width": 51,
+          "height": 95
+        }
+      },
+      {
+        "candidate": 2,
+        "sourceRect": {
+          "x": 122,
+          "y": 10,
+          "width": 53,
+          "height": 93
+        }
+      },
+      {
+        "candidate": 1,
+        "sourceRect": {
+          "x": 64,
+          "y": 9,
+          "width": 51,
+          "height": 94
+        }
+      }
+    ],
+    "move": [
+      {
+        "candidate": 6,
+        "sourceRect": {
+          "x": 391,
+          "y": 11,
+          "width": 72,
+          "height": 91
+        }
+      },
+      {
+        "candidate": 7,
+        "sourceRect": {
+          "x": 467,
+          "y": 10,
+          "width": 62,
+          "height": 92
+        }
+      },
+      {
+        "candidate": 8,
+        "sourceRect": {
+          "x": 534,
+          "y": 9,
+          "width": 56,
+          "height": 93
+        }
+      },
+      {
+        "candidate": 9,
+        "sourceRect": {
+          "x": 593,
+          "y": 10,
+          "width": 50,
+          "height": 92
+        }
+      },
+      {
+        "candidate": 10,
+        "sourceRect": {
+          "x": 648,
+          "y": 11,
+          "width": 50,
+          "height": 91
+        }
+      },
+      {
+        "candidate": 11,
+        "sourceRect": {
+          "x": 705,
+          "y": 11,
+          "width": 51,
+          "height": 91
+        }
+      },
+      {
+        "candidate": 8,
+        "sourceRect": {
+          "x": 534,
+          "y": 9,
+          "width": 56,
+          "height": 93
+        }
+      },
+      {
+        "candidate": 9,
+        "sourceRect": {
+          "x": 593,
+          "y": 10,
+          "width": 50,
+          "height": 92
+        }
+      }
+    ],
+    "attack": [
+      {
+        "candidate": 19,
+        "sourceRect": {
+          "x": 781,
+          "y": 111,
+          "width": 108,
+          "height": 83
+        }
+      },
+      {
+        "candidate": 20,
+        "sourceRect": {
+          "x": 894,
+          "y": 109,
+          "width": 103,
+          "height": 85
+        }
+      },
+      {
+        "candidate": 21,
+        "sourceRect": {
+          "x": 1007,
+          "y": 100,
+          "width": 42,
+          "height": 94
+        }
+      },
+      {
+        "candidate": 22,
+        "sourceRect": {
+          "x": 1,
+          "y": 207,
+          "width": 89,
+          "height": 83
+        }
+      },
+      {
+        "candidate": 23,
+        "sourceRect": {
+          "x": 93,
+          "y": 207,
+          "width": 67,
+          "height": 83
+        }
+      },
+      {
+        "candidate": 24,
+        "sourceRect": {
+          "x": 161,
+          "y": 217,
+          "width": 120,
+          "height": 73
+        }
+      },
+      {
+        "candidate": 25,
+        "sourceRect": {
+          "x": 284,
+          "y": 218,
+          "width": 140,
+          "height": 72
+        }
+      },
+      {
+        "candidate": 26,
+        "sourceRect": {
+          "x": 428,
+          "y": 217,
+          "width": 93,
+          "height": 73
+        }
+      }
+    ],
+    "cast": [
+      {
+        "candidate": 52,
+        "sourceRect": {
+          "x": 3,
+          "y": 402,
+          "width": 75,
+          "height": 90
+        }
+      },
+      {
+        "candidate": 53,
+        "sourceRect": {
+          "x": 79,
+          "y": 402,
+          "width": 73,
+          "height": 90
+        }
+      },
+      {
+        "candidate": 54,
+        "sourceRect": {
+          "x": 158,
+          "y": 406,
+          "width": 72,
+          "height": 86
+        }
+      },
+      {
+        "candidate": 55,
+        "sourceRect": {
+          "x": 233,
+          "y": 406,
+          "width": 72,
+          "height": 86
+        }
+      },
+      {
+        "candidate": 56,
+        "sourceRect": {
+          "x": 306,
+          "y": 408,
+          "width": 74,
+          "height": 84
+        }
+      },
+      {
+        "candidate": 57,
+        "sourceRect": {
+          "x": 382,
+          "y": 409,
+          "width": 74,
+          "height": 83
+        }
+      },
+      {
+        "candidate": 58,
+        "sourceRect": {
+          "x": 460,
+          "y": 409,
+          "width": 74,
+          "height": 83
+        }
+      },
+      {
+        "candidate": 52,
+        "sourceRect": {
+          "x": 3,
+          "y": 402,
+          "width": 75,
+          "height": 90
+        }
+      }
+    ],
+    "hit": [
+      {
+        "candidate": 452,
+        "sourceRect": {
+          "x": 15,
+          "y": 4160,
+          "width": 58,
+          "height": 101
+        }
+      },
+      {
+        "candidate": 453,
+        "sourceRect": {
+          "x": 72,
+          "y": 4160,
+          "width": 57,
+          "height": 101
+        }
+      },
+      {
+        "candidate": 454,
+        "sourceRect": {
+          "x": 129,
+          "y": 4174,
+          "width": 69,
+          "height": 87
+        }
+      },
+      {
+        "candidate": 455,
+        "sourceRect": {
+          "x": 212,
+          "y": 4165,
+          "width": 69,
+          "height": 96
+        }
+      }
+    ],
+    "defeat": [
+      {
+        "candidate": 479,
+        "sourceRect": {
+          "x": 530,
+          "y": 4302,
+          "width": 66,
+          "height": 90
+        }
+      },
+      {
+        "candidate": 480,
+        "sourceRect": {
+          "x": 663,
+          "y": 4306,
+          "width": 54,
+          "height": 86
+        }
+      },
+      {
+        "candidate": 481,
+        "sourceRect": {
+          "x": 720,
+          "y": 4297,
+          "width": 96,
+          "height": 95
+        }
+      },
+      {
+        "candidate": 482,
+        "sourceRect": {
+          "x": 818,
+          "y": 4332,
+          "width": 60,
+          "height": 60
+        }
+      },
+      {
+        "candidate": 483,
+        "sourceRect": {
+          "x": 877,
+          "y": 4346,
+          "width": 87,
+          "height": 46
+        }
+      },
+      {
+        "candidate": 484,
+        "sourceRect": {
+          "x": 1051,
+          "y": 4347,
+          "width": 92,
+          "height": 46
+        }
+      },
+      {
+        "candidate": 488,
+        "sourceRect": {
+          "x": 967,
+          "y": 4360,
+          "width": 85,
+          "height": 32
+        }
+      },
+      {
+        "candidate": 496,
+        "sourceRect": {
+          "x": 107,
+          "y": 4459,
+          "width": 97,
+          "height": 35
+        }
+      }
+    ]
+  }
+}

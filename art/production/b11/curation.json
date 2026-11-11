@@ -1,0 +1,363 @@
+{
+  "schemaVersion": 1,
+  "alphaCutoff": 192,
+  "paletteColours": 32,
+  "draftGrid": {
+    "cellSize": 209,
+    "rows": 6,
+    "columns": 6
+  },
+  "drafts": [
+    {
+      "id": "killer",
+      "baseId": "killer",
+      "bodyClass": "normal",
+      "masterHeight": 82,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": null,
+      "reference": "art/licensed-reference/great-pirate-colosseum/Killer.png"
+    },
+    {
+      "id": "caesar-clown",
+      "baseId": "caesar-clown",
+      "bodyClass": "large",
+      "masterHeight": 96,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": null,
+      "reference": "art/licensed-reference/great-pirate-colosseum/CaesarClown.png"
+    },
+    {
+      "id": "pica",
+      "baseId": "pica",
+      "bodyClass": "large",
+      "masterHeight": 100,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": null,
+      "reference": "art/licensed-reference/great-pirate-colosseum/Pica.png"
+    },
+    {
+      "id": "luffy-gear-4-boundman",
+      "baseId": "luffy",
+      "bodyClass": "large",
+      "masterHeight": 100,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": null,
+      "reference": "art/production/b11/references/luffy-idle.png"
+    },
+    {
+      "id": "luffy-gear-4-snakeman",
+      "baseId": "luffy",
+      "bodyClass": "large",
+      "masterHeight": 94,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": null,
+      "reference": "art/production/b11/references/luffy-idle.png"
+    },
+    {
+      "id": "chopper-monster-point",
+      "baseId": "chopper",
+      "bodyClass": "large",
+      "masterHeight": 104,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": null,
+      "reference": "art/production/b11/references/chopper-idle.png"
+    },
+    {
+      "id": "garp",
+      "baseId": "garp",
+      "bodyClass": "normal",
+      "masterHeight": 70,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": [
+        "move",
+        "attack",
+        "hit",
+        "defeat"
+      ],
+      "reference": "art/production/b11/references/garp-idle.png"
+    },
+    {
+      "id": "capone-bege",
+      "baseId": "capone-bege",
+      "bodyClass": "small",
+      "masterHeight": 56,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": [
+        "move",
+        "attack",
+        "cast",
+        "hit",
+        "defeat"
+      ],
+      "reference": "art/production/b11/references/capone-bege-idle.png"
+    },
+    {
+      "id": "arlong",
+      "baseId": "arlong",
+      "bodyClass": "normal",
+      "masterHeight": 82,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": [
+        "move",
+        "hit",
+        "defeat"
+      ],
+      "reference": "art/production/b11/references/arlong-idle.png"
+    },
+    {
+      "id": "marine-recruit",
+      "baseId": "marine-recruit",
+      "bodyClass": "normal",
+      "masterHeight": 82,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": null,
+      "reference": "art/production/b11/references/marine-recruit-idle.png"
+    },
+    {
+      "id": "rifle-marine",
+      "baseId": "rifle-marine",
+      "bodyClass": "normal",
+      "masterHeight": 82,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": null,
+      "reference": "art/production/b11/references/rifle-marine-idle.png"
+    },
+    {
+      "id": "pirate-raider",
+      "baseId": "pirate-raider",
+      "bodyClass": "normal",
+      "masterHeight": 82,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": null,
+      "reference": "art/production/b11/references/pirate-raider-idle.png"
+    },
+    {
+      "id": "sea-king",
+      "baseId": "sea-king",
+      "bodyClass": "large",
+      "masterHeight": 100,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": null,
+      "reference": "art/production/b11/references/sea-king-idle.png",
+      "mirrorPoses": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        11,
+        12,
+        13,
+        17,
+        18,
+        19,
+        23,
+        24,
+        25,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ]
+    },
+    {
+      "id": "pacifista",
+      "baseId": "pacifista",
+      "bodyClass": "large",
+      "masterHeight": 100,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": null,
+      "reference": "art/production/b11/references/pacifista-idle.png"
+    },
+    {
+      "id": "vice-admiral",
+      "baseId": "vice-admiral",
+      "bodyClass": "normal",
+      "masterHeight": 88,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": null,
+      "reference": "art/production/b11/references/vice-admiral-design.png"
+    },
+    {
+      "id": "cipher-pol-agent",
+      "baseId": "cipher-pol-agent",
+      "bodyClass": "normal",
+      "masterHeight": 82,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": null,
+      "reference": "art/production/b11/references/cipher-pol-agent-design.png"
+    },
+    {
+      "id": "seraphim",
+      "baseId": "seraphim",
+      "bodyClass": "large",
+      "masterHeight": 96,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": null,
+      "reference": "art/production/b11/references/seraphim-design.png"
+    },
+    {
+      "id": "fish-man-raider",
+      "baseId": "fish-man-raider",
+      "bodyClass": "normal",
+      "masterHeight": 82,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": null,
+      "reference": "art/production/b11/references/fish-man-raider-design.png"
+    },
+    {
+      "id": "skypiea-priest",
+      "baseId": "skypiea-priest",
+      "bodyClass": "normal",
+      "masterHeight": 82,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": null,
+      "reference": "art/production/b11/references/skypiea-priest-design.png",
+      "keepComponents": 2
+    },
+    {
+      "id": "cp9-elite",
+      "baseId": "cp9-elite",
+      "bodyClass": "normal",
+      "masterHeight": 82,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": null,
+      "reference": "art/production/b11/references/cp9-elite-design.png"
+    },
+    {
+      "id": "impel-down-guard",
+      "baseId": "impel-down-guard",
+      "bodyClass": "normal",
+      "masterHeight": 82,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": null,
+      "reference": "art/production/b11/references/impel-down-guard-design.png"
+    },
+    {
+      "id": "new-fish-man-officer",
+      "baseId": "new-fish-man-officer",
+      "bodyClass": "normal",
+      "masterHeight": 82,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": null,
+      "reference": "art/production/b11/references/new-fish-man-officer-design.png"
+    },
+    {
+      "id": "punk-hazard-guard",
+      "baseId": "punk-hazard-guard",
+      "bodyClass": "normal",
+      "masterHeight": 82,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": null,
+      "reference": "art/production/b11/references/punk-hazard-guard-design.png"
+    },
+    {
+      "id": "donquixote-officer",
+      "baseId": "donquixote-officer",
+      "bodyClass": "normal",
+      "masterHeight": 82,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": null,
+      "reference": "art/production/b11/references/donquixote-officer-design.png"
+    },
+    {
+      "id": "beast-pirate",
+      "baseId": "beast-pirate",
+      "bodyClass": "normal",
+      "masterHeight": 82,
+      "sourceAnchorX": 105,
+      "masterPose": 0,
+      "supplementalStates": null,
+      "reference": "art/production/b11/references/beast-pirate-design.png"
+    }
+  ],
+  "clips": {
+    "idle": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      0
+    ],
+    "move": [
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      6,
+      7
+    ],
+    "attack": [
+      12,
+      13,
+      14,
+      15,
+      16,
+      16,
+      17,
+      12
+    ],
+    "cast": [
+      18,
+      18,
+      19,
+      19,
+      20,
+      20,
+      21,
+      21,
+      22,
+      22,
+      23,
+      18
+    ],
+    "hit": [
+      25,
+      26,
+      27,
+      28
+    ],
+    "defeat": [
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      35,
+      35
+    ]
+  }
+}

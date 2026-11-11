@@ -1,0 +1,4260 @@
+{
+  "schemaVersion": 1,
+  "outputs": [
+    {
+      "path": "public/assets/portraits/ace.png",
+      "bytes": 1771,
+      "sha256": "7343e9539d91b691033f1fdb8a3fd761d5c3cf3512f98f337dbd105f5f56f1e5"
+    },
+    {
+      "path": "public/assets/tokens/ace.png",
+      "bytes": 1121,
+      "sha256": "dba28cfd6d121af9f22869fc57df1273bef92864799f4a96ebe3a26536f9f8bc"
+    },
+    {
+      "path": "public/assets/animations/ace-b11-v2/ace-b11-v2.png",
+      "bytes": 20125,
+      "sha256": "457569e05845130e2728812c9ba483559ae25b9afa8ff8d376030757207be085"
+    },
+    {
+      "path": "public/assets/animations/ace-b11-v2/ace-b11-v2.json",
+      "bytes": 16107,
+      "sha256": "d33da1990b22c8da1bf9dea40c4685449cc01ea7093a3cdd98cafde2eb60cf52"
+    },
+    {
+      "path": "art/production/b11/ace/body-poses.png",
+      "bytes": 20123,
+      "sha256": "60fcbc99cdd3851fc041bed996da3b8a0200a1b48d8d1891dbad1bf0b099ccea"
+    },
+    {
+      "path": "art/production/b11/ace/frame-map.json",
+      "bytes": 14778,
+      "sha256": "89dbe7a37d79612d373317273da028d2f6181b3e1a86d3b2166b232c12432620"
+    },
+    {
+      "path": "art/production/b11/ace/master.png",
+      "bytes": 1393,
+      "sha256": "c9aac2a24fa12fbfcee7efb85f49bdb891faa3cabd154f9939b7db79f13ddf57"
+    },
+    {
+      "path": "art/production/b11/ace/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/ace/selection.json",
+      "bytes": 8166,
+      "sha256": "ddaef0c888615c6b210eb881b5c023c9bc2d55495b20905f1b5083d923607918"
+    },
+    {
+      "path": "art/qa/b11/ace/all-clips.gif",
+      "bytes": 26679,
+      "sha256": "058ecb00c8f91c0a72edd38cd96f91ba28c8d421ea4c09dffe3f7f775909d30d"
+    },
+    {
+      "path": "art/qa/b11/ace/clips.png",
+      "bytes": 59706,
+      "sha256": "4cd759df654a4c9dcd1ce7213060c821adc6db32cc31373e42e90ca0dab3c6ec"
+    },
+    {
+      "path": "art/qa/b11/ace/before-after.png",
+      "bytes": 1981,
+      "sha256": "dd3010e6b74cef483a1471cc7f247d5bb10278b2494d96f46aecf18ed23897f0"
+    },
+    {
+      "path": "art/production/b11/ace/body.aseprite",
+      "bytes": 25707,
+      "sha256": "a6fbb64bf37710a3f1025a52e677b4c8d73ea92338a2d309d6e0994276986b3d"
+    },
+    {
+      "path": "public/assets/portraits/akainu.png",
+      "bytes": 2256,
+      "sha256": "f303e77aac726f9bf81001fd78f2096bf99655b709449a0d9e080274c77a5181"
+    },
+    {
+      "path": "public/assets/tokens/akainu.png",
+      "bytes": 1437,
+      "sha256": "37b57550bc455bad5404326a16393e3679e52d1738e12f6c624e7ac50ce67373"
+    },
+    {
+      "path": "public/assets/animations/akainu-b11-v2/akainu-b11-v2.png",
+      "bytes": 33304,
+      "sha256": "414a6361f04a16e2d625472bc95d6ae8d2ee026d8addde672e1171ba20fd9c96"
+    },
+    {
+      "path": "public/assets/animations/akainu-b11-v2/akainu-b11-v2.json",
+      "bytes": 16083,
+      "sha256": "80824a0126200d304cc7b675e53866cbd9c64b86644242f3d056fd2c2b035a24"
+    },
+    {
+      "path": "art/production/b11/akainu/body-poses.png",
+      "bytes": 33953,
+      "sha256": "4eb2301ecf24274e5a7f60c3fa775a1b7a789c436a98153ec60902b413ff0d08"
+    },
+    {
+      "path": "art/production/b11/akainu/frame-map.json",
+      "bytes": 14802,
+      "sha256": "a3e9025b30dd615c5b01357df5ac14dfd7d909a9756abc2a5fb4417524d287ac"
+    },
+    {
+      "path": "art/production/b11/akainu/master.png",
+      "bytes": 1823,
+      "sha256": "fb14b338471dc9184cdba5e7d38182a21e1f7d96b0902491d3e03a3372a276b3"
+    },
+    {
+      "path": "art/production/b11/akainu/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/akainu/selection.json",
+      "bytes": 8243,
+      "sha256": "80f069e6ed05f1581ea8cf77ee7b28d8a872541ce23bae54453edd15bf53abab"
+    },
+    {
+      "path": "art/qa/b11/akainu/all-clips.gif",
+      "bytes": 40289,
+      "sha256": "3b6bea491c8485d0d28a2733ca35eecc9d17bf1b21e7b2ec12bd8d3c3e66117b"
+    },
+    {
+      "path": "art/qa/b11/akainu/clips.png",
+      "bytes": 78512,
+      "sha256": "f62ce0ec5d9c9d86380e6e3b1b5ba1d62e61e8d2c6860ea15a383b15e8a211f5"
+    },
+    {
+      "path": "art/qa/b11/akainu/before-after.png",
+      "bytes": 2842,
+      "sha256": "7f0f91a31b4cb37d9342b236ce023d152e64337373cc113e710b830d993e45ba"
+    },
+    {
+      "path": "art/production/b11/akainu/body.aseprite",
+      "bytes": 36800,
+      "sha256": "f0558f8fcb2e467903fbd360a9da7951fed5c3c4a9bc7bcd8556b0ae91a91959"
+    },
+    {
+      "path": "public/assets/portraits/arlong.png",
+      "bytes": 1778,
+      "sha256": "d6defc90bd41cce864e96b4bced772443df1a2114468211f74734bd9150606f1"
+    },
+    {
+      "path": "public/assets/tokens/arlong.png",
+      "bytes": 1243,
+      "sha256": "914fa6b77eb4f380dee4cf6d7b11c30fdf1550c36a070fd6404738d06f6b9aa2"
+    },
+    {
+      "path": "public/assets/animations/arlong-b11-v2/arlong-b11-v2.png",
+      "bytes": 26772,
+      "sha256": "b64020cc81572406d5be8049356ee83ee6d1ee521bf5a82a8711884ff6cbf673"
+    },
+    {
+      "path": "public/assets/animations/arlong-b11-v2/arlong-b11-v2.json",
+      "bytes": 16042,
+      "sha256": "cd1ccbae0eb6d150715f8a372a9be0f6749580d39feebfefae25e8d5d3ba9d87"
+    },
+    {
+      "path": "art/production/b11/arlong/body-poses.png",
+      "bytes": 25681,
+      "sha256": "e135ba5e0bef7c26de02586981620b5818f906d4120c900c151fa4a76cf3ef1e"
+    },
+    {
+      "path": "art/production/b11/arlong/frame-map.json",
+      "bytes": 13472,
+      "sha256": "8be71300e7b3bb3aaf0209170b6bd6bf3b22fc50ea10657d489acecb2990e573"
+    },
+    {
+      "path": "art/production/b11/arlong/master.png",
+      "bytes": 1538,
+      "sha256": "472147ad64d8db5e3dc6ff6d81b7fa7131e8baa9e2694d345acea3ff1026a57c"
+    },
+    {
+      "path": "art/production/b11/arlong/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/arlong/selection.json",
+      "bytes": 5877,
+      "sha256": "16085923336c8c89165cc8a44507470760b1e14318f2b753a02c3beb8d5e0feb"
+    },
+    {
+      "path": "art/qa/b11/arlong/all-clips.gif",
+      "bytes": 31889,
+      "sha256": "6cc83cb443b9b6087cc2c21177ff1a565bccdef8de30260ca6209faedacc1f82"
+    },
+    {
+      "path": "art/qa/b11/arlong/clips.png",
+      "bytes": 70292,
+      "sha256": "7c8943656c9a82a79bfbe1bcc5e175d2a0ab97b0e2a438809f202af500d12373"
+    },
+    {
+      "path": "art/qa/b11/arlong/before-after.png",
+      "bytes": 2917,
+      "sha256": "2029366010541ea5106bb018debcac9c2a1ff240307e4cf6b37ff0f7ade16539"
+    },
+    {
+      "path": "art/production/b11/arlong/draft.png",
+      "bytes": 1489333,
+      "sha256": "c8c5294bc8937d51543029116ae7c362efc458cceb0470206bfc8e964238b898"
+    },
+    {
+      "path": "art/production/b11/arlong/prompt.txt",
+      "bytes": 2232,
+      "sha256": "76e7ac6a296092aa1cf6b851302e626f700439b17cd3e32eacb7644631e8d3cb"
+    },
+    {
+      "path": "art/production/b11/arlong/curated-draft-poses.png",
+      "bytes": 25758,
+      "sha256": "66dab07ac8a951a894a53bea106effa1de563559da395ad521c1b5304c914616"
+    },
+    {
+      "path": "art/production/b11/arlong/body.aseprite",
+      "bytes": 29919,
+      "sha256": "e079ed43c14d8823be68f30335372e3552c6b21704dc8819c980de467e06e8d4"
+    },
+    {
+      "path": "public/assets/portraits/beast-pirate.png",
+      "bytes": 3555,
+      "sha256": "3789db45e11fb71bc5e635ddbce545be305637fcbb5556024ff85bb9218213a6"
+    },
+    {
+      "path": "public/assets/tokens/beast-pirate.png",
+      "bytes": 2359,
+      "sha256": "9222f71e6f2c161a2f89526d9183df9ecf3326451c5d697f648c1ae64ddd5648"
+    },
+    {
+      "path": "public/assets/portraits/beast-pirate-vanguard.png",
+      "bytes": 3555,
+      "sha256": "3789db45e11fb71bc5e635ddbce545be305637fcbb5556024ff85bb9218213a6"
+    },
+    {
+      "path": "public/assets/tokens/beast-pirate-vanguard.png",
+      "bytes": 2359,
+      "sha256": "9222f71e6f2c161a2f89526d9183df9ecf3326451c5d697f648c1ae64ddd5648"
+    },
+    {
+      "path": "public/assets/portraits/beast-pirate-assault.png",
+      "bytes": 3555,
+      "sha256": "3789db45e11fb71bc5e635ddbce545be305637fcbb5556024ff85bb9218213a6"
+    },
+    {
+      "path": "public/assets/tokens/beast-pirate-assault.png",
+      "bytes": 2359,
+      "sha256": "9222f71e6f2c161a2f89526d9183df9ecf3326451c5d697f648c1ae64ddd5648"
+    },
+    {
+      "path": "public/assets/portraits/beast-pirate-artillery.png",
+      "bytes": 3555,
+      "sha256": "3789db45e11fb71bc5e635ddbce545be305637fcbb5556024ff85bb9218213a6"
+    },
+    {
+      "path": "public/assets/tokens/beast-pirate-artillery.png",
+      "bytes": 2359,
+      "sha256": "9222f71e6f2c161a2f89526d9183df9ecf3326451c5d697f648c1ae64ddd5648"
+    },
+    {
+      "path": "public/assets/animations/beast-pirate-b11-v2/beast-pirate-b11-v2.png",
+      "bytes": 56831,
+      "sha256": "1340a54d795ecfaffc605a588df4db6614b886cf2e2bba31ede8285dc589705a"
+    },
+    {
+      "path": "public/assets/animations/beast-pirate-b11-v2/beast-pirate-b11-v2.json",
+      "bytes": 16044,
+      "sha256": "ea946e322a2c5975b745c894d175c1d909f963790d3625198897e6a46acdaea2"
+    },
+    {
+      "path": "art/production/b11/beast-pirate/body-poses.png",
+      "bytes": 54179,
+      "sha256": "38fc700ff4109aff0e4b3fc9cea8ead8d8125b5b8c4850a7f4d1db83012e0553"
+    },
+    {
+      "path": "art/production/b11/beast-pirate/frame-map.json",
+      "bytes": 11841,
+      "sha256": "e1feaf4b30ffbd8a1a6ec3d9d2c03e6055b880d4a1a566776699d2c479358c3b"
+    },
+    {
+      "path": "art/production/b11/beast-pirate/master.png",
+      "bytes": 2921,
+      "sha256": "0b7fc2665371c166f38b48593143c4603d5f5d40acd6579673f2b50ddfd9c437"
+    },
+    {
+      "path": "art/production/b11/beast-pirate/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/beast-pirate/selection.json",
+      "bytes": 3222,
+      "sha256": "fd02c23d03aa16838600070e05405d1b4f713a309928ccd797992e0a946acf3e"
+    },
+    {
+      "path": "art/qa/b11/beast-pirate/all-clips.gif",
+      "bytes": 59189,
+      "sha256": "e77890074529a0ea4c749a35166983e8fbc75357554572fbf0f4a0373cc93dc6"
+    },
+    {
+      "path": "art/qa/b11/beast-pirate/clips.png",
+      "bytes": 111626,
+      "sha256": "91a7c136b49f2acc0ac5f05114bf96ca652c48ebb382f28c2e50d4dbd747a33e"
+    },
+    {
+      "path": "art/qa/b11/beast-pirate/before-after.png",
+      "bytes": 4171,
+      "sha256": "035b15d1a475abd21f4adbd3fe3f22fe2934433c2a27fe3d4aa36fd0825780a4"
+    },
+    {
+      "path": "art/production/b11/beast-pirate/draft.png",
+      "bytes": 1960200,
+      "sha256": "80129cd27b3e4dd5bcde45448d66effafbd6d8e7f27e9a5a2cefd0aafaa77ce7"
+    },
+    {
+      "path": "art/production/b11/beast-pirate/prompt.txt",
+      "bytes": 2345,
+      "sha256": "d82e696a90f6fd56e8327ec683e8713ba620744a3bdcb405ea182adf1d070a1b"
+    },
+    {
+      "path": "art/production/b11/beast-pirate/curated-draft-poses.png",
+      "bytes": 48105,
+      "sha256": "77808376814e185490404a2ff0f1a8abb9e78fb6f32305f8cabe88ab13d14252"
+    },
+    {
+      "path": "art/production/b11/beast-pirate/body.aseprite",
+      "bytes": 59277,
+      "sha256": "6f2fe99cfad6e89418ea728248ab85570f7487e1bc51a2867d5ad9e4021fe780"
+    },
+    {
+      "path": "public/assets/portraits/blackbeard.png",
+      "bytes": 2958,
+      "sha256": "5be2df1e7dc82680d97b207bb7411a0cfdd4977bdf100d4866cdd44b446c76da"
+    },
+    {
+      "path": "public/assets/tokens/blackbeard.png",
+      "bytes": 1985,
+      "sha256": "119cb430abdf4d265dd1f712a79275557a23ee06fea18d182b0cf0ebdca0e530"
+    },
+    {
+      "path": "public/assets/animations/blackbeard-b11-v2/blackbeard-b11-v2.png",
+      "bytes": 47354,
+      "sha256": "41f30d7f9e5a14ece5b837d4ed293c229715791c1a9b2195031654571dd200b3"
+    },
+    {
+      "path": "public/assets/animations/blackbeard-b11-v2/blackbeard-b11-v2.json",
+      "bytes": 16095,
+      "sha256": "22d4c083a67cc8bcfe5c1bef717824aa421f7bf44a47b102645e5c6c62701ec9"
+    },
+    {
+      "path": "art/production/b11/blackbeard/body-poses.png",
+      "bytes": 47548,
+      "sha256": "440715ae2239a51e25116e4c7b7a726fdb91f5cc6e43d625b2e95f1f0538bc22"
+    },
+    {
+      "path": "art/production/b11/blackbeard/frame-map.json",
+      "bytes": 14890,
+      "sha256": "e25a2d84c275376c3b46d0e7d33a3344b0e377a515bb0283d1a3c8ac722e796a"
+    },
+    {
+      "path": "art/production/b11/blackbeard/master.png",
+      "bytes": 2454,
+      "sha256": "e77ad8951953cfc4fee7ee073289e462f26d6558641a89759bfe5dae2bbbee25"
+    },
+    {
+      "path": "art/production/b11/blackbeard/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/blackbeard/selection.json",
+      "bytes": 8374,
+      "sha256": "8319575751c66aa1c92b695f978d1e6165ac1b244d25e69abe3cd2bb7da22eae"
+    },
+    {
+      "path": "art/qa/b11/blackbeard/all-clips.gif",
+      "bytes": 60934,
+      "sha256": "e0e206dd6462e02966cf131387264f2030c87e7896b69d3ff2875eb61181c513"
+    },
+    {
+      "path": "art/qa/b11/blackbeard/clips.png",
+      "bytes": 100485,
+      "sha256": "a0779925feebc6805333d2a5303928ac7ed72b5bca8d9c03a1d96fa554e7187b"
+    },
+    {
+      "path": "art/qa/b11/blackbeard/before-after.png",
+      "bytes": 6222,
+      "sha256": "30d5cd88145786047898e09670cb015d9446a69df81770bb114ca70c2b666eb7"
+    },
+    {
+      "path": "art/production/b11/blackbeard/body.aseprite",
+      "bytes": 50260,
+      "sha256": "d92a460bdf903f41c52b0d074ae30d4764639599d71f12aa524879c8a340d9ce"
+    },
+    {
+      "path": "public/assets/portraits/brook.png",
+      "bytes": 1615,
+      "sha256": "8d59cbb5508bea9a27010d16cfa450421c08841e33ef9383bada78ddf2f7350b"
+    },
+    {
+      "path": "public/assets/tokens/brook.png",
+      "bytes": 1032,
+      "sha256": "ddf24ef83cdb2c456bd46cfbb93d577974a3112c886e922d417bdaac498ad875"
+    },
+    {
+      "path": "public/assets/animations/brook-b11-v2/brook-b11-v2.png",
+      "bytes": 17900,
+      "sha256": "718c23fdb0bea68389762df2dfec0b6575d64b00671d271c5291733e72746466"
+    },
+    {
+      "path": "public/assets/animations/brook-b11-v2/brook-b11-v2.json",
+      "bytes": 16080,
+      "sha256": "1769f26940320e44b18ca20e3f5a8eca32342a33703e165176d2cf1d4bce6c2b"
+    },
+    {
+      "path": "art/production/b11/brook/body-poses.png",
+      "bytes": 17912,
+      "sha256": "47eb4dc33e6fdc51df35402d4205af63011808b307918842eade8364dce0649f"
+    },
+    {
+      "path": "art/production/b11/brook/frame-map.json",
+      "bytes": 14781,
+      "sha256": "74e4529a0706ccb49814fcc0557f93e886f369f235a5a2aae3d7b29ec1f62550"
+    },
+    {
+      "path": "art/production/b11/brook/master.png",
+      "bytes": 1280,
+      "sha256": "bfcc15bc2e332beee992a3f9871ce4f961fb5e042230ed9c9763ba8df1df4f46"
+    },
+    {
+      "path": "art/production/b11/brook/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/brook/selection.json",
+      "bytes": 8236,
+      "sha256": "093fb875142eaf9e3b5b257ed0bcce58e0b5a808eb8499dfbaba9b3d22cb5c76"
+    },
+    {
+      "path": "art/qa/b11/brook/all-clips.gif",
+      "bytes": 23821,
+      "sha256": "c1d8b06ac69edbc8d5a0cb898eacb2984087cfcfe0ff5bf7b3e0c690bcbcb01a"
+    },
+    {
+      "path": "art/qa/b11/brook/clips.png",
+      "bytes": 58458,
+      "sha256": "e34f722420a59cec99bba7353c6382dd51fe11ed5078d9cfe29776f14a7bde8d"
+    },
+    {
+      "path": "art/qa/b11/brook/before-after.png",
+      "bytes": 2787,
+      "sha256": "9f632cfcc1bb61bad5541a7310fc24ebe1276b05ce34da1171232e4cc06ef720"
+    },
+    {
+      "path": "art/production/b11/brook/body.aseprite",
+      "bytes": 22334,
+      "sha256": "440d147984970f0bb1e8167d615e559b701cb14fa8e2ba89c4c89a218834f4d8"
+    },
+    {
+      "path": "public/assets/portraits/buggy.png",
+      "bytes": 2020,
+      "sha256": "20ca0f69c7feb29150f114742c6ab599254c3437d95e6ae105b1f5d5c5040026"
+    },
+    {
+      "path": "public/assets/tokens/buggy.png",
+      "bytes": 1323,
+      "sha256": "fa7d1accada558baf8795b2c9ed62b5f3e42f708d5277464e5eb7cde0f36f1c0"
+    },
+    {
+      "path": "public/assets/animations/buggy-b11-v2/buggy-b11-v2.png",
+      "bytes": 24476,
+      "sha256": "bccca2521de028866c1ad4436ebdb9e38139bf93c82071e6347a83df602d5912"
+    },
+    {
+      "path": "public/assets/animations/buggy-b11-v2/buggy-b11-v2.json",
+      "bytes": 16029,
+      "sha256": "045e294eb8a7a0c1e41bcc23d8b6369b261fa0e6de600197c0043716d304053d"
+    },
+    {
+      "path": "art/production/b11/buggy/body-poses.png",
+      "bytes": 24261,
+      "sha256": "f01ba4773278cc4ef5f65ba94d85ec48c3007f76fff9a98f5e61e6cfaba3b664"
+    },
+    {
+      "path": "art/production/b11/buggy/frame-map.json",
+      "bytes": 14780,
+      "sha256": "430fe2a925c3851c71abe94313312073da77ef8de37e1ac92f33e6c56a21cd08"
+    },
+    {
+      "path": "art/production/b11/buggy/master.png",
+      "bytes": 1590,
+      "sha256": "a2f56d2c33b48e6f1a356291cbdd26736f04db9ed5ad3aeee20b23b2987f7587"
+    },
+    {
+      "path": "art/production/b11/buggy/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/buggy/selection.json",
+      "bytes": 8156,
+      "sha256": "71ad0ee9f91b3faa1d339f997d276ffd3121ef83a86e920a8b5363ca4d7d9d76"
+    },
+    {
+      "path": "art/qa/b11/buggy/all-clips.gif",
+      "bytes": 33966,
+      "sha256": "1ea014984d5d43da6198c8d70c4748ad976af4f9b966d96db72d2ea1a1a38e7b"
+    },
+    {
+      "path": "art/qa/b11/buggy/clips.png",
+      "bytes": 66804,
+      "sha256": "a40f06421cb946ba0728094130953dcb1a50e78f201cd57713fdd056ec2e32b4"
+    },
+    {
+      "path": "art/qa/b11/buggy/before-after.png",
+      "bytes": 2170,
+      "sha256": "67d79047a97a1d076b3be07b016fc4719192ce984814bb049e76d88e5d085297"
+    },
+    {
+      "path": "art/production/b11/buggy/body.aseprite",
+      "bytes": 31291,
+      "sha256": "6e830ddfcbbdf7cc83028847e664575fa202c3b91f78db1a247956eed10f9fb2"
+    },
+    {
+      "path": "public/assets/portraits/caesar-clown.png",
+      "bytes": 3827,
+      "sha256": "ddcb831db04866a22c6376210e2cf3ab4924d21e246dcc97fb8e3a4a5aa284c5"
+    },
+    {
+      "path": "public/assets/tokens/caesar-clown.png",
+      "bytes": 2655,
+      "sha256": "3e68fe3a4e557f731d8d0f51a41fb6296406999d5eeae59b67569c5c732146e4"
+    },
+    {
+      "path": "public/assets/animations/caesar-clown-b11-v2/caesar-clown-b11-v2.png",
+      "bytes": 67879,
+      "sha256": "be259e4b85f22ce7f3befb3930fa4a6f8ba26f9376ee6b9404f63d8dc4ac458e"
+    },
+    {
+      "path": "public/assets/animations/caesar-clown-b11-v2/caesar-clown-b11-v2.json",
+      "bytes": 16060,
+      "sha256": "7d4b7cf611ac2eebb3737ebec458acda77166c3e172e28c019dd4464542254bc"
+    },
+    {
+      "path": "art/production/b11/caesar-clown/body-poses.png",
+      "bytes": 64466,
+      "sha256": "93b600840a85663d2eaad35b4c8e8440769eb7f235047f0176a8f662e05883da"
+    },
+    {
+      "path": "art/production/b11/caesar-clown/frame-map.json",
+      "bytes": 11841,
+      "sha256": "e1feaf4b30ffbd8a1a6ec3d9d2c03e6055b880d4a1a566776699d2c479358c3b"
+    },
+    {
+      "path": "art/production/b11/caesar-clown/master.png",
+      "bytes": 3301,
+      "sha256": "fdf0744787121ec309514b7062027509da7a044fb8c2035dd5044b125e00666c"
+    },
+    {
+      "path": "art/production/b11/caesar-clown/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/caesar-clown/selection.json",
+      "bytes": 3373,
+      "sha256": "65fe3aeea4711c12203f4e66b9e2d77db795753d6eca8c9a1a209443122e66a6"
+    },
+    {
+      "path": "art/qa/b11/caesar-clown/all-clips.gif",
+      "bytes": 70757,
+      "sha256": "471baa9f05733339a2873405b654d4fc3f942b854eb482fb2dc1dfe2c0c25f34"
+    },
+    {
+      "path": "art/qa/b11/caesar-clown/clips.png",
+      "bytes": 124498,
+      "sha256": "bcd72933bcbb23b6c4ac30a84e6ccd89db4ea0df460577c70e682c7295320070"
+    },
+    {
+      "path": "art/qa/b11/caesar-clown/before-after.png",
+      "bytes": 5842,
+      "sha256": "2de8da04a5150dbb4764e42c7fd58e12f7a3cfaaffbe036098827fd1fe1b9ff7"
+    },
+    {
+      "path": "art/production/b11/caesar-clown/draft.png",
+      "bytes": 2098074,
+      "sha256": "ef3d85203d539be9118a3e64e843b40ca355b36b4f9d1308712cace9b55e31b7"
+    },
+    {
+      "path": "art/production/b11/caesar-clown/prompt.txt",
+      "bytes": 2146,
+      "sha256": "757de83a4750e2292100c09756e9f99fcdfdb20f820a7d5039cd4faf6495aa59"
+    },
+    {
+      "path": "art/production/b11/caesar-clown/curated-draft-poses.png",
+      "bytes": 59739,
+      "sha256": "00203787867c21d4d9bc66fd9130abdf3bae15965e2ef764493a14e606a42439"
+    },
+    {
+      "path": "art/production/b11/caesar-clown/body.aseprite",
+      "bytes": 69730,
+      "sha256": "1fca20f82229f5b38f7c042a44624b3b476fd537612926c9818eeab5dca59366"
+    },
+    {
+      "path": "public/assets/portraits/capone-bege.png",
+      "bytes": 2112,
+      "sha256": "35335596b9fd1fad2d3921b0b42e2b8ba723b0b1deb31c7f8f3b2d7b31c75f47"
+    },
+    {
+      "path": "public/assets/tokens/capone-bege.png",
+      "bytes": 1351,
+      "sha256": "491b4c487153b6f30f155fec320359bead21588b64be98db8ee400b788df005c"
+    },
+    {
+      "path": "public/assets/animations/capone-bege-b11-v2/capone-bege-b11-v2.png",
+      "bytes": 40661,
+      "sha256": "23ed2f20d07247ff2aa234e6421d7c1b66237305811eae2112a20197da645c4a"
+    },
+    {
+      "path": "public/assets/animations/capone-bege-b11-v2/capone-bege-b11-v2.json",
+      "bytes": 16047,
+      "sha256": "5b3870e6d29162a81d43f82f7b0ae1018186049901353d0e2d6713afa5d39b20"
+    },
+    {
+      "path": "art/production/b11/capone-bege/body-poses.png",
+      "bytes": 38567,
+      "sha256": "34b3e4429e963991d6287fe1aa3b8c3d48173dcb61811432503abb8ce41bf461"
+    },
+    {
+      "path": "art/production/b11/capone-bege/frame-map.json",
+      "bytes": 12215,
+      "sha256": "70db6e7a32ef3036bc03657bda96701993002b921f2c00b1f06722b9b0064b89"
+    },
+    {
+      "path": "art/production/b11/capone-bege/master.png",
+      "bytes": 1635,
+      "sha256": "b506614c8b52221a723b287359db3bdbdc7b9f62ab617e4fd2ade4d5f4dd6afe"
+    },
+    {
+      "path": "art/production/b11/capone-bege/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/capone-bege/selection.json",
+      "bytes": 4152,
+      "sha256": "4115172a82f4e9744d16100e96ca4769c666099bbb9b1bcc6a8bb6ffcfe245bb"
+    },
+    {
+      "path": "art/qa/b11/capone-bege/all-clips.gif",
+      "bytes": 46224,
+      "sha256": "a6d4d4e241cb1cc260bf11d127576cb7a629f3bad886ba238ea0ac0ca7680aa6"
+    },
+    {
+      "path": "art/qa/b11/capone-bege/clips.png",
+      "bytes": 90997,
+      "sha256": "6f85433ba338f7a0979f6cb6883eecbbe4d82a657e690f5743ce2cd537af8dcb"
+    },
+    {
+      "path": "art/qa/b11/capone-bege/before-after.png",
+      "bytes": 2273,
+      "sha256": "b572534d6d2809b41169e29e5694939c477840b7566fd23c1a08a28ae38a1b8b"
+    },
+    {
+      "path": "art/production/b11/capone-bege/draft.png",
+      "bytes": 1273862,
+      "sha256": "d432ba294907a462e4da713c169565aef4259c39ba9348b610632bed516b9c7f"
+    },
+    {
+      "path": "art/production/b11/capone-bege/prompt.txt",
+      "bytes": 2276,
+      "sha256": "5935dc727590f94cb9fd23ea8b585da7dafbed9514a608064a8d57fabbea01dd"
+    },
+    {
+      "path": "art/production/b11/capone-bege/curated-draft-poses.png",
+      "bytes": 35497,
+      "sha256": "4a8fee94a85b741df7eec08fe0de6797ac7b38255ca8269c14f9c880467a2e99"
+    },
+    {
+      "path": "art/production/b11/capone-bege/body.aseprite",
+      "bytes": 43474,
+      "sha256": "d45515fc51f1ecad4c2ca931cdb3d7a9d6ac535957acbee45e515d5616340312"
+    },
+    {
+      "path": "public/assets/portraits/chopper.png",
+      "bytes": 1657,
+      "sha256": "eb536b8c43464c937b435ee9d58d91762ea0bc6ed9ee41ca46557fff80f1437c"
+    },
+    {
+      "path": "public/assets/tokens/chopper.png",
+      "bytes": 990,
+      "sha256": "53eff67f349d8246927babb27b3a113593133cf2aa9a798db83e553f594a8084"
+    },
+    {
+      "path": "public/assets/animations/chopper-b11-v2/chopper-b11-v2.png",
+      "bytes": 14108,
+      "sha256": "9be29d2b9593c7792bdcfbbc0d2e4e0224f7165419a649165f47aa84603c8b0f"
+    },
+    {
+      "path": "public/assets/animations/chopper-b11-v2/chopper-b11-v2.json",
+      "bytes": 16119,
+      "sha256": "4d1cef9a61b71e46e2de66c926ceb2ec2f439609e9642b2bc184bc26157b6130"
+    },
+    {
+      "path": "art/production/b11/chopper/body-poses.png",
+      "bytes": 13884,
+      "sha256": "026714093d7990572340edba7f8c6e0ce42bfe491b272255ed0840d9d6ce97a8"
+    },
+    {
+      "path": "art/production/b11/chopper/frame-map.json",
+      "bytes": 14773,
+      "sha256": "18c8863834a295721a3046befeedf8ef6d313291bca9964acae2f31bd85ed1e3"
+    },
+    {
+      "path": "art/production/b11/chopper/master.png",
+      "bytes": 1270,
+      "sha256": "6ba7169f6bd9803814b9521fffb00e221f2fc3c6757142018ce7dd8fadc1a2b3"
+    },
+    {
+      "path": "art/production/b11/chopper/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/chopper/selection.json",
+      "bytes": 8205,
+      "sha256": "235eb9dbf1321502f668f322b9166a54a63fe5652bd50ffc5f5cd319d026c7f8"
+    },
+    {
+      "path": "art/qa/b11/chopper/all-clips.gif",
+      "bytes": 23255,
+      "sha256": "d5de2c18ffd561b6aa4605d5c58a13022476cb4ff53792d8a1e95b6e93f14468"
+    },
+    {
+      "path": "art/qa/b11/chopper/clips.png",
+      "bytes": 54246,
+      "sha256": "756d27141b1b0886bf28715e5cd4bf9753906463ce050854fd0ba3c7aad2bb9c"
+    },
+    {
+      "path": "art/qa/b11/chopper/before-after.png",
+      "bytes": 1801,
+      "sha256": "31e5ddd2c394b73719f8abf60853255161275c657115b2981f8709c85fa4c6bf"
+    },
+    {
+      "path": "art/production/b11/chopper/body.aseprite",
+      "bytes": 20386,
+      "sha256": "ede3e77241e441735388d3cce79fec193c0f8461d723e04679ff6e1e5801f1b2"
+    },
+    {
+      "path": "public/assets/forms/chopper-monster-point/portrait.svg",
+      "bytes": 8438,
+      "sha256": "7fd9ad5f94e3dd62028b14ba65520cac05324553cbd51e06a7516c814c68794e"
+    },
+    {
+      "path": "public/assets/forms/chopper-monster-point/token.svg",
+      "bytes": 8438,
+      "sha256": "6aa75b2a0455fe93b45fbfabedc238dfbcbf686048b9d28c24d3c65f7445bfed"
+    },
+    {
+      "path": "public/assets/animations/chopper-monster-point-b11-v2/chopper-monster-point-b11-v2.png",
+      "bytes": 97723,
+      "sha256": "15c5654e169153b06fc7c7ca6c49496e7d015462dfcbbd4c22fce2fef76e77e0"
+    },
+    {
+      "path": "public/assets/animations/chopper-monster-point-b11-v2/chopper-monster-point-b11-v2.json",
+      "bytes": 16161,
+      "sha256": "f4fc49a438b2c599020cef3dea8563118fa1d0e77603d99f944907fd7195ff38"
+    },
+    {
+      "path": "art/production/b11/chopper-monster-point/body-poses.png",
+      "bytes": 92478,
+      "sha256": "f362fc0de54a3531bd6b0921a6a750a0f9cc52996434b5cbaf23317442c02986"
+    },
+    {
+      "path": "art/production/b11/chopper-monster-point/frame-map.json",
+      "bytes": 11841,
+      "sha256": "e1feaf4b30ffbd8a1a6ec3d9d2c03e6055b880d4a1a566776699d2c479358c3b"
+    },
+    {
+      "path": "art/production/b11/chopper-monster-point/master.png",
+      "bytes": 4277,
+      "sha256": "96d08bb36982e4b231841dc5f97093b293a8a32ea0a0153d8f1b18af0f4885e7"
+    },
+    {
+      "path": "art/production/b11/chopper-monster-point/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/chopper-monster-point/selection.json",
+      "bytes": 3403,
+      "sha256": "0c6a4606398d99fed7d83de80470f1ae36cb5da7410e263fa2f13b4e6ea72c99"
+    },
+    {
+      "path": "art/qa/b11/chopper-monster-point/all-clips.gif",
+      "bytes": 100318,
+      "sha256": "219e0a8ad5c20935746c6a53a405d5fec8ca8f346a4e1e3e2ca5d9b99c47aa2a"
+    },
+    {
+      "path": "art/qa/b11/chopper-monster-point/clips.png",
+      "bytes": 161925,
+      "sha256": "e17dc8c6b266ab8323d769758a7432f6845ad007a647681689564852ba14597f"
+    },
+    {
+      "path": "art/qa/b11/chopper-monster-point/before-after.png",
+      "bytes": 5663,
+      "sha256": "e60c12b6f6e363c68b48cf88d95794a674507a76c7f3dc3a23683d9c1f1db744"
+    },
+    {
+      "path": "art/production/b11/chopper-monster-point/draft.png",
+      "bytes": 1977165,
+      "sha256": "8b19c5dcc96a2007dc8256805b92936721e4b02ee9ee16c07a47015674b206dc"
+    },
+    {
+      "path": "art/production/b11/chopper-monster-point/prompt.txt",
+      "bytes": 2356,
+      "sha256": "523ee86fa9c1dd45bd068213f17f85022373e48bd7c96e345474f20881c532fe"
+    },
+    {
+      "path": "art/production/b11/chopper-monster-point/curated-draft-poses.png",
+      "bytes": 86267,
+      "sha256": "244ad01a1281a882dca35cf5b23a0a42584f39d755064186049f0d74d9302877"
+    },
+    {
+      "path": "art/production/b11/chopper-monster-point/body.aseprite",
+      "bytes": 100356,
+      "sha256": "b5816e8ce420f915ff739f49f5b9633b5ab415482991b446735a482d9ae9e911"
+    },
+    {
+      "path": "public/assets/portraits/cipher-pol-agent.png",
+      "bytes": 3310,
+      "sha256": "542d13741744b290ce118700997f68e538701f99f12f9642607cda4725d7dbf7"
+    },
+    {
+      "path": "public/assets/tokens/cipher-pol-agent.png",
+      "bytes": 2176,
+      "sha256": "a29b720eb3eea33e63c8113ad8b090398fea1375f25fb72deb9595ccb5c68d02"
+    },
+    {
+      "path": "public/assets/animations/cipher-pol-agent-b11-v2/cipher-pol-agent-b11-v2.png",
+      "bytes": 51207,
+      "sha256": "190d5f53082e48adedf0ceec5c4d7f0eb2aa4e29d29a0905c3999dc92ca5fa34"
+    },
+    {
+      "path": "public/assets/animations/cipher-pol-agent-b11-v2/cipher-pol-agent-b11-v2.json",
+      "bytes": 16087,
+      "sha256": "576e8ce65d75e43c8c8962775cb3184b236af7bc47a059a242127e17268da859"
+    },
+    {
+      "path": "art/production/b11/cipher-pol-agent/body-poses.png",
+      "bytes": 48925,
+      "sha256": "737c621f41642822446b91ed2f4d3b6963068fd292669380962b44087753ecb4"
+    },
+    {
+      "path": "art/production/b11/cipher-pol-agent/frame-map.json",
+      "bytes": 11841,
+      "sha256": "e1feaf4b30ffbd8a1a6ec3d9d2c03e6055b880d4a1a566776699d2c479358c3b"
+    },
+    {
+      "path": "art/production/b11/cipher-pol-agent/master.png",
+      "bytes": 2690,
+      "sha256": "859e9c6c1f0d7583c5c30667eb9b91e0807fcb09f3005c284c02dd299642f96b"
+    },
+    {
+      "path": "art/production/b11/cipher-pol-agent/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/cipher-pol-agent/selection.json",
+      "bytes": 3298,
+      "sha256": "5fe0efc68ef541b81a126326ff355c2cd4bb650d7bae347e2cf3a5facc406b59"
+    },
+    {
+      "path": "art/qa/b11/cipher-pol-agent/all-clips.gif",
+      "bytes": 52530,
+      "sha256": "705f2778f2f4041c98caf03960abc4ebb5aa4adf09b7b577fc6e2dd798b56e5e"
+    },
+    {
+      "path": "art/qa/b11/cipher-pol-agent/clips.png",
+      "bytes": 106324,
+      "sha256": "3b9752efd5b4a34f9d35e369bd92620ff5d821d93b2822a0fb463cb15f0b14b8"
+    },
+    {
+      "path": "art/qa/b11/cipher-pol-agent/before-after.png",
+      "bytes": 3578,
+      "sha256": "51e12c7ac40e2ec3a4acfd8996e0d609f3820f180aeaa835bbc8f3cafb4cd318"
+    },
+    {
+      "path": "art/production/b11/cipher-pol-agent/draft.png",
+      "bytes": 1403728,
+      "sha256": "18ff4c46784c3c833553298a050d586e67ac9981c48592936f6ca5639e8fa7d4"
+    },
+    {
+      "path": "art/production/b11/cipher-pol-agent/prompt.txt",
+      "bytes": 2341,
+      "sha256": "1c1a47cd196db8f7d9b81ade84761e26e0d9d666e27eda716cdf3b23d2b77337"
+    },
+    {
+      "path": "art/production/b11/cipher-pol-agent/curated-draft-poses.png",
+      "bytes": 41876,
+      "sha256": "54d7718a8ae66fcdb3357b3beedee4f795b1de14a9312a80d2c26be4215557b0"
+    },
+    {
+      "path": "art/production/b11/cipher-pol-agent/body.aseprite",
+      "bytes": 53373,
+      "sha256": "f6bf002ae13a3516f5db107158ec731ed0f6ae3cd99811f416d8308d71080f3f"
+    },
+    {
+      "path": "public/assets/portraits/cp9-elite.png",
+      "bytes": 3439,
+      "sha256": "aebbc0920a12d5584deeb00fc192111c4505113291d1924383c89e56348a0e6e"
+    },
+    {
+      "path": "public/assets/tokens/cp9-elite.png",
+      "bytes": 2286,
+      "sha256": "eac97c99191d278999b9f21265d4610b22b9ab412079647c501b280032336849"
+    },
+    {
+      "path": "public/assets/portraits/cp9-elite-laser.png",
+      "bytes": 3439,
+      "sha256": "aebbc0920a12d5584deeb00fc192111c4505113291d1924383c89e56348a0e6e"
+    },
+    {
+      "path": "public/assets/tokens/cp9-elite-laser.png",
+      "bytes": 2286,
+      "sha256": "eac97c99191d278999b9f21265d4610b22b9ab412079647c501b280032336849"
+    },
+    {
+      "path": "public/assets/portraits/cp9-elite-tidal.png",
+      "bytes": 3439,
+      "sha256": "aebbc0920a12d5584deeb00fc192111c4505113291d1924383c89e56348a0e6e"
+    },
+    {
+      "path": "public/assets/tokens/cp9-elite-tidal.png",
+      "bytes": 2286,
+      "sha256": "eac97c99191d278999b9f21265d4610b22b9ab412079647c501b280032336849"
+    },
+    {
+      "path": "public/assets/animations/cp9-elite-b11-v2/cp9-elite-b11-v2.png",
+      "bytes": 51347,
+      "sha256": "e6f8b125be675d5bf4bcde609686c33eb63696ceb2901205554346ca0bfb9932"
+    },
+    {
+      "path": "public/assets/animations/cp9-elite-b11-v2/cp9-elite-b11-v2.json",
+      "bytes": 16035,
+      "sha256": "78c3239de2e755091fb87396d84c0887f9dd2cd085039e14f4b030bc9910b3de"
+    },
+    {
+      "path": "art/production/b11/cp9-elite/body-poses.png",
+      "bytes": 48966,
+      "sha256": "b8eb278b63fc32adeddf38c3900de553dcae0b8a67fe6b27268a67f3b1025c21"
+    },
+    {
+      "path": "art/production/b11/cp9-elite/frame-map.json",
+      "bytes": 11841,
+      "sha256": "e1feaf4b30ffbd8a1a6ec3d9d2c03e6055b880d4a1a566776699d2c479358c3b"
+    },
+    {
+      "path": "art/production/b11/cp9-elite/master.png",
+      "bytes": 2824,
+      "sha256": "5f50d83428a427f4fef3ccfccee8e741634cd7b1406ad67f053271acfc6b7aaa"
+    },
+    {
+      "path": "art/production/b11/cp9-elite/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/cp9-elite/selection.json",
+      "bytes": 3200,
+      "sha256": "9b6643e7014e69fd305acbf63659b84d8343c45eaf4f24e6bad34a503829fffb"
+    },
+    {
+      "path": "art/qa/b11/cp9-elite/all-clips.gif",
+      "bytes": 53121,
+      "sha256": "320a65c6dc6c2260c2c18919976f88e97d1f523033c4fd857ce883a60a4234df"
+    },
+    {
+      "path": "art/qa/b11/cp9-elite/clips.png",
+      "bytes": 104445,
+      "sha256": "a845d15f4ac671c42d269ed138dceec8c305a89be94088b2d2db404080163b31"
+    },
+    {
+      "path": "art/qa/b11/cp9-elite/before-after.png",
+      "bytes": 4017,
+      "sha256": "de2c8b375c2c8587c33297a3af19a29a7a907c41c1517b270994e338b4657811"
+    },
+    {
+      "path": "art/production/b11/cp9-elite/draft.png",
+      "bytes": 1489566,
+      "sha256": "d7b2671fa6bfb3fef1ff2062544c1f1c2a645ee2111c00ee2a1bcc2e358e7ed7"
+    },
+    {
+      "path": "art/production/b11/cp9-elite/prompt.txt",
+      "bytes": 2347,
+      "sha256": "aff77ad52b0d24a35b4110fb5a10d92690c47d60940d4ce801eff65138f1e707"
+    },
+    {
+      "path": "art/production/b11/cp9-elite/curated-draft-poses.png",
+      "bytes": 42629,
+      "sha256": "4aa2ea1ad6d182c5bd49c370dfa3998f2215635bc470d9bbe7780b4dbe9d30ec"
+    },
+    {
+      "path": "art/production/b11/cp9-elite/body.aseprite",
+      "bytes": 54121,
+      "sha256": "8bf65354c03fb063260a0ba49f330ce41d709bc265036fb76fe9f49057e8c9c1"
+    },
+    {
+      "path": "public/assets/portraits/crocodile.png",
+      "bytes": 2266,
+      "sha256": "9cb5c9f6671c3b0f7f4ff4fb7734c49f5f6b9ec7498315ff74d3f1a1c6aca579"
+    },
+    {
+      "path": "public/assets/tokens/crocodile.png",
+      "bytes": 1365,
+      "sha256": "166edc4e1eaddb140448a62719fa25ff4d41ab6c7d415879d8816548a806431c"
+    },
+    {
+      "path": "public/assets/animations/crocodile-b11-v2/crocodile-b11-v2.png",
+      "bytes": 30078,
+      "sha256": "6afddedd61a3b1c6d3212bbbf30840ae593acd96b0238568c1d72b57a230ff4b"
+    },
+    {
+      "path": "public/assets/animations/crocodile-b11-v2/crocodile-b11-v2.json",
+      "bytes": 16125,
+      "sha256": "96be5783a49d6d006d59788d73a8b30584bf7e62c6e95255e4d576620bb79396"
+    },
+    {
+      "path": "art/production/b11/crocodile/body-poses.png",
+      "bytes": 31026,
+      "sha256": "81ac3ab1a2e0500dd0b1b6b5d4e84d58787de42a97579ee18d3a4d89faec083d"
+    },
+    {
+      "path": "art/production/b11/crocodile/frame-map.json",
+      "bytes": 14797,
+      "sha256": "926a569cc33b36dc1121846acdd5c6c616bb139508e915f858644e013d795704"
+    },
+    {
+      "path": "art/production/b11/crocodile/master.png",
+      "bytes": 1752,
+      "sha256": "d824810df55e6ddb262786ce24fdb996720a44180ad998fc2cbcac23c03361ac"
+    },
+    {
+      "path": "art/production/b11/crocodile/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/crocodile/selection.json",
+      "bytes": 8206,
+      "sha256": "01485246855117e964cb11cbba9a37b7e6461120b5967d8dc0a67cbe4e6b31a4"
+    },
+    {
+      "path": "art/qa/b11/crocodile/all-clips.gif",
+      "bytes": 36809,
+      "sha256": "366c1cea5d5d2d89796bb4de6a16bd6f366b05fc821177bd1dfedf19d0d1be83"
+    },
+    {
+      "path": "art/qa/b11/crocodile/clips.png",
+      "bytes": 75090,
+      "sha256": "e70f5c5507a96fb636348945a5b18047a80849877c8ca8af743fb73cf35affdb"
+    },
+    {
+      "path": "art/qa/b11/crocodile/before-after.png",
+      "bytes": 2362,
+      "sha256": "253fa01718789bd115533d5f2a775c5bb14a5c2761945ce58ba3f48c710b8e0d"
+    },
+    {
+      "path": "art/production/b11/crocodile/body.aseprite",
+      "bytes": 34363,
+      "sha256": "c3927f36ab6f16b841b63cfe527ae4b2f51cb37f4a5ddabe63d383f0fa09e825"
+    },
+    {
+      "path": "public/assets/portraits/doflamingo.png",
+      "bytes": 2581,
+      "sha256": "4056c90a10a0c52396bed1404dc801cb3ff05f180f043472303b414a781d0f83"
+    },
+    {
+      "path": "public/assets/tokens/doflamingo.png",
+      "bytes": 1661,
+      "sha256": "f2e4f4732956547a67d12dd4d7dd097b251b3b6318a0d7412c009c7d19df1089"
+    },
+    {
+      "path": "public/assets/animations/doflamingo-b11-v2/doflamingo-b11-v2.png",
+      "bytes": 39041,
+      "sha256": "380877df62eaa08337fd3728ee5a44691b327cd1372d25aa450732abeee2c001"
+    },
+    {
+      "path": "public/assets/animations/doflamingo-b11-v2/doflamingo-b11-v2.json",
+      "bytes": 16128,
+      "sha256": "fcfafa9404f53cfe22cf35dd4dfaf51f754d46709367eceabe82afed6ac689bc"
+    },
+    {
+      "path": "art/production/b11/doflamingo/body-poses.png",
+      "bytes": 38762,
+      "sha256": "18e7f04d9db7a6e5a88f3e702a8097018378662ba05bed9ebd363582ce2b1e9e"
+    },
+    {
+      "path": "art/production/b11/doflamingo/frame-map.json",
+      "bytes": 14831,
+      "sha256": "dcfdb96cc23bebbd685abc0906a0e4e47d174e6f9b107c614aa38a7e3722e29b"
+    },
+    {
+      "path": "art/production/b11/doflamingo/master.png",
+      "bytes": 2089,
+      "sha256": "f51942ae6c9d78b7606d884c299bb71aace7f3df9993525a75508f120b0f5f7f"
+    },
+    {
+      "path": "art/production/b11/doflamingo/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/doflamingo/selection.json",
+      "bytes": 8279,
+      "sha256": "36cadb6d04992cc5dc0732131f22de2f683560a30c8ca45afd81dd3345ef128d"
+    },
+    {
+      "path": "art/qa/b11/doflamingo/all-clips.gif",
+      "bytes": 46393,
+      "sha256": "ca6ee60fc24ce1890bd4e24b71de372f3918ead9b7471d5227ed650daf9a0f9b"
+    },
+    {
+      "path": "art/qa/b11/doflamingo/clips.png",
+      "bytes": 87606,
+      "sha256": "ff49d41b33a48b754ef4ab78484f4e6a976503358186ba8000261e313ebd0c1b"
+    },
+    {
+      "path": "art/qa/b11/doflamingo/before-after.png",
+      "bytes": 2731,
+      "sha256": "08f9276085c3370c081c634e1f7b4759b2010c075a009e499ab57c460f62c072"
+    },
+    {
+      "path": "art/production/b11/doflamingo/body.aseprite",
+      "bytes": 45628,
+      "sha256": "34b97ace99de45a9dbafbd3db27f6929e4c4fd97ce35294da40f1495c84e9028"
+    },
+    {
+      "path": "public/assets/portraits/donquixote-officer.png",
+      "bytes": 3800,
+      "sha256": "450fc86eea7abc828e46b321a21355f6e4fca2578a5e7839d7589bc75897137d"
+    },
+    {
+      "path": "public/assets/tokens/donquixote-officer.png",
+      "bytes": 2572,
+      "sha256": "db8c86a913311f9065ef30e662fdd74b38aa0cbfb9632611659ae9ff44d8af47"
+    },
+    {
+      "path": "public/assets/portraits/donquixote-officer-vanguard.png",
+      "bytes": 3800,
+      "sha256": "450fc86eea7abc828e46b321a21355f6e4fca2578a5e7839d7589bc75897137d"
+    },
+    {
+      "path": "public/assets/tokens/donquixote-officer-vanguard.png",
+      "bytes": 2572,
+      "sha256": "db8c86a913311f9065ef30e662fdd74b38aa0cbfb9632611659ae9ff44d8af47"
+    },
+    {
+      "path": "public/assets/portraits/donquixote-officer-assault.png",
+      "bytes": 3800,
+      "sha256": "450fc86eea7abc828e46b321a21355f6e4fca2578a5e7839d7589bc75897137d"
+    },
+    {
+      "path": "public/assets/tokens/donquixote-officer-assault.png",
+      "bytes": 2572,
+      "sha256": "db8c86a913311f9065ef30e662fdd74b38aa0cbfb9632611659ae9ff44d8af47"
+    },
+    {
+      "path": "public/assets/portraits/donquixote-officer-artillery.png",
+      "bytes": 3800,
+      "sha256": "450fc86eea7abc828e46b321a21355f6e4fca2578a5e7839d7589bc75897137d"
+    },
+    {
+      "path": "public/assets/tokens/donquixote-officer-artillery.png",
+      "bytes": 2572,
+      "sha256": "db8c86a913311f9065ef30e662fdd74b38aa0cbfb9632611659ae9ff44d8af47"
+    },
+    {
+      "path": "public/assets/animations/donquixote-officer-b11-v2/donquixote-officer-b11-v2.png",
+      "bytes": 61611,
+      "sha256": "258c1d59254f344abd8dedca5948e2e4655d1a7e67b77d6e0f4b785a0cffe2e9"
+    },
+    {
+      "path": "public/assets/animations/donquixote-officer-b11-v2/donquixote-officer-b11-v2.json",
+      "bytes": 16062,
+      "sha256": "be5e5a26fd90878eefd3dd738e1ab13d507255c809487555ee7329527ec6f8f2"
+    },
+    {
+      "path": "art/production/b11/donquixote-officer/body-poses.png",
+      "bytes": 58438,
+      "sha256": "684eb4af231396f8d300f89d168b2149c968be8b7895e591211bd5bc168518af"
+    },
+    {
+      "path": "art/production/b11/donquixote-officer/frame-map.json",
+      "bytes": 11841,
+      "sha256": "e1feaf4b30ffbd8a1a6ec3d9d2c03e6055b880d4a1a566776699d2c479358c3b"
+    },
+    {
+      "path": "art/production/b11/donquixote-officer/master.png",
+      "bytes": 3093,
+      "sha256": "8accace25a898de84657d6df02b250152f5f8b64b7dc825d01e75c903307b411"
+    },
+    {
+      "path": "art/production/b11/donquixote-officer/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/donquixote-officer/selection.json",
+      "bytes": 3263,
+      "sha256": "c88069e04f20aa07a9101d287b6aff10fb9a1f044404103ebef629e3bb9361db"
+    },
+    {
+      "path": "art/qa/b11/donquixote-officer/all-clips.gif",
+      "bytes": 65179,
+      "sha256": "c6812fb524ff0bee32878e96474f8ee46cc6810c0244d531de1b94dd936ab058"
+    },
+    {
+      "path": "art/qa/b11/donquixote-officer/clips.png",
+      "bytes": 120197,
+      "sha256": "16bf32a3f3b95c4af92ebfdb3bb1aae17ecce2330e9b469c7483683bfe414651"
+    },
+    {
+      "path": "art/qa/b11/donquixote-officer/before-after.png",
+      "bytes": 4442,
+      "sha256": "63e8bd0a4b6b82e781e70aa62c7c72d26e3929c34278567affe8db56444fed7f"
+    },
+    {
+      "path": "art/production/b11/donquixote-officer/draft.png",
+      "bytes": 1905396,
+      "sha256": "2b95508b0ac4742a8d6a62237b14c9f718adb5e1eb2908a03d120eb49bb29274"
+    },
+    {
+      "path": "art/production/b11/donquixote-officer/prompt.txt",
+      "bytes": 2306,
+      "sha256": "07ff658e2b7ee0f5fafb0f6a2d86885f5e95029fa62d3517783166ac651184a8"
+    },
+    {
+      "path": "art/production/b11/donquixote-officer/curated-draft-poses.png",
+      "bytes": 53051,
+      "sha256": "97bec6650af5ca827bcb400adaaeb6cb50a4126c11392c5b10c252886ee02d0a"
+    },
+    {
+      "path": "art/production/b11/donquixote-officer/body.aseprite",
+      "bytes": 64619,
+      "sha256": "9b95002462367c4f20458b8da610dacb347484571d8f5b2c68e004b0802cff39"
+    },
+    {
+      "path": "public/assets/portraits/enel.png",
+      "bytes": 2554,
+      "sha256": "761560f3a79fb0527a6bf58e905baefdb4a196e5a34c2b1f6de801e3e26ca487"
+    },
+    {
+      "path": "public/assets/tokens/enel.png",
+      "bytes": 1667,
+      "sha256": "72ce18d454d3e04171d3c7c68c41226f98cb6d83b0b76b035307126b4a9dc837"
+    },
+    {
+      "path": "public/assets/animations/enel-b11-v2/enel-b11-v2.png",
+      "bytes": 32936,
+      "sha256": "e049c38e5eb501f79c52451c599196e61eb15bb65f9481162b2cd0c51a450610"
+    },
+    {
+      "path": "public/assets/animations/enel-b11-v2/enel-b11-v2.json",
+      "bytes": 16036,
+      "sha256": "912f6f0a75a4f069ba490ac05c674465ff877d1c76e1ac54bdfbc0f0852ad0d9"
+    },
+    {
+      "path": "art/production/b11/enel/body-poses.png",
+      "bytes": 32709,
+      "sha256": "3f9b157920554ebffeefbaf98e93a219557cfdfbe3b1530bc2bb308be6cbd1dd"
+    },
+    {
+      "path": "art/production/b11/enel/frame-map.json",
+      "bytes": 14811,
+      "sha256": "e7415384966ac94624c4ae905a5279ed0101acdd2ef0aededb803a2dceb3e74f"
+    },
+    {
+      "path": "art/production/b11/enel/master.png",
+      "bytes": 1965,
+      "sha256": "eee7ef65dc6a999648a72cf8119072669f59863724830292cb40937ea4b3ce81"
+    },
+    {
+      "path": "art/production/b11/enel/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/enel/selection.json",
+      "bytes": 8210,
+      "sha256": "0d3d87008d52a38c1508b29916565255ba32e21a467af466a64ba4d7a57257f4"
+    },
+    {
+      "path": "art/qa/b11/enel/all-clips.gif",
+      "bytes": 43677,
+      "sha256": "39878d36f70e595fd161db6a0166a20f895a3020560901557a601a8fb2fe3525"
+    },
+    {
+      "path": "art/qa/b11/enel/clips.png",
+      "bytes": 76446,
+      "sha256": "77c180b8b14159a257b4d48452c28e48bf88e8d953bb3cc98b081b6281a6db5d"
+    },
+    {
+      "path": "art/qa/b11/enel/before-after.png",
+      "bytes": 3050,
+      "sha256": "e6cfcbf041ac1fa79ea41065654243ae6e86b1ea180856d3f7ba7cdcd53a832d"
+    },
+    {
+      "path": "art/production/b11/enel/body.aseprite",
+      "bytes": 40755,
+      "sha256": "4859fab226494765c0b3c27ef34817d47a0bcbc3c2c6db4c4a0a206ee8e51c8b"
+    },
+    {
+      "path": "public/assets/portraits/fish-man-raider.png",
+      "bytes": 3525,
+      "sha256": "d85190e9efe02fe91a9610c580ae798c43203df2101552ea847cce666f334232"
+    },
+    {
+      "path": "public/assets/tokens/fish-man-raider.png",
+      "bytes": 2352,
+      "sha256": "bc05fd1acff2f3e00832bd6b1e7de68cdb6be5501782ee65b86cc9a808f56dfe"
+    },
+    {
+      "path": "public/assets/animations/fish-man-raider-b11-v2/fish-man-raider-b11-v2.png",
+      "bytes": 53379,
+      "sha256": "162fab194a34018beecd5d07b670774a407bd8c8c4a153a0981d65a12bb68750"
+    },
+    {
+      "path": "public/assets/animations/fish-man-raider-b11-v2/fish-man-raider-b11-v2.json",
+      "bytes": 16053,
+      "sha256": "017b47a01b78fc11aead5c578f7d1eff403d8bd5e7f539b628a205471781c6cb"
+    },
+    {
+      "path": "art/production/b11/fish-man-raider/body-poses.png",
+      "bytes": 50934,
+      "sha256": "285f00d78b06babd7a70600edfa372bf42e7cacec6245c1eb2d776cb5fcbbbe1"
+    },
+    {
+      "path": "art/production/b11/fish-man-raider/frame-map.json",
+      "bytes": 11841,
+      "sha256": "e1feaf4b30ffbd8a1a6ec3d9d2c03e6055b880d4a1a566776699d2c479358c3b"
+    },
+    {
+      "path": "art/production/b11/fish-man-raider/master.png",
+      "bytes": 2870,
+      "sha256": "55a14a2fc648abf10be8d88c097ed1281ee3c68191960210c52f760bd5014d2c"
+    },
+    {
+      "path": "art/production/b11/fish-man-raider/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/fish-man-raider/selection.json",
+      "bytes": 3243,
+      "sha256": "ab695e52d5ae112bad1cc7aa29be90640554f18a62cb7c2757ef6bd014d6d600"
+    },
+    {
+      "path": "art/qa/b11/fish-man-raider/all-clips.gif",
+      "bytes": 56708,
+      "sha256": "c5974684613b669af9ec682022b8103b9cb720b29a7ad214732949f962dec7e4"
+    },
+    {
+      "path": "art/qa/b11/fish-man-raider/clips.png",
+      "bytes": 108789,
+      "sha256": "9619540868b79ef5620e67efe6a069ca1c795204a49687576476cc7a32588735"
+    },
+    {
+      "path": "art/qa/b11/fish-man-raider/before-after.png",
+      "bytes": 4037,
+      "sha256": "567aaa0e7aa7306d9f55fa02410bded791fe064756733d50fa361670540ef2fb"
+    },
+    {
+      "path": "art/production/b11/fish-man-raider/draft.png",
+      "bytes": 1800856,
+      "sha256": "c2d75e258aeefb986d3b7ad0cebcd6ababf79c0d0c287a2e2c981fe91c74d086"
+    },
+    {
+      "path": "art/production/b11/fish-man-raider/prompt.txt",
+      "bytes": 2303,
+      "sha256": "cf74a9b17e504b4c7b9f93a191d8990acfb867ee1a81178ef294ae891bfc873c"
+    },
+    {
+      "path": "art/production/b11/fish-man-raider/curated-draft-poses.png",
+      "bytes": 45112,
+      "sha256": "8872b6d37a6a7210f13b597f3b581cba31608ded9239e0f0547fb1873ec6b0fa"
+    },
+    {
+      "path": "art/production/b11/fish-man-raider/body.aseprite",
+      "bytes": 56183,
+      "sha256": "c0b33f72b28bed8d91a16e60ba6d8f174906fb70ad45b2a7f804ed3790957073"
+    },
+    {
+      "path": "public/assets/portraits/franky.png",
+      "bytes": 2977,
+      "sha256": "b42c84440b3a570f4f0f505f9cff456668635ff03be30643f32af7ecdf22ec89"
+    },
+    {
+      "path": "public/assets/tokens/franky.png",
+      "bytes": 1977,
+      "sha256": "42f70d908011e18be778f559924cac70d65d2a0c5d71d2697d135c81c52e6d22"
+    },
+    {
+      "path": "public/assets/animations/franky-b11-v2/franky-b11-v2.png",
+      "bytes": 42461,
+      "sha256": "9af3e5e912bc15e1d16ef37a66d4054a3d6412766e37cf7d682171884df073ea"
+    },
+    {
+      "path": "public/assets/animations/franky-b11-v2/franky-b11-v2.json",
+      "bytes": 16083,
+      "sha256": "0889b21c84aa3178d65f830a357abffc62524333dd3fbe9b2952719847b042ed"
+    },
+    {
+      "path": "art/production/b11/franky/body-poses.png",
+      "bytes": 42184,
+      "sha256": "6256edca5c735cd38c23108f54641b855d1eb7576535eeeb12a9db4b144bb75d"
+    },
+    {
+      "path": "art/production/b11/franky/frame-map.json",
+      "bytes": 14799,
+      "sha256": "561b63b5523d8d54aeb7fc1bce8067c387fe99609dde55e8b6307251401b7821"
+    },
+    {
+      "path": "art/production/b11/franky/master.png",
+      "bytes": 2331,
+      "sha256": "2e887e1e2322af810b2c17fd41012a6e2387b2dc6af11d09bd43f292682863e6"
+    },
+    {
+      "path": "art/production/b11/franky/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/franky/selection.json",
+      "bytes": 8257,
+      "sha256": "0f356f29f14a6c944f58672dbdb8ec432617a473214207c875a77a3512a89b01"
+    },
+    {
+      "path": "art/qa/b11/franky/all-clips.gif",
+      "bytes": 50027,
+      "sha256": "ae829bc61be44c20604cba49b90bb7e24e7405d58fe925ae099449fab298b30a"
+    },
+    {
+      "path": "art/qa/b11/franky/clips.png",
+      "bytes": 92187,
+      "sha256": "9ca2d7cddca3c86c5dfc76b89260ee8f9da363f275361f11db0ad64f9b959a67"
+    },
+    {
+      "path": "art/qa/b11/franky/before-after.png",
+      "bytes": 4964,
+      "sha256": "4c260ff2cf3aa505b02a61d160c84154b46dc152a734378177bcf592c3c6422a"
+    },
+    {
+      "path": "art/production/b11/franky/body.aseprite",
+      "bytes": 48190,
+      "sha256": "d09d5d3f67ff1e36717354eb7f8c6f48e3b9d6fc2920e9efa23fc4d0d8a22238"
+    },
+    {
+      "path": "public/assets/portraits/garp.png",
+      "bytes": 2303,
+      "sha256": "955fef12c8836fdbb9a432617aed067a0401985a5959adfc94158fb851932a44"
+    },
+    {
+      "path": "public/assets/tokens/garp.png",
+      "bytes": 1475,
+      "sha256": "6595f033f15ddb792bf80f7ba3c0347b4755fb8cf0667789dc2439bad5f30347"
+    },
+    {
+      "path": "public/assets/animations/garp-b11-v2/garp-b11-v2.png",
+      "bytes": 46951,
+      "sha256": "2fd720adffce0c1f82a8db8821ead9bd7f0e3d02b64fe77412c73e0611166869"
+    },
+    {
+      "path": "public/assets/animations/garp-b11-v2/garp-b11-v2.json",
+      "bytes": 16110,
+      "sha256": "1216e9b4bd08474d50619ded1621ec68fd83c0f33f1b1e7e28277361404d8c56"
+    },
+    {
+      "path": "art/production/b11/garp/body-poses.png",
+      "bytes": 45041,
+      "sha256": "6d58c480aac7e4feeec72c1644714c47e823f9f613d34361a29ef88f27686b8a"
+    },
+    {
+      "path": "art/production/b11/garp/frame-map.json",
+      "bytes": 12983,
+      "sha256": "0a95ae59322f7ff3971ec79ad1b1a3e415e065898d9275368047e09e830f8f99"
+    },
+    {
+      "path": "art/production/b11/garp/master.png",
+      "bytes": 1772,
+      "sha256": "a55d753689ba6a276e502daa8941e331cf1b5138444dc6c8202ea9dbda3c8016"
+    },
+    {
+      "path": "art/production/b11/garp/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/garp/selection.json",
+      "bytes": 5579,
+      "sha256": "f00882f24b023f0a3464c661e8e01d05dcc639d58336f8b6d52deb24b6ef031d"
+    },
+    {
+      "path": "art/qa/b11/garp/all-clips.gif",
+      "bytes": 54434,
+      "sha256": "eed45e1d7fcef715b13619438aa983c86c991424fb4cd0ae8046676285722d88"
+    },
+    {
+      "path": "art/qa/b11/garp/clips.png",
+      "bytes": 94154,
+      "sha256": "a9b8209acb2eced746a724bb042c6f1f05db390334823d771f6c960465b35651"
+    },
+    {
+      "path": "art/qa/b11/garp/before-after.png",
+      "bytes": 3321,
+      "sha256": "431df2a84db2961894344e06b48c9a73c52cf3fd785b990551449253a12c1f15"
+    },
+    {
+      "path": "art/production/b11/garp/draft.png",
+      "bytes": 1760298,
+      "sha256": "b3cc3fc43b2e6a4eb8ba738460121bbb011c62405add336dc05836c610fd9c83"
+    },
+    {
+      "path": "art/production/b11/garp/prompt.txt",
+      "bytes": 2245,
+      "sha256": "4d984d06e359fb8dac932c7d630ac90549c676f441e0174745b1d2462344d3d3"
+    },
+    {
+      "path": "art/production/b11/garp/curated-draft-poses.png",
+      "bytes": 38832,
+      "sha256": "75dfa4a312cbca9e09a07936e6058a292a5d0e2fea7e89a82c3609bbb896d0c5"
+    },
+    {
+      "path": "art/production/b11/garp/body.aseprite",
+      "bytes": 50061,
+      "sha256": "c3c3bfc8fae652b10a7da5ec8e84fa889135c95ee2ba13b78b98cc7e9d6cc56d"
+    },
+    {
+      "path": "public/assets/portraits/hancock.png",
+      "bytes": 1796,
+      "sha256": "c447a16a738c5f122c98d9710fb6454a26fa3f79f5ea2a5712168477c248e41c"
+    },
+    {
+      "path": "public/assets/tokens/hancock.png",
+      "bytes": 1115,
+      "sha256": "84a45dfa7df00d3bc2f9ad6efcac03be548084f4a467e47e9b59b4c65c11ab97"
+    },
+    {
+      "path": "public/assets/animations/hancock-b11-v2/hancock-b11-v2.png",
+      "bytes": 22784,
+      "sha256": "2723cf859a2174190b829fde609d992f16d1c1ced3f1843190b96f66d8568055"
+    },
+    {
+      "path": "public/assets/animations/hancock-b11-v2/hancock-b11-v2.json",
+      "bytes": 16119,
+      "sha256": "15354ddac558fd8a4c9dfa30287d018596ae91981c28cae87ab3a0efa5c6203f"
+    },
+    {
+      "path": "art/production/b11/hancock/body-poses.png",
+      "bytes": 22865,
+      "sha256": "3d12f1e79a74a9f599068eaa69419ba15704421a291d5a5255e4cfcd27f9973b"
+    },
+    {
+      "path": "art/production/b11/hancock/frame-map.json",
+      "bytes": 14812,
+      "sha256": "631caace5811fb39d8d26ffa260313e0f5763bd84bc8109a4cbdd6d1b4eaf48f"
+    },
+    {
+      "path": "art/production/b11/hancock/master.png",
+      "bytes": 1404,
+      "sha256": "27372e2550a6e82cc98cba4922ddf9f03a347e409a150bc67076f134f084fa7c"
+    },
+    {
+      "path": "art/production/b11/hancock/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/hancock/selection.json",
+      "bytes": 8236,
+      "sha256": "5f40f04132ff7e41d30ebdba138eeb2b2f4469b970babfebc76bb292a276b4d3"
+    },
+    {
+      "path": "art/qa/b11/hancock/all-clips.gif",
+      "bytes": 30020,
+      "sha256": "06b86345671be3046905d7bb97bb9e2a1109c5b82b10934c68dd93c81ff3da50"
+    },
+    {
+      "path": "art/qa/b11/hancock/clips.png",
+      "bytes": 66024,
+      "sha256": "93733c577d447e5331ddcefe8f5e034d8946627375d2b7868a3c19da1e8c1ae5"
+    },
+    {
+      "path": "art/qa/b11/hancock/before-after.png",
+      "bytes": 2170,
+      "sha256": "8f4a1189d8a033beeeb4759e80938703a2a55efd37ce8e5fd53a355e43dc8d98"
+    },
+    {
+      "path": "art/production/b11/hancock/body.aseprite",
+      "bytes": 27140,
+      "sha256": "4887add7637d067c5ded7d19f46351ff35142b2d41dae9b1c99bfeb030c3e32a"
+    },
+    {
+      "path": "public/assets/portraits/hody-jones.png",
+      "bytes": 2782,
+      "sha256": "b17aa5f45768309ca42199f25f125c4c24d63cc374731ee2cc18f8ee530bc66b"
+    },
+    {
+      "path": "public/assets/tokens/hody-jones.png",
+      "bytes": 1719,
+      "sha256": "c96d03012409ace247d511585ddb1d1d1804a4937c396502e6990bdb9bc76096"
+    },
+    {
+      "path": "public/assets/animations/hody-jones-b11-v2/hody-jones-b11-v2.png",
+      "bytes": 42012,
+      "sha256": "e85dd863b6c976012452f22728ce9ca51ab5a09cd9192d01a469a210b0506b81"
+    },
+    {
+      "path": "public/assets/animations/hody-jones-b11-v2/hody-jones-b11-v2.json",
+      "bytes": 16054,
+      "sha256": "fe7ecb6de38778a747ecaff0c3e16f9085bbcc698245419c1d28561ec4aa06f3"
+    },
+    {
+      "path": "art/production/b11/hody-jones/body-poses.png",
+      "bytes": 41790,
+      "sha256": "2f6ec3654e4d4493592bdadceab9b9c3cb3747a5f63087126d408f19ccd05017"
+    },
+    {
+      "path": "art/production/b11/hody-jones/frame-map.json",
+      "bytes": 14818,
+      "sha256": "d768fadc94c5c0e4964f81bc9aa22be0f9b4ddf4d189a4c939aa0e4ff7fd2e54"
+    },
+    {
+      "path": "art/production/b11/hody-jones/master.png",
+      "bytes": 2119,
+      "sha256": "f031a7bff17fa3de8b420b70a36e721ee2d53b9d64628436bf5adbd5ad69972f"
+    },
+    {
+      "path": "art/production/b11/hody-jones/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/hody-jones/selection.json",
+      "bytes": 8251,
+      "sha256": "d120bf4ef8b2d70272aba91528319b6644bf92582f055f8585c81c252f3193e9"
+    },
+    {
+      "path": "art/qa/b11/hody-jones/all-clips.gif",
+      "bytes": 49203,
+      "sha256": "80b781c471345423b4b1220b9ad78d058a1f4a86dd742129fa114daf2a6fcdc0"
+    },
+    {
+      "path": "art/qa/b11/hody-jones/clips.png",
+      "bytes": 91036,
+      "sha256": "fba6214006280e7a4ace60745b3ee5a0c8e421dad22ef92cc80b2324ebd0dbb0"
+    },
+    {
+      "path": "art/qa/b11/hody-jones/before-after.png",
+      "bytes": 3225,
+      "sha256": "d0a2ec04b363cd5729eb05cb7d42c08a281251e9a1b5e15dd1a26163a08ec21e"
+    },
+    {
+      "path": "art/production/b11/hody-jones/body.aseprite",
+      "bytes": 45667,
+      "sha256": "0df4128324a1b492489c573ec04b5603826be602e2d96a5bc6645b2b83293c0e"
+    },
+    {
+      "path": "public/assets/portraits/impel-down-guard.png",
+      "bytes": 3565,
+      "sha256": "2237091af3db11e3b5cac2266e742cc4c4ae26e81a2a0630cace61118699025e"
+    },
+    {
+      "path": "public/assets/tokens/impel-down-guard.png",
+      "bytes": 2353,
+      "sha256": "56bec69e7371416e0202a5072d503dfcca5d63a542743b90a9ac7706788feaa9"
+    },
+    {
+      "path": "public/assets/animations/impel-down-guard-b11-v2/impel-down-guard-b11-v2.png",
+      "bytes": 58275,
+      "sha256": "8ccb2fbb4aa479f88ab50cb1392515cb7aac842966dc537b19414b7635827453"
+    },
+    {
+      "path": "public/assets/animations/impel-down-guard-b11-v2/impel-down-guard-b11-v2.json",
+      "bytes": 16056,
+      "sha256": "7433fce2d8185b8037da46bf2a1355ad2d121770f6ca4d7a355aeb84e4a80dad"
+    },
+    {
+      "path": "art/production/b11/impel-down-guard/body-poses.png",
+      "bytes": 55229,
+      "sha256": "df64e093a34b4c9828e9e02a81a32991c93b36c5739fc492d7de47ddeedbb3dd"
+    },
+    {
+      "path": "art/production/b11/impel-down-guard/frame-map.json",
+      "bytes": 11841,
+      "sha256": "e1feaf4b30ffbd8a1a6ec3d9d2c03e6055b880d4a1a566776699d2c479358c3b"
+    },
+    {
+      "path": "art/production/b11/impel-down-guard/master.png",
+      "bytes": 2919,
+      "sha256": "e59a7dcb9ac55eae4f6b414feb8a30bb9408dbfb5884a088db3a8cbb7e30e31c"
+    },
+    {
+      "path": "art/production/b11/impel-down-guard/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/impel-down-guard/selection.json",
+      "bytes": 3250,
+      "sha256": "ca5170208f56a6b97c7c75b451fdfbbe44522e7c830d737ddfa7759e7e69b1a2"
+    },
+    {
+      "path": "art/qa/b11/impel-down-guard/all-clips.gif",
+      "bytes": 62171,
+      "sha256": "f463bcc98c5ab4998fd4862c47f843bb2967d4e171e2ec7517b42867396a1e7e"
+    },
+    {
+      "path": "art/qa/b11/impel-down-guard/clips.png",
+      "bytes": 118536,
+      "sha256": "de87fe7fd025242bab825ab2fbae965aa5f65b2e8312db767a63d82cdbe81793"
+    },
+    {
+      "path": "art/qa/b11/impel-down-guard/before-after.png",
+      "bytes": 4094,
+      "sha256": "985a609b91879b3e04e73a3724dd42381f9d8616decc376ca150665d3b230a1a"
+    },
+    {
+      "path": "art/production/b11/impel-down-guard/draft.png",
+      "bytes": 2155900,
+      "sha256": "569c63207fcde293f04f03a148442f6c0c8c76713bc7eb10e60cf897b74651a5"
+    },
+    {
+      "path": "art/production/b11/impel-down-guard/prompt.txt",
+      "bytes": 2316,
+      "sha256": "ee8e8c01ac547fcefb195403ac2eb374ec091c1550588170ab8b83cc3658d8ad"
+    },
+    {
+      "path": "art/production/b11/impel-down-guard/curated-draft-poses.png",
+      "bytes": 49818,
+      "sha256": "7340aaab7f0ccb97326607b5db76f23cdf56e68fb28f854d57e64cc9ef813a2f"
+    },
+    {
+      "path": "art/production/b11/impel-down-guard/body.aseprite",
+      "bytes": 61274,
+      "sha256": "94323e68e8ea7a5eff9a5b060391991e22644c327f43395bea0c400f89188ef0"
+    },
+    {
+      "path": "public/assets/portraits/ivankov.png",
+      "bytes": 2487,
+      "sha256": "30bcc6369b998a8eafea6bee46989c0f77b589bbc21f80f5933c4703cd5e3057"
+    },
+    {
+      "path": "public/assets/tokens/ivankov.png",
+      "bytes": 1579,
+      "sha256": "bcf1c4d37ab3902fd8ba327120c90ffd23cfb47b227f249469c92da41fa1f344"
+    },
+    {
+      "path": "public/assets/animations/ivankov-b11-v2/ivankov-b11-v2.png",
+      "bytes": 36504,
+      "sha256": "b649aeccca27f9c2d1bea4d740c81157e98b407b92fa339e4a4440273914c01b"
+    },
+    {
+      "path": "public/assets/animations/ivankov-b11-v2/ivankov-b11-v2.json",
+      "bytes": 16086,
+      "sha256": "bcd2059226bcce73c7cad68d8ca0efe2e2e25a28085c4e3380fbe351ead38055"
+    },
+    {
+      "path": "art/production/b11/ivankov/body-poses.png",
+      "bytes": 35798,
+      "sha256": "dba5817f630e72a6aecd1a99e3502978ab3fecb835d428d2c156405dd9135e5f"
+    },
+    {
+      "path": "art/production/b11/ivankov/frame-map.json",
+      "bytes": 14782,
+      "sha256": "107e0cbc5abeef7b5862b61de30a57b98548a732a2462847dca5052df9f9a023"
+    },
+    {
+      "path": "art/production/b11/ivankov/master.png",
+      "bytes": 1902,
+      "sha256": "561c5d0fb6bbf00000e1a114bf2c4a9a3c251318e8e82a4b935e735d67f60940"
+    },
+    {
+      "path": "art/production/b11/ivankov/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/ivankov/selection.json",
+      "bytes": 8227,
+      "sha256": "cc7e2da2118c43513b348110414a4a2e0845070c245d59d8fad37addf3a09b43"
+    },
+    {
+      "path": "art/qa/b11/ivankov/all-clips.gif",
+      "bytes": 47777,
+      "sha256": "a5defe6a5ce5155e59bd54627948ebc86b3eddd694512d571617f3a63e6c9828"
+    },
+    {
+      "path": "art/qa/b11/ivankov/clips.png",
+      "bytes": 81939,
+      "sha256": "ebfa35d302192e622daf98e16e3546e06d30d328ab91dddeddd26817c8f053a9"
+    },
+    {
+      "path": "art/qa/b11/ivankov/before-after.png",
+      "bytes": 2582,
+      "sha256": "e50568a59c49d37b0e6e4b41f0d2215f3e8b80c3bb9c03e7d0d8af15d8a18c92"
+    },
+    {
+      "path": "art/production/b11/ivankov/body.aseprite",
+      "bytes": 43039,
+      "sha256": "9bc19201f6b4dcd4c66f81f41e9a9cac316782891df727bddf095a834c7bf26a"
+    },
+    {
+      "path": "public/assets/portraits/jinbe.png",
+      "bytes": 2464,
+      "sha256": "3592519e735fafa64a1203855dca74e55079e8cc58118c7fa76c635236abb104"
+    },
+    {
+      "path": "public/assets/tokens/jinbe.png",
+      "bytes": 1579,
+      "sha256": "9cba351b4af5bdc2c5d2db59f5a485b4b7fe8c87b030c3ce0f2f906709bb09a4"
+    },
+    {
+      "path": "public/assets/animations/jinbe-b11-v2/jinbe-b11-v2.png",
+      "bytes": 36339,
+      "sha256": "645df5ea24d37f27e608d7b85c2bdb72f7606f65cab371984e4eddd59f50244f"
+    },
+    {
+      "path": "public/assets/animations/jinbe-b11-v2/jinbe-b11-v2.json",
+      "bytes": 16080,
+      "sha256": "e50fd062aac5da53f8e573c11c4612427851e0a0379a3122aa499da4c1ce4ba0"
+    },
+    {
+      "path": "art/production/b11/jinbe/body-poses.png",
+      "bytes": 36149,
+      "sha256": "8248c13c076ffb8493bf5b5cab637af975b9308cf09500a204c0abc603746a39"
+    },
+    {
+      "path": "art/production/b11/jinbe/frame-map.json",
+      "bytes": 14775,
+      "sha256": "81c93a4466d3b06a201df8d6098f028be304a94b0d9ebd8e5275ca29a11bd554"
+    },
+    {
+      "path": "art/production/b11/jinbe/master.png",
+      "bytes": 1890,
+      "sha256": "158d04850cf55c9b57fd476d2af317ab24a8ed02dbe6f49d12a6392c63066363"
+    },
+    {
+      "path": "art/production/b11/jinbe/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/jinbe/selection.json",
+      "bytes": 8216,
+      "sha256": "740a98d7269552e32448c5703d0834ebb1703eb6ce5b3d9cda83add1ea57f14e"
+    },
+    {
+      "path": "art/qa/b11/jinbe/all-clips.gif",
+      "bytes": 41697,
+      "sha256": "6eb837ee6afc86343e17b9b2b4c10195aa48f38a5e8490db29bb4fa7f05f0248"
+    },
+    {
+      "path": "art/qa/b11/jinbe/clips.png",
+      "bytes": 82129,
+      "sha256": "120a84325e8eab59172975dda08f203fb37e77c2615e117a36578e7e34323466"
+    },
+    {
+      "path": "art/qa/b11/jinbe/before-after.png",
+      "bytes": 3732,
+      "sha256": "36da80a799f366c697e8d11e82f5607b5799485fc3cfda94ca83863dcdec312b"
+    },
+    {
+      "path": "art/production/b11/jinbe/body.aseprite",
+      "bytes": 39461,
+      "sha256": "70b9f6df5f35d752a2820dfcf470a18865d6856f4951fccff90b37bb99a1b36e"
+    },
+    {
+      "path": "public/assets/portraits/kid.png",
+      "bytes": 2120,
+      "sha256": "800b72ca9eb7b13b9d5b756b6ec9d9d1ca33867536d258906d0e5cfe460b15c6"
+    },
+    {
+      "path": "public/assets/tokens/kid.png",
+      "bytes": 1404,
+      "sha256": "37258507910d3730c73d5e32dc92a6488f7fc0fd5ccdb1d19e1462efef0511c1"
+    },
+    {
+      "path": "public/assets/animations/kid-b11-v2/kid-b11-v2.png",
+      "bytes": 27511,
+      "sha256": "419c665baab5bf3b6358627d700b911a7f5268848708e459a3ce0856231c23e2"
+    },
+    {
+      "path": "public/assets/animations/kid-b11-v2/kid-b11-v2.json",
+      "bytes": 16107,
+      "sha256": "e2be6c0d486d3431c803f0a6ddfe12369666ef1c6a88b15a77b67dc5175604c4"
+    },
+    {
+      "path": "art/production/b11/kid/body-poses.png",
+      "bytes": 29007,
+      "sha256": "a7a234f93741f985504b958bc40843b6bf13539247980bdbf15b57fb20d9e3b3"
+    },
+    {
+      "path": "art/production/b11/kid/frame-map.json",
+      "bytes": 14770,
+      "sha256": "ef42fdc1355d056269895adfcf04042440506de740f4844362cffac157c91e2a"
+    },
+    {
+      "path": "art/production/b11/kid/master.png",
+      "bytes": 1677,
+      "sha256": "4d20092df85f0b84f3e3824f35d816d425d507c8e70cc7434dec7c2f7a67b8af"
+    },
+    {
+      "path": "art/production/b11/kid/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/kid/selection.json",
+      "bytes": 8203,
+      "sha256": "22a94d867bb50f409befe230ca89566e5b3f05dccada64daf67459fd7b71d9fb"
+    },
+    {
+      "path": "art/qa/b11/kid/all-clips.gif",
+      "bytes": 31953,
+      "sha256": "6ed4d39b20d2befaafb4e320c49e0dbbefef18e5825789c64d4917c2888c816b"
+    },
+    {
+      "path": "art/qa/b11/kid/clips.png",
+      "bytes": 70873,
+      "sha256": "b6c0f51938935bee868efc733927b713aed64f04c21a5321c440ada508410b32"
+    },
+    {
+      "path": "art/qa/b11/kid/before-after.png",
+      "bytes": 2686,
+      "sha256": "b3d5adf8a378a00f43af78b680b2b87985384e3b021181f6e6f54ae605c638c3"
+    },
+    {
+      "path": "art/production/b11/kid/body.aseprite",
+      "bytes": 31323,
+      "sha256": "ad82765d397af7ad3fa9c72852e24b2307b954d9b53bc61a4ed79689529c9841"
+    },
+    {
+      "path": "public/assets/portraits/killer.png",
+      "bytes": 3431,
+      "sha256": "bf6d242e1b069bd989bfe76f622f30c9316ac032141bbcfffed3ef893df66e9e"
+    },
+    {
+      "path": "public/assets/tokens/killer.png",
+      "bytes": 2309,
+      "sha256": "e3557de8c03eb9834daf6d5385e94f7ceb340915b99da64d1de2f2d096b9c34d"
+    },
+    {
+      "path": "public/assets/animations/killer-b11-v2/killer-b11-v2.png",
+      "bytes": 60078,
+      "sha256": "65b542972bdde7630fa8ef99e4028a56a549313aa5635ca635ab219a527e9ae2"
+    },
+    {
+      "path": "public/assets/animations/killer-b11-v2/killer-b11-v2.json",
+      "bytes": 16032,
+      "sha256": "dd6754f503257b032775735c2362193ec83dd8aaf6b1eb2101d8f53e5b1edc0a"
+    },
+    {
+      "path": "art/production/b11/killer/body-poses.png",
+      "bytes": 57529,
+      "sha256": "73adc7e9d6c398c61ff72b7a5ed6a9537f23aff1abf027b0d8b55f28f4e0bc20"
+    },
+    {
+      "path": "art/production/b11/killer/frame-map.json",
+      "bytes": 11841,
+      "sha256": "e1feaf4b30ffbd8a1a6ec3d9d2c03e6055b880d4a1a566776699d2c479358c3b"
+    },
+    {
+      "path": "art/production/b11/killer/master.png",
+      "bytes": 2865,
+      "sha256": "61d45351b2161f38e99a87e51e5ccf0fd0e69ed44f6eff22f3406e27c05147c8"
+    },
+    {
+      "path": "art/production/b11/killer/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/killer/selection.json",
+      "bytes": 3324,
+      "sha256": "248e15164672b22cb77b4012631bcd75a624556001e1bb682fb4eea773e68998"
+    },
+    {
+      "path": "art/qa/b11/killer/all-clips.gif",
+      "bytes": 63592,
+      "sha256": "5eef139c305d9101305360177a11e581b4e3b845d321df682623fc967ef947a8"
+    },
+    {
+      "path": "art/qa/b11/killer/clips.png",
+      "bytes": 110796,
+      "sha256": "9ec5124bd32fc3daf21974ec1c5b412fb00f40118fe2087dc641329643469410"
+    },
+    {
+      "path": "art/qa/b11/killer/before-after.png",
+      "bytes": 5990,
+      "sha256": "dc21a0388dee47cbf8813a80174c654f6ef949c8eda8f8095ffee873abb335a7"
+    },
+    {
+      "path": "art/production/b11/killer/draft.png",
+      "bytes": 1910358,
+      "sha256": "a38cc5958651e87f859b50ff4e045847f896f27cf26199fd044f1439c9e5a5b4"
+    },
+    {
+      "path": "art/production/b11/killer/prompt.txt",
+      "bytes": 2140,
+      "sha256": "998d06e1ff173db2f569de0fcee06dab51ec5acea32fc87083906cf89e0051ad"
+    },
+    {
+      "path": "art/production/b11/killer/curated-draft-poses.png",
+      "bytes": 52617,
+      "sha256": "67bebf1091026336b77830beeeaa833d86f49fac383d3f448f315f2d4b8e0f75"
+    },
+    {
+      "path": "art/production/b11/killer/body.aseprite",
+      "bytes": 61915,
+      "sha256": "247e2dc66e45572864996873c33bf1794b10e8515ca5c0ab19cbe18bc72f380e"
+    },
+    {
+      "path": "public/assets/portraits/kizaru.png",
+      "bytes": 2381,
+      "sha256": "b29cfe1f9914688f898019478b951ee422ddfe5982a8bf23fef0ab1dd34a4275"
+    },
+    {
+      "path": "public/assets/tokens/kizaru.png",
+      "bytes": 1539,
+      "sha256": "5838a99e2372d74bd54e0fce0996ee59aa9fceb57e43f85ec41ba9308e6f61ab"
+    },
+    {
+      "path": "public/assets/animations/kizaru-b11-v2/kizaru-b11-v2.png",
+      "bytes": 32118,
+      "sha256": "cb546385c0ad9d3c8de279f0ad81a620155ecad9522f4df8eb076b4cee96b507"
+    },
+    {
+      "path": "public/assets/animations/kizaru-b11-v2/kizaru-b11-v2.json",
+      "bytes": 16083,
+      "sha256": "4e72c47c9614f5029e063299fa37c39df2fb53347c8d47569cae2e10231a73fc"
+    },
+    {
+      "path": "art/production/b11/kizaru/body-poses.png",
+      "bytes": 31983,
+      "sha256": "15e4e4c26ab8b08a1c443ac86ef087763704499e353de400ac511439f45d3c47"
+    },
+    {
+      "path": "art/production/b11/kizaru/frame-map.json",
+      "bytes": 14770,
+      "sha256": "c32d569876d0d4f620a499f0eb9207224b0287cc2e57e933cf38709bd5d06e38"
+    },
+    {
+      "path": "art/production/b11/kizaru/master.png",
+      "bytes": 1826,
+      "sha256": "f7a2650bc4b92874d1d0ec60e5303dd65d25f1f451d494c44ddf8c16e60939d6"
+    },
+    {
+      "path": "art/production/b11/kizaru/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/kizaru/selection.json",
+      "bytes": 8207,
+      "sha256": "2cdcd41f6f9aa13f737e4b042e2f6bb56c87f0c9a8c253205be90a5a3e6ea716"
+    },
+    {
+      "path": "art/qa/b11/kizaru/all-clips.gif",
+      "bytes": 43522,
+      "sha256": "6bd8dcff06c88f7e789c4a6f5e67b4c44fd2dcb3523c949c4172f08c93e9036e"
+    },
+    {
+      "path": "art/qa/b11/kizaru/clips.png",
+      "bytes": 76951,
+      "sha256": "44e0a6d9678f16b6ecc45266334e0e297c0f553db356bfda61ae14a03d33034b"
+    },
+    {
+      "path": "art/qa/b11/kizaru/before-after.png",
+      "bytes": 2494,
+      "sha256": "b756b39c1a1f94acec515a53caecf983eae7b3b2a51944a3e0774cb61fa8488a"
+    },
+    {
+      "path": "art/production/b11/kizaru/body.aseprite",
+      "bytes": 38543,
+      "sha256": "20738fa1a7c2120e3f13ba2f484a5178904b16404c5d774db2e25fe22309eaca"
+    },
+    {
+      "path": "public/assets/portraits/koby.png",
+      "bytes": 1561,
+      "sha256": "7b43a8e3130ac5675fd5b2123414e09816b753c9f2b9d665414ab0bb4fcf8af2"
+    },
+    {
+      "path": "public/assets/tokens/koby.png",
+      "bytes": 1035,
+      "sha256": "1a521173c9700e827bcefd0296167092ece4c7eb4cc0ee7a53ac5b44d48826fc"
+    },
+    {
+      "path": "public/assets/animations/koby-b11-v2/koby-b11-v2.png",
+      "bytes": 15974,
+      "sha256": "6347402b9557b09c3b8bd0ff7ce2e8fbc1506bbc74d1aa2c255457ff2dcaeba4"
+    },
+    {
+      "path": "public/assets/animations/koby-b11-v2/koby-b11-v2.json",
+      "bytes": 16077,
+      "sha256": "19dccb63dcd306057fab47809f41d58999851e5bd1322f0fb775e2b187a05abb"
+    },
+    {
+      "path": "art/production/b11/koby/body-poses.png",
+      "bytes": 15871,
+      "sha256": "e1261c03bc9f8004de4e69f61a97c01d802189a35d7874502b647d488e94b93d"
+    },
+    {
+      "path": "art/production/b11/koby/frame-map.json",
+      "bytes": 14766,
+      "sha256": "0825aec69ace4f94dd1f52edee1c7d2aebddb8ce143381e859773be00fb850e0"
+    },
+    {
+      "path": "art/production/b11/koby/master.png",
+      "bytes": 1257,
+      "sha256": "4dc63461f74c59615d1aaad9541cee9bd1a6c39c5c3c7dd7e9c6a04bc539958e"
+    },
+    {
+      "path": "art/production/b11/koby/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/koby/selection.json",
+      "bytes": 8206,
+      "sha256": "8e745f826cdfd3cb500b3a3834e08265f7ff73447216f765ef7a1574ba5affbb"
+    },
+    {
+      "path": "art/qa/b11/koby/all-clips.gif",
+      "bytes": 22684,
+      "sha256": "e01df6fa945733d0e36081664bb65173f991d0946d15d75cbdc1f7585f4952a3"
+    },
+    {
+      "path": "art/qa/b11/koby/clips.png",
+      "bytes": 55930,
+      "sha256": "1b86651922e5cdb2c71d78d62d9dfd981d2d751354cdbfeca5a40839428855ee"
+    },
+    {
+      "path": "art/qa/b11/koby/before-after.png",
+      "bytes": 1860,
+      "sha256": "06163cb22aaf6db119d829059cca1d21c23a54f15aaa15f920cb56195c50595d"
+    },
+    {
+      "path": "art/production/b11/koby/body.aseprite",
+      "bytes": 19814,
+      "sha256": "77b89f625c484e383b6bd4a519f6f231dbc07b2cbb781b81587964ee7ccb67f3"
+    },
+    {
+      "path": "public/assets/portraits/kuma.png",
+      "bytes": 1915,
+      "sha256": "d0548bae6c6aeac765c62f2afb92729b34802d1689994356aa1a65a3aa1e5f87"
+    },
+    {
+      "path": "public/assets/tokens/kuma.png",
+      "bytes": 1188,
+      "sha256": "70b0d14b5c00ca9b96940f678dd56fc9fd97c8fbbf84bc9ddf4182763f26dfef"
+    },
+    {
+      "path": "public/assets/animations/kuma-b11-v2/kuma-b11-v2.png",
+      "bytes": 25315,
+      "sha256": "522a10803920753dd604877e51f816efd31a735c680440995fa91fbe5cc988b0"
+    },
+    {
+      "path": "public/assets/animations/kuma-b11-v2/kuma-b11-v2.json",
+      "bytes": 16077,
+      "sha256": "12541486753e8943ee647ea8c202d92b710f924ac9fbe3b2186aa91cfa7809f7"
+    },
+    {
+      "path": "art/production/b11/kuma/body-poses.png",
+      "bytes": 25686,
+      "sha256": "1f66097c8cb0a01eaf53d7632915dcc42f3f27feefbbe19c40cb42424b0fd06a"
+    },
+    {
+      "path": "art/production/b11/kuma/frame-map.json",
+      "bytes": 14788,
+      "sha256": "a30229135e827e960a2a070e522b48f6c769b665726e24ea68b8fa792ed6ad52"
+    },
+    {
+      "path": "art/production/b11/kuma/master.png",
+      "bytes": 1559,
+      "sha256": "cb8044706a82d96387a3db59f8b225484790c8dc99ff88306d46ce2aa5ce8542"
+    },
+    {
+      "path": "art/production/b11/kuma/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/kuma/selection.json",
+      "bytes": 8246,
+      "sha256": "c2dfebb7470d1f3871d5d7366f6bf2b4f07b168481246776dfc3e196f82732f2"
+    },
+    {
+      "path": "art/qa/b11/kuma/all-clips.gif",
+      "bytes": 33051,
+      "sha256": "972f54d13ee44f0124b71c2f0bc0fb923c8493c4457f07ec500e477c332ab1a2"
+    },
+    {
+      "path": "art/qa/b11/kuma/clips.png",
+      "bytes": 67716,
+      "sha256": "ed85e3b5c394bec3866a71fe954a0895517b1706c69e981cac2d680531634eea"
+    },
+    {
+      "path": "art/qa/b11/kuma/before-after.png",
+      "bytes": 2852,
+      "sha256": "febb095170c25dbf24b5f1b89fe33a813533496d2eb4412a1eef0b1b5330f991"
+    },
+    {
+      "path": "art/production/b11/kuma/body.aseprite",
+      "bytes": 30146,
+      "sha256": "491862011b10328982adb8eb744e162338b5a822a776d4a8c36dbe1c91640f49"
+    },
+    {
+      "path": "public/assets/portraits/kuzan.png",
+      "bytes": 2272,
+      "sha256": "bd36dec36deccb70033aa1e67869bef58658dfc5f580273f480b01a176e5de3b"
+    },
+    {
+      "path": "public/assets/tokens/kuzan.png",
+      "bytes": 1435,
+      "sha256": "ab3579e02adccd5e4ae7caa0bf7b21737470b54ffd379860647f5d06f9c81ee2"
+    },
+    {
+      "path": "public/assets/animations/kuzan-b11-v2/kuzan-b11-v2.png",
+      "bytes": 31209,
+      "sha256": "75446eebcd62cb5befb76b71ed558e521c6c0d921ec04daad097a431e05c4f06"
+    },
+    {
+      "path": "public/assets/animations/kuzan-b11-v2/kuzan-b11-v2.json",
+      "bytes": 16080,
+      "sha256": "9c24007bb02bfa65476514cbf3aa725e951d277c44acddcdc49abaac0d692039"
+    },
+    {
+      "path": "art/production/b11/kuzan/body-poses.png",
+      "bytes": 31874,
+      "sha256": "16917fb7bbe41ab4a2b7019f80ef12f0b742f3533a9d5f249c58b5e449db84fd"
+    },
+    {
+      "path": "art/production/b11/kuzan/frame-map.json",
+      "bytes": 14777,
+      "sha256": "afcdfbdeca651e012370c7d7592f0a757d456644c7c329258ac7414989892ad2"
+    },
+    {
+      "path": "art/production/b11/kuzan/master.png",
+      "bytes": 1749,
+      "sha256": "450e7c677396db95326e0ba3bc2b77b0fe06819b7d493ba954a0fc93189c567a"
+    },
+    {
+      "path": "art/production/b11/kuzan/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/kuzan/selection.json",
+      "bytes": 8202,
+      "sha256": "2241b6178b1fb86ef51c9109d5fff27020a7263f77a2085ea93ec6002ff92ab9"
+    },
+    {
+      "path": "art/qa/b11/kuzan/all-clips.gif",
+      "bytes": 37822,
+      "sha256": "5fee4be9f046c806becdb9028147fbf7ade0bb3b731c2d03a57d16b4140fd6d5"
+    },
+    {
+      "path": "art/qa/b11/kuzan/clips.png",
+      "bytes": 76078,
+      "sha256": "1f8ebfaa41414fac8dd99f7d9d98f73b881f9f90c9230037092f5de61f443ef7"
+    },
+    {
+      "path": "art/qa/b11/kuzan/before-after.png",
+      "bytes": 2425,
+      "sha256": "3652df781e50fda2fc40e0e9854f8a8c1a2670e16d51e85092ee9963508062bd"
+    },
+    {
+      "path": "art/production/b11/kuzan/body.aseprite",
+      "bytes": 35451,
+      "sha256": "8fe8b54a53d2e2525cab2cc36002d62d9150fac378125b2f92900631ec752230"
+    },
+    {
+      "path": "public/assets/portraits/law.png",
+      "bytes": 1909,
+      "sha256": "7519c148c03bfcced66e18c878f19208b58a064b54776398ec8e504a9ff00a69"
+    },
+    {
+      "path": "public/assets/tokens/law.png",
+      "bytes": 1206,
+      "sha256": "92f82c3a0cac537f0521f8c206171bcfe13fdf5c2b885cd05c3307123d2c03a3"
+    },
+    {
+      "path": "public/assets/animations/law-b11-v2/law-b11-v2.png",
+      "bytes": 21967,
+      "sha256": "5242131983fd7e79537909bb9188697fecf786ab35e740c8609626f6c3f7432c"
+    },
+    {
+      "path": "public/assets/animations/law-b11-v2/law-b11-v2.json",
+      "bytes": 16107,
+      "sha256": "111820e0588e82482f7ad4bc795d700f042257baf00b3458ac75b529f809f042"
+    },
+    {
+      "path": "art/production/b11/law/body-poses.png",
+      "bytes": 22165,
+      "sha256": "56659ac8699f48eb83ebad2ddf0b901eb38718dc8091e3968d636fcfdc9984a7"
+    },
+    {
+      "path": "art/production/b11/law/frame-map.json",
+      "bytes": 14775,
+      "sha256": "9a601a88dc8d342ef94e5944401d5c518582267c6ad9a6030841740af0cd1630"
+    },
+    {
+      "path": "art/production/b11/law/master.png",
+      "bytes": 1538,
+      "sha256": "eac87f53866575728691ead23a230615efeebfc3dfc1f049d385e63f04350593"
+    },
+    {
+      "path": "art/production/b11/law/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/law/selection.json",
+      "bytes": 8197,
+      "sha256": "0d64760148be782b1866bc88590afd8587be65275a938759f4f8b5aaa46cacb6"
+    },
+    {
+      "path": "art/qa/b11/law/all-clips.gif",
+      "bytes": 30841,
+      "sha256": "c246f0cadfa999e9c320b291b83706ad585251646758a27748df696bfbad1bb6"
+    },
+    {
+      "path": "art/qa/b11/law/clips.png",
+      "bytes": 62095,
+      "sha256": "680cd0d4242c7928833dc756f23fd817279067921694e0226ef1291e7859abfc"
+    },
+    {
+      "path": "art/qa/b11/law/before-after.png",
+      "bytes": 2097,
+      "sha256": "9cf70ad5478453ac5203253d7b8c1684986c1290c998523ca2dede69cc297f89"
+    },
+    {
+      "path": "art/production/b11/law/body.aseprite",
+      "bytes": 29593,
+      "sha256": "d89500ab12ef2341e2b984fcce02af5004a149287056b2b5346d8fd8b3f174db"
+    },
+    {
+      "path": "public/assets/forms/luffy-gear-4-boundman/portrait.svg",
+      "bytes": 7761,
+      "sha256": "e248c3cb4d78a720ab0b13df167aa5e19decfcfa083a6aa68e3ae65d757ab080"
+    },
+    {
+      "path": "public/assets/forms/luffy-gear-4-boundman/token.svg",
+      "bytes": 7761,
+      "sha256": "efe520d8b00fb2bfb36995b629d86a3f5b4d3206c44ff69157cd977f9050508d"
+    },
+    {
+      "path": "public/assets/animations/luffy-gear-4-boundman-b11-v2/luffy-gear-4-boundman-b11-v2.png",
+      "bytes": 92558,
+      "sha256": "f59841f24a68b749f40122593ee1973bfc759a00ddc24274ccf610d4ef31cf60"
+    },
+    {
+      "path": "public/assets/animations/luffy-gear-4-boundman-b11-v2/luffy-gear-4-boundman-b11-v2.json",
+      "bytes": 16131,
+      "sha256": "79c0a77602dfa16f585222556a856079791534ae71da76b1ec468cf8ed6cad28"
+    },
+    {
+      "path": "art/production/b11/luffy-gear-4-boundman/body-poses.png",
+      "bytes": 87685,
+      "sha256": "56dd3f69d3b99abb4fd6101fa0c4867da76f27e5969fee319e27d687f14a2366"
+    },
+    {
+      "path": "art/production/b11/luffy-gear-4-boundman/frame-map.json",
+      "bytes": 11841,
+      "sha256": "e1feaf4b30ffbd8a1a6ec3d9d2c03e6055b880d4a1a566776699d2c479358c3b"
+    },
+    {
+      "path": "art/production/b11/luffy-gear-4-boundman/master.png",
+      "bytes": 3822,
+      "sha256": "9ec8bc10cedb16050c7b379ecd1557a464477b86671255c1c6072ce28ec29bdb"
+    },
+    {
+      "path": "art/production/b11/luffy-gear-4-boundman/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/luffy-gear-4-boundman/selection.json",
+      "bytes": 2946,
+      "sha256": "f4aef55c5cd736cb9dd819ab3b761d1cd6f14652e855442b2aa15d1608978fbd"
+    },
+    {
+      "path": "art/qa/b11/luffy-gear-4-boundman/all-clips.gif",
+      "bytes": 94728,
+      "sha256": "40c87c063d2c5291929e1254c315011f26d5ec3dd1a07f06a01020266442812b"
+    },
+    {
+      "path": "art/qa/b11/luffy-gear-4-boundman/clips.png",
+      "bytes": 156515,
+      "sha256": "a0d6ca21ae6acac34791c93e0ca938d6981c2ede36927d641dc46db636b74774"
+    },
+    {
+      "path": "art/qa/b11/luffy-gear-4-boundman/before-after.png",
+      "bytes": 5116,
+      "sha256": "4f42104e58a8ab8ae5596823898a214a4fea4724d009704752e80fd2d5a415f8"
+    },
+    {
+      "path": "art/production/b11/luffy-gear-4-boundman/draft.png",
+      "bytes": 2206121,
+      "sha256": "a6397139677bfe1e6856c03b2ded48f73dad9abd1fde360a4a36fb6009df3fc5"
+    },
+    {
+      "path": "art/production/b11/luffy-gear-4-boundman/prompt.txt",
+      "bytes": 2420,
+      "sha256": "dc4d374251e16ac0a80b94bb442fe3d2f4c177d80e34bd406cb7c865c03029e1"
+    },
+    {
+      "path": "art/production/b11/luffy-gear-4-boundman/curated-draft-poses.png",
+      "bytes": 81878,
+      "sha256": "8fb9b9bf26e01ffa54234932df07253da0a8e73e47dbec631c49b091366fcfcd"
+    },
+    {
+      "path": "art/production/b11/luffy-gear-4-boundman/body.aseprite",
+      "bytes": 94330,
+      "sha256": "5eb85b508025788cdff6f304d00c881852f94859b94cdfb8540184b9c2525299"
+    },
+    {
+      "path": "public/assets/forms/luffy-gear-4-snakeman/portrait.svg",
+      "bytes": 4228,
+      "sha256": "cf0d38484cfd7949093b5de39745d258e45c52b0c478ca4b650a9604141d2e8e"
+    },
+    {
+      "path": "public/assets/forms/luffy-gear-4-snakeman/token.svg",
+      "bytes": 4228,
+      "sha256": "65f87c0c6bb58b43847c4e96548495d8311ae9f36ea5728f861a01ccf3e4eaa5"
+    },
+    {
+      "path": "public/assets/animations/luffy-gear-4-snakeman-b11-v2/luffy-gear-4-snakeman-b11-v2.png",
+      "bytes": 51485,
+      "sha256": "35126255d5e93cdbf82f6d485805bcd31caad6970361d7925a7b8a5bb3ea7d78"
+    },
+    {
+      "path": "public/assets/animations/luffy-gear-4-snakeman-b11-v2/luffy-gear-4-snakeman-b11-v2.json",
+      "bytes": 16132,
+      "sha256": "4f374bcb3d1982ec2014fffb40943730453cbbe09e6b4e8f8ea3b8e9d9455473"
+    },
+    {
+      "path": "art/production/b11/luffy-gear-4-snakeman/body-poses.png",
+      "bytes": 49395,
+      "sha256": "42d0d16ac949dfbe47e3d65997a06174e333b9da004feec6c645a1ee2a743e1b"
+    },
+    {
+      "path": "art/production/b11/luffy-gear-4-snakeman/frame-map.json",
+      "bytes": 11841,
+      "sha256": "e1feaf4b30ffbd8a1a6ec3d9d2c03e6055b880d4a1a566776699d2c479358c3b"
+    },
+    {
+      "path": "art/production/b11/luffy-gear-4-snakeman/master.png",
+      "bytes": 2555,
+      "sha256": "ca06af14a19223bce67e6273b1a92d49bb4316179a18e2c885ebbb2dbf83af94"
+    },
+    {
+      "path": "art/production/b11/luffy-gear-4-snakeman/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/luffy-gear-4-snakeman/selection.json",
+      "bytes": 2946,
+      "sha256": "8ccd7c452e0932fec988d18da2e4e0cba1cd1bb3b4046ee5dde264aef2668cef"
+    },
+    {
+      "path": "art/qa/b11/luffy-gear-4-snakeman/all-clips.gif",
+      "bytes": 54329,
+      "sha256": "0b7133df0b1b10f032a601ababac6cc27227bf7412974777f11679a5e2b958ec"
+    },
+    {
+      "path": "art/qa/b11/luffy-gear-4-snakeman/clips.png",
+      "bytes": 106996,
+      "sha256": "195c48d35c9ff1140bd3a490991659356529793f1375fb82f727aa21a282a181"
+    },
+    {
+      "path": "art/qa/b11/luffy-gear-4-snakeman/before-after.png",
+      "bytes": 3836,
+      "sha256": "10f0352dcbe67e2edfd607eac9e87e69f2b7ad02fe13c97fc810d715de049109"
+    },
+    {
+      "path": "art/production/b11/luffy-gear-4-snakeman/draft.png",
+      "bytes": 1534883,
+      "sha256": "b7696c77e407f18f9f3087e433ce96ed2a1130c7342f80d03c880932cdc1e8a1"
+    },
+    {
+      "path": "art/production/b11/luffy-gear-4-snakeman/prompt.txt",
+      "bytes": 2364,
+      "sha256": "b3418a064ce2242b53f5e06d2589082b1016bd4fde487d48bc3d1ee05e348cf9"
+    },
+    {
+      "path": "art/production/b11/luffy-gear-4-snakeman/curated-draft-poses.png",
+      "bytes": 44131,
+      "sha256": "b27e50ad88242bd38feaa69e383261366100638ff22761272f1613579fb90d7d"
+    },
+    {
+      "path": "art/production/b11/luffy-gear-4-snakeman/body.aseprite",
+      "bytes": 53397,
+      "sha256": "d1d478d64714f0654a951fa54b7660896cfd31cb12ee7967b28bc819bd39f17f"
+    },
+    {
+      "path": "public/assets/portraits/magellan.png",
+      "bytes": 1840,
+      "sha256": "1dbe005b35e423305a5832a114880730f0ca24b17ebf2d037afab0970bcb9f5d"
+    },
+    {
+      "path": "public/assets/tokens/magellan.png",
+      "bytes": 1087,
+      "sha256": "c0b02d6596a1360f962a72ea6c4b5ff1ef932e6f7a0c2f6b8b8b05c31ea54bee"
+    },
+    {
+      "path": "public/assets/animations/magellan-b11-v2/magellan-b11-v2.png",
+      "bytes": 24259,
+      "sha256": "35fe40a77aabf3a81acb5bf93e6eec7088793b1007f7c9014c3e1819b42dd161"
+    },
+    {
+      "path": "public/assets/animations/magellan-b11-v2/magellan-b11-v2.json",
+      "bytes": 16048,
+      "sha256": "b90833adc28096497f46cf6a9a89887e3ba77576115567912d904e277091f9c1"
+    },
+    {
+      "path": "art/production/b11/magellan/body-poses.png",
+      "bytes": 26202,
+      "sha256": "23f15d4187c5051e60f87a0d6280c66cfa21d522bf0a3897f56e1e363c9e9db3"
+    },
+    {
+      "path": "art/production/b11/magellan/frame-map.json",
+      "bytes": 14793,
+      "sha256": "70c70cf21fe26385d86458ade3136134ed9cdb3e885a6dd0099d16f3260be3b9"
+    },
+    {
+      "path": "art/production/b11/magellan/master.png",
+      "bytes": 1450,
+      "sha256": "3f2b8076001335a6d665ff9dd24b36468fc63d9e8acf440413cdfe04a5847d57"
+    },
+    {
+      "path": "art/production/b11/magellan/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/magellan/selection.json",
+      "bytes": 8200,
+      "sha256": "1c21715ab9533c9f5c1bff6dabcffe6d8c2fa80e5d1c3f3164208ec6fadd6df5"
+    },
+    {
+      "path": "art/qa/b11/magellan/all-clips.gif",
+      "bytes": 29260,
+      "sha256": "0dc759e8b499b3291e651edbf8747874b69aa4e1726143ab8dfbb571473c7020"
+    },
+    {
+      "path": "art/qa/b11/magellan/clips.png",
+      "bytes": 69914,
+      "sha256": "9d01f75f3547a245ba9d61544430de5eaaad428caf75677800db72edc5f01f50"
+    },
+    {
+      "path": "art/qa/b11/magellan/before-after.png",
+      "bytes": 2851,
+      "sha256": "3f6f3bfb09eeba703e8942d30c7b2071002438ac3f8059597687164ef6132e12"
+    },
+    {
+      "path": "art/production/b11/magellan/body.aseprite",
+      "bytes": 27543,
+      "sha256": "f307c7f48fa6c70a7dce4c7d1b0eeb8dda32d935b3075655be35a0c4903c64bc"
+    },
+    {
+      "path": "public/assets/portraits/marine-recruit.png",
+      "bytes": 2887,
+      "sha256": "b22e0ebaafb35e08d4aba3015b7292dd0ec0461fc5d5a06e2eed61668c8cd049"
+    },
+    {
+      "path": "public/assets/tokens/marine-recruit.png",
+      "bytes": 1889,
+      "sha256": "68f2f21fbee9ab613b867e4200ce77df9016c7ea3e79ca75027656d72fd5f982"
+    },
+    {
+      "path": "public/assets/animations/marine-recruit-b11-v2/marine-recruit-b11-v2.png",
+      "bytes": 42004,
+      "sha256": "b0188a0bbeef1eacdd0d20f4cc1291b831d49cf151e8cf634f3601b4b3160db8"
+    },
+    {
+      "path": "public/assets/animations/marine-recruit-b11-v2/marine-recruit-b11-v2.json",
+      "bytes": 16053,
+      "sha256": "82da8c7900be5125a357a34fe8e737172e41062e44077cb0d8320a7711f62301"
+    },
+    {
+      "path": "art/production/b11/marine-recruit/body-poses.png",
+      "bytes": 40355,
+      "sha256": "8c5b79273307a68f8ddcdd601efe9b597f87b840c56a5009efe074ade1d1f354"
+    },
+    {
+      "path": "art/production/b11/marine-recruit/frame-map.json",
+      "bytes": 11841,
+      "sha256": "e1feaf4b30ffbd8a1a6ec3d9d2c03e6055b880d4a1a566776699d2c479358c3b"
+    },
+    {
+      "path": "art/production/b11/marine-recruit/master.png",
+      "bytes": 2386,
+      "sha256": "ef9393b01bc609c148fadfac94bcd8a8e4ef663ed05ee296c91ca6f762d94f4f"
+    },
+    {
+      "path": "art/production/b11/marine-recruit/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/marine-recruit/selection.json",
+      "bytes": 3309,
+      "sha256": "5502d8602936570116b96a829cea3e054be21c8c1653275122731cef58975a46"
+    },
+    {
+      "path": "art/qa/b11/marine-recruit/all-clips.gif",
+      "bytes": 45927,
+      "sha256": "d4ac7470b64780d5703a4721994a2d97d627ae205c0a5c5ac1abfd1ca7113f51"
+    },
+    {
+      "path": "art/qa/b11/marine-recruit/clips.png",
+      "bytes": 92143,
+      "sha256": "4da6fadeedb0974c2b9b24724f546ee298de10acab118b10ba0bfe01189e30b4"
+    },
+    {
+      "path": "art/qa/b11/marine-recruit/before-after.png",
+      "bytes": 8544,
+      "sha256": "84f9ce052508863e30d2e90950e1ff41216cec024a97275f79c1becdedadfeb7"
+    },
+    {
+      "path": "art/production/b11/marine-recruit/draft.png",
+      "bytes": 1594417,
+      "sha256": "f6b8f82a312f5e06447d623bc276dd258d21760bf540bc4cbb6ebab9c1833e67"
+    },
+    {
+      "path": "art/production/b11/marine-recruit/prompt.txt",
+      "bytes": 2018,
+      "sha256": "49bf8357a8d2c52091cfebd7820b07aa560b3ddc33d0faf99f86f09b169327f2"
+    },
+    {
+      "path": "art/production/b11/marine-recruit/curated-draft-poses.png",
+      "bytes": 35674,
+      "sha256": "d93c8f6b20f51ec3ab146aedd6715487a9e73dbd7a3a34b7d0472858f3709389"
+    },
+    {
+      "path": "art/production/b11/marine-recruit/body.aseprite",
+      "bytes": 44725,
+      "sha256": "dac08f79a4bc185d0df71d55b46336cac67f96ba81a6748c6dc0a2e1f2852790"
+    },
+    {
+      "path": "public/assets/portraits/mihawk.png",
+      "bytes": 1910,
+      "sha256": "94108e7c8a55c262cb5da08b69d106b3bea43130b5673a5475954d979fc3a63a"
+    },
+    {
+      "path": "public/assets/tokens/mihawk.png",
+      "bytes": 1143,
+      "sha256": "b5c5b9d9f12452f59daf27c7c35c126595a59266dd063f8d5e089cadd358058d"
+    },
+    {
+      "path": "public/assets/animations/mihawk-b11-v2/mihawk-b11-v2.png",
+      "bytes": 25173,
+      "sha256": "5917ded397460ba6c447697ffb21cc0ddc1db4f0342d517521df4b0d34042ecf"
+    },
+    {
+      "path": "public/assets/animations/mihawk-b11-v2/mihawk-b11-v2.json",
+      "bytes": 16116,
+      "sha256": "9036c84e81884b6178198963791f735311c29b15ed47bac3789b38b8f2741858"
+    },
+    {
+      "path": "art/production/b11/mihawk/body-poses.png",
+      "bytes": 25836,
+      "sha256": "2a2e4778d0ab1c99856bcfd5f5f801241e1f818e8d970781caa5c23e314e3732"
+    },
+    {
+      "path": "art/production/b11/mihawk/frame-map.json",
+      "bytes": 14797,
+      "sha256": "f9de58e3c773081b922427acbe84e40d9531685bd509dcd10153cea86154dbf5"
+    },
+    {
+      "path": "art/production/b11/mihawk/master.png",
+      "bytes": 1592,
+      "sha256": "448e4d9368d2224b9778f64a7bfeb2a20fb1e943d58def0ba3a366dbb3b74f82"
+    },
+    {
+      "path": "art/production/b11/mihawk/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/mihawk/selection.json",
+      "bytes": 8240,
+      "sha256": "279f1f69ed6c65500f91f210aca154414eb8f1e77e93b1a7b433e2f2d702a951"
+    },
+    {
+      "path": "art/qa/b11/mihawk/all-clips.gif",
+      "bytes": 29735,
+      "sha256": "d547cdbf61a5b9d6a611ca3f5dcc034ced868c16c309e97254b9be53920d7f9f"
+    },
+    {
+      "path": "art/qa/b11/mihawk/clips.png",
+      "bytes": 69214,
+      "sha256": "a9d9d6bc2d8ee1a4d0b3ea6ec9eaa3acf6045e069ef2fc4a4d39a130f644cb59"
+    },
+    {
+      "path": "art/qa/b11/mihawk/before-after.png",
+      "bytes": 2998,
+      "sha256": "38770558a8e937780a2bef850d29954c1bab443fa9a4a3a037900e8480809945"
+    },
+    {
+      "path": "art/production/b11/mihawk/body.aseprite",
+      "bytes": 29224,
+      "sha256": "5b82eb1f0c8a31c52380a4c922b35181dfe228d43fd55523788d5dbe092384c1"
+    },
+    {
+      "path": "public/assets/portraits/nami.png",
+      "bytes": 1928,
+      "sha256": "f6db02c3473c07a12f82b94432dff813b22de13dfeca947fbfa9ff5ca6347a21"
+    },
+    {
+      "path": "public/assets/tokens/nami.png",
+      "bytes": 1169,
+      "sha256": "75298cc2f6a1e4ee5b1d858f158c32f22ffb29bf3f7c86e2c7a0d11b73f29056"
+    },
+    {
+      "path": "public/assets/animations/nami-b11-v2/nami-b11-v2.png",
+      "bytes": 23539,
+      "sha256": "72fbec53533dba9ca62d6aa907698941e98b92b2b6fc7be112acdb32ff559e87"
+    },
+    {
+      "path": "public/assets/animations/nami-b11-v2/nami-b11-v2.json",
+      "bytes": 16110,
+      "sha256": "857857f9e96e0b5159c313a7cc2366adbd7a0d48f902ffee7e339af50f3349fb"
+    },
+    {
+      "path": "art/production/b11/nami/body-poses.png",
+      "bytes": 23987,
+      "sha256": "65e5740f27f50d04f6f0923021d5002f24a81c6d3fd7d4102d36f0e53b661654"
+    },
+    {
+      "path": "art/production/b11/nami/frame-map.json",
+      "bytes": 14815,
+      "sha256": "dd4d315b6f56b33cc72e8464d81b6466eaf58a7d02c061f849152c99cbe13d3c"
+    },
+    {
+      "path": "art/production/b11/nami/master.png",
+      "bytes": 1429,
+      "sha256": "0445eab5fadb6db2a67f75fed579682293ba6e447b672b3cc2620f2e49cedc7e"
+    },
+    {
+      "path": "art/production/b11/nami/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/nami/selection.json",
+      "bytes": 8225,
+      "sha256": "f46ae12ead94fbb0f651f3d0312ebba08ae0e927cd389c7e80830cd03df5cae9"
+    },
+    {
+      "path": "art/qa/b11/nami/all-clips.gif",
+      "bytes": 29372,
+      "sha256": "ff8aacc465574bb9d8c981f5e9178581bae0fcda320b5d5d756fdd70caea3caf"
+    },
+    {
+      "path": "art/qa/b11/nami/clips.png",
+      "bytes": 65050,
+      "sha256": "319bf48fbdb20f9d138d4dcb76f1b627c920496287565d69be849bea6ae2469b"
+    },
+    {
+      "path": "art/qa/b11/nami/before-after.png",
+      "bytes": 2115,
+      "sha256": "d0ad0c27081cd2f72bd56fe28115aef37add40a3c9d50dc08dbee0bf1b445cb9"
+    },
+    {
+      "path": "art/production/b11/nami/body.aseprite",
+      "bytes": 27127,
+      "sha256": "21f43117fef4dc0a823d9f140135618796da417da57a092f9ac07085370a724f"
+    },
+    {
+      "path": "public/assets/portraits/new-fish-man-officer.png",
+      "bytes": 3635,
+      "sha256": "667b59d6abb976063bc5b1158ea0470d03cf7e3b477f9de7dcbbcd21a2d9c023"
+    },
+    {
+      "path": "public/assets/tokens/new-fish-man-officer.png",
+      "bytes": 2452,
+      "sha256": "a11adfa4570b9128c2e2f5b8625eb3c2037df3d5650750b3f969346874e92c2f"
+    },
+    {
+      "path": "public/assets/animations/new-fish-man-officer-b11-v2/new-fish-man-officer-b11-v2.png",
+      "bytes": 57130,
+      "sha256": "6f3da71a8c40a7af0f8c0c57dbf11e32968776c716c6b04e15dcdcd2d7237075"
+    },
+    {
+      "path": "public/assets/animations/new-fish-man-officer-b11-v2/new-fish-man-officer-b11-v2.json",
+      "bytes": 16068,
+      "sha256": "3a74c26de73907e80a480ead9df8a6f40ea055580f22b281c7127ff2c3ccd3db"
+    },
+    {
+      "path": "art/production/b11/new-fish-man-officer/body-poses.png",
+      "bytes": 54107,
+      "sha256": "2b353a165fc5ecbdbaa6c02de20d890fae464aaea31aaa8ed083503e3c04c863"
+    },
+    {
+      "path": "art/production/b11/new-fish-man-officer/frame-map.json",
+      "bytes": 11841,
+      "sha256": "e1feaf4b30ffbd8a1a6ec3d9d2c03e6055b880d4a1a566776699d2c479358c3b"
+    },
+    {
+      "path": "art/production/b11/new-fish-man-officer/master.png",
+      "bytes": 3011,
+      "sha256": "ef43f225d5455e602c99c124c70cc9931935b908e2988b46af012c2e2c332300"
+    },
+    {
+      "path": "art/production/b11/new-fish-man-officer/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/new-fish-man-officer/selection.json",
+      "bytes": 3278,
+      "sha256": "5455e3f4b0dff0f7ec6ffd63f99a07e167a1155a8e3bfcf016adb03c41f29662"
+    },
+    {
+      "path": "art/qa/b11/new-fish-man-officer/all-clips.gif",
+      "bytes": 61232,
+      "sha256": "bee61e4f5ce146f37b7078d45824f6d009fe98b1610c3822b44d65cb590838e0"
+    },
+    {
+      "path": "art/qa/b11/new-fish-man-officer/clips.png",
+      "bytes": 115250,
+      "sha256": "4b84d9b77a96319c803009c1ba3baabddfdd8a6d32e9ff2095ffb2568e45dfcd"
+    },
+    {
+      "path": "art/qa/b11/new-fish-man-officer/before-after.png",
+      "bytes": 4135,
+      "sha256": "b027699a5229bf74d4809832eadc946e0b7dbf2fff635b91b3b1be39cb9af35c"
+    },
+    {
+      "path": "art/production/b11/new-fish-man-officer/draft.png",
+      "bytes": 1905517,
+      "sha256": "83854dca0076c7506bbabb7d5224601448fd0147bacb99795934b58102a49fa6"
+    },
+    {
+      "path": "art/production/b11/new-fish-man-officer/prompt.txt",
+      "bytes": 2295,
+      "sha256": "ebc50dc749b8428b009e1233ca2c4a264135c4661e916d108769f790e9165009"
+    },
+    {
+      "path": "art/production/b11/new-fish-man-officer/curated-draft-poses.png",
+      "bytes": 48825,
+      "sha256": "407569451aa8f12c9ec36b7fff39b599c4728c9418b0a45a065281440d3eb65a"
+    },
+    {
+      "path": "art/production/b11/new-fish-man-officer/body.aseprite",
+      "bytes": 59736,
+      "sha256": "597676e2eba752ead66a99019c92043f1cd7501a79a3c52e85a10b5def4f98c3"
+    },
+    {
+      "path": "public/assets/portraits/pacifista.png",
+      "bytes": 4396,
+      "sha256": "94e9a412466b471449a469522b4d709755fa19507e18519f6da202385223b9a3"
+    },
+    {
+      "path": "public/assets/tokens/pacifista.png",
+      "bytes": 3293,
+      "sha256": "6cf9bae95f4d5045ce88815c5b08ed219915d09c6a2d501afd3dc6f6a46053ba"
+    },
+    {
+      "path": "public/assets/animations/pacifista-b11-v2/pacifista-b11-v2.png",
+      "bytes": 87750,
+      "sha256": "cb8e4016ff6d25db1661a9c910f799586b3d26c297617285c66772fd069dbf27"
+    },
+    {
+      "path": "public/assets/animations/pacifista-b11-v2/pacifista-b11-v2.json",
+      "bytes": 16038,
+      "sha256": "132847e32133d7e1b33971a38c0b19a4082b58d10fe2cb43cddbdeda91665634"
+    },
+    {
+      "path": "art/production/b11/pacifista/body-poses.png",
+      "bytes": 82382,
+      "sha256": "57b7707ec4c611060bbac9ad9a1f79e584948a0c65d6523281f3fbc5de1f33e6"
+    },
+    {
+      "path": "art/production/b11/pacifista/frame-map.json",
+      "bytes": 11841,
+      "sha256": "e1feaf4b30ffbd8a1a6ec3d9d2c03e6055b880d4a1a566776699d2c479358c3b"
+    },
+    {
+      "path": "art/production/b11/pacifista/master.png",
+      "bytes": 4018,
+      "sha256": "5cf1cc14635fed2e3e89f149f0f359fcad158a8a7bfb1b20f400705b6a585fb5"
+    },
+    {
+      "path": "art/production/b11/pacifista/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/pacifista/selection.json",
+      "bytes": 3312,
+      "sha256": "c18bcc7924e2aca6b89f864c12e486082b6519c1d98d60f3ac1fae5688268059"
+    },
+    {
+      "path": "art/qa/b11/pacifista/all-clips.gif",
+      "bytes": 89468,
+      "sha256": "fb887027b544902e01c16cd6609543c96f4ab489d06749e73682fe8db8eed131"
+    },
+    {
+      "path": "art/qa/b11/pacifista/clips.png",
+      "bytes": 149443,
+      "sha256": "3e0df8679804cb5e19bab3b4787ec55b683cf0ba2f3c6bcba51aeac995983066"
+    },
+    {
+      "path": "art/qa/b11/pacifista/before-after.png",
+      "bytes": 13612,
+      "sha256": "90474ebae12c7776f18da9e38da87364ab92119eb9354a217a3d70b0036565fa"
+    },
+    {
+      "path": "art/production/b11/pacifista/draft.png",
+      "bytes": 1827878,
+      "sha256": "c489769a257851549068adf7391268e342a105f43b81050245081beba57ae2b2"
+    },
+    {
+      "path": "art/production/b11/pacifista/prompt.txt",
+      "bytes": 2189,
+      "sha256": "c521c358348b0b451e9d42bfe6c717ec4cbb7b429d1eaea8111bfe4b3fd39853"
+    },
+    {
+      "path": "art/production/b11/pacifista/curated-draft-poses.png",
+      "bytes": 75730,
+      "sha256": "40b0deb504d9fbc76c4eb6ee0a10cc051fcbfb1e72c0dff0b6afad3ce400a374"
+    },
+    {
+      "path": "art/production/b11/pacifista/body.aseprite",
+      "bytes": 90343,
+      "sha256": "eccdcb43044294402642cb3c91575599c9bc76b3c3b13278ff6b114a194febab"
+    },
+    {
+      "path": "public/assets/portraits/pica.png",
+      "bytes": 4945,
+      "sha256": "5ba719dc16e2064816c47c88ac982b1d461617f03358b1e9a4dc8feee131c559"
+    },
+    {
+      "path": "public/assets/tokens/pica.png",
+      "bytes": 3648,
+      "sha256": "b718b609e20b705a17e00b286a0e5cfd218dec785a50a6a8ca53fc4491a2791f"
+    },
+    {
+      "path": "public/assets/animations/pica-b11-v2/pica-b11-v2.png",
+      "bytes": 98126,
+      "sha256": "3f0ae41b22e56fae0fde83f29c2ef819d4e7a804b0b5c20b1c1fe442746dd5a8"
+    },
+    {
+      "path": "public/assets/animations/pica-b11-v2/pica-b11-v2.json",
+      "bytes": 16036,
+      "sha256": "c65e33ae07fd432e4501e12b953cf5a490621018ab76005e38365b95623af00f"
+    },
+    {
+      "path": "art/production/b11/pica/body-poses.png",
+      "bytes": 92192,
+      "sha256": "fe82fdb566a9cd229773ca39553671077b5ef350800e50246ff73fe3cdb230d2"
+    },
+    {
+      "path": "art/production/b11/pica/frame-map.json",
+      "bytes": 11841,
+      "sha256": "e1feaf4b30ffbd8a1a6ec3d9d2c03e6055b880d4a1a566776699d2c479358c3b"
+    },
+    {
+      "path": "art/production/b11/pica/master.png",
+      "bytes": 4467,
+      "sha256": "4b931409ec7aef247c37e1c44186ad0207d48fbe90a9912bf822a118800edc93"
+    },
+    {
+      "path": "art/production/b11/pica/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/pica/selection.json",
+      "bytes": 3318,
+      "sha256": "48b235cbba0860f72d8dbb05d48a664a45bade3606e00b36657681d57233c83d"
+    },
+    {
+      "path": "art/qa/b11/pica/all-clips.gif",
+      "bytes": 101799,
+      "sha256": "5bbea23428c699facdb1b0fd6b26cc0b71dab542ea28c908e5edc28299f165cc"
+    },
+    {
+      "path": "art/qa/b11/pica/clips.png",
+      "bytes": 161971,
+      "sha256": "400dc038dd8cf268522666ce66882591a2cc649ddd5ff65ee250c64a6c61d874"
+    },
+    {
+      "path": "art/qa/b11/pica/before-after.png",
+      "bytes": 7704,
+      "sha256": "8918d8f2e11edd1bb7665c274dd6f04a01e7c10b712f5b7667e870e90b4582a6"
+    },
+    {
+      "path": "art/production/b11/pica/draft.png",
+      "bytes": 2366969,
+      "sha256": "fe271d52c5fd78fdb574b0e23ca104c55b10b587de2476c4a4c0e51af1c2cc30"
+    },
+    {
+      "path": "art/production/b11/pica/prompt.txt",
+      "bytes": 2288,
+      "sha256": "7346cb427e54bfbd49827c2cd843ddf1227be053a48ebcd57a7a93df29890243"
+    },
+    {
+      "path": "art/production/b11/pica/curated-draft-poses.png",
+      "bytes": 85140,
+      "sha256": "63b859b4234085d9132ce23ca81a08b9acc427ff0c16a087905b44a1657d5e6a"
+    },
+    {
+      "path": "art/production/b11/pica/body.aseprite",
+      "bytes": 102482,
+      "sha256": "92f9292e5db7e5c402c9e1025060f2fc6d7f5f5612647aa1ae45a7c073349fe9"
+    },
+    {
+      "path": "public/assets/portraits/pirate-raider.png",
+      "bytes": 3374,
+      "sha256": "5adcebb1bc322197f7de1687a0100cc98c2a2f1e869160dbe286346321a6243f"
+    },
+    {
+      "path": "public/assets/tokens/pirate-raider.png",
+      "bytes": 2250,
+      "sha256": "f1883ffa22f80e22e043734091ee42d41a75874552d1642df7f8ae34f07440b7"
+    },
+    {
+      "path": "public/assets/animations/pirate-raider-b11-v2/pirate-raider-b11-v2.png",
+      "bytes": 53152,
+      "sha256": "8ce625576ebf0464900cc9f750fbf08959486341f3aa33eab222636839633e00"
+    },
+    {
+      "path": "public/assets/animations/pirate-raider-b11-v2/pirate-raider-b11-v2.json",
+      "bytes": 16050,
+      "sha256": "5e2194b29928072b97dd6713b718d94e608dcff1245895b7cfec006117c89ccc"
+    },
+    {
+      "path": "art/production/b11/pirate-raider/body-poses.png",
+      "bytes": 51099,
+      "sha256": "c0c7da9bc1de450e0856d3e693a05688cace226ab6cf16015a03cd9306d70df2"
+    },
+    {
+      "path": "art/production/b11/pirate-raider/frame-map.json",
+      "bytes": 11841,
+      "sha256": "e1feaf4b30ffbd8a1a6ec3d9d2c03e6055b880d4a1a566776699d2c479358c3b"
+    },
+    {
+      "path": "art/production/b11/pirate-raider/master.png",
+      "bytes": 2772,
+      "sha256": "22ecb4d787957fe4f0aa2912deb3c4cdc6f8c36b65b14457c01c604833a5236d"
+    },
+    {
+      "path": "art/production/b11/pirate-raider/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/pirate-raider/selection.json",
+      "bytes": 3303,
+      "sha256": "31cffe35930dc819bfbd15612007064c97d5da2bc9c6d0c573eb0045328f41e2"
+    },
+    {
+      "path": "art/qa/b11/pirate-raider/all-clips.gif",
+      "bytes": 56557,
+      "sha256": "427c6822fbd8256a27257943ab405da815fbad195f469a28c578f08ca511603d"
+    },
+    {
+      "path": "art/qa/b11/pirate-raider/clips.png",
+      "bytes": 105359,
+      "sha256": "0951ea93925c55f8acb7730a7938763fbc81d035bdd02620b5636cf0807b9d50"
+    },
+    {
+      "path": "art/qa/b11/pirate-raider/before-after.png",
+      "bytes": 10327,
+      "sha256": "19df8441044723241c27b8c3513676672fce5698b31b92c2d797b55278c7fe0c"
+    },
+    {
+      "path": "art/production/b11/pirate-raider/draft.png",
+      "bytes": 1861633,
+      "sha256": "e4396f5165df3f1a4e3e5172416318cf760da6ef53ec25f273d35c2646ac1616"
+    },
+    {
+      "path": "art/production/b11/pirate-raider/prompt.txt",
+      "bytes": 2052,
+      "sha256": "436574c2c10eabab77bbbc072d50aa07a06f29cfa298ddf662c00d5178af6e31"
+    },
+    {
+      "path": "art/production/b11/pirate-raider/curated-draft-poses.png",
+      "bytes": 45815,
+      "sha256": "6b10635f9e40fe386ed23616dc45398fae53befa0f97c89afefe732e0d615430"
+    },
+    {
+      "path": "art/production/b11/pirate-raider/body.aseprite",
+      "bytes": 56363,
+      "sha256": "36fec31953043e2feda6fc813c81382ad81b78a5ef1354feeb8ff65648fb2830"
+    },
+    {
+      "path": "public/assets/portraits/punk-hazard-guard.png",
+      "bytes": 3531,
+      "sha256": "7697033796ced7b5ac0e4bcbdd31c60067a2f34791e927c5fcce0d069cabe7c8"
+    },
+    {
+      "path": "public/assets/tokens/punk-hazard-guard.png",
+      "bytes": 2326,
+      "sha256": "dad9c24fce2604668265633231d5fb99f357b00d27fc2b4cfae948dc6f21a0ef"
+    },
+    {
+      "path": "public/assets/animations/punk-hazard-guard-b11-v2/punk-hazard-guard-b11-v2.png",
+      "bytes": 54402,
+      "sha256": "2e4368aefa03f4da57181994b7258ef25139fc6b0a5377574d9c3375573ec5ca"
+    },
+    {
+      "path": "public/assets/animations/punk-hazard-guard-b11-v2/punk-hazard-guard-b11-v2.json",
+      "bytes": 16059,
+      "sha256": "3cc206c2b1e0866a296bbeae5fd6ff9dd7ca1644e3d46fe6065c94695fab02e1"
+    },
+    {
+      "path": "art/production/b11/punk-hazard-guard/body-poses.png",
+      "bytes": 52071,
+      "sha256": "b5a53855fc18ec2a78bf6a3a5c08110776e1b2899daab2da06d1e5c8bf1d17df"
+    },
+    {
+      "path": "art/production/b11/punk-hazard-guard/frame-map.json",
+      "bytes": 11841,
+      "sha256": "e1feaf4b30ffbd8a1a6ec3d9d2c03e6055b880d4a1a566776699d2c479358c3b"
+    },
+    {
+      "path": "art/production/b11/punk-hazard-guard/master.png",
+      "bytes": 2900,
+      "sha256": "9a14683d0b92859653eef5f6b2e96b46abaf6444d5720207a96b21e9f9b96171"
+    },
+    {
+      "path": "art/production/b11/punk-hazard-guard/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/punk-hazard-guard/selection.json",
+      "bytes": 3257,
+      "sha256": "29a3e2a9bfebd21c0ed9576b13f143c02663550c95992d60815e9560bcbf5345"
+    },
+    {
+      "path": "art/qa/b11/punk-hazard-guard/all-clips.gif",
+      "bytes": 56751,
+      "sha256": "9e5334acf50e1f107c32b1abce57e6ff14fc017f17441bdb5fd865b456ef8051"
+    },
+    {
+      "path": "art/qa/b11/punk-hazard-guard/clips.png",
+      "bytes": 111415,
+      "sha256": "18e7c5391515ddc8cd8afbc084011420c981e63d7a0733d30ce47db6864a293c"
+    },
+    {
+      "path": "art/qa/b11/punk-hazard-guard/before-after.png",
+      "bytes": 4014,
+      "sha256": "097e5606f6a05df0e48389dd5a53d6f697bcceef788b9fb0c29fcfea0c40f999"
+    },
+    {
+      "path": "art/production/b11/punk-hazard-guard/draft.png",
+      "bytes": 2234569,
+      "sha256": "64fad9662b8bf03bfabb2dbc554b94944298c53898a5b24b98c30a9eda561da3"
+    },
+    {
+      "path": "art/production/b11/punk-hazard-guard/prompt.txt",
+      "bytes": 2422,
+      "sha256": "a7ee47a2ff067818c1c8c9ffc99c9349b63f376f07d708726976cfd2d61b2b25"
+    },
+    {
+      "path": "art/production/b11/punk-hazard-guard/curated-draft-poses.png",
+      "bytes": 45460,
+      "sha256": "37f29363ec3be542846ce5f5acdeb3c7553874f3dd1e6408aaea8c0147799949"
+    },
+    {
+      "path": "art/production/b11/punk-hazard-guard/body.aseprite",
+      "bytes": 57554,
+      "sha256": "dec651b5016f2fea223292b28d032526e214d80f64b5104b31188e3eb4a7cfa6"
+    },
+    {
+      "path": "public/assets/portraits/rifle-marine.png",
+      "bytes": 3298,
+      "sha256": "ad6693b5290ad1818c00f7faf0ed43b99598664d90be033223c635020e18d439"
+    },
+    {
+      "path": "public/assets/tokens/rifle-marine.png",
+      "bytes": 2150,
+      "sha256": "f21888d8a808b757174e670d2f53d1bf4f5fce67e2024705c09faf0f4e27984b"
+    },
+    {
+      "path": "public/assets/animations/rifle-marine-b11-v2/rifle-marine-b11-v2.png",
+      "bytes": 46877,
+      "sha256": "626e36cfabf742fc624e19b7eb23608a70d373b378c2f51ff2d58b1e60f14251"
+    },
+    {
+      "path": "public/assets/animations/rifle-marine-b11-v2/rifle-marine-b11-v2.json",
+      "bytes": 16047,
+      "sha256": "c705336d0566d879ed6d8d355bdafc7fd68d2fe835463f38f48bf4bac1ac58a5"
+    },
+    {
+      "path": "art/production/b11/rifle-marine/body-poses.png",
+      "bytes": 44836,
+      "sha256": "c2859a897463429b1ab5f23a288c89c5d051f42fa94aa8f1573341825b0a4a61"
+    },
+    {
+      "path": "art/production/b11/rifle-marine/frame-map.json",
+      "bytes": 11841,
+      "sha256": "e1feaf4b30ffbd8a1a6ec3d9d2c03e6055b880d4a1a566776699d2c479358c3b"
+    },
+    {
+      "path": "art/production/b11/rifle-marine/master.png",
+      "bytes": 2652,
+      "sha256": "425a5d4fd235c2563e6e113aa1b83dafb2d6209b30ffe245af3fb230a5456e02"
+    },
+    {
+      "path": "art/production/b11/rifle-marine/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/rifle-marine/selection.json",
+      "bytes": 3301,
+      "sha256": "a5d926a60e595cf35073fd7b86ced259925404d37738ac9a88c2e3dde8379c5d"
+    },
+    {
+      "path": "art/qa/b11/rifle-marine/all-clips.gif",
+      "bytes": 50068,
+      "sha256": "e85cad8d8fe8db31806a0d5c3f79143961a4dc9afa9aaa52a179fcdc5e004876"
+    },
+    {
+      "path": "art/qa/b11/rifle-marine/clips.png",
+      "bytes": 100357,
+      "sha256": "4f0a18ff714b73b964df4e01af390477bed461cdba69f7030ef196c72667154c"
+    },
+    {
+      "path": "art/qa/b11/rifle-marine/before-after.png",
+      "bytes": 8859,
+      "sha256": "874fd77b9a153b131fce6ccaaa9bafd33f12a9ccb283b9847854cf8e9ca58dab"
+    },
+    {
+      "path": "art/production/b11/rifle-marine/draft.png",
+      "bytes": 1372549,
+      "sha256": "424de7b19efe4ea8a24f3720b212c91da38c1aed76380e45cecc5cdb65878274"
+    },
+    {
+      "path": "art/production/b11/rifle-marine/prompt.txt",
+      "bytes": 2094,
+      "sha256": "215c4fbdcf257674d55b409fdfb6c8060d0640c071d3360006f150f92362b28e"
+    },
+    {
+      "path": "art/production/b11/rifle-marine/curated-draft-poses.png",
+      "bytes": 39612,
+      "sha256": "d7ca45e56768257d7941fdc4d74fc43a4f850943dd945b02ab7d14fd5b0c629f"
+    },
+    {
+      "path": "art/production/b11/rifle-marine/body.aseprite",
+      "bytes": 50270,
+      "sha256": "7923961da1bf9ed9ac8e2f2417cdbf8e7f5b803eebd9884373a39bb8c173baa3"
+    },
+    {
+      "path": "public/assets/portraits/rob-lucci.png",
+      "bytes": 1414,
+      "sha256": "70157e87b5c812f0fbeb8857edc44eda58ea0e5c32e8c9903b99d48f66778c82"
+    },
+    {
+      "path": "public/assets/tokens/rob-lucci.png",
+      "bytes": 810,
+      "sha256": "2e76a2e106bd67abb76354661828e7971b085960ef10b59a2f148ac0085ae878"
+    },
+    {
+      "path": "public/assets/animations/rob-lucci-b11-v2/rob-lucci-b11-v2.png",
+      "bytes": 15195,
+      "sha256": "0bbd3568722ac331ff9af629388b829de14a066d585b5c6b12741bbc36dee531"
+    },
+    {
+      "path": "public/assets/animations/rob-lucci-b11-v2/rob-lucci-b11-v2.json",
+      "bytes": 16051,
+      "sha256": "284e78c07874f3df8d00e2073ab8cb217692365359ad9db4c0a517b1c34dd325"
+    },
+    {
+      "path": "art/production/b11/rob-lucci/body-poses.png",
+      "bytes": 15637,
+      "sha256": "39656ac5cb101df684b731917f2f6a0a92d9fd005fa50d168c2284e9a7d071b9"
+    },
+    {
+      "path": "art/production/b11/rob-lucci/frame-map.json",
+      "bytes": 14783,
+      "sha256": "ebf69ee3431b8d180539ca1af65b40459e6781ba8c6c22495c932fb110fdab68"
+    },
+    {
+      "path": "art/production/b11/rob-lucci/master.png",
+      "bytes": 1157,
+      "sha256": "a4e97b094fce464961f621dfd693ee6321c09f161cd69be7507fe56c5d590e7c"
+    },
+    {
+      "path": "art/production/b11/rob-lucci/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/rob-lucci/selection.json",
+      "bytes": 8195,
+      "sha256": "45d2fca585c7439d717513e40488ef4122742d7de7a5891e2b67e6626b66eae1"
+    },
+    {
+      "path": "art/qa/b11/rob-lucci/all-clips.gif",
+      "bytes": 21958,
+      "sha256": "251ebf7c5a9e3bba4d1b683ab804a830435c8a05e7b956fd2858782b4b473657"
+    },
+    {
+      "path": "art/qa/b11/rob-lucci/clips.png",
+      "bytes": 56223,
+      "sha256": "173f14be374b80e8cee5796d61c0b13c63e58395bdea960e9e0fa0c07b80b1e6"
+    },
+    {
+      "path": "art/qa/b11/rob-lucci/before-after.png",
+      "bytes": 1711,
+      "sha256": "baaa1e2c0924c7f0ade7882671df97f12e019a07c58410d99fcbc525dad104c8"
+    },
+    {
+      "path": "art/production/b11/rob-lucci/body.aseprite",
+      "bytes": 19161,
+      "sha256": "0a64922469388e627d338f3bddf880cef321878043f2f0ce4b01cba30b48507e"
+    },
+    {
+      "path": "public/assets/portraits/robin.png",
+      "bytes": 1835,
+      "sha256": "5abb87c8dfc912417a8b5e393b52645d2494ca3c0c5befe40a1cea0297c1f761"
+    },
+    {
+      "path": "public/assets/tokens/robin.png",
+      "bytes": 1139,
+      "sha256": "351292f73b310d54097f820ab0859ba94f2f7b198f7c77148a255207ae8e40b0"
+    },
+    {
+      "path": "public/assets/animations/robin-b11-v2/robin-b11-v2.png",
+      "bytes": 23004,
+      "sha256": "148d2ecf61e6862f7f87121aaf987611bb610bc6f1e1532938168ca2eb3d44c6"
+    },
+    {
+      "path": "public/assets/animations/robin-b11-v2/robin-b11-v2.json",
+      "bytes": 16113,
+      "sha256": "f9bbc86f97f7dc31f7a8b6d1a2b112cee297cabce0ba33251470e0c83270de4b"
+    },
+    {
+      "path": "art/production/b11/robin/body-poses.png",
+      "bytes": 24007,
+      "sha256": "c93d1e0fce3f4ebe4716a2fb9abcff348a3c85b655fb601165d1865d4c03c7a1"
+    },
+    {
+      "path": "art/production/b11/robin/frame-map.json",
+      "bytes": 14797,
+      "sha256": "fd72d250eaa782feb8efaf4dc912dc35de87dabff9e5bdbb25f862aa6600355e"
+    },
+    {
+      "path": "art/production/b11/robin/master.png",
+      "bytes": 1436,
+      "sha256": "dca489a3683e13b8faf422fb4c479cc8cc33fcbd2405384817fe02c5676c9bd3"
+    },
+    {
+      "path": "art/production/b11/robin/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/robin/selection.json",
+      "bytes": 8215,
+      "sha256": "b56fedafa4c6b7797fc57271f235fd25a1ec25f787b01daa80d92dc1e6ac99f5"
+    },
+    {
+      "path": "art/qa/b11/robin/all-clips.gif",
+      "bytes": 29760,
+      "sha256": "5539d5b5330a159c1e2bd5aa707a5bbeeaba75ae6d0dd621741b9a364e84bbd5"
+    },
+    {
+      "path": "art/qa/b11/robin/clips.png",
+      "bytes": 65760,
+      "sha256": "c55bd18478a3368f81e5138720a57e5a917ade5b41c8cd90a20dcc7031f5feb4"
+    },
+    {
+      "path": "art/qa/b11/robin/before-after.png",
+      "bytes": 2088,
+      "sha256": "0c174b5f315d91c4856ea6360ab06325f6c2946db6e1c3f80481f4cd2a72a8f4"
+    },
+    {
+      "path": "art/production/b11/robin/body.aseprite",
+      "bytes": 27420,
+      "sha256": "1437d04864f1654b6e1d4a26a64bb943958b7e2fc681a82ad7c0baa9fac6ed7c"
+    },
+    {
+      "path": "public/assets/portraits/sabo.png",
+      "bytes": 2017,
+      "sha256": "9e90fb03445aaa8891eaa4c4daa0bdfffca7ecbdee428b13a95cb73e6fbeb511"
+    },
+    {
+      "path": "public/assets/tokens/sabo.png",
+      "bytes": 1409,
+      "sha256": "ba3abceb81b1f4f9849e2e19695230f230e3729df8c9e9fafff9d8adf19d554f"
+    },
+    {
+      "path": "public/assets/animations/sabo-b11-v2/sabo-b11-v2.png",
+      "bytes": 24072,
+      "sha256": "a860de38035bfce596a8f359314b522e3e76303134dde207e09b217a47ad502d"
+    },
+    {
+      "path": "public/assets/animations/sabo-b11-v2/sabo-b11-v2.json",
+      "bytes": 16110,
+      "sha256": "4f228c9068a5c136a424db3f6df83c3593290d8d0f6d36433bdfc07f8a674779"
+    },
+    {
+      "path": "art/production/b11/sabo/body-poses.png",
+      "bytes": 24851,
+      "sha256": "7b7554c5da1886ce5444aa367927e8d5300eec6a152e21400b6289cc8f2b6c85"
+    },
+    {
+      "path": "art/production/b11/sabo/frame-map.json",
+      "bytes": 14910,
+      "sha256": "37383ce80a8a000570195b0389cea3d34286b172d9a9241142fa1c2c5e08ebc0"
+    },
+    {
+      "path": "art/production/b11/sabo/master.png",
+      "bytes": 1733,
+      "sha256": "1e16b18e4eccfa4cc795a3f1b52350cef6fcea8e62852ceb368f3d12cc819a58"
+    },
+    {
+      "path": "art/production/b11/sabo/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/sabo/selection.json",
+      "bytes": 8324,
+      "sha256": "ba1d25e3ba9ac171736b0c1713cf5eb487a0966ae7137c489eb171ae268eb531"
+    },
+    {
+      "path": "art/qa/b11/sabo/all-clips.gif",
+      "bytes": 35304,
+      "sha256": "2bd5e0fe08a9d1b397220a1966c32d06e2a413a1ef0d81ef5bab6ddc1fe4282a"
+    },
+    {
+      "path": "art/qa/b11/sabo/clips.png",
+      "bytes": 69191,
+      "sha256": "f6721cef64ef33878865e0136a856c0dd0d31e123d7ca5c895794dd1fc577a13"
+    },
+    {
+      "path": "art/qa/b11/sabo/before-after.png",
+      "bytes": 4525,
+      "sha256": "f0ad6a0b00a777acb8d385e0ac96d357901b744e74645eb23d04f90e1cea0b57"
+    },
+    {
+      "path": "art/production/b11/sabo/body.aseprite",
+      "bytes": 27581,
+      "sha256": "245e623fd4f4fae698e5cbd7f16de4bc2f044f650009b654ab715a5110e6844c"
+    },
+    {
+      "path": "public/assets/portraits/sanji.png",
+      "bytes": 1438,
+      "sha256": "10bea27b7dd67b9004ee82361b16abec3751f815198e781d888da1ebe865ee67"
+    },
+    {
+      "path": "public/assets/tokens/sanji.png",
+      "bytes": 844,
+      "sha256": "38df539f55b884af8447747aa33397fb756d06f0481b13d40cc83da33b659800"
+    },
+    {
+      "path": "public/assets/animations/sanji-b11-v2/sanji-b11-v2.png",
+      "bytes": 16258,
+      "sha256": "06b7e52158320e657122a813e4e30130ad7e3131e42318bdbf9ea4ff2733dc56"
+    },
+    {
+      "path": "public/assets/animations/sanji-b11-v2/sanji-b11-v2.json",
+      "bytes": 16113,
+      "sha256": "e2898d26ad2ff1b514f894ccafcc6773cd124bb40998320f1fa0efaeebacf47e"
+    },
+    {
+      "path": "art/production/b11/sanji/body-poses.png",
+      "bytes": 16856,
+      "sha256": "ffb4d8da762438e8456b904b05906353c6eab2f6b0dc4403f6e0fc7097234e3c"
+    },
+    {
+      "path": "art/production/b11/sanji/frame-map.json",
+      "bytes": 14784,
+      "sha256": "cfbb76e82940d8fd207615cb3f25e08a44433fcfde01a70f34c6d5258c036a01"
+    },
+    {
+      "path": "art/production/b11/sanji/master.png",
+      "bytes": 1135,
+      "sha256": "9268d425ff67fc0ca3cdbe9bd39b26bd89f1a32721f26ea887bd142c54efb1f5"
+    },
+    {
+      "path": "art/production/b11/sanji/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/sanji/selection.json",
+      "bytes": 8195,
+      "sha256": "b101b3779f706e2f456d84df3e4bf2e1b602b39cde93233f29f87e05cc20ec4b"
+    },
+    {
+      "path": "art/qa/b11/sanji/all-clips.gif",
+      "bytes": 21887,
+      "sha256": "9a46f6cea6d5445f2281d31762466a12bd2ceeddc22c72c7d3bbb0209bd58d4c"
+    },
+    {
+      "path": "art/qa/b11/sanji/clips.png",
+      "bytes": 56138,
+      "sha256": "2ac3191d766d8bdcd645676758542c7c3ecb67529b205a82a88146669f925b07"
+    },
+    {
+      "path": "art/qa/b11/sanji/before-after.png",
+      "bytes": 1698,
+      "sha256": "86def440dd5c496152d6c4185f8bae109cda250e0d8fb3fe076ddf18bb50b705"
+    },
+    {
+      "path": "art/production/b11/sanji/body.aseprite",
+      "bytes": 18645,
+      "sha256": "571e145c7df52f09f86f52bd4ab9c599daf6245b7c301cb0f0694b271299563a"
+    },
+    {
+      "path": "public/assets/portraits/sea-king.png",
+      "bytes": 3834,
+      "sha256": "d1cb3435e5ea5f428fe699beb40396c39686f50c303763619b1ccbc64409f467"
+    },
+    {
+      "path": "public/assets/tokens/sea-king.png",
+      "bytes": 2898,
+      "sha256": "44d14289b4d17bcfde91e3db84e32878bfa9768f3ceb32fa5d49e1575284f232"
+    },
+    {
+      "path": "public/assets/animations/sea-king-b11-v2/sea-king-b11-v2.png",
+      "bytes": 78281,
+      "sha256": "942360c168409caedf2d2eb129e9e0aeb2fe40f5aecec75880753368a0070761"
+    },
+    {
+      "path": "public/assets/animations/sea-king-b11-v2/sea-king-b11-v2.json",
+      "bytes": 16036,
+      "sha256": "018bed79c6b6bc8592ff9ac9c97b55cd9c62bd4cabf76c505e4ab8f375e00eb5"
+    },
+    {
+      "path": "art/production/b11/sea-king/body-poses.png",
+      "bytes": 74398,
+      "sha256": "4ff814f3a89a9efc96d0baf0ece002f9ffb70601a2bd66a01d4c7bdba937ad88"
+    },
+    {
+      "path": "art/production/b11/sea-king/frame-map.json",
+      "bytes": 11841,
+      "sha256": "e1feaf4b30ffbd8a1a6ec3d9d2c03e6055b880d4a1a566776699d2c479358c3b"
+    },
+    {
+      "path": "art/production/b11/sea-king/master.png",
+      "bytes": 3568,
+      "sha256": "894df06255c4a0e1e989c74fcee9ad02141ca64785f9640d618b9c98ced9a335"
+    },
+    {
+      "path": "art/production/b11/sea-king/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/sea-king/selection.json",
+      "bytes": 3092,
+      "sha256": "ab3d6adb4a693f1ebd27eef26a9949aebe4cb1dd4f9aadc573b2803009a2e0b9"
+    },
+    {
+      "path": "art/qa/b11/sea-king/all-clips.gif",
+      "bytes": 79069,
+      "sha256": "7cf6766c8918b9f2ee0b410937be9937d432a2fdca288818489a158be340ac0c"
+    },
+    {
+      "path": "art/qa/b11/sea-king/clips.png",
+      "bytes": 136818,
+      "sha256": "67dc9bc6f70081cdd322e54af9a510275c44d1d07e73277e1cea57e01b15f660"
+    },
+    {
+      "path": "art/qa/b11/sea-king/before-after.png",
+      "bytes": 11422,
+      "sha256": "12ac748e51eaf778441ff63dd26dcaa215adee606323a9d08bd9f46ab7073c62"
+    },
+    {
+      "path": "art/production/b11/sea-king/draft.png",
+      "bytes": 1967511,
+      "sha256": "f4b505cc38f5a7b290f6e2b3d828eac099941d908066516676eed08d024cc143"
+    },
+    {
+      "path": "art/production/b11/sea-king/prompt.txt",
+      "bytes": 2281,
+      "sha256": "c3c522c1c89743b70efd3fbf9723339036e8960d3e8f3bf6c99d13e6aa7590ab"
+    },
+    {
+      "path": "art/production/b11/sea-king/curated-draft-poses.png",
+      "bytes": 68213,
+      "sha256": "951f33424f35c67ec1255fed5f9cb2c81b04d499a75d6142450a5f1ad5ae9cf0"
+    },
+    {
+      "path": "art/production/b11/sea-king/body.aseprite",
+      "bytes": 82053,
+      "sha256": "ef24d074fd3b94e81575728658f1c014b5983f8d9436e287a906d1d5dc536c71"
+    },
+    {
+      "path": "public/assets/portraits/seraphim.png",
+      "bytes": 4890,
+      "sha256": "39f87579c38ed9369e9f447115b8df427c49f489c6b233baef4c3a238997a4be"
+    },
+    {
+      "path": "public/assets/tokens/seraphim.png",
+      "bytes": 3392,
+      "sha256": "29bf719f9abaec6219050c8a4853a6e68a405d2c96db1b768e9ffd1a6eeb6f26"
+    },
+    {
+      "path": "public/assets/animations/seraphim-b11-v2/seraphim-b11-v2.png",
+      "bytes": 88605,
+      "sha256": "f1a02d9d700e0c61084e1042875ef9707c363cb2b401bb53b5e14929745083d9"
+    },
+    {
+      "path": "public/assets/animations/seraphim-b11-v2/seraphim-b11-v2.json",
+      "bytes": 16062,
+      "sha256": "c42eae24eabe76b7b95517b561a0ccb23854fb4b44b6abf02be163ab32744760"
+    },
+    {
+      "path": "art/production/b11/seraphim/body-poses.png",
+      "bytes": 83468,
+      "sha256": "9d3a83dedd867abe3652ad4637704cd6c81fbccc5ee6be35b7871317d3cf9ea9"
+    },
+    {
+      "path": "art/production/b11/seraphim/frame-map.json",
+      "bytes": 11841,
+      "sha256": "e1feaf4b30ffbd8a1a6ec3d9d2c03e6055b880d4a1a566776699d2c479358c3b"
+    },
+    {
+      "path": "art/production/b11/seraphim/master.png",
+      "bytes": 4110,
+      "sha256": "0f98995e8f42f7dd7180b2296d2bf09bbcba0b3e12a93d95cfc6503314c52503"
+    },
+    {
+      "path": "art/production/b11/seraphim/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/seraphim/selection.json",
+      "bytes": 3247,
+      "sha256": "a9c3e77f014583f4830389a1776c936f01190167cb3b3eaa6b6a687f420ce280"
+    },
+    {
+      "path": "art/qa/b11/seraphim/all-clips.gif",
+      "bytes": 91603,
+      "sha256": "024bc05b6ed71b55e96d00b5ed4f53f6fad0075c0ef769b0bf32fc75fa304567"
+    },
+    {
+      "path": "art/qa/b11/seraphim/clips.png",
+      "bytes": 150981,
+      "sha256": "8526ef0d948727af9d71c40d9527874df243a27dbbfcc51fbab05e2de92175f0"
+    },
+    {
+      "path": "art/qa/b11/seraphim/before-after.png",
+      "bytes": 5255,
+      "sha256": "e038c791ff4c7afd18a40ac2cba8736f5defcee927a0c5a396081383457610ef"
+    },
+    {
+      "path": "art/production/b11/seraphim/draft.png",
+      "bytes": 2027783,
+      "sha256": "39bfb49c3b98333b3a3ca9415e4d184f8fa6e5940d6eb7df8eb78cd6bb7dc90a"
+    },
+    {
+      "path": "art/production/b11/seraphim/prompt.txt",
+      "bytes": 2405,
+      "sha256": "979ca3a7a992d702ed6a4ac3d4593a3b9517112c7605f668570d0843f163e3ad"
+    },
+    {
+      "path": "art/production/b11/seraphim/curated-draft-poses.png",
+      "bytes": 77530,
+      "sha256": "0397289109d5a9009d36f647c11673ab6cc5aa0530d1e309c28ea870b2f81c8b"
+    },
+    {
+      "path": "art/production/b11/seraphim/body.aseprite",
+      "bytes": 91700,
+      "sha256": "7984fbfb82f9f052630f1505c975150414478fa5a7e7a9296fa96054a00ce89b"
+    },
+    {
+      "path": "public/assets/portraits/shanks.png",
+      "bytes": 2060,
+      "sha256": "69361e1132476d2afe51d5509262a5ce8cd48d205f31ba564a0bd227250bc188"
+    },
+    {
+      "path": "public/assets/tokens/shanks.png",
+      "bytes": 1307,
+      "sha256": "53652e1c96fc7c066d34cf20e9b34428e9f1d1684875e97e8dd603636ea75baa"
+    },
+    {
+      "path": "public/assets/animations/shanks-b11-v2/shanks-b11-v2.png",
+      "bytes": 24800,
+      "sha256": "db5a61853f58299f25a83490775ba2d6ea23d1c84f40e5b55e9c1da93b6fdd0b"
+    },
+    {
+      "path": "public/assets/animations/shanks-b11-v2/shanks-b11-v2.json",
+      "bytes": 16083,
+      "sha256": "74b0d2e4b80f1a42b40078f497d09ca7d2d71ffacf1356999890b33783ed6736"
+    },
+    {
+      "path": "art/production/b11/shanks/body-poses.png",
+      "bytes": 25746,
+      "sha256": "aeea99e8a1e68a3a4b91599094588ca33b079e0c18332cc36049713bc10cc716"
+    },
+    {
+      "path": "art/production/b11/shanks/frame-map.json",
+      "bytes": 14782,
+      "sha256": "2eafa18543e85af0c6033034bcce1ffd3ee0f70be81c81118566e931724dd154"
+    },
+    {
+      "path": "art/production/b11/shanks/master.png",
+      "bytes": 1580,
+      "sha256": "615ec2912370d0deaa9440e52ebca0637fcac65443c7cf48650ca9373b8a04de"
+    },
+    {
+      "path": "art/production/b11/shanks/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/shanks/selection.json",
+      "bytes": 8243,
+      "sha256": "8e8fcea90ea2122c654a3cf071d84c1c6bd9ad99ff55ed8b37377a38fd64db05"
+    },
+    {
+      "path": "art/qa/b11/shanks/all-clips.gif",
+      "bytes": 31772,
+      "sha256": "96ef5a986c1dbed1907eeb538579d4cb94c32d8e47327f7cae0e53215ffde9d2"
+    },
+    {
+      "path": "art/qa/b11/shanks/clips.png",
+      "bytes": 67911,
+      "sha256": "abcde571954853541bba93c28cead7b7832d3662287d0875722a523c5bb2e41d"
+    },
+    {
+      "path": "art/qa/b11/shanks/before-after.png",
+      "bytes": 2429,
+      "sha256": "a930ed0ae6437f9509f3e23bba33039fe8f2f005100f268f68c6f93b74435cc7"
+    },
+    {
+      "path": "art/production/b11/shanks/body.aseprite",
+      "bytes": 29115,
+      "sha256": "53d6183095ed06227ef6e72e173db4f2284f406494e874aa663e59c985d6939d"
+    },
+    {
+      "path": "public/assets/portraits/skypiea-priest.png",
+      "bytes": 3813,
+      "sha256": "5ed29b13912a944c7d0abaa4c22a2592cc22e449111dea4db6f8dce2340b9d4f"
+    },
+    {
+      "path": "public/assets/tokens/skypiea-priest.png",
+      "bytes": 2575,
+      "sha256": "5dbe125af289190cbf379acd304946883722962857562cc97cdea378275345ab"
+    },
+    {
+      "path": "public/assets/animations/skypiea-priest-b11-v2/skypiea-priest-b11-v2.png",
+      "bytes": 59172,
+      "sha256": "531f41efd98c204c1e3a69498b328e3af7089f0f8a625b586a3f2d108c47b94b"
+    },
+    {
+      "path": "public/assets/animations/skypiea-priest-b11-v2/skypiea-priest-b11-v2.json",
+      "bytes": 16050,
+      "sha256": "55d755187d1f51b5e2bb3351f53c2eab0be5abdb5aadb04979c997eaf2e48bf3"
+    },
+    {
+      "path": "art/production/b11/skypiea-priest/body-poses.png",
+      "bytes": 56040,
+      "sha256": "295642aae67597d7690e91a390a5203980c0bed15a12cb96c7cac39efe9c3893"
+    },
+    {
+      "path": "art/production/b11/skypiea-priest/frame-map.json",
+      "bytes": 11841,
+      "sha256": "e1feaf4b30ffbd8a1a6ec3d9d2c03e6055b880d4a1a566776699d2c479358c3b"
+    },
+    {
+      "path": "art/production/b11/skypiea-priest/master.png",
+      "bytes": 3110,
+      "sha256": "22f08496e96a2808590500932900048646c3fa263d2e516ef3b7707246685943"
+    },
+    {
+      "path": "art/production/b11/skypiea-priest/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/skypiea-priest/selection.json",
+      "bytes": 3235,
+      "sha256": "8d639de662930fb99f1fcbcaf4d4204fee78c1c278778a20093b3ec54e08d09f"
+    },
+    {
+      "path": "art/qa/b11/skypiea-priest/all-clips.gif",
+      "bytes": 63349,
+      "sha256": "c73804f0f019c008508b2a9f030f89cc0eaccc25ed62a62b614fd61cca992c18"
+    },
+    {
+      "path": "art/qa/b11/skypiea-priest/clips.png",
+      "bytes": 117351,
+      "sha256": "8a608f6bd802af78eb9f2f5455d82d292932cc4ae0246eaea776343a1fdc52bf"
+    },
+    {
+      "path": "art/qa/b11/skypiea-priest/before-after.png",
+      "bytes": 4386,
+      "sha256": "6042b5cc54ebe4a1d88adafe9d96c8536af832e550060e84977e83cbff939c94"
+    },
+    {
+      "path": "art/production/b11/skypiea-priest/draft.png",
+      "bytes": 1958097,
+      "sha256": "fc993a8109bf71903e71152166d99ca12edb34068755562b80b4b6b1dfa0a97c"
+    },
+    {
+      "path": "art/production/b11/skypiea-priest/prompt.txt",
+      "bytes": 2392,
+      "sha256": "887c4032be724ba10e9995f40f2eb87ea6f25835fa057aa79a7e229a452dd13e"
+    },
+    {
+      "path": "art/production/b11/skypiea-priest/curated-draft-poses.png",
+      "bytes": 50861,
+      "sha256": "16a7c7012209fc07687b9f3c4b3b296c78cdaa93bf93ba25bf12621d955973ce"
+    },
+    {
+      "path": "art/production/b11/skypiea-priest/body.aseprite",
+      "bytes": 62879,
+      "sha256": "5cae0ad2d3ea4334c7e9766fe8142284760d88349b1f0b251f97d21fda0b5089"
+    },
+    {
+      "path": "public/assets/portraits/smoker.png",
+      "bytes": 1836,
+      "sha256": "0934d5ede57a2547d9ec080e1005fa8311ba2292d28a7b816809a15cadad71a2"
+    },
+    {
+      "path": "public/assets/tokens/smoker.png",
+      "bytes": 1184,
+      "sha256": "36f240b9c0fddd1da057874137e34cca64c84c546d5bd01d5cb4005b76b2a178"
+    },
+    {
+      "path": "public/assets/animations/smoker-b11-v2/smoker-b11-v2.png",
+      "bytes": 22739,
+      "sha256": "3d4fd4c1f55dad2b126b9d35d62316facaba86041116047389183ff43a1833b0"
+    },
+    {
+      "path": "public/assets/animations/smoker-b11-v2/smoker-b11-v2.json",
+      "bytes": 16116,
+      "sha256": "81653e63b16b8687df3288a4d185733e2163005d841fb2116337c1cb5242aaaa"
+    },
+    {
+      "path": "art/production/b11/smoker/body-poses.png",
+      "bytes": 24095,
+      "sha256": "b599c7bb4c63039accc596c4d72967504cc564af5a3aa5f2f9372051541a5fd9"
+    },
+    {
+      "path": "art/production/b11/smoker/frame-map.json",
+      "bytes": 14761,
+      "sha256": "50ecb738a7d8039f235bfd5839056d5077aff809890a230307efe249ab08d429"
+    },
+    {
+      "path": "art/production/b11/smoker/master.png",
+      "bytes": 1470,
+      "sha256": "bf113dc9ccf3d23a4dc35843c97573ba88fe0f69426f62f7e43006b145a4bc67"
+    },
+    {
+      "path": "art/production/b11/smoker/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/smoker/selection.json",
+      "bytes": 8197,
+      "sha256": "54c1d0a70491cb4ba549e3f40f705090f211f5a0b3ae3f66cfc9bd9a065f76ef"
+    },
+    {
+      "path": "art/qa/b11/smoker/all-clips.gif",
+      "bytes": 28565,
+      "sha256": "985fead8d148cc66406d053805295de2e4b41741d8df0c8d1cf5eca504ccfc3a"
+    },
+    {
+      "path": "art/qa/b11/smoker/clips.png",
+      "bytes": 66817,
+      "sha256": "138ad42ac7564062e8ecb1cf22cff34d3f16f51db8d811c350506ec8942f2d80"
+    },
+    {
+      "path": "art/qa/b11/smoker/before-after.png",
+      "bytes": 2556,
+      "sha256": "0902f711cad580e8b957b6911d972550a9604c55f34808d6e9694b21c76e6b66"
+    },
+    {
+      "path": "art/production/b11/smoker/body.aseprite",
+      "bytes": 26736,
+      "sha256": "fd68ac1daa059e7258181c282d0971ce7f7e020aae7cd8fc59728c83d148c07a"
+    },
+    {
+      "path": "public/assets/portraits/tashigi.png",
+      "bytes": 1621,
+      "sha256": "9481d432f4442989e9d6341c7935a0f017e5d241dc2de62ffe54b18e73df14ea"
+    },
+    {
+      "path": "public/assets/tokens/tashigi.png",
+      "bytes": 1093,
+      "sha256": "63e90eee0a5283d400223191d2856c7886d3362803ca0e40214c497627d46742"
+    },
+    {
+      "path": "public/assets/animations/tashigi-b11-v2/tashigi-b11-v2.png",
+      "bytes": 16695,
+      "sha256": "925243ee641f2e689ccd1a27aed93e54840778bd05d5e33c93623c47e0dcce6e"
+    },
+    {
+      "path": "public/assets/animations/tashigi-b11-v2/tashigi-b11-v2.json",
+      "bytes": 16119,
+      "sha256": "dba20c6f25b129716c25b9928ad8a86fe10c52ac992fa9eaf7eda91cd4e3dace"
+    },
+    {
+      "path": "art/production/b11/tashigi/body-poses.png",
+      "bytes": 17203,
+      "sha256": "68591bda66e36aeea4b02eb2a07ce4b39dcb0584053e01757c9fe4a30263ba4f"
+    },
+    {
+      "path": "art/production/b11/tashigi/frame-map.json",
+      "bytes": 14742,
+      "sha256": "4a46b108a7a9fcdfd0bb2dfd66ad397e4c16d93070ff38a5eea8c51fd6fd5dbf"
+    },
+    {
+      "path": "art/production/b11/tashigi/master.png",
+      "bytes": 1376,
+      "sha256": "e3e5ebfff782c51dd8399a91ccc7b99bdbe54356037e979156c1e581b5a64885"
+    },
+    {
+      "path": "art/production/b11/tashigi/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/tashigi/selection.json",
+      "bytes": 8152,
+      "sha256": "24ffa276d7b55cf6dba8c2739207f32f14f86018345126e1eb31c2c5fbddfe39"
+    },
+    {
+      "path": "art/qa/b11/tashigi/all-clips.gif",
+      "bytes": 25510,
+      "sha256": "80b4f35edd038092d4844c5645f0f99a8574cc98908e95506ca0b7a53e78b623"
+    },
+    {
+      "path": "art/qa/b11/tashigi/clips.png",
+      "bytes": 58545,
+      "sha256": "7604e4595732871992463148908a033577fca6e0f07cec46a97fa683b9d7ec92"
+    },
+    {
+      "path": "art/qa/b11/tashigi/before-after.png",
+      "bytes": 1957,
+      "sha256": "b8b690cf1b49914105cbedac5b9caedc4d6877e5bb90e2c802f4edb82037cf2a"
+    },
+    {
+      "path": "art/production/b11/tashigi/body.aseprite",
+      "bytes": 23208,
+      "sha256": "78322c54b799c5aee25d6d5b8d9c0444818639d06713f4172598329c91b95ffd"
+    },
+    {
+      "path": "public/assets/portraits/usopp.png",
+      "bytes": 2070,
+      "sha256": "0f7eea8065c1698ce85aa18e7d70bcafdc5486a5ad3c871ac48fe6ead1f449c7"
+    },
+    {
+      "path": "public/assets/tokens/usopp.png",
+      "bytes": 1343,
+      "sha256": "da36e5fae5441f6691929b9babc90def0265128c4ab93a2c6fc21474c7842106"
+    },
+    {
+      "path": "public/assets/animations/usopp-b11-v2/usopp-b11-v2.png",
+      "bytes": 26086,
+      "sha256": "07c2cfd01227e2a011c858e68440ea614924e49a64ee82bb1960417dc18b499d"
+    },
+    {
+      "path": "public/assets/animations/usopp-b11-v2/usopp-b11-v2.json",
+      "bytes": 16113,
+      "sha256": "5f7bd9d3d941180df0ade49031cd163a3f6c9cffccbbcc821109bac731784a51"
+    },
+    {
+      "path": "art/production/b11/usopp/body-poses.png",
+      "bytes": 26266,
+      "sha256": "0c66944fab178b6c162d931ebe8cae6a188851710f69a8c24cf2592b69fa0a33"
+    },
+    {
+      "path": "art/production/b11/usopp/frame-map.json",
+      "bytes": 14810,
+      "sha256": "02057542abe9a1c41875d8aae59e1c0fc88f5213e00fe07f8ca9cb0f6ced13d1"
+    },
+    {
+      "path": "art/production/b11/usopp/master.png",
+      "bytes": 1675,
+      "sha256": "a51e3c013cfc80a8f6037b1e00ddefd645731fe98d2ea58cc1ea48723e64fb00"
+    },
+    {
+      "path": "art/production/b11/usopp/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/usopp/selection.json",
+      "bytes": 8249,
+      "sha256": "e73d33a264053e29901e2971da5de78e09afccc1d4efc7ea30eb1cb7f93df795"
+    },
+    {
+      "path": "art/qa/b11/usopp/all-clips.gif",
+      "bytes": 35303,
+      "sha256": "e4fb7d5d9622d85fedddd592f4714a54240b72215c2f63f253f185bc0e72c0d0"
+    },
+    {
+      "path": "art/qa/b11/usopp/clips.png",
+      "bytes": 68960,
+      "sha256": "46e78fd3cedb37a67d6d6b39c5c71ccbe38a048c9c614f07914a9c33b8c40fd1"
+    },
+    {
+      "path": "art/qa/b11/usopp/before-after.png",
+      "bytes": 2627,
+      "sha256": "99a6b0036abe050949a63ba1fab12228969f63fed7a2ea63156bcfac9541f398"
+    },
+    {
+      "path": "art/production/b11/usopp/body.aseprite",
+      "bytes": 33399,
+      "sha256": "8c3aa7e1ab0638fdd559e16c5a2d4fdc21b513b67dd1e4d5b6e000ec54fa9e51"
+    },
+    {
+      "path": "public/assets/portraits/vice-admiral.png",
+      "bytes": 4095,
+      "sha256": "bc7dbcc8124740293e7839702e539f85345c3c14341f603399c853cea8404799"
+    },
+    {
+      "path": "public/assets/tokens/vice-admiral.png",
+      "bytes": 2807,
+      "sha256": "3e56ca4739f50bfadcdc5ef9870a2e95f79d41cbd938c297f59a96f2e0d7db9b"
+    },
+    {
+      "path": "public/assets/animations/vice-admiral-b11-v2/vice-admiral-b11-v2.png",
+      "bytes": 66874,
+      "sha256": "83e5074da6c5097ee42826c29136d0fee93d15a087f507bda30ecf0b8511dbb8"
+    },
+    {
+      "path": "public/assets/animations/vice-admiral-b11-v2/vice-admiral-b11-v2.json",
+      "bytes": 16069,
+      "sha256": "5cc7fab8bd43e9f4b294d5f1846ff528cd155d98b7a10ff414a00010352d4445"
+    },
+    {
+      "path": "art/production/b11/vice-admiral/body-poses.png",
+      "bytes": 63465,
+      "sha256": "dcae112af90c5329a6f3c19e55fdf1a947e2fa8075ce7a735fe6cf0ede3be12f"
+    },
+    {
+      "path": "art/production/b11/vice-admiral/frame-map.json",
+      "bytes": 11841,
+      "sha256": "e1feaf4b30ffbd8a1a6ec3d9d2c03e6055b880d4a1a566776699d2c479358c3b"
+    },
+    {
+      "path": "art/production/b11/vice-admiral/master.png",
+      "bytes": 3387,
+      "sha256": "ee18b570a857b3bea689ca18109179645a89b486154643df07a1a345ddf9c478"
+    },
+    {
+      "path": "art/production/b11/vice-admiral/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/vice-admiral/selection.json",
+      "bytes": 3263,
+      "sha256": "b4d3054defe29320fadb0bf4eedf12477b7bb25c1bdc965d9a42ea0990d232f5"
+    },
+    {
+      "path": "art/qa/b11/vice-admiral/all-clips.gif",
+      "bytes": 70472,
+      "sha256": "d5e2707470cd776b6ebb17185dbb8258932de13046041c191d88fecc45c06461"
+    },
+    {
+      "path": "art/qa/b11/vice-admiral/clips.png",
+      "bytes": 124516,
+      "sha256": "a55a8fb0dff07762519ace662f177ca64a32dbf0d3151d2ab4f4b1669582faf1"
+    },
+    {
+      "path": "art/qa/b11/vice-admiral/before-after.png",
+      "bytes": 4321,
+      "sha256": "2b4dbb2c9c08520d50da37afe1a428d7ac3f0ee70ae719603f92b8a8cf5bae03"
+    },
+    {
+      "path": "art/production/b11/vice-admiral/draft.png",
+      "bytes": 2079534,
+      "sha256": "fe15109d6f0e3dc35921e4ce945ad32dfe8baf53eae724b9a077b3647a15a277"
+    },
+    {
+      "path": "art/production/b11/vice-admiral/prompt.txt",
+      "bytes": 2377,
+      "sha256": "b5246f501f89b015b2d842af480e5e15c728bb1a45a59177ba85ea6f7dab7c0a"
+    },
+    {
+      "path": "art/production/b11/vice-admiral/curated-draft-poses.png",
+      "bytes": 58224,
+      "sha256": "f6aa09ed4c5f86529cff493090bd40bf31895d35c4fc7cf1de3be918ac610b46"
+    },
+    {
+      "path": "art/production/b11/vice-admiral/body.aseprite",
+      "bytes": 69820,
+      "sha256": "a8b47e0d5b37b9643a1d157e5b95a3c1e4896ae4b0927998829f7f593f82697a"
+    },
+    {
+      "path": "public/assets/portraits/whitebeard.png",
+      "bytes": 2994,
+      "sha256": "92cbad245002701b61e16e64dd89ccdb96343f98910beb4f2ed9b2da77a8ab0c"
+    },
+    {
+      "path": "public/assets/tokens/whitebeard.png",
+      "bytes": 2174,
+      "sha256": "4d2ae8edd2136853fd5f8ff64ab9e0ab3098827e8fd5f375d317e4516761dc25"
+    },
+    {
+      "path": "public/assets/animations/whitebeard-b11-v2/whitebeard-b11-v2.png",
+      "bytes": 52352,
+      "sha256": "a3131c0873e6a7a1d3dccf690868f4de942642a04a727f77f6edf1f174e48a00"
+    },
+    {
+      "path": "public/assets/animations/whitebeard-b11-v2/whitebeard-b11-v2.json",
+      "bytes": 16044,
+      "sha256": "a82b776271af99549664a047a8daedfb6a58d8969941e78c27ad08928cffdb9e"
+    },
+    {
+      "path": "art/production/b11/whitebeard/body-poses.png",
+      "bytes": 53432,
+      "sha256": "38b8c40bf70e1e0f117b9820cd78ac153e93bf32c8fd26eed36d3324a6c89e7b"
+    },
+    {
+      "path": "art/production/b11/whitebeard/frame-map.json",
+      "bytes": 14825,
+      "sha256": "1817693813df5508500808b6652223d46edabbff4f8f154e6c3abb19abc644a3"
+    },
+    {
+      "path": "art/production/b11/whitebeard/master.png",
+      "bytes": 2681,
+      "sha256": "d4ae6d55c02dfcffcce9e545b90eaaadbc191388d4b4f4cf8d7055073101430e"
+    },
+    {
+      "path": "art/production/b11/whitebeard/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/whitebeard/selection.json",
+      "bytes": 8240,
+      "sha256": "9625224e404617bfc9b73bf94c8ae9ad04bbc3920af949f3ec979ff899fe05a8"
+    },
+    {
+      "path": "art/qa/b11/whitebeard/all-clips.gif",
+      "bytes": 58361,
+      "sha256": "5878aa3ed4235b3bf5bf3cc6a62e8e6f5a07a2a6ab5396b66f303e3891c67829"
+    },
+    {
+      "path": "art/qa/b11/whitebeard/clips.png",
+      "bytes": 106249,
+      "sha256": "31d9bdb1caeedcebb5b107b5b2e4cb838222aeff09e7a1abe3481f705710e39c"
+    },
+    {
+      "path": "art/qa/b11/whitebeard/before-after.png",
+      "bytes": 4831,
+      "sha256": "e5897deceb24987624acfbcd2662b90fa87454e1accda3db0a50f4400a7a9d53"
+    },
+    {
+      "path": "art/production/b11/whitebeard/body.aseprite",
+      "bytes": 55052,
+      "sha256": "cb461408b586266d71a59acac827235e57ae588aa920a2f0bb42f0567e21a9f9"
+    },
+    {
+      "path": "public/assets/portraits/zoro.png",
+      "bytes": 2001,
+      "sha256": "9daf8a00e590156a3bda2224aaf1729c346d2d33ae63242d40b94ac685da3838"
+    },
+    {
+      "path": "public/assets/tokens/zoro.png",
+      "bytes": 1297,
+      "sha256": "f3d753c3b327f7db670d763af542ff01fbd7fb9a965ae4547798284ba72baae4"
+    },
+    {
+      "path": "public/assets/animations/zoro-b11-v2/zoro-b11-v2.png",
+      "bytes": 24863,
+      "sha256": "5f3b7525de500860bc60f7a24fa8987b960dee9c23b32f45ea819c2795e1ff7f"
+    },
+    {
+      "path": "public/assets/animations/zoro-b11-v2/zoro-b11-v2.json",
+      "bytes": 16110,
+      "sha256": "b2c8796c37ef456851184a84b48b03bda1a270aec9459812a61d5aa09758a9b3"
+    },
+    {
+      "path": "art/production/b11/zoro/body-poses.png",
+      "bytes": 25344,
+      "sha256": "802610e9686f56852e1a458bfb3a50c5c9f007e1e4e59b3cec3281a4c4c4ab1e"
+    },
+    {
+      "path": "art/production/b11/zoro/frame-map.json",
+      "bytes": 14800,
+      "sha256": "0cd7b61a41dda8cd27f2bf2ff3fa399dfe5ca4abb883d267da043be282c991d5"
+    },
+    {
+      "path": "art/production/b11/zoro/master.png",
+      "bytes": 1551,
+      "sha256": "d79ffc85524366459b56440f5f2b477f8f9cb207eae44dae1ddabc8340db9154"
+    },
+    {
+      "path": "art/production/b11/zoro/fx-poses.png",
+      "bytes": 4687,
+      "sha256": "b0f1dbe48da34980777705498ba9809487b0f873753583fb1b3d47c50adac8a9"
+    },
+    {
+      "path": "art/production/b11/zoro/selection.json",
+      "bytes": 8226,
+      "sha256": "7f9737c78c13149c255665dc9c2ef7d3426368b689f91d82b95aac1a65eff17b"
+    },
+    {
+      "path": "art/qa/b11/zoro/all-clips.gif",
+      "bytes": 32561,
+      "sha256": "470599754ddc0c85e9e04a3d5d7815049266e109bac2a0a0c6711d8282ef70e5"
+    },
+    {
+      "path": "art/qa/b11/zoro/clips.png",
+      "bytes": 66226,
+      "sha256": "8f008e756a727b4f1e1e96e3403b1abf9b0a94573175e5c9f951067de3210ea7"
+    },
+    {
+      "path": "art/qa/b11/zoro/before-after.png",
+      "bytes": 2183,
+      "sha256": "daec370dab5d62d976d614dadeef9171b3b9144676a8c03d9d3caa3c8ae6f58f"
+    },
+    {
+      "path": "art/production/b11/zoro/body.aseprite",
+      "bytes": 30902,
+      "sha256": "3eb30dd8cdff8491d775d3a324ae6fda1702c03e964ef699157550bc0914cf84"
+    },
+    {
+      "path": "public/assets/portraits/koala.png",
+      "bytes": 2568,
+      "sha256": "32ba72739f7d7d43fc824a0cb29e1cc08861d9a51ef8c088ab2f254408f6d023"
+    },
+    {
+      "path": "public/assets/tokens/koala.png",
+      "bytes": 1643,
+      "sha256": "4b6f0f109cf234e6c71dcbacd2bb6dc894c8f3771ba50c50a1d7ef19271c23a1"
+    },
+    {
+      "path": "public/assets/portraits/kaido.png",
+      "bytes": 4433,
+      "sha256": "558698999ee8c0860691b4ebc28a8040a8edc136019bd8d74eaab76ec20db278"
+    },
+    {
+      "path": "public/assets/tokens/kaido.png",
+      "bytes": 3375,
+      "sha256": "32387e49fa0557808203281d1dd9455dcb14bf036410920ed9d049148b9e44b0"
+    },
+    {
+      "path": "public/assets/portraits/luffy.png",
+      "bytes": 1589,
+      "sha256": "028fe49f50d9c6d3b1430b205578b4704cb0f0f4a9d6be8ce43b0964a71e481f"
+    },
+    {
+      "path": "public/assets/tokens/luffy.png",
+      "bytes": 1047,
+      "sha256": "69c854644741dd4a73712a4e3d6a94815f3a6c584f625fc022612188c1abe764"
+    }
+  ]
+}

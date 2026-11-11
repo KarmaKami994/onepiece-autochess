@@ -1,0 +1,12 @@
+Create ONE frozen pixel-art ANIMATION AUTHORING DRAFT for The exact project-owned PIRATE RAIDER in reference 1: muscular adult pirate, red bandana over long dark hair, open dark brown sleeveless vest, bare tan arms/chest, striped dark red sash, dark navy baggy trousers, brown boots, short curved cutlass. Preserve this silhouette and palette.
+Reference 1 is the character identity / original sheet. Reference 2 is the accepted B10 pixel style ONLY; do not copy its character or clothing.
+Transparent square canvas, exactly 1254 x 1254. EXACT 6 columns x 6 rows, each cell 209 x 209. One isolated complete SAME character in every cell, canonical 3/4 RIGHT facing. Same fixed body scale, bottom-centred anchor, generous margins. Body about 150 pixels tall on this source canvas, later exported at 82px. All weapons/limbs remain inside their own cell.
+Crisp low-resolution pixel clusters, warm dark outline, upper-left light, 3-value ramps; visible at 82px. No smooth illustration, no 3D, no chibi restyling. Stable face, hair, outfit and equipment across all 36 drawings.
+Six GENUINELY DIFFERENT BODY poses per row, no translated/scaled/rotated whole-image copies:
+Row 1 IDLE: six subtle guard/breathing poses, actual elbow/shoulder/knee changes, calm closed loop.
+Row 2 MOVE: six real heavy running strides, knees and boots alternate, left arm counter-swings, cutlass held to side.
+Row 3 ATTACK: cutlass blow with anticipation, lift, backswing, forward cut, follow-through, guard. No painted trail.
+Row 4 CAST: six aggressive overhead cutlass preparation and lunging command gestures; no aura or particles.
+Row 5 HIT: six guarded recoil/torso-compression/arm-response poses, recover.
+Row 6 DEFEAT: six stages stagger, knee buckles, kneel, hand to ground, fall, final resting body. Whole figure remains in its cell.
+No text, grid lines, labels, letters, numbers, background/checkerboard, ground disc/shadow, coloured rim, aura, particles or FX. This is a source draft for subsequent local curation and pixel cleanup, not an unreviewed production atlas.

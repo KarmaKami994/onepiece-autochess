@@ -1,0 +1,174 @@
+{
+  "id": "luffy-gear-4-snakeman",
+  "kind": "pve",
+  "baseId": "luffy",
+  "formId": "luffy-gear-4-snakeman",
+  "sourceType": "AI-assisted-body-poses",
+  "scale": 0.5402298850574713,
+  "bodyClass": "large",
+  "originalSource": {
+    "localPath": "art/licensed-reference/gigant-battle/MonkeyDLuffy.png",
+    "sha256": "d77e40b80168e4533a27d22e2da55208435034267c9210597ecc5193d272113d",
+    "creditRecord": "ASSET_PROVENANCE.md; earlier owner-attested Luffy source"
+  },
+  "permission": {
+    "status": "confirmed",
+    "note": "Project-owner attestation covers the archived earlier Luffy source and derivatives (ASSET_LICENSE.md). New form poses are frozen AI-assisted derivatives of that existing identity, not original game rips."
+  },
+  "reference": "art/production/b11/references/luffy-idle.png",
+  "tool": "built-in image_gen; exact model/seed/settings not exposed",
+  "preservedStates": [],
+  "supplementalStates": null,
+  "selections": {
+    "idle": [
+      {
+        "draftPose": 0
+      },
+      {
+        "draftPose": 1
+      },
+      {
+        "draftPose": 2
+      },
+      {
+        "draftPose": 3
+      },
+      {
+        "draftPose": 4
+      },
+      {
+        "draftPose": 0
+      }
+    ],
+    "move": [
+      {
+        "draftPose": 6
+      },
+      {
+        "draftPose": 7
+      },
+      {
+        "draftPose": 8
+      },
+      {
+        "draftPose": 9
+      },
+      {
+        "draftPose": 10
+      },
+      {
+        "draftPose": 11
+      },
+      {
+        "draftPose": 6
+      },
+      {
+        "draftPose": 7
+      }
+    ],
+    "attack": [
+      {
+        "draftPose": 12
+      },
+      {
+        "draftPose": 13
+      },
+      {
+        "draftPose": 14
+      },
+      {
+        "draftPose": 15
+      },
+      {
+        "draftPose": 16
+      },
+      {
+        "draftPose": 16
+      },
+      {
+        "draftPose": 17
+      },
+      {
+        "draftPose": 12
+      }
+    ],
+    "cast": [
+      {
+        "draftPose": 18
+      },
+      {
+        "draftPose": 18
+      },
+      {
+        "draftPose": 19
+      },
+      {
+        "draftPose": 19
+      },
+      {
+        "draftPose": 20
+      },
+      {
+        "draftPose": 20
+      },
+      {
+        "draftPose": 21
+      },
+      {
+        "draftPose": 21
+      },
+      {
+        "draftPose": 22
+      },
+      {
+        "draftPose": 22
+      },
+      {
+        "draftPose": 23
+      },
+      {
+        "draftPose": 18
+      }
+    ],
+    "hit": [
+      {
+        "draftPose": 25
+      },
+      {
+        "draftPose": 26
+      },
+      {
+        "draftPose": 27
+      },
+      {
+        "draftPose": 28
+      }
+    ],
+    "defeat": [
+      {
+        "draftPose": 30
+      },
+      {
+        "draftPose": 31
+      },
+      {
+        "draftPose": 32
+      },
+      {
+        "draftPose": 33
+      },
+      {
+        "draftPose": 34
+      },
+      {
+        "draftPose": 35
+      },
+      {
+        "draftPose": 35
+      },
+      {
+        "draftPose": 35
+      }
+    ]
+  }
+}

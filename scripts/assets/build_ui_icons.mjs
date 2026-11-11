@@ -2,6 +2,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
+import { preferredV2AssetKeys } from "./preferred_v2_source.mjs";
 
 const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(SCRIPT_DIRECTORY, "..", "..");
@@ -164,16 +165,19 @@ async function fitAsset(input, width, height, maxWidth, maxHeight) {
 }
 
 async function writeDerivedPortraits() {
+  const preferred=await preferredV2AssetKeys(ROOT);
   for (const directory of ["characters", "portraits", "tokens"]) await mkdir(path.join(PUBLIC, directory), { recursive: true });
   for (const id of NEW_CREW) {
-    const atlas = path.join(PUBLIC, "animations", `${id}-v2`, `${id}-v2.png`);
+    const key=preferred(id);
+    const atlas = path.join(PUBLIC, "animations", key, `${key}.png`);
     const idle = await sharp(atlas).extract({ left: 0, top: 0, width: 128, height: 128 }).png().toBuffer();
     await writeFile(path.join(PUBLIC, "characters", `${id}.png`), await fitAsset(idle, 512, 768, 448, 704));
     await writeFile(path.join(PUBLIC, "portraits", `${id}.png`), await fitAsset(idle, 320, 320, 270, 300));
     await writeFile(path.join(PUBLIC, "tokens", `${id}.png`), await fitAsset(idle, 160, 160, 128, 146));
   }
   for (const id of ["vice-admiral", "cipher-pol-agent", "seraphim"]) {
-    const source = path.join(PUBLIC, "enemies", `${id}.png`);
+    const key=preferred(id);
+    const source = await sharp(path.join(PUBLIC,"animations",key,`${key}.png`)).extract({left:0,top:0,width:128,height:128}).png().toBuffer();
     await writeFile(path.join(PUBLIC, "portraits", `${id}.png`), await fitAsset(source, 320, 320, 270, 300));
     await writeFile(path.join(PUBLIC, "tokens", `${id}.png`), await fitAsset(source, 160, 160, 128, 146));
   }
@@ -192,10 +196,9 @@ async function writeIconFamilies() {
   for (const id of ["robin-demonio-fleur", "luffy-gear-4-boundman", "luffy-gear-4-snakeman", "chopper-monster-point"]) {
     const directory = path.join(PUBLIC, "forms", id);
     await mkdir(directory, { recursive: true });
-    for (const [name, size] of [["portrait", 320], ["token", 160]]) {
-      const svg = id === "robin-demonio-fleur"
-        ? await readFile(path.join(ROOT, "art/production/b10", id, `${name}.svg`), "utf8")
-        : formSvg(id, size);
+    for (const name of ["portrait", "token"]) {
+      const batch=id === "robin-demonio-fleur"?"b10":"b11";
+      const svg = await readFile(path.join(ROOT, "art/production", batch, id, `${name}.svg`), "utf8");
       await writeFile(path.join(directory, `${name}.svg`), svg);
     }
     await writeFile(path.join(directory, "overlay.svg"), formSvg(id, 128, true));

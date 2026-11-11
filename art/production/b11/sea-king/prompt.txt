@@ -1,0 +1,12 @@
+Create ONE frozen pixel-art ANIMATION AUTHORING DRAFT for The exact project-owned SEA KING in reference 1: blue scaled serpentine sea monster, golden horns, crimson red fins, tan segmented belly, long coiled tail, tiny clawed forearms, angular roaring reptile/shark head. NO humanoid legs, no clothing, no human torso. Preserve those precise existing colours and recognizable coiled anatomy.
+Reference 1 is the character identity / original sheet. Reference 2 is the accepted B10 pixel style ONLY; do not copy its character or clothing.
+Transparent square canvas, exactly 1254 x 1254. EXACT 6 columns x 6 rows, each cell 209 x 209. One isolated complete SAME character in every cell, canonical 3/4 RIGHT facing. Same fixed body scale, bottom-centred anchor, generous margins. Body about 150 pixels tall on this source canvas, later exported at 100px. All weapons/limbs remain inside their own cell.
+Crisp low-resolution pixel clusters, warm dark outline, upper-left light, 3-value ramps; visible at 100px. No smooth illustration, no 3D, no chibi restyling. Stable face, hair, outfit and equipment across all 36 drawings.
+Six GENUINELY DIFFERENT BODY poses per row, no translated/scaled/rotated whole-image copies:
+Row 1 IDLE: six subtle guard/breathing poses, actual elbow/shoulder/knee changes, calm closed loop.
+Row 2 MOVE: six real serpentine locomotion poses: alternating compression/extension of the coil, tail sweeps, neck counterbalances, fins articulate. This is NOT a walking humanoid or a translated/rotated whole image.
+Row 3 ATTACK: a neck-driven jaw bite: coil braces, head pulls back, jaws open, head thrusts forward, jaws snap, neck recovers; tail counterbalances. No water FX.
+Row 4 CAST: coil tightens, neck rises, forearms spread, head rears and roars, neck drops into threatening posture, coil settles. No energy FX.
+Row 5 HIT: six guarded recoil/torso-compression/arm-response poses, recover.
+Row 6 DEFEAT: six stages stagger, knee buckles, kneel, hand to ground, fall, final resting body. Whole figure remains in its cell.
+No text, grid lines, labels, letters, numbers, background/checkerboard, ground disc/shadow, coloured rim, aura, particles or FX. This is a source draft for subsequent local curation and pixel cleanup, not an unreviewed production atlas.

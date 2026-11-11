@@ -34,6 +34,7 @@ import {
 import {
   CREW_ANIMATION_MANIFEST,
   CREW_V2_ANIMATIONS,
+  B11_ANIMATION_MANIFEST,
   getCrewAnimationDefinition,
   getCrewAnimationDefinitions,
 } from "../../components/crewAnimationManifest";
@@ -522,9 +523,10 @@ describe("P9 production asset integration", () => {
     )) as { entries: Array<{ id: string; source: { sha256: string; localPath: string }; outputAssetKey: string }> };
     for (const id of P9_IDS) {
       expect(CREW_ANIMATION_MANIFEST).not.toHaveProperty(id);
-      expect(getCrewAnimationDefinitions(id)).toEqual([CREW_V2_ANIMATIONS[id]]);
+      expect(getCrewAnimationDefinitions(id)).toEqual([CREW_V2_ANIMATIONS[id], B11_ANIMATION_MANIFEST[id]]);
       expect(getCrewAnimationDefinition(id)).toMatchObject({
         contentId: id,
+        assetKey: `${id}-b11-v2`,
         version: "v2",
         frameCount: 46,
         sheetColumns: 8,

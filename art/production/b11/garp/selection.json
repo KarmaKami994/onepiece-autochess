@@ -1,0 +1,300 @@
+{
+  "id": "garp",
+  "kind": "crew",
+  "baseId": "garp",
+  "sourceType": "licensed-original-with-missing-clip-supplement",
+  "scale": 0.8611111111111112,
+  "bodyClass": "normal",
+  "originalSource": {
+    "strategy": "auto-frame-map",
+    "localPath": "art/licensed-reference/gigant-battle/Garp.png",
+    "sha256": "ef044a99225cc4a784ae03824c0421665736317bc565d7d973386f80f54de980",
+    "dimensions": {
+      "width": 846,
+      "height": 698
+    },
+    "game": "One Piece: Gigant Battle!",
+    "gameUrl": "https://spritedatabase.net/game/2000",
+    "sheetUrl": "https://spritedatabase.net/file/12056",
+    "contributor": "Grim",
+    "contributorBasis": "Sprite Database file page read 2026-08-14",
+    "frameMap": "auto:connected-components-v1",
+    "derivedFrameMap": "public/assets/animations/garp-v2/garp-v2.json#frames"
+  },
+  "permission": {
+    "status": "confirmed",
+    "note": "Project-owner attestation in the Codex project conversation on 2026-08-14 explicitly permits use, adaptation, and public-repository collaboration for this source and its derived runtime atlas; no downstream asset license is granted."
+  },
+  "reference": "art/production/b11/references/garp-idle.png",
+  "tool": "built-in image_gen; exact model/seed/settings not exposed",
+  "preservedStates": [
+    "idle",
+    "cast"
+  ],
+  "supplementalStates": [
+    "move",
+    "attack",
+    "hit",
+    "defeat"
+  ],
+  "selections": {
+    "idle": [
+      {
+        "candidate": 0,
+        "sourceRect": {
+          "x": 1,
+          "y": 20,
+          "width": 54,
+          "height": 83
+        }
+      },
+      {
+        "candidate": 1,
+        "sourceRect": {
+          "x": 63,
+          "y": 21,
+          "width": 56,
+          "height": 82
+        }
+      },
+      {
+        "candidate": 2,
+        "sourceRect": {
+          "x": 130,
+          "y": 22,
+          "width": 57,
+          "height": 81
+        }
+      },
+      {
+        "candidate": 1,
+        "sourceRect": {
+          "x": 63,
+          "y": 21,
+          "width": 56,
+          "height": 82
+        }
+      },
+      {
+        "candidate": 0,
+        "sourceRect": {
+          "x": 1,
+          "y": 20,
+          "width": 54,
+          "height": 83
+        }
+      },
+      {
+        "candidate": 1,
+        "sourceRect": {
+          "x": 63,
+          "y": 21,
+          "width": 56,
+          "height": 82
+        }
+      }
+    ],
+    "move": [
+      {
+        "draftPose": 6
+      },
+      {
+        "draftPose": 7
+      },
+      {
+        "draftPose": 8
+      },
+      {
+        "draftPose": 9
+      },
+      {
+        "draftPose": 10
+      },
+      {
+        "draftPose": 11
+      },
+      {
+        "draftPose": 6
+      },
+      {
+        "draftPose": 7
+      }
+    ],
+    "attack": [
+      {
+        "draftPose": 12
+      },
+      {
+        "draftPose": 13
+      },
+      {
+        "draftPose": 14
+      },
+      {
+        "draftPose": 15
+      },
+      {
+        "draftPose": 16
+      },
+      {
+        "draftPose": 16
+      },
+      {
+        "draftPose": 17
+      },
+      {
+        "draftPose": 12
+      }
+    ],
+    "cast": [
+      {
+        "candidate": 10,
+        "sourceRect": {
+          "x": 0,
+          "y": 148,
+          "width": 80,
+          "height": 77
+        }
+      },
+      {
+        "candidate": 11,
+        "sourceRect": {
+          "x": 80,
+          "y": 129,
+          "width": 88,
+          "height": 96
+        }
+      },
+      {
+        "candidate": 12,
+        "sourceRect": {
+          "x": 170,
+          "y": 130,
+          "width": 100,
+          "height": 94
+        }
+      },
+      {
+        "candidate": 13,
+        "sourceRect": {
+          "x": 272,
+          "y": 130,
+          "width": 100,
+          "height": 95
+        }
+      },
+      {
+        "candidate": 14,
+        "sourceRect": {
+          "x": 374,
+          "y": 129,
+          "width": 100,
+          "height": 96
+        }
+      },
+      {
+        "candidate": 15,
+        "sourceRect": {
+          "x": 477,
+          "y": 123,
+          "width": 132,
+          "height": 102
+        }
+      },
+      {
+        "candidate": 16,
+        "sourceRect": {
+          "x": 612,
+          "y": 139,
+          "width": 133,
+          "height": 86
+        }
+      },
+      {
+        "candidate": 17,
+        "sourceRect": {
+          "x": 0,
+          "y": 232,
+          "width": 86,
+          "height": 106
+        }
+      },
+      {
+        "candidate": 18,
+        "sourceRect": {
+          "x": 92,
+          "y": 240,
+          "width": 81,
+          "height": 98
+        }
+      },
+      {
+        "candidate": 19,
+        "sourceRect": {
+          "x": 179,
+          "y": 243,
+          "width": 132,
+          "height": 95
+        }
+      },
+      {
+        "candidate": 20,
+        "sourceRect": {
+          "x": 314,
+          "y": 259,
+          "width": 139,
+          "height": 79
+        }
+      },
+      {
+        "candidate": 21,
+        "sourceRect": {
+          "x": 457,
+          "y": 259,
+          "width": 90,
+          "height": 79
+        }
+      }
+    ],
+    "hit": [
+      {
+        "draftPose": 25
+      },
+      {
+        "draftPose": 26
+      },
+      {
+        "draftPose": 27
+      },
+      {
+        "draftPose": 28
+      }
+    ],
+    "defeat": [
+      {
+        "draftPose": 30
+      },
+      {
+        "draftPose": 31
+      },
+      {
+        "draftPose": 32
+      },
+      {
+        "draftPose": 33
+      },
+      {
+        "draftPose": 34
+      },
+      {
+        "draftPose": 35
+      },
+      {
+        "draftPose": 35
+      },
+      {
+        "draftPose": 35
+      }
+    ]
+  }
+}

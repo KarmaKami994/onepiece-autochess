@@ -875,9 +875,10 @@ describe("Monster Point presentation", () => {
     expect(phaserSource).toContain('event.kind === "transform" && source');
     expect(phaserSource).toContain('showCastName(source, event.label ?? "Monster Point")');
     expect(phaserSource).toContain(
-      "const visual = formVisualDefinition(event.toFormId)",
+      "if (unitId) this.refreshUnitBody(unitId)",
     );
-    expect(phaserSource).toContain("formOverlayKey(event.toFormId)");
+    expect(phaserSource).toContain("body.overlay = this.add.image(0, -4, formOverlayKey(formId))");
+    expect(phaserSource).toContain("formId && !definition?.formId");
     expect(phaserSource).toMatch(
       /showCastName\(source, event\.label \?\? "Monster Point"\);[\s\S]*?if \(!reduceMotion\)/,
     );

@@ -1,0 +1,12 @@
+Create ONE frozen pixel-art ANIMATION AUTHORING DRAFT for KILLER from One Piece. Preserve the original reference's blue/white striped face-covering metal helmet with narrow eye slits, long blond mane, sleeveless BLUE shirt, blue jeans, tan muscular arms, boots and TWO curved wrist-mounted scythe blades. No uncovered face, no new outfit.
+Reference 1 is the character identity / original sheet. Reference 2 is the accepted B10 pixel style ONLY; do not copy its character or clothing.
+Transparent square canvas, exactly 1254 x 1254. EXACT 6 columns x 6 rows, each cell 209 x 209. One isolated complete SAME character in every cell, canonical 3/4 RIGHT facing. Same fixed body scale, bottom-centred anchor, generous margins. Body about 150 pixels tall on this source canvas, later exported at 82px. All weapons/limbs remain inside their own cell.
+Crisp low-resolution pixel clusters, warm dark outline, upper-left light, 3-value ramps; visible at 82px. No smooth illustration, no 3D, no chibi restyling. Stable face, hair, outfit and equipment across all 36 drawings.
+Six GENUINELY DIFFERENT BODY poses per row, no translated/scaled/rotated whole-image copies:
+Row 1 IDLE: six subtle guard/breathing poses, actual elbow/shoulder/knee changes, calm closed loop.
+Row 2 MOVE: six grounded running cycle poses with genuinely alternating feet/knees and opposing arms; blades held safely.
+Row 3 ATTACK: six dual-scythe slashing poses: wind-up, draw back, forward step, decisive slash RIGHT, follow-through, retract; blades fit the cell.
+Row 4 CAST: six distinct spinning dual-blade ability poses: crouch, arms open, torso twist, both scythes extend RIGHT, follow-through, recovery; no painted slash FX.
+Row 5 HIT: six guarded recoil/torso-compression/arm-response poses, recover.
+Row 6 DEFEAT: six stages stagger, knee buckles, kneel, hand to ground, fall, final resting body. Whole figure remains in its cell.
+No text, grid lines, labels, letters, numbers, background/checkerboard, ground disc/shadow, coloured rim, aura, particles or FX. This is a source draft for subsequent local curation and pixel cleanup, not an unreviewed production atlas.

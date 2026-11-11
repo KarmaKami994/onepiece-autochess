@@ -89,9 +89,9 @@ describe("P12 named PvE encounters", () => {
       expect(metadata.frameCount).toBe(46);
       expect(animation!.idleVisualTopPx).toBe(metadata.frame.idleVisualTopPx);
     }
-    expect(getCrewAnimationDefinition("cp9-elite-laser")?.assetKey).toBe("cp9-elite-v2");
-    expect(getCrewAnimationDefinition("donquixote-officer-artillery")?.assetKey).toBe("donquixote-officer-v2");
-    expect(getCrewAnimationDefinition("beast-pirate-assault")?.assetKey).toBe("beast-pirate-v2");
+    expect(getCrewAnimationDefinition("cp9-elite-laser")?.assetKey).toBe("cp9-elite-b11-v2");
+    expect(getCrewAnimationDefinition("donquixote-officer-artillery")?.assetKey).toBe("donquixote-officer-b11-v2");
+    expect(getCrewAnimationDefinition("beast-pirate-assault")?.assetKey).toBe("beast-pirate-b11-v2");
   });
 
   it("records every P12 source, processing rule, and permission basis", async () => {
