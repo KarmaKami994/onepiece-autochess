@@ -15,6 +15,8 @@ export type CrewAnimationClip = {
 
 export type CrewAnimationDefinition = {
   contentId: string;
+  /** Presentation identity only; never changes the economic unit definition. */
+  formId?: string;
   assetKey: string;
   kind: "crew" | "pve";
   version: "v1" | "v2";
@@ -316,11 +318,31 @@ export const PVE_ANIMATION_MANIFEST = {
   "beast-pirate-artillery": pveV2Definition("beast-pirate-artillery", 84, 8, "beast-pirate"),
 } as const satisfies Record<string, CrewAnimationDefinition>;
 
+function b10Pilot(
+  base: CrewAnimationDefinition,
+  id: string,
+  idleVisualTopPx: number,
+  formId?: string,
+): CrewAnimationDefinition {
+  const assetKey = `${id}-b10-v2`;
+  return { ...base, assetKey, sheetPath: `/assets/animations/${assetKey}/${assetKey}.png`, idleVisualTopPx, formId };
+}
+
+export const B10_ANIMATION_PILOTS = {
+  koala: b10Pilot(CREW_V2_ANIMATIONS.koala, "koala", 29),
+  kaido: b10Pilot(PVE_ANIMATION_MANIFEST.kaido, "kaido", 13),
+} as const;
+
+export const FORM_ANIMATION_MANIFEST: Readonly<Record<string, CrewAnimationDefinition>> = {
+  "robin-demonio-fleur": b10Pilot(CREW_V2_ANIMATIONS.robin, "robin-demonio-fleur", 17, "robin-demonio-fleur"),
+};
+
 export const ANIMATION_CONTENT_MANIFEST = {
   ...CREW_ANIMATION_MANIFEST,
   ...CREW_V2_ANIMATIONS,
   luffy: LUFFY_V2_ANIMATION,
   ...PVE_ANIMATION_MANIFEST,
+  ...B10_ANIMATION_PILOTS,
 } as const satisfies Record<string, CrewAnimationDefinition>;
 
 const CREW_VARIANT_OVERRIDES: Partial<Record<string, CrewAnimationDefinition[]>> = {
@@ -369,18 +391,23 @@ export function resolveAnimationCandidates(
   return [...(base ? [base] : []), ...variants];
 }
 
-export function getCrewAnimationDefinitions(contentId: string) {
+export function getCrewAnimationDefinitions(contentId: string, formId?: string) {
   const base = CREW_ANIMATION_MANIFEST[
     contentId as keyof typeof CREW_ANIMATION_MANIFEST
   ] as CrewAnimationDefinition | undefined;
   const pve = PVE_ANIMATION_MANIFEST[
     contentId as keyof typeof PVE_ANIMATION_MANIFEST
   ] as CrewAnimationDefinition | undefined;
-  return resolveAnimationCandidates(
+  const candidates = resolveAnimationCandidates(
     base,
     CREW_VARIANT_OVERRIDES[contentId] ?? [],
     pve,
   );
+  const pilot = B10_ANIMATION_PILOTS[contentId as keyof typeof B10_ANIMATION_PILOTS];
+  if (pilot) candidates.push(pilot);
+  const form = formId ? FORM_ANIMATION_MANIFEST[formId] : undefined;
+  if (form?.contentId === contentId) candidates.push(form);
+  return candidates;
 }
 
 export const ALL_CREW_ANIMATION_DEFINITIONS = [
@@ -390,13 +417,13 @@ export const ALL_CREW_ANIMATION_DEFINITIONS = [
     "luffy",
     ...Object.keys(PVE_ANIMATION_MANIFEST),
   ]),
-].flatMap(getCrewAnimationDefinitions);
+].flatMap((contentId) => getCrewAnimationDefinitions(contentId));
 
 export const ALL_UNIT_ANIMATION_DEFINITIONS =
-  ALL_CREW_ANIMATION_DEFINITIONS;
+  [...ALL_CREW_ANIMATION_DEFINITIONS, ...Object.values(FORM_ANIMATION_MANIFEST)];
 
-export function getCrewAnimationDefinition(contentId: string) {
-  return getCrewAnimationDefinitions(contentId).at(-1);
+export function getCrewAnimationDefinition(contentId: string, formId?: string) {
+  return getCrewAnimationDefinitions(contentId, formId).at(-1);
 }
 
 export function crewSheetKey(assetKey: string) {

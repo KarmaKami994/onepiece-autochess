@@ -1,0 +1,325 @@
+{
+  "schemaVersion": 1,
+  "outputs": [
+    {
+      "path": "public/assets/animations/koala-b10-v2/koala-b10-v2.png",
+      "bytes": 37363,
+      "sha256": "d0d2f3d83f66a686b2a42b483727b7de6e3f9d4dab2ecb6cc08752d2b3953034"
+    },
+    {
+      "path": "public/assets/animations/koala-b10-v2/koala-b10-v2.json",
+      "bytes": 16092,
+      "sha256": "65e06af42a5549daeac4417af1f917842805caba1eb96b63c2a267781136571a"
+    },
+    {
+      "path": "art/production/b10/koala/body-poses.png",
+      "bytes": 32023,
+      "sha256": "7e7f30f38433c0abb276fe27b38a549d5bb939c89081084a67da8ee630a2b3f1"
+    },
+    {
+      "path": "art/production/b10/koala/frame-map.json",
+      "bytes": 11051,
+      "sha256": "c949504d4fb989120b7585e6d5e9560286a37c6a7486bb978788e4b438ad000e"
+    },
+    {
+      "path": "art/production/b10/koala/draft.png",
+      "bytes": 1406015,
+      "sha256": "0ea4e5b465e159e62b683b4ba551e1ba563b8bebfe5dee1fc1a3510c25ddb89d"
+    },
+    {
+      "path": "art/production/b10/koala/prompt.txt",
+      "bytes": 2340,
+      "sha256": "c7535b4e60602add6ea493fb7ff5dc0bbad85ee4b2bda77206daab11f679f344"
+    },
+    {
+      "path": "art/production/b10/koala/master.png",
+      "bytes": 2150,
+      "sha256": "27c56f8c500933cc3cfda69f1fe0c2072560376336111d8a3a19f3f4e71da1d9"
+    },
+    {
+      "path": "art/production/b10/koala/fx-poses.png",
+      "bytes": 2388,
+      "sha256": "a4f053ea364997e170d762fc7d3929e80f4a95ab4c06436428d4235d125a89fd"
+    },
+    {
+      "path": "art/production/b10/koala/body.aseprite",
+      "bytes": 40109,
+      "sha256": "a25516b1a92faa591e894c77228a9c401f8868475c9fdbc435b019e7ae0b1bd9"
+    },
+    {
+      "path": "public/assets/pilots/b10/koala/portrait.png",
+      "bytes": 3131,
+      "sha256": "433f015fba4f7b596ed1b6b0ad9df53c3699e6841dfe218442c420015f6562d0"
+    },
+    {
+      "path": "public/assets/pilots/b10/koala/token.png",
+      "bytes": 2108,
+      "sha256": "1d3dfa67566573248ec9902dadc8d4114fba6f3c5259c6a96cab595722fdced2"
+    },
+    {
+      "path": "art/qa/b10/koala/all-clips.gif",
+      "bytes": 41854,
+      "sha256": "78a016293bd7813d8143a67376f44f61d31d3ad0e87ba62c87b8239ab71c4d00"
+    },
+    {
+      "path": "art/qa/b10/koala/idle.gif",
+      "bytes": 6942,
+      "sha256": "42d78ba68de4a39b31e4c2b9a1b9a5602fb6da103320114bdfce1bdcfbfa3171"
+    },
+    {
+      "path": "art/qa/b10/koala/move.gif",
+      "bytes": 8329,
+      "sha256": "a2add2ae994e0100db947f8979f6bc181bd0b8aace4c8bf7fe3484d4eda9a5b4"
+    },
+    {
+      "path": "art/qa/b10/koala/attack.gif",
+      "bytes": 8104,
+      "sha256": "5ae1b527cb66b94fb92bc39b43b5bfb4ba739ec33392c5cc374a8c87c9e64ed0"
+    },
+    {
+      "path": "art/qa/b10/koala/cast.gif",
+      "bytes": 8046,
+      "sha256": "1041b13d13bb0fadf61eac30bed03b14c21c63eab567dcf6e973fd64effe0f91"
+    },
+    {
+      "path": "art/qa/b10/koala/hit.gif",
+      "bytes": 4618,
+      "sha256": "fe8fe5d154825e4a99782b23dc429dcd0b78b16d17d3b592d7a174a96c6d5c5d"
+    },
+    {
+      "path": "art/qa/b10/koala/defeat.gif",
+      "bytes": 6220,
+      "sha256": "89fdd4c9ab4c5a29f7e1839ac196bfbfaefea2ec78cb5c3303c0bd4f87b86722"
+    },
+    {
+      "path": "public/assets/animations/kaido-b10-v2/kaido-b10-v2.png",
+      "bytes": 89352,
+      "sha256": "d9318e21d95325f59d47e2694b4fb0d86935f60b4937bfebe344b3c0cba2dc32"
+    },
+    {
+      "path": "public/assets/animations/kaido-b10-v2/kaido-b10-v2.json",
+      "bytes": 16092,
+      "sha256": "5d14bbf4ca7e1b414ea095c4a082ea87c33a8d3f98fb775519f0f3df54e68430"
+    },
+    {
+      "path": "art/production/b10/kaido/body-poses.png",
+      "bytes": 78757,
+      "sha256": "076e242838efe393457d1369c393a3f73e199199d80a615b3fd13740429edd6a"
+    },
+    {
+      "path": "art/production/b10/kaido/frame-map.json",
+      "bytes": 11051,
+      "sha256": "c949504d4fb989120b7585e6d5e9560286a37c6a7486bb978788e4b438ad000e"
+    },
+    {
+      "path": "art/production/b10/kaido/draft.png",
+      "bytes": 2143311,
+      "sha256": "b49311a79f98c651d8234853795791d6e5b8fc57a39c2d27092211e8a9b83824"
+    },
+    {
+      "path": "art/production/b10/kaido/prompt.txt",
+      "bytes": 2214,
+      "sha256": "d7ada1d4dcefe428a1c7189a451d735798c8fa42ef90e922f81dfd7c2f31dcc1"
+    },
+    {
+      "path": "art/production/b10/kaido/master.png",
+      "bytes": 4044,
+      "sha256": "e6653e3fce376b41c0934f1a6ba15aac4e0b63ef21140d6ec5de3ff04bd86d67"
+    },
+    {
+      "path": "art/production/b10/kaido/fx-poses.png",
+      "bytes": 2388,
+      "sha256": "a4f053ea364997e170d762fc7d3929e80f4a95ab4c06436428d4235d125a89fd"
+    },
+    {
+      "path": "art/production/b10/kaido/body.aseprite",
+      "bytes": 91762,
+      "sha256": "ac5d6dc339482f47f3cfab2cd258f7b547eb7a884db921284fc2578df7280997"
+    },
+    {
+      "path": "public/assets/pilots/b10/kaido/portrait.png",
+      "bytes": 6546,
+      "sha256": "7c34e2f64eb508641956a266b50bbb4e9afa58b257c0fb624b9cd015c4848d70"
+    },
+    {
+      "path": "public/assets/pilots/b10/kaido/token.png",
+      "bytes": 4513,
+      "sha256": "573790d39bf3c40dac1c1fc5b473a599f30fa0d17d9f474f3b638983468b799f"
+    },
+    {
+      "path": "art/qa/b10/kaido/all-clips.gif",
+      "bytes": 90776,
+      "sha256": "83fd65de3e383062ab2d9107a18c6707d90dcc7e3b9abaf4b3fa5e0ba123da6a"
+    },
+    {
+      "path": "art/qa/b10/kaido/idle.gif",
+      "bytes": 15362,
+      "sha256": "bc9c1f6e43a770d7a17f431b76be9c810b1de50bfb83842b109ab7d66c4c7885"
+    },
+    {
+      "path": "art/qa/b10/kaido/move.gif",
+      "bytes": 19675,
+      "sha256": "0c57638094c55aae28970d1661352dc34859e7fe5f61d1f32db43c65bd6a63a9"
+    },
+    {
+      "path": "art/qa/b10/kaido/attack.gif",
+      "bytes": 17137,
+      "sha256": "5fe294435295b1ba5d97951e98a59d34058e8c9e1bcaf0bb92fd9f94f0448090"
+    },
+    {
+      "path": "art/qa/b10/kaido/cast.gif",
+      "bytes": 16436,
+      "sha256": "1c1a2a7be6c60b3c06f14a1b9e8ac0443e6216afbd7f39e41ab55e6663b108ed"
+    },
+    {
+      "path": "art/qa/b10/kaido/hit.gif",
+      "bytes": 9912,
+      "sha256": "c2bae457971d101b715c3f1b70ac57893dca695a30a64ebf8f2a551ddff6dc96"
+    },
+    {
+      "path": "art/qa/b10/kaido/defeat.gif",
+      "bytes": 12659,
+      "sha256": "dc293c7200656043e999b4dd95db56b5b6479106b3fcf476d7f5f57153f7ab5f"
+    },
+    {
+      "path": "public/assets/animations/robin-demonio-fleur-b10-v2/robin-demonio-fleur-b10-v2.png",
+      "bytes": 83479,
+      "sha256": "06348ef2087862066999afa6d959bd1099b7543b774812b54ccc32e664dbd950"
+    },
+    {
+      "path": "public/assets/animations/robin-demonio-fleur-b10-v2/robin-demonio-fleur-b10-v2.json",
+      "bytes": 16134,
+      "sha256": "11c2cfc830e65085921090ca8486a9af201a726b9913d7642df0d333b5319adf"
+    },
+    {
+      "path": "art/production/b10/robin-demonio-fleur/body-poses.png",
+      "bytes": 71484,
+      "sha256": "908f2f868b265c1921bbf31b3abcf3f1ec62983afd7404f33ec116476e881d01"
+    },
+    {
+      "path": "art/production/b10/robin-demonio-fleur/frame-map.json",
+      "bytes": 11051,
+      "sha256": "c949504d4fb989120b7585e6d5e9560286a37c6a7486bb978788e4b438ad000e"
+    },
+    {
+      "path": "art/production/b10/robin-demonio-fleur/draft.png",
+      "bytes": 1923990,
+      "sha256": "4cbd0aba48fffb5f7b4025e94d7e453155817c507150df2200ad99b05606fd78"
+    },
+    {
+      "path": "art/production/b10/robin-demonio-fleur/prompt.txt",
+      "bytes": 2411,
+      "sha256": "bfb873665ddea5d999edcfac9e31a35bb00a2e354a9ceba255d448995f6a21e9"
+    },
+    {
+      "path": "art/production/b10/robin-demonio-fleur/master.png",
+      "bytes": 3625,
+      "sha256": "f3154d1004c59ee1beb64b4861d2647a281587abb64216c421d5f9565ecf19df"
+    },
+    {
+      "path": "art/production/b10/robin-demonio-fleur/fx-poses.png",
+      "bytes": 2388,
+      "sha256": "a4f053ea364997e170d762fc7d3929e80f4a95ab4c06436428d4235d125a89fd"
+    },
+    {
+      "path": "art/production/b10/robin-demonio-fleur/body.aseprite",
+      "bytes": 86896,
+      "sha256": "9b6d46b1e1039acb5c93a6b3b4ba2946a9181fcad80c4fc182b809a3da352ba3"
+    },
+    {
+      "path": "public/assets/pilots/b10/robin-demonio-fleur/portrait.png",
+      "bytes": 5843,
+      "sha256": "08372647c024e1eb7fa39b4a24424f61ba93e3bab3280032b8b0844c69921a60"
+    },
+    {
+      "path": "public/assets/pilots/b10/robin-demonio-fleur/token.png",
+      "bytes": 4012,
+      "sha256": "9da2d040543e55ef13ad029d3ad04c6a1aeda171956650e8fb0ddb400bb76fba"
+    },
+    {
+      "path": "art/qa/b10/robin-demonio-fleur/all-clips.gif",
+      "bytes": 85087,
+      "sha256": "cacf99ca06c2a5bc94a341965901c3afca6845ad0f84116f0e01883f25a40a7c"
+    },
+    {
+      "path": "art/qa/b10/robin-demonio-fleur/idle.gif",
+      "bytes": 13803,
+      "sha256": "cb9feb7c352e038ec62ffaa40798cff14ddbe8ff49268350c568946a24b74c58"
+    },
+    {
+      "path": "art/qa/b10/robin-demonio-fleur/move.gif",
+      "bytes": 17684,
+      "sha256": "8d6e6d22d453e1878bb13debd9de5ee9e1233b239913d393d8117324f76f155e"
+    },
+    {
+      "path": "art/qa/b10/robin-demonio-fleur/attack.gif",
+      "bytes": 16498,
+      "sha256": "d0bd05f4bcd20170ab29dd89b55a2160e695735aab413836c62aed638d709a8c"
+    },
+    {
+      "path": "art/qa/b10/robin-demonio-fleur/cast.gif",
+      "bytes": 16513,
+      "sha256": "990d5a96b55ff6a6fb83a732c6b6dd5a4215042b03852fef506b1440f0736079"
+    },
+    {
+      "path": "art/qa/b10/robin-demonio-fleur/hit.gif",
+      "bytes": 9673,
+      "sha256": "b45dfb16f51fbfafe780daad334525b9163ba8614eed3d49575428e2af4dd64d"
+    },
+    {
+      "path": "art/qa/b10/robin-demonio-fleur/defeat.gif",
+      "bytes": 11321,
+      "sha256": "a8ed77b2dd34c659ea59ae4c2e600e4a69eed8af8bc4628ed96442070c641853"
+    },
+    {
+      "path": "art/production/b10/robin-demonio-fleur/portrait.svg",
+      "bytes": 6429,
+      "sha256": "ada6e08bafd38a5dbe7a57cb75b9b5972865274ef2aa5bf4f4e28acf4d7380c3"
+    },
+    {
+      "path": "art/production/b10/robin-demonio-fleur/token.svg",
+      "bytes": 6429,
+      "sha256": "1980323fe0fd1848b74030302f771d6c744402b40af45f944344a25a02ac4584"
+    },
+    {
+      "path": "public/assets/forms/robin-demonio-fleur/portrait.svg",
+      "bytes": 6429,
+      "sha256": "ada6e08bafd38a5dbe7a57cb75b9b5972865274ef2aa5bf4f4e28acf4d7380c3"
+    },
+    {
+      "path": "public/assets/forms/robin-demonio-fleur/token.svg",
+      "bytes": 6429,
+      "sha256": "1980323fe0fd1848b74030302f771d6c744402b40af45f944344a25a02ac4584"
+    },
+    {
+      "path": "art/production/b10/icons/sea-prism-shard.svg",
+      "bytes": 860,
+      "sha256": "8f377fb39c07ad9b4b7725097eb4cc6e1a14843a164d0f7cacc05c37e6d617c7"
+    },
+    {
+      "path": "public/assets/items/sea-prism-shard.svg",
+      "bytes": 860,
+      "sha256": "ac4734a620de12f7ac318283e6364d05ab18071f34b6692bef3efe3fe0306955"
+    },
+    {
+      "path": "art/production/b10/icons/black-blade.svg",
+      "bytes": 1008,
+      "sha256": "481c01d9dfd1f0c653e64aa597ba0be5ee75bbd31ecfc7c5808d525b03ed292c"
+    },
+    {
+      "path": "public/assets/items/black-blade.svg",
+      "bytes": 1008,
+      "sha256": "fe8605db8d84b967c9dac2be4e664cd6b9da5ba07ed932d6c9f03ba71b9851bf"
+    },
+    {
+      "path": "art/production/b10/icons/emperors-jolly-roger.svg",
+      "bytes": 934,
+      "sha256": "e25cc936abcc536c2217a11ebd09a0489597217bf43a797eba7c9bd6b786f41f"
+    },
+    {
+      "path": "public/assets/items/emperors-jolly-roger.svg",
+      "bytes": 934,
+      "sha256": "078c4cae6c7f4c583d3d3e88a19bec12d27dcfe0ebad5d09919cbc88c86c5cb2"
+    }
+  ]
+}

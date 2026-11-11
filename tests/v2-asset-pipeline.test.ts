@@ -5,6 +5,7 @@ import sharp from "sharp";
 import { describe, expect, it } from "vitest";
 import {
   CREW_V2_ANIMATIONS,
+  B10_ANIMATION_PILOTS,
   PVE_ANIMATION_MANIFEST,
   getCrewAnimationDefinitions,
 } from "../components/crewAnimationManifest";
@@ -116,12 +117,13 @@ const v1CrewIds = new Set([
 
 type SourceEntry = {
   id: string;
+  pilotFor?: string;
   kind: "crew" | "pve";
   outputAssetKey: string;
   fallbackAssetKey: string;
-  editableSource?: "licensed-reference-png";
+  editableSource?: "licensed-reference-png" | "authored-pose-board";
   source: {
-    strategy: "auto-frame-map" | "licensed-frame-map" | "procedural-cutout";
+    strategy: "auto-frame-map" | "licensed-frame-map" | "procedural-cutout" | "authored-frame-map";
     localPath: string;
     sha256: string | null;
     dimensions?: { width: number; height: number };
@@ -270,8 +272,8 @@ describe("animation v2 asset pipeline", () => {
     });
     expect(matrix.standard.missingSourcePolicy).toContain("v1");
 
-    const crew = matrix.entries.filter((entry) => entry.kind === "crew");
-    const pve = matrix.entries.filter((entry) => entry.kind === "pve");
+    const crew = matrix.entries.filter((entry) => entry.kind === "crew" && !entry.pilotFor);
+    const pve = matrix.entries.filter((entry) => entry.kind === "pve" && !entry.pilotFor);
     expect(crew.map((entry) => entry.id).sort()).toEqual(crewIds);
     expect(pve.map((entry) => entry.id).sort()).toEqual(pveVisualIds);
 
@@ -299,7 +301,7 @@ describe("animation v2 asset pipeline", () => {
       );
       const source = await readFile(path.join(projectRoot, entry.source.localPath));
       expect(sha256(source)).toBe(entry.source.sha256);
-      expect(getCrewAnimationDefinitions(entry.id).at(-1)).toMatchObject({
+      expect(getCrewAnimationDefinitions(entry.id).find((definition) => definition.assetKey === entry.outputAssetKey)).toMatchObject({
         assetKey: entry.outputAssetKey,
         kind: "crew",
         version: "v2",
@@ -310,7 +312,7 @@ describe("animation v2 asset pipeline", () => {
   it("builds every crew atlas from its SHA-pinned sheet without extreme source rectangles", async () => {
     const matrix = await sourceMatrix();
     for (const entry of matrix.entries.filter(
-      (candidate) => candidate.kind === "crew",
+      (candidate) => candidate.kind === "crew" && !candidate.pilotFor,
     )) {
       const metadata = await expectRuntimeBundle(entry);
       expect(metadata).toMatchObject({
@@ -377,7 +379,7 @@ describe("animation v2 asset pipeline", () => {
   it("bundles every PvE v2 atlas, metadata file, and editable source", async () => {
     const matrix = await sourceMatrix();
     for (const entry of matrix.entries.filter(
-      (candidate) => candidate.kind === "pve",
+      (candidate) => candidate.kind === "pve" && !candidate.pilotFor,
     )) {
       const metadata = await expectRuntimeBundle(entry);
       expect(metadata).toMatchObject({
@@ -404,11 +406,11 @@ describe("animation v2 asset pipeline", () => {
     for (const contentId of crewIds) {
       const definitions = getCrewAnimationDefinitions(contentId);
       expect(definitions.map((definition) => definition.version)).toEqual(
-        v1CrewIds.has(contentId) ? ["v1", "v2"] : ["v2"],
+        contentId === "koala" ? ["v2", "v2"] : v1CrewIds.has(contentId) ? ["v1", "v2"] : ["v2"],
       );
       expect(definitions.at(-1)).toMatchObject({
         contentId,
-        assetKey: `${contentId}-v2`,
+        assetKey: contentId === "koala" ? "koala-b10-v2" : `${contentId}-v2`,
         kind: "crew",
         frameWidth: 128,
         frameHeight: 128,
@@ -433,7 +435,7 @@ describe("animation v2 asset pipeline", () => {
         originX: 0.5,
         originY: 116 / 128,
       });
-      expect(getCrewAnimationDefinitions(contentId)).toEqual([definition]);
+      expect(getCrewAnimationDefinitions(contentId)).toEqual(contentId === "kaido" ? [definition, B10_ANIMATION_PILOTS.kaido] : [definition]);
     }
   });
 

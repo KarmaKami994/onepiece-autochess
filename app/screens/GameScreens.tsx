@@ -164,7 +164,7 @@ export function MainMenu({
           <span className="button-icon">⚙</span>
           SETTINGS
         </button>
-        <button type="button" className="pixel-button compact" onClick={onAnimationLab}>
+        <button type="button" className="pixel-button compact" disabled={!saveReady} onClick={onAnimationLab}>
           <span className="button-icon">▦</span>
           ANIMATION LAB
         </button>

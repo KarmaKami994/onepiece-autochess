@@ -1,0 +1,26 @@
+[
+  {
+    "id": "koala",
+    "path": "art/production/b10/references/koala-existing-idle.png",
+    "source": "art/licensed-reference/great-pirate-colosseum/Koala.png",
+    "sourceSha256": "7c94c32f406bd137a4cf403beaf3007f540b1e1092dde07817510a967702da6d"
+  },
+  {
+    "id": "kaido",
+    "path": "art/production/b10/references/kaido-existing-idle.png",
+    "source": "art/licensed-reference/great-pirate-colosseum/Kaido.png",
+    "sourceSha256": "6d79b1b23f29ae8114551b7626b2dead05f186cd060795c258cef9fd30197458"
+  },
+  {
+    "id": "robin",
+    "path": "art/production/b10/references/robin-existing-idle.png",
+    "source": "art/licensed-reference/gigant-battle-2/NicoRobin.png",
+    "sourceSha256": "7d133c5d9d9e5e83e30179b527d2cb6110b95f5e6834ea9742a907b12c23f8a6"
+  },
+  {
+    "id": "zoro",
+    "path": "art/production/b10/references/zoro-existing-idle.png",
+    "source": "art/licensed-reference/gigant-battle-2/RoronoaZoro.png",
+    "sourceSha256": "9c657fa9eaafd0b84d87185b30981723c22d58b5db4bfe263032b3ec772d3e76"
+  }
+]

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import {
   ANIMATION_CONTENT_MANIFEST,
+  FORM_ANIMATION_MANIFEST,
   getCrewAnimationDefinitions,
   type CrewAnimationDefinition,
   type CrewAnimationState,
@@ -65,7 +66,7 @@ function spriteStyle(
 
 export default function AnimationLab({ onBack }: { onBack: () => void }) {
   const rosterDefinitions = useMemo(
-    () => Object.values(ANIMATION_CONTENT_MANIFEST),
+    () => [...Object.values(ANIMATION_CONTENT_MANIFEST), ...Object.values(FORM_ANIMATION_MANIFEST)],
     [],
   );
   const [contentId, setContentId] = useState<string>(
@@ -77,7 +78,13 @@ export default function AnimationLab({ onBack }: { onBack: () => void }) {
   const [playing, setPlaying] = useState(true);
   const [elapsedMs, setElapsedMs] = useState(0);
   const definitions = useMemo(
-    () => getCrewAnimationDefinitions(contentId),
+    () => {
+      const form = FORM_ANIMATION_MANIFEST[contentId];
+      const candidates = getCrewAnimationDefinitions(form?.contentId ?? contentId, form?.formId);
+      // Compare a form with its preferred base body. Legacy base variants remain
+      // available under the ordinary crew entry, without a clipped third panel.
+      return form ? candidates.slice(-2) : candidates;
+    },
     [contentId],
   );
   const primaryDefinition = definitions.at(-1);
@@ -128,9 +135,9 @@ export default function AnimationLab({ onBack }: { onBack: () => void }) {
               }}
             >
               {rosterDefinitions.map((candidate) => (
-                <option key={candidate.contentId} value={candidate.contentId}>
-                  {candidate.kind === "pve" ? "PVE · " : "CREW · "}
-                  {candidate.contentId.toUpperCase()}
+                <option key={candidate.formId ?? candidate.contentId} value={candidate.formId ?? candidate.contentId}>
+                  {candidate.formId ? "FORM · " : candidate.kind === "pve" ? "PVE · " : "CREW · "}
+                  {(candidate.formId ?? candidate.contentId).toUpperCase()}
                 </option>
               ))}
             </select>
@@ -214,7 +221,7 @@ export default function AnimationLab({ onBack }: { onBack: () => void }) {
               <article
                 className="animation-preview-panel"
                 key={definition.assetKey}
-                aria-label={`${definition.contentId} ${definition.version} preview`}
+                aria-label={`${definition.formId ?? definition.contentId} ${definition.assetKey} preview`}
               >
                 <div className="animation-preview-stage">
                   <div className="animation-deck-grid" aria-hidden="true" />

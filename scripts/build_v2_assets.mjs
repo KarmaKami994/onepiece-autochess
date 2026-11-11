@@ -32,7 +32,7 @@ async function makeEditable(libreSprite, gif, editable) {
 }
 
 async function buildMatrixEntry(entry, libreSprite, skipEditable) {
-  const createsLibreSpriteEditable = entry.editableSource !== "licensed-reference-png";
+  const createsLibreSpriteEditable = !["licensed-reference-png", "authored-pose-board"].includes(entry.editableSource);
   const staging = path.join(os.tmpdir(), `grand-line-v2-${entry.id}-${randomUUID()}`);
   const frames = path.join(staging, "frames");
   const sheet = path.join(staging, `${entry.outputAssetKey}.png`);

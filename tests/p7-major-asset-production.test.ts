@@ -116,7 +116,7 @@ describe("P7 major asset production", () => {
     for (const id of newCrewIds) {
       expect(CREW_ANIMATION_MANIFEST).not.toHaveProperty(id);
       expect(getCrewAnimationDefinitions(id).map((entry) => entry.version))
-        .toEqual(["v2"]);
+        .toEqual(id === "koala" ? ["v2", "v2"] : ["v2"]);
     }
   });
 
