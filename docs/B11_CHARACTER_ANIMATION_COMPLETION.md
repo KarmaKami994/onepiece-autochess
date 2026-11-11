@@ -96,12 +96,16 @@ the owner-approved checks; asset source generation alone is not runtime PASS.
 
 Owner explicitly approved the focused B11 atlas/form/fallback/save/replay/Phoenix
 scope, typecheck/lint, assets, build, both desktop browser sizes and normal PR CI.
-Local results: **188/188 focused tests**, **12/12 browser cases** in both desktop
+Local results: **245/245 focused test cases**, **12/12 browser cases** in both desktop
 sizes, typecheck/lint/assets/build PASS; 137 atlases validated. Normal PR CI
 is the [live PR gate](https://github.com/KarmaKami994/onepiece-autochess/pull/73/checks). Results and initial fixture/provenance corrections are
 recorded in `PROJECT_STATE.md` and the PR. Initial CI passed 958/959; its sole
 P9 single-v2 expectation now explicitly covers retained original + preferred
-B11 variants (affected P9 20/20, typecheck and affected lint PASS). No separate local
+B11 variants (affected P9 20/20, typecheck and affected lint PASS). CI #185
+then passed all 959 normal tests; its coverage run hit the new monolithic
+58-package test deadline. The same assertions are now isolated per package
+under the unchanged timeout (B11 62/62). This adds 57 case boundaries, no
+extra package checks or weakened thresholds. No separate local
 production aggregate, baseline or 1,000-seed soak. No gameplay, unlock/catalyst,
 item/form numbers, bot, economy, RNG or save-format change. No B12 work.
 

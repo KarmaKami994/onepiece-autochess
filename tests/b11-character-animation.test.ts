@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { access, readFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
@@ -15,6 +16,7 @@ type Rect = { x: number; y: number; width: number; height: number };
 type Frame = { state: CrewAnimationState; sourceRect: Rect; sourcePivot: { x: number; y: number } };
 type Entry = { productionFor?: string; outputAssetKey: string; source: { localPath: string; sha256: string; frameMap: string; frameMapSha256: string } };
 type Selection = { sourceType: string; preservedStates: string[]; supplementalStates: string[] | null; selections: Record<CrewAnimationState, { sourceRect?: Rect; candidate?: number }[]> };
+const productionSources = (JSON.parse(readFileSync(path.join(root, "art/animation-v2/source-matrix.json"), "utf8")) as { entries: Entry[] }).entries.filter(entry => entry.productionFor);
 
 function trimmedCellHash(pixels: Buffer, width: number, rect: Rect): string {
   let left = 128, top = 128, right = -1, bottom = -1;
@@ -37,6 +39,7 @@ describe("B11 complete character/form/PvE presentation", () => {
     expect(DEFAULT_CONTENT.units).toHaveLength(34);
     expect(DEFAULT_CONTENT.enemies).toHaveLength(29);
     expect(DEFAULT_CONTENT.forms).toHaveLength(4);
+    expect(productionSources).toHaveLength(58);
     expect(Object.keys(B11_ANIMATION_MANIFEST)).toHaveLength(60);
     const preferred = [...DEFAULT_CONTENT.units, ...DEFAULT_CONTENT.enemies].map(unit => getCrewAnimationDefinitions(unit.id).at(-1));
     expect(preferred.every(definition => definition?.frameCount === 46)).toBe(true);
@@ -58,41 +61,38 @@ describe("B11 complete character/form/PvE presentation", () => {
     }
   });
 
-  it("pins all 58 new sources/maps and keeps complete six-clip local export packages", async () => {
-    const matrix = JSON.parse((await read("art/animation-v2/source-matrix.json")).toString()) as { entries: Entry[] };
-    const entries = matrix.entries.filter(entry => entry.productionFor);
-    expect(entries).toHaveLength(58);
+  // Keep the same assertions, isolated per package within the normal 5s timeout
+  // even when the full suite runs under V8 coverage on the shared CI runner.
+  it.each(productionSources)("pins six-clip source/map/export package $productionFor", async (entry) => {
     const minimum: Record<CrewAnimationState, number> = { idle: 3, move: 6, attack: 5, cast: 6, hit: 2, defeat: 5 };
-    for (const entry of entries) {
-      const id = entry.productionFor!, directory = `art/production/b11/${id}`;
-      const body = await read(entry.source.localPath);
-      const rgba = await sharp(body).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
-      expect(sha(body), id).toBe(entry.source.sha256);
-      const map = await read(entry.source.frameMap);
-      expect(sha(map), id).toBe(entry.source.frameMapSha256);
-      const frames = (JSON.parse(map.toString()) as { frames: Frame[] }).frames;
-      expect(frames, id).toHaveLength(46);
-      const selection = JSON.parse((await read(`${directory}/selection.json`)).toString()) as Selection;
-      for (const state of Object.keys(minimum) as CrewAnimationState[]) {
-        const clip = frames.filter(frame => frame.state === state);
-        const distinct = new Set<string>();
-        for (const frame of clip) {
-          expect(frame.sourcePivot).toEqual({ x: frame.sourceRect.x + 64, y: frame.sourceRect.y + 116 });
-          distinct.add(trimmedCellHash(rgba.data, rgba.info.width, frame.sourceRect));
-        }
-        // Faithful imported short clips are explicitly documented source limits.
-        // Every newly authored/native clip has the B10 true-drawing minimum.
-        const original = selection.preservedStates.includes(state);
-        expect(distinct.size, `${id}/${state}`).toBeGreaterThanOrEqual(original ? Math.min(minimum[state], new Set(selection.selections[state].map(pose => pose.candidate)).size) : minimum[state]);
+    const id = entry.productionFor!, directory = `art/production/b11/${id}`;
+    const body = await read(entry.source.localPath);
+    const rgba = await sharp(body).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    expect(sha(body), id).toBe(entry.source.sha256);
+    const map = await read(entry.source.frameMap);
+    expect(sha(map), id).toBe(entry.source.frameMapSha256);
+    const frames = (JSON.parse(map.toString()) as { frames: Frame[] }).frames;
+    expect(frames, id).toHaveLength(46);
+    const selection = JSON.parse((await read(`${directory}/selection.json`)).toString()) as Selection;
+    for (const state of Object.keys(minimum) as CrewAnimationState[]) {
+      const clip = frames.filter(frame => frame.state === state);
+      const distinct = new Set<string>();
+      for (const frame of clip) {
+        expect(frame.sourcePivot).toEqual({ x: frame.sourceRect.x + 64, y: frame.sourceRect.y + 116 });
+        distinct.add(trimmedCellHash(rgba.data, rgba.info.width, frame.sourceRect));
       }
-      const alpha = new Set<number>();
-      for (let i = 3; i < rgba.data.length; i += 4) alpha.add(rgba.data[i]);
-      expect([...alpha].sort((a, b) => a - b)).toEqual([0, 255]);
-      const atlas = await read(`public/assets/animations/${entry.outputAssetKey}/${entry.outputAssetKey}.png`);
-      expect(atlas.length, id).toBeLessThanOrEqual(512 * 1024);
-      expect(await sharp(atlas).metadata()).toMatchObject({ width: 1024, height: 768 });
-      for (const file of [`${directory}/body.aseprite`, `${directory}/master.png`, `${directory}/fx-poses.png`, `art/qa/b11/${id}/clips.png`, `art/qa/b11/${id}/all-clips.gif`]) await access(path.join(root, file));
+      // Faithful imported short clips are explicitly documented source limits.
+      // Every newly authored/native clip has the B10 true-drawing minimum.
+      const original = selection.preservedStates.includes(state);
+      expect(distinct.size, `${id}/${state}`).toBeGreaterThanOrEqual(original ? Math.min(minimum[state], new Set(selection.selections[state].map(pose => pose.candidate)).size) : minimum[state]);
     }
+    const alpha = new Set<number>();
+    for (let i = 3; i < rgba.data.length; i += 4) alpha.add(rgba.data[i]);
+    expect([...alpha].sort((a, b) => a - b)).toEqual([0, 255]);
+    const atlas = await read(`public/assets/animations/${entry.outputAssetKey}/${entry.outputAssetKey}.png`);
+    expect(atlas.length, id).toBeLessThanOrEqual(512 * 1024);
+    expect(await sharp(atlas).metadata()).toMatchObject({ width: 1024, height: 768 });
+    for (const file of [`${directory}/body.aseprite`, `${directory}/master.png`, `${directory}/fx-poses.png`, `art/qa/b11/${id}/clips.png`, `art/qa/b11/${id}/all-clips.gif`]) await access(path.join(root, file));
   });
 
   it("retains original good clips and freezes explicit source rectangles for the three hybrid sheets", async () => {
