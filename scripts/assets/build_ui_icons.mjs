@@ -9,6 +9,14 @@ const PUBLIC = path.join(ROOT, "public", "assets");
 const UI_SOURCE = path.join(ROOT, "art", "ui-icons");
 const QA = path.join(ROOT, "art", "qa");
 const SOURCES_ONLY = process.argv.includes("--sources-only");
+const B10_ICON_PILOTS = new Set(["sea-prism-shard", "black-blade", "emperors-jolly-roger"]);
+
+async function itemSvg(spec) {
+  if (!B10_ICON_PILOTS.has(spec.id)) return frameSvg(spec, "item");
+  // Hand-edited 48px vector/pixel master; never replace with the old motif.
+  return (await readFile(path.join(ROOT, "art/production/b10/icons", `${spec.id}.svg`), "utf8"))
+    .replace('width="48" height="48"', 'width="96" height="96"');
+}
 
 const NEW_CREW = [
   "koby", "koala", "franky", "brook", "ivankov", "jinbe",
@@ -178,14 +186,18 @@ async function writeIconFamilies() {
     readFile(path.join(UI_SOURCE, "status-icons.json"), "utf8").then(JSON.parse),
   ]);
   for (const directory of ["items", "traits", "status", "forms"]) await mkdir(path.join(PUBLIC, directory), { recursive: true });
-  for (const spec of items.items) await writeFile(path.join(PUBLIC, "items", `${spec.id}.svg`), frameSvg(spec, "item"));
+  for (const spec of items.items) await writeFile(path.join(PUBLIC, "items", `${spec.id}.svg`), await itemSvg(spec));
   for (const spec of traits.traits) await writeFile(path.join(PUBLIC, "traits", `${spec.id}.svg`), traitSvg(spec));
   for (const spec of statuses.statuses) await writeFile(path.join(PUBLIC, "status", `${spec.id}.svg`), statusSvg(spec));
   for (const id of ["robin-demonio-fleur", "luffy-gear-4-boundman", "luffy-gear-4-snakeman", "chopper-monster-point"]) {
     const directory = path.join(PUBLIC, "forms", id);
     await mkdir(directory, { recursive: true });
-    await writeFile(path.join(directory, "portrait.svg"), formSvg(id, 320));
-    await writeFile(path.join(directory, "token.svg"), formSvg(id, 160));
+    for (const [name, size] of [["portrait", 320], ["token", 160]]) {
+      const svg = id === "robin-demonio-fleur"
+        ? await readFile(path.join(ROOT, "art/production/b10", id, `${name}.svg`), "utf8")
+        : formSvg(id, size);
+      await writeFile(path.join(directory, `${name}.svg`), svg);
+    }
     await writeFile(path.join(directory, "overlay.svg"), formSvg(id, 128, true));
   }
   return { items: items.items, traits: traits.traits, statuses: statuses.statuses };

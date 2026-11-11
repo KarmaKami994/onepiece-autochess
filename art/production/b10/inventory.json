@@ -1,0 +1,2553 @@
+{
+  "schemaVersion": 1,
+  "base": "74cea3577eba98a07911b2d488abd3ece20b373d",
+  "entries": [
+    {
+      "id": "nami",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "nami-v2",
+      "source": "art/licensed-reference/gigant-battle-2/Nami.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 341,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "usopp",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "usopp-v2",
+      "source": "art/licensed-reference/gigant-battle-2/Usopp.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 425,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "chopper",
+      "kind": "crew",
+      "bodyClass": "small",
+      "originalAsset": "chopper-v2",
+      "source": "art/licensed-reference/gigant-battle-2/Chopper.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 380,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "tashigi",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "tashigi-v2",
+      "source": "art/licensed-reference/gigant-battle/Tashigi.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 29,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "koby",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "koby-v2",
+      "source": "art/licensed-reference/gigant-battle-2/Coby.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 328,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "koala",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "koala-v2",
+      "source": "art/licensed-reference/great-pirate-colosseum/Koala.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 3,
+      "clips": {
+        "idle": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 3,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 3,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 3,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 3,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 3,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 3,
+          "visuallyApproved": false
+        }
+      },
+      "pilot": "koala-b10-v2",
+      "pilotReview": "kuratieren — all six clips authored; owner / board review pending"
+    },
+    {
+      "id": "sanji",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "sanji-v2",
+      "source": "art/licensed-reference/gigant-battle-2/Sanji.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 728,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "robin",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "robin-v2",
+      "source": "art/licensed-reference/gigant-battle-2/NicoRobin.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 490,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "smoker",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "smoker-v2",
+      "source": "art/licensed-reference/gigant-battle-2/Smoker.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 254,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "sabo",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "sabo-v2",
+      "source": "art/licensed-reference/great-pirate-colosseum/Sabo.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 219,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "franky",
+      "kind": "crew",
+      "bodyClass": "large",
+      "originalAsset": "franky-v2",
+      "source": "art/licensed-reference/gigant-battle-2/Franky.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 309,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "brook",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "brook-v2",
+      "source": "art/licensed-reference/gigant-battle-2/Brook.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 338,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "ivankov",
+      "kind": "crew",
+      "bodyClass": "large",
+      "originalAsset": "ivankov-v2",
+      "source": "art/licensed-reference/gigant-battle/Ivankov.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 352,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "killer",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "killer-v2",
+      "source": "art/licensed-reference/great-pirate-colosseum/Killer.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 2,
+      "clips": {
+        "idle": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 2,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 2,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 2,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 2,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 2,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 2,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "luffy",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "luffy-v2",
+      "source": "art/licensed-reference/gigant-battle/MonkeyDLuffy.png",
+      "detectedCandidates": null,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 3,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 5,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "zoro",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "zoro-v2",
+      "source": "art/licensed-reference/gigant-battle-2/RoronoaZoro.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 624,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "kid",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "kid-v2",
+      "source": "art/licensed-reference/gigant-battle-2/EustassKid.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 284,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "crocodile",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "crocodile-v2",
+      "source": "art/licensed-reference/gigant-battle/Crocodile.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 285,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "jinbe",
+      "kind": "crew",
+      "bodyClass": "large",
+      "originalAsset": "jinbe-v2",
+      "source": "art/licensed-reference/gigant-battle/Jinbei.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 284,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "kuma",
+      "kind": "crew",
+      "bodyClass": "large",
+      "originalAsset": "kuma-v2",
+      "source": "art/licensed-reference/gigant-battle/BartholomewKuma.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 223,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "buggy",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "buggy-v2",
+      "source": "art/licensed-reference/gigant-battle/Buggy.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 407,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "law",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "law-v2",
+      "source": "art/licensed-reference/gigant-battle-2/TrafalgarLaw.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 344,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "ace",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "ace-v2",
+      "source": "art/licensed-reference/gigant-battle/Ace.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 462,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "hancock",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "hancock-v2",
+      "source": "art/licensed-reference/gigant-battle/BoaHancock.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 358,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "doflamingo",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "doflamingo-v2",
+      "source": "art/licensed-reference/gigant-battle-2/DonquixoteDoflamingo.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 354,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "kizaru",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "kizaru-v2",
+      "source": "art/licensed-reference/gigant-battle/Kizaru.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 334,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "kuzan",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "kuzan-v2",
+      "source": "art/licensed-reference/gigant-battle/Aokiji.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 305,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "akainu",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "akainu-v2",
+      "source": "art/licensed-reference/gigant-battle/Akainu.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 325,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "capone-bege",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "capone-bege-v2",
+      "source": "art/licensed-reference/gigant-battle-2/CaponeBege.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 11,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 11,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "garp",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "garp-v2",
+      "source": "art/licensed-reference/gigant-battle/Garp.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 34,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "mihawk",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "mihawk-v2",
+      "source": "art/licensed-reference/gigant-battle/DraculeMihawk.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 302,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "shanks",
+      "kind": "crew",
+      "bodyClass": "normal",
+      "originalAsset": "shanks-v2",
+      "source": "art/licensed-reference/gigant-battle-2/Shanks.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 296,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "blackbeard",
+      "kind": "crew",
+      "bodyClass": "large",
+      "originalAsset": "blackbeard-v2",
+      "source": "art/licensed-reference/great-pirate-colosseum/Blackbeard.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 109,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "whitebeard",
+      "kind": "crew",
+      "bodyClass": "large",
+      "originalAsset": "whitebeard-v2",
+      "source": "art/licensed-reference/gigant-battle/Whitebeard.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 330,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "marine-recruit",
+      "kind": "pve",
+      "bodyClass": "normal",
+      "originalAsset": "marine-recruit-v2",
+      "source": "public/assets/enemies/marine-recruit.png",
+      "strategy": "procedural-cutout",
+      "detectedCandidates": null,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "rifle-marine",
+      "kind": "pve",
+      "bodyClass": "normal",
+      "originalAsset": "rifle-marine-v2",
+      "source": "public/assets/enemies/rifle-marine.png",
+      "strategy": "procedural-cutout",
+      "detectedCandidates": null,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "pirate-raider",
+      "kind": "pve",
+      "bodyClass": "normal",
+      "originalAsset": "pirate-raider-v2",
+      "source": "public/assets/enemies/pirate-raider.png",
+      "strategy": "procedural-cutout",
+      "detectedCandidates": null,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "pacifista",
+      "kind": "pve",
+      "bodyClass": "large",
+      "originalAsset": "pacifista-v2",
+      "source": "public/assets/enemies/pacifista.png",
+      "strategy": "procedural-cutout",
+      "detectedCandidates": null,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "sea-king",
+      "kind": "pve",
+      "bodyClass": "large",
+      "originalAsset": "sea-king-v2",
+      "source": "public/assets/enemies/sea-king.png",
+      "strategy": "procedural-cutout",
+      "detectedCandidates": null,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "vice-admiral",
+      "kind": "pve",
+      "bodyClass": "normal",
+      "originalAsset": "vice-admiral-v2",
+      "source": "public/assets/enemies/vice-admiral.png",
+      "strategy": "procedural-cutout",
+      "detectedCandidates": null,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "cipher-pol-agent",
+      "kind": "pve",
+      "bodyClass": "normal",
+      "originalAsset": "cipher-pol-agent-v2",
+      "source": "public/assets/enemies/cipher-pol-agent.png",
+      "strategy": "procedural-cutout",
+      "detectedCandidates": null,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "seraphim",
+      "kind": "pve",
+      "bodyClass": "large",
+      "originalAsset": "seraphim-v2",
+      "source": "public/assets/enemies/seraphim.png",
+      "strategy": "procedural-cutout",
+      "detectedCandidates": null,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "arlong",
+      "kind": "pve",
+      "bodyClass": "large",
+      "originalAsset": "arlong-v2",
+      "source": "art/licensed-reference/gigant-battle/Arlong.PNG",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 15,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 3,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "fish-man-raider",
+      "kind": "pve",
+      "bodyClass": "normal",
+      "originalAsset": "fish-man-raider-v2",
+      "source": "public/assets/enemies/fish-man-raider.png",
+      "strategy": "procedural-cutout",
+      "detectedCandidates": null,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "enel",
+      "kind": "pve",
+      "bodyClass": "large",
+      "originalAsset": "enel-v2",
+      "source": "art/licensed-reference/gigant-battle-2/Enel.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 266,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "skypiea-priest",
+      "kind": "pve",
+      "bodyClass": "normal",
+      "originalAsset": "skypiea-priest-v2",
+      "source": "public/assets/enemies/skypiea-priest.png",
+      "strategy": "procedural-cutout",
+      "detectedCandidates": null,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "rob-lucci",
+      "kind": "pve",
+      "bodyClass": "large",
+      "originalAsset": "rob-lucci-v2",
+      "source": "art/licensed-reference/gigant-battle-2/RobLucci.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 145,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "cp9-elite",
+      "kind": "pve",
+      "bodyClass": "normal",
+      "originalAsset": "cp9-elite-v2",
+      "source": "public/assets/enemies/cp9-elite.png",
+      "strategy": "procedural-cutout",
+      "detectedCandidates": null,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "magellan",
+      "kind": "pve",
+      "bodyClass": "large",
+      "originalAsset": "magellan-v2",
+      "source": "art/licensed-reference/gigant-battle/Magellan.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 228,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "impel-down-guard",
+      "kind": "pve",
+      "bodyClass": "normal",
+      "originalAsset": "impel-down-guard-v2",
+      "source": "public/assets/enemies/impel-down-guard.png",
+      "strategy": "procedural-cutout",
+      "detectedCandidates": null,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "hody-jones",
+      "kind": "pve",
+      "bodyClass": "large",
+      "originalAsset": "hody-jones-v2",
+      "source": "art/licensed-reference/gigant-battle-2/HodyJones.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 377,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": 6,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": 12,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": 8,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "new-fish-man-officer",
+      "kind": "pve",
+      "bodyClass": "normal",
+      "originalAsset": "new-fish-man-officer-v2",
+      "source": "public/assets/enemies/new-fish-man-officer.png",
+      "strategy": "procedural-cutout",
+      "detectedCandidates": null,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "caesar-clown",
+      "kind": "pve",
+      "bodyClass": "large",
+      "originalAsset": "caesar-clown-v2",
+      "source": "art/licensed-reference/great-pirate-colosseum/CaesarClown.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 4,
+      "clips": {
+        "idle": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 4,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "punk-hazard-guard",
+      "kind": "pve",
+      "bodyClass": "normal",
+      "originalAsset": "punk-hazard-guard-v2",
+      "source": "public/assets/enemies/punk-hazard-guard.png",
+      "strategy": "procedural-cutout",
+      "detectedCandidates": null,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "pica",
+      "kind": "pve",
+      "bodyClass": "large",
+      "originalAsset": "pica-v2",
+      "source": "art/licensed-reference/great-pirate-colosseum/Pica.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 3,
+      "clips": {
+        "idle": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 3,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 3,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 3,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 3,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 3,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 3,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "donquixote-officer",
+      "kind": "pve",
+      "bodyClass": "normal",
+      "originalAsset": "donquixote-officer-v2",
+      "source": "public/assets/enemies/donquixote-officer.png",
+      "strategy": "procedural-cutout",
+      "detectedCandidates": null,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "kaido",
+      "kind": "pve",
+      "bodyClass": "large",
+      "originalAsset": "kaido-v2",
+      "source": "art/licensed-reference/great-pirate-colosseum/Kaido.png",
+      "strategy": "auto-frame-map",
+      "detectedCandidates": 2,
+      "clips": {
+        "idle": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 2,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 2,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 2,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 2,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 2,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "neu zeichnen",
+          "sourceRectangles": 2,
+          "visuallyApproved": false
+        }
+      },
+      "pilot": "kaido-b10-v2",
+      "pilotReview": "kuratieren — all six clips authored; owner / board review pending"
+    },
+    {
+      "id": "beast-pirate",
+      "kind": "pve",
+      "bodyClass": "normal",
+      "originalAsset": "beast-pirate-v2",
+      "source": "public/assets/enemies/beast-pirate.png",
+      "strategy": "procedural-cutout",
+      "detectedCandidates": null,
+      "clips": {
+        "idle": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "kuratieren",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "robin-demonio-fleur",
+      "kind": "form",
+      "bodyClass": "large",
+      "originalAsset": "base body + SVG overlay",
+      "source": "public/assets/forms/robin-demonio-fleur",
+      "strategy": "no independent body atlas before B10",
+      "detectedCandidates": null,
+      "clips": {
+        "idle": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        }
+      },
+      "pilot": "robin-demonio-fleur-b10-v2",
+      "pilotReview": "kuratieren — all six clips authored; owner / board review pending"
+    },
+    {
+      "id": "luffy-gear-4-boundman",
+      "kind": "form",
+      "bodyClass": "large",
+      "originalAsset": "base body + SVG overlay",
+      "source": "public/assets/forms/luffy-gear-4-boundman",
+      "strategy": "no independent body atlas before B10",
+      "detectedCandidates": null,
+      "clips": {
+        "idle": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "luffy-gear-4-snakeman",
+      "kind": "form",
+      "bodyClass": "large",
+      "originalAsset": "base body + SVG overlay",
+      "source": "public/assets/forms/luffy-gear-4-snakeman",
+      "strategy": "no independent body atlas before B10",
+      "detectedCandidates": null,
+      "clips": {
+        "idle": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        }
+      }
+    },
+    {
+      "id": "chopper-monster-point",
+      "kind": "form",
+      "bodyClass": "large",
+      "originalAsset": "base body + SVG overlay",
+      "source": "public/assets/forms/chopper-monster-point",
+      "strategy": "no independent body atlas before B10",
+      "detectedCandidates": null,
+      "clips": {
+        "idle": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "move": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "attack": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "cast": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "hit": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        },
+        "defeat": {
+          "status": "neu zeichnen",
+          "sourceRectangles": null,
+          "visuallyApproved": false
+        }
+      }
+    }
+  ]
+}

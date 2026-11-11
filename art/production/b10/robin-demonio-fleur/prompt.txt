@@ -1,0 +1,12 @@
+Create ONE pixel-art animation AUTHORING DRAFT sheet for Nico Robin's DEMONIO FLEUR form from One Piece. Attached Robin sprite is the character reference only; attached Zoro sprite sets the crisp small-game sprite rendering style. Demonio needs her own distinct body, not the ordinary Robin sprite with an icon.
+
+Transparent background, exactly 1536 x 1536 canvas. EXACT 6 columns x 6 rows grid, 256 x 256 cells. ONE complete isolated SAME character per cell. No text/grid/captions, no backdrop, no checkerboard or colored halo. Adult Nico Robin recognizable face, long straight black hair, small swept black horns, broad black bat wings, FOUR black/purple demonic extra arms behind the two normal arms. Dark opaque high-neck black/purple FULL COVERAGE combat bodysuit with long sleeves and full leggings, boots. Fully clothed, no cleavage/nudity or sexualization. No weapons. Violet highlights on dark body separate readable anatomy and wings. Canonical three-quarter RIGHT facing. Body about 170 pixels tall, same scale across cells, bottom centered. Crisp low-resolution pixel art, dark warm outline, three-value color ramps, upper-left light; individual pixel clusters clear at 88 px game scale, not smooth illustration.
+
+Every row has six GENUINELY DIFFERENT anatomically coherent body poses, not translated/scaled whole-body copies. Fixed same face, outfit, number of arms and wings.
+Row 1: six calm idle guard/breathing poses with subtle arm, wing, shoulder, knee changes, closed loop.
+Row 2: six grounded walking cycle poses, alternating feet/contact/passing, opposing normal arm swing, extra arms and wings track weight; NO flying.
+Row 3: six multi-arm palm attack poses: guard, draw extra arms back, torsion, extend multiple palms RIGHT, follow-through, recover.
+Row 4: six Demonio clutch ability poses: crouch, all arms open, rear arms reach forward around invisible target, crossed-arm clutch squeeze, release, recover. No victim, no separate hand FX.
+Row 5: six hit/guard/recoil/recovery poses with wings following body.
+Row 6: six defeat poses: stagger, knees buckle, kneel, hand to ground, fold wings/fall, final resting pose. All arms/wings remain within respective cell.
+NO shadow/ground disc, NO particles, glow, aura, lightning, text, other characters. Body and effect layer must remain separable, so draw only the character. This draft will be curated and pixel-cleaned before local export.

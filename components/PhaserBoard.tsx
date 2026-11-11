@@ -1475,7 +1475,7 @@ export default function PhaserBoard({
             );
             const portraitKey = this.portraitKey(unit);
             const animationDefinition = [
-              ...getCrewAnimationDefinitions(unit.contentId),
+              ...getCrewAnimationDefinitions(unit.contentId, unit.formId),
             ]
               .reverse()
               .find((candidate) =>
@@ -1651,6 +1651,7 @@ export default function PhaserBoard({
             const formVisual = formVisualDefinition(unit.formId);
             if (
               formVisual &&
+              !animationDefinition?.formId &&
               this.textures.exists(formOverlayKey(unit.formId ?? ""))
             ) {
               container.add(

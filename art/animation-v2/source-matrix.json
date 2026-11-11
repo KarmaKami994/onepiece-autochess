@@ -1069,6 +1069,117 @@
       "pivot": { "x": 64, "y": 116 }, "processing": ["repository-authored vector composition", "deterministic pixel rasterization", "integer offsets", "local pixel effects"],
       "permission": { "status": "project-owned", "note": "Locally authored faction minion generated deterministically by scripts/assets/build_p12_pve_assets.mjs; no external sheet pixels are used." },
       "recipe": { "maxWidth": 88, "maxHeight": 110, "effectColor": "#a28ddb", "attackEffect": "slash", "castEffect": "beam" }
+    },
+    {
+      "id": "koala-b10",
+      "pilotFor": "koala",
+      "kind": "crew",
+      "outputAssetKey": "koala-b10-v2",
+      "fallbackAssetKey": "koala-v2",
+      "editableSource": "authored-pose-board",
+      "source": {
+        "strategy": "authored-frame-map",
+        "localPath": "art/production/b10/koala/body-poses.png",
+        "sha256": "7e7f30f38433c0abb276fe27b38a549d5bb939c89081084a67da8ee630a2b3f1",
+        "dimensions": {
+          "width": 768,
+          "height": 768
+        },
+        "gameUrl": null,
+        "sheetUrl": null,
+        "contributor": "Project-authored curation of built-in image_gen draft; original references credited in art/production/b10/provenance.json",
+        "frameMap": "art/production/b10/koala/frame-map.json",
+        "frameMapSha256": "c949504d4fb989120b7585e6d5e9560286a37c6a7486bb978788e4b438ad000e"
+      },
+      "pivot": {
+        "x": 64,
+        "y": 116
+      },
+      "processing": [
+        "frozen per-identity source; never regenerate in build",
+        "explicit semantic 46-frame map; no scanner",
+        "one scale per identity, integer registered ground anchor",
+        "hard alpha / shared non-dithered 32-colour palette",
+        "body and FX separate; existing runtime FX unchanged"
+      ],
+      "permission": {
+        "status": "confirmed",
+        "note": "Project-owner attestation for existing source references remains applicable; new poses are AI-assisted derivatives made for B10, not original game rips. No downstream asset licence is granted. See art/production/b10/provenance.json."
+      }
+    },
+    {
+      "id": "kaido-b10",
+      "pilotFor": "kaido",
+      "kind": "pve",
+      "outputAssetKey": "kaido-b10-v2",
+      "fallbackAssetKey": "kaido-v2",
+      "editableSource": "authored-pose-board",
+      "source": {
+        "strategy": "authored-frame-map",
+        "localPath": "art/production/b10/kaido/body-poses.png",
+        "sha256": "076e242838efe393457d1369c393a3f73e199199d80a615b3fd13740429edd6a",
+        "dimensions": {
+          "width": 768,
+          "height": 768
+        },
+        "gameUrl": null,
+        "sheetUrl": null,
+        "contributor": "Project-authored curation of built-in image_gen draft; original references credited in art/production/b10/provenance.json",
+        "frameMap": "art/production/b10/kaido/frame-map.json",
+        "frameMapSha256": "c949504d4fb989120b7585e6d5e9560286a37c6a7486bb978788e4b438ad000e"
+      },
+      "pivot": {
+        "x": 64,
+        "y": 116
+      },
+      "processing": [
+        "frozen per-identity source; never regenerate in build",
+        "explicit semantic 46-frame map; no scanner",
+        "one scale per identity, integer registered ground anchor",
+        "hard alpha / shared non-dithered 32-colour palette",
+        "body and FX separate; existing runtime FX unchanged"
+      ],
+      "permission": {
+        "status": "confirmed",
+        "note": "Project-owner attestation for existing source references remains applicable; new poses are AI-assisted derivatives made for B10, not original game rips. No downstream asset licence is granted. See art/production/b10/provenance.json."
+      }
+    },
+    {
+      "id": "robin-demonio-fleur-b10",
+      "pilotFor": "robin-demonio-fleur",
+      "kind": "crew",
+      "outputAssetKey": "robin-demonio-fleur-b10-v2",
+      "fallbackAssetKey": "robin-v2",
+      "editableSource": "authored-pose-board",
+      "source": {
+        "strategy": "authored-frame-map",
+        "localPath": "art/production/b10/robin-demonio-fleur/body-poses.png",
+        "sha256": "908f2f868b265c1921bbf31b3abcf3f1ec62983afd7404f33ec116476e881d01",
+        "dimensions": {
+          "width": 768,
+          "height": 768
+        },
+        "gameUrl": null,
+        "sheetUrl": null,
+        "contributor": "Project-authored curation of built-in image_gen draft; original references credited in art/production/b10/provenance.json",
+        "frameMap": "art/production/b10/robin-demonio-fleur/frame-map.json",
+        "frameMapSha256": "c949504d4fb989120b7585e6d5e9560286a37c6a7486bb978788e4b438ad000e"
+      },
+      "pivot": {
+        "x": 64,
+        "y": 116
+      },
+      "processing": [
+        "frozen per-identity source; never regenerate in build",
+        "explicit semantic 46-frame map; no scanner",
+        "one scale per identity, integer registered ground anchor",
+        "hard alpha / shared non-dithered 32-colour palette",
+        "body and FX separate; existing runtime FX unchanged"
+      ],
+      "permission": {
+        "status": "confirmed",
+        "note": "Project-owner attestation for existing source references remains applicable; new poses are AI-assisted derivatives made for B10, not original game rips. No downstream asset licence is granted. See art/production/b10/provenance.json."
+      }
     }
   ]
 }

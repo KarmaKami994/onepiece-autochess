@@ -140,15 +140,18 @@ async function inspectEntry(entry) {
   const permissionReady = BUILDABLE_PERMISSION_STATES.has(entry.permission.status);
   const hashReady = Boolean(entry.source.sha256);
   const hashMatches = hashReady && actualSha256 === entry.source.sha256;
+  const authoredMapMatches = entry.source.strategy !== "authored-frame-map" ||
+    Boolean(entry.source.frameMapSha256 && await sha256(resolveProjectPath(entry.source.frameMap)) === entry.source.frameMapSha256);
   const frameMapReady =
     entry.source.strategy === "procedural-cutout" || Boolean(entry.source.frameMap);
-  const buildable = sourceExists && permissionReady && hashMatches && frameMapReady;
+  const buildable = sourceExists && permissionReady && hashMatches && frameMapReady && authoredMapMatches;
   let reason = null;
   if (!sourceExists) reason = "source missing";
   else if (!permissionReady) reason = `permission ${entry.permission.status}`;
   else if (!hashReady) reason = "source SHA-256 not recorded";
   else if (!hashMatches) reason = `source SHA-256 mismatch (${actualSha256})`;
   else if (!frameMapReady) reason = "frame map missing";
+  else if (!authoredMapMatches) reason = "authored frame-map SHA-256 missing or mismatched";
   return { entry, sourcePath, sourceExists, actualSha256, buildable, reason };
 }
 
@@ -651,7 +654,9 @@ async function renderFrameMap(status, options) {
   await writeAtlasAndGif(frames, options);
   const metadata = {
     schemaVersion: 2,
-    pipeline: "licensed-frame-map-v1",
+    pipeline: entry.source.strategy === "authored-frame-map"
+      ? "authored-frame-map-v1"
+      : "licensed-frame-map-v1",
     assetId: entry.id,
     assetKey: entry.outputAssetKey,
     source: entry.source.localPath,
@@ -727,7 +732,7 @@ async function main() {
     await renderProceduralCutout(status, options);
   } else if (status.entry.source.strategy === "auto-frame-map") {
     await renderAutoFrameMap(status, options);
-  } else if (status.entry.source.strategy === "licensed-frame-map") {
+  } else if (["licensed-frame-map", "authored-frame-map"].includes(status.entry.source.strategy)) {
     await renderFrameMap(status, options);
   } else {
     throw new Error(`Unsupported source strategy ${status.entry.source.strategy}`);

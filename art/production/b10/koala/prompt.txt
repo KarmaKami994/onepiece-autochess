@@ -1,0 +1,13 @@
+Create a pixel-art animation AUTHORING DRAFT for ONE character, Koala from One Piece, based on the attached EXISTING sprite (identity/outfit reference) and attached Zoro sprite (pixel rendering/style reference only). This is an unapproved source sheet that will be manually curated, never directly used as an unreviewed production atlas.
+
+Transparent background. Square canvas exactly 1536 x 1536. EXACT grid 6 columns by 6 rows, each cell 256 x 256. No lines, borders, letters, numbers, captions, weapons or second character. One complete isolated Koala in every cell. Her body must fit comfortably within each cell, anchored bottom-center, same scale across all cells, about 160 pixels tall when rendered on this canvas. Draw as crisp low-resolution sprite pixels, not an illustration. Strong dark warm outlines, three-value ramps, upper-left light; source-style details readable at 80 pixels tall. Canonical three-quarter view facing RIGHT. Preserve orange short bob, red cap and goggles, pink frilled blouse, brown short skirt, dark fitted stockings, brown boots. Adult clothed fighter, no sexualization.
+
+Every row is one clip with SIX genuinely different, anatomically coherent BODY poses, no whole-image translated/scaled/rotated duplicates. Same face/outfit throughout:
+Row 1: six calm idle breathing/fist-ready poses, mostly subtle arm, elbow, shoulder, knee changes, loop closes.
+Row 2: six side-view run/walk cycle poses, clear alternation of feet, bent knees, opposing arm swing, contact/down/passing/up. Same ground plane.
+Row 3: six Fish-Man Karate palm attack poses: anticipation, deep wind-up, stepping open-palm extension RIGHT, follow-through, retract, recover.
+Row 4: six strong two-handed Fish-Man Karate ability poses: crouched prepare, hands pulled back, torso twist, both palms push RIGHT, follow-through, recovery. NO water or effects painted over body.
+Row 5: six distinct hit/recoil poses, defensive arms, compressed torso then recovery.
+Row 6: six defeat poses: stagger, bent knee, kneel, hand to ground, falling, final prone/resting body, whole figure remains in its own cell.
+
+Do not use drop shadows, ground discs, FX, blur, gradients, checkerboard or colored background. Keep each sprite separated, same recognizable character, all 36 cells occupied. Nearest-neighbor pixel style matching original reference.

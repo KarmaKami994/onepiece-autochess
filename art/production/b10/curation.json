@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "reviewStatus": "owner-style-review-pending",
+  "tool": "built-in image_gen; model, seed and generation settings not exposed",
+  "draftGrid": { "columns": 6, "rows": 6, "cellSize": 209 },
+  "alphaCutoff": 192,
+  "paletteColours": 32,
+  "pilots": [
+    { "id": "koala", "kind": "crew", "baseId": "koala", "bodyClass": "normal", "masterHeight": 82, "sourceAnchorX": 105, "masterPose": 0 },
+    { "id": "kaido", "kind": "pve", "baseId": "kaido", "bodyClass": "large", "masterHeight": 100, "sourceAnchorX": 105, "masterPose": 0 },
+    { "id": "robin-demonio-fleur", "kind": "crew", "baseId": "robin", "formId": "robin-demonio-fleur", "bodyClass": "large", "masterHeight": 94, "sourceAnchorX": 105, "masterPose": 0 }
+  ],
+  "clips": {
+    "idle": [0, 1, 2, 3, 4, 0],
+    "move": [6, 7, 8, 9, 10, 11, 6, 7],
+    "attack": [12, 13, 14, 15, 16, 16, 17, 12],
+    "cast": [18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 18],
+    "hit": [25, 26, 27, 28],
+    "defeat": [30, 31, 32, 33, 34, 35, 35, 35]
+  },
+  "notes": [
+    "Each draft is frozen, not regenerated during export. The requested 1536 canvas was returned as 1254; actual 209px cells are recorded explicitly.",
+    "All poses use the same per-identity scale; registration adjusts placement, never frame-by-frame body size. Clip timings remain the existing v2 contract.",
+    "Alpha threshold removes the draft's low-alpha coloured fringe. Shared 32-colour, non-dithered palette creates hard pixel edges.",
+    "No painted FX in body poses. FX is a separate empty editable layer; the existing runtime continues to own combat FX.",
+    "Source support sheets are identity/palette references. New full-body poses are AI-assisted derivatives, not original game rips or a full sheet provided by Megadoomer."
+  ]
+}

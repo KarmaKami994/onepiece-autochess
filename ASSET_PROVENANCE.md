@@ -952,3 +952,16 @@ The set contains an original deep-navy ocean regatta arena with a central curren
 | `public/assets/carousel/contact-sheet.png` | `1400×800` | `5632adc7c3d26831bb3025d592fff5fbd00cabf8771b2b7d05504be931e2e4d3` |
 
 Visual QA on `2026-08-24` confirmed that all eight palette/direction combinations remain distinguishable on the arena, all 32 item frames stay inside their cells, all sprite edges are hard pixels, all atlas backgrounds are transparent, and the generated contact sheet contains no text, logo, watermark, recognizable external character, or copied interface.
+
+<!-- B10 authored pilots -->
+## B10 frozen authored pilots — 2026-11-11
+
+Existing licensed-reference PNGs and prior runtime atlases remain unchanged. Koala / Kaido support sheets and Robin / Zoro full-sheet sprites are identity/style references; the new bodies are AI-assisted derivatives, not original rips. Kaido uses the owner-requested https://spritedatabase.net/file/21137, contributor Megadoomer; exact original/reference hashes, permission attestations, prompts, unexposed model/seed and pending owner review are recorded in `art/production/b10/provenance.json`. No PixelLab/provider runtime dependency. Pinned local export, not identical AI regeneration, is reproducible.
+
+| Pilot | Frozen source | Source SHA-256 | Runtime atlas SHA-256 | Editable working copy |
+| --- | --- | --- | --- | --- |
+| `koala-b10-v2` | `art/production/b10/koala/body-poses.png` | `7e7f30f38433c0abb276fe27b38a549d5bb939c89081084a67da8ee630a2b3f1` | `d0d2f3d83f66a686b2a42b483727b7de6e3f9d4dab2ecb6cc08752d2b3953034` | `art/libresprite/koala-b10-v2.aseprite` |
+| `kaido-b10-v2` | `art/production/b10/kaido/body-poses.png` | `076e242838efe393457d1369c393a3f73e199199d80a615b3fd13740429edd6a` | `d9318e21d95325f59d47e2694b4fb0d86935f60b4937bfebe344b3c0cba2dc32` | `art/libresprite/kaido-b10-v2.aseprite` |
+| `robin-demonio-fleur-b10-v2` | `art/production/b10/robin-demonio-fleur/body-poses.png` | `908f2f868b265c1921bbf31b3abcf3f1ec62983afd7404f33ec116476e881d01` | `06348ef2087862066999afa6d959bd1099b7543b774812b54ccc32e664dbd950` | `art/libresprite/robin-demonio-fleur-b10-v2.aseprite` |
+
+Three project-authored 48px icon masters (Sea-Prism Shard, Black Blade, Emperor's Jolly Roger) preserve item IDs, runtime SVG paths and glyph fallback. Demonio's static SVG identity derives from the same master; old badges and icons remain under `art/production/b10/*/legacy`. Full export hashes, maps and GIFs: `art/production/b10/outputs.json`. Contract/style/inventory: `docs/B10_ASSET_PRODUKTION.md`. No gameplay or new asset licence claim.

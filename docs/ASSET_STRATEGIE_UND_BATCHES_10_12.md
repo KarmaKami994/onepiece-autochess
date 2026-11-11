@@ -1,7 +1,9 @@
 # Feste Asset-Strategie — B10, B11 und B12
 
 Stand: **09.11.2026**. Basis: B09-Squash `74cea3577eba98a07911b2d488abd3ece20b373d`.
-**Dieser Auftrag liefert den Plan. Noch keine neuen Assets oder Implementierung.**
+Plan vom 09.11.; B10 wurde am 11.11.2026 beauftragt. Kandidat, Stilkarte und
+Prüf-/Abnahmestand: [B10_ASSET_PRODUKTION.md](B10_ASSET_PRODUKTION.md).
+B11/B12 bleiben spätere Aufträge.
 
 ## 1. Ziel und Grenze
 

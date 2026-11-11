@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" shape-rendering="crispEdges">
+  <title>Black Blade — completed item</title>
+  <path fill="#111421" d="M7 3h34v2h2v2h2v34h-2v2h-2v2H7v-2H5v-2H3V7h2V5h2z"/>
+  <path fill="#c59742" d="M8 5h32v2h3v33h-3v3H8v-3H5V8h3zm1 3v32h30V8z" fill-rule="evenodd"/>
+  <path fill="#39335b" d="M9 9h30v30H9z"/>
+  <path fill="#171d2d" d="M13 28h5v-6h6v-6h6v-6h8v8h-6v6h-6v6h-6v5h-7z"/>
+  <path fill="#d5e7e3" d="M15 28h4v-5h6v-6h6v-6h7v3h-4v6h-6v6h-6v6h-4z"/>
+  <path fill="#5c7b8c" d="M20 28h3v-5h6v-6h6v-3h3v4h-6v6h-6v6h-5z"/>
+  <path fill="#101722" d="M22 24h3v-4h4v-4h3v3h-3v4h-4v4h-3z"/>
+  <path fill="#fff7cb" d="M32 11h6v2h-6zM18 25h2v3h-2z"/>
+  <path fill="#171826" d="M10 23h5v4h4v4h4v5h-5v-4h-4v-4h-4zM8 34h4v-4h5v5h-4v5H8z"/>
+  <path fill="#e6b852" d="M11 24h3v4h4v4h4v3h-4v-3h-4v-4h-3zM10 35h3v3h-3z"/>
+  <path fill="#ad5e58" d="M13 32h3v3h-3zM10 35h3v3h-3z"/>
+  <path fill="#e0c5f3" d="M10 11h2v2h2v2h-2v2h-2v-2H8v-2h2z"/>
+</svg>

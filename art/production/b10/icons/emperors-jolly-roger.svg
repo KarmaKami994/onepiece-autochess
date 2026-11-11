@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" shape-rendering="crispEdges">
+  <title>Emperor's Jolly Roger — Emperor trait badge</title>
+  <path fill="#111421" d="M7 3h34v2h2v2h2v34h-2v2h-2v2H7v-2H5v-2H3V7h2V5h2z"/>
+  <path fill="#e0b750" d="M8 5h32v2h3v33h-3v3H8v-3H5V8h3zm1 3v32h30V8z" fill-rule="evenodd"/>
+  <path fill="#412756" d="M9 9h30v30H9z"/>
+  <path fill="#8e52b2" d="M12 10h24v22h-4v4h-4v4h-8v-4h-4v-4h-4z"/>
+  <path fill="#161421" d="M15 18h18v14h-4v4H19v-4h-4z"/>
+  <path fill="#f5e6b9" d="M20 19h8v2h3v7h-3v6h-8v-6h-3v-7h3z"/>
+  <path fill="#211c32" d="M19 23h4v4h-4zM25 23h4v4h-4zM23 28h2v3h-2zM22 32h1v2h-1zM25 32h1v2h-1z"/>
+  <path fill="#edbd4b" d="M16 10h3v3h3V9h4v4h3v-3h3v8H16z"/>
+  <path fill="#fff3b0" d="M18 11h1v3h4v-4h2v4h4v-3h1v4H18z"/>
+  <path fill="#bd9a5b" d="M17 16h14v2H17z"/>
+  <path fill="#e2b5ed" d="M12 35h3v2h3v2h-3v1h-3zM33 35h3v5h-3v-1h-3v-2h3z"/>
+</svg>

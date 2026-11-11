@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-11",
+  "base": "74cea3577eba98a07911b2d488abd3ece20b373d",
+  "tool": "built-in image_gen",
+  "modelIdentifier": null,
+  "modelIdentifierNote": "Not exposed by the tool; no model/version or seed invented.",
+  "seed": null,
+  "pixelLabAvailability": "No active tool and no plugin search result; not used.",
+  "attemptsPerIdentity": 1,
+  "requestedCanvas": {
+    "width": 1536,
+    "height": 1536
+  },
+  "actualCanvas": {
+    "width": 1254,
+    "height": 1254
+  },
+  "transparentBackground": true,
+  "references": [
+    {
+      "id": "koala",
+      "path": "art/production/b10/references/koala-existing-idle.png",
+      "source": "art/licensed-reference/great-pirate-colosseum/Koala.png",
+      "sourceSha256": "7c94c32f406bd137a4cf403beaf3007f540b1e1092dde07817510a967702da6d",
+      "sha256": "5263045b4839ecb190e22ca8adac92753c4f08db62cdbbe3a19987f6cf99a292",
+      "sourcePage": "https://spritedatabase.net/file/21048",
+      "contributor": "Megadoomer",
+      "permission": {
+        "status": "confirmed",
+        "note": "Project-owner attestation in the Codex project conversation on 2026-09-10 confirms authorization for applicable One Piece assets in this private/local project; no downstream asset license is granted."
+      }
+    },
+    {
+      "id": "kaido",
+      "path": "art/production/b10/references/kaido-existing-idle.png",
+      "source": "art/licensed-reference/great-pirate-colosseum/Kaido.png",
+      "sourceSha256": "6d79b1b23f29ae8114551b7626b2dead05f186cd060795c258cef9fd30197458",
+      "sha256": "07502c9a691fcbff6b5658ca9e5fb2cc1c6631d7fe2d346c8377efee98d84be9",
+      "sourcePage": "https://spritedatabase.net/file/21137",
+      "contributor": "Megadoomer",
+      "permission": {
+        "status": "confirmed",
+        "note": "Project-owner attestation records written authorization for applicable One Piece assets in this private/local project; no downstream asset license is granted."
+      }
+    },
+    {
+      "id": "robin",
+      "path": "art/production/b10/references/robin-existing-idle.png",
+      "source": "art/licensed-reference/gigant-battle-2/NicoRobin.png",
+      "sourceSha256": "7d133c5d9d9e5e83e30179b527d2cb6110b95f5e6834ea9742a907b12c23f8a6",
+      "sha256": "1b2c1dfd2b2765c0d760b38a73a39e40a5db5b058f5f80a2a128c083bcc6211d",
+      "sourcePage": "https://spritedatabase.net/file/14846",
+      "contributor": "Maverick PK",
+      "permission": {
+        "status": "confirmed",
+        "note": "Project-owner attestation in the Codex project conversation on 2026-08-14 explicitly permits use, adaptation, and public-repository collaboration for this source and its derived runtime atlas; no downstream asset license is granted."
+      }
+    },
+    {
+      "id": "zoro",
+      "path": "art/production/b10/references/zoro-existing-idle.png",
+      "source": "art/licensed-reference/gigant-battle-2/RoronoaZoro.png",
+      "sourceSha256": "9c657fa9eaafd0b84d87185b30981723c22d58b5db4bfe263032b3ec772d3e76",
+      "sha256": "867ec43913c588d7310739abb3ac3e569c772b18f726c014c5104ca5111c0d52",
+      "sourcePage": "https://spritedatabase.net/file/14764",
+      "contributor": "Heatpark; Maverick PK",
+      "permission": {
+        "status": "confirmed",
+        "note": "Project-owner attestation in the Codex project conversation on 2026-08-14 explicitly permits use, adaptation, and public-repository collaboration for this source and its derived runtime atlas; no downstream asset license is granted."
+      }
+    }
+  ],
+  "prompts": [
+    {
+      "id": "koala",
+      "path": "art/production/b10/koala/prompt.txt",
+      "mode": "referenced draft, then local curation",
+      "references": [
+        "art/production/b10/references/koala-existing-idle.png",
+        "art/production/b10/references/zoro-existing-idle.png"
+      ]
+    },
+    {
+      "id": "kaido",
+      "path": "art/production/b10/kaido/prompt.txt",
+      "mode": "referenced draft, then local curation",
+      "references": [
+        "art/licensed-reference/great-pirate-colosseum/Kaido.png",
+        "art/production/b10/references/zoro-existing-idle.png"
+      ]
+    },
+    {
+      "id": "robin-demonio-fleur",
+      "path": "art/production/b10/robin-demonio-fleur/prompt.txt",
+      "mode": "referenced draft, then local curation",
+      "references": [
+        "art/production/b10/references/robin-existing-idle.png",
+        "art/production/b10/references/zoro-existing-idle.png"
+      ]
+    }
+  ],
+  "classification": "AI-assisted derived body poses; original sheets retained; icons project-authored vector/pixel masters.",
+  "localExport": "Frozen body-poses.png + explicit SHA-pinned frame-map; no generation/provider call in build, CI or game.",
+  "curation": "curation.json; hard alpha, connected-body cleanup, fixed per-identity scale, registered anchor, shared palette; manual clip selection, holds explicit.",
+  "reviewStatus": "owner-style-review-pending; not a claim of approved visual quality or passed browser/tests",
+  "outputs": "art/production/b10/outputs.json"
+}
