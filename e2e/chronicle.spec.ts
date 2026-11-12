@@ -45,6 +45,10 @@ test("local completion survives restart once; replay pauses, switches perspectiv
   await installVoyage(page);
   await page.getByRole("button", { name: /SKIP ANIMATION/ }).click();
   await expect(page.locator(".results-screen")).toBeVisible();
+  const resultItem = page.locator('.final-crew img[src="/assets/items/armament-wraps.svg"]');
+  await expect(resultItem).toBeVisible();
+  await expect.poll(() => resultItem.evaluate(image => image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath("results-items.png"), fullPage: true });
   await expect.poll(async () => JSON.parse(await activeSave(page)) as { state: { phase: string } }).toMatchObject({ state: { phase: "game-over" } });
   await page.reload(); await page.getByRole("button", { name: /CONTINUE/ }).click();
   await expect(page.locator(".results-screen")).toBeVisible();

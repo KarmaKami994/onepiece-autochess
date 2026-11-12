@@ -4,22 +4,22 @@
   "sourcePath": "art/ui-icons/food-icons.json",
   "sourceSha256": "9bc8f8b30573a6deb4870a661daffe736de024a36f9abe60cf367d6613b3a6db",
   "generatorPath": "scripts/assets/build_food_icons.mjs",
-  "generatorSha256": "e7735f6dc7636e08ebeba8743b611f85df759837992446d6bcd2b11a60c4ca54",
+  "generatorSha256": "c6130e7ae1950b57321f8c3f1d0ce3e111820e04c2a912d4b0179c522440b50b",
   "outputs": [
     {
       "id": "sea-king-bento",
       "path": "public/assets/food/sea-king-bento.svg",
-      "sha256": "e839327aa7fd40bae91e2fbc2d6bef37442836e97d9529921da73dcce69d0107"
+      "sha256": "97b6651a9b1160f53ce1a23811a4c86dec77412e7b9f6426191f1571be31cd2b"
     },
     {
       "id": "cola-tonic",
       "path": "public/assets/food/cola-tonic.svg",
-      "sha256": "e4a86dc10243c388fbc06b4e80424df5c11c1286e504f5889175831e974c81f6"
+      "sha256": "df72b000a780afdfc34f97f069815a05cfe9d8c782533196f2e93671539b2890"
     },
     {
       "id": "pirate-curry",
       "path": "public/assets/food/pirate-curry.svg",
-      "sha256": "c41d7c16b38b5650d796306c6e1e1efef336d28ff581db9b5fe24688f50288d6"
+      "sha256": "8837aeb854ca658865f395664a64645d2f424f063148b3bd2dc85c17b00de268"
     }
   ]
 }

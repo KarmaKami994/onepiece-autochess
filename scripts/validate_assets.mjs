@@ -140,6 +140,16 @@ for (const output of foodProvenance.outputs) {
   await validateSvg(path.join(root, output.path));
 }
 
+const iconProvenance = JSON.parse(await readFile(path.join(root, "art/production/b12/provenance.json"), "utf8"));
+const expectedIcons = [
+  ...itemIds.map(id => `items/${id}`), ...foodIds.map(id => `food/${id}`),
+  ...traitIds.map(id => `traits/${id}`), ...statusSpecs.statuses.map(status => `status/${status.id}`),
+].sort();
+if (JSON.stringify(iconProvenance.outputs.map(record => `${record.family}/${record.id}`).sort()) !== JSON.stringify(expectedIcons)) throw new Error("B12 provenance must exactly cover the existing icon catalogues");
+for (const pinned of [...iconProvenance.inputs, ...iconProvenance.outputs.flatMap(record => [record.source, record.master, record.editableSvg, record.output, ...(record.original ? [record.original] : [])])]) {
+  if (await sha256(path.join(root, pinned.path)) !== pinned.sha256) throw new Error(`B12 icon provenance mismatch: ${pinned.path}`);
+}
+
 for (const entry of sourceMatrix.entries) {
   const source = path.join(root, entry.source.localPath);
   await requireFile(source);

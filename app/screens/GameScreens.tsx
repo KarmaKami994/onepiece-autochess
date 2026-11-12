@@ -11,6 +11,7 @@ import {
   type BoardUnit,
 } from "@/components/PhaserBoard";
 import BattleBoard from "@/components/BattleBoard";
+import { VisualIcon } from "@/components/VisualIcon";
 import PhaseClockDisplay from "../PhaseClockDisplay";
 import { GalleyTray } from "../GalleyTray";
 import { MUSIC_TRACKS, type AudioSettings } from "../audioSettings";
@@ -45,28 +46,6 @@ export type Settings = AudioSettings & {
   highContrast: boolean;
   boardSkin: BoardSkin;
 };
-
-function VisualIcon({
-  imagePath,
-  fallback,
-  className,
-}: {
-  imagePath?: string;
-  fallback: string;
-  className?: string;
-}) {
-  const [failed, setFailed] = useState(false);
-  if (!imagePath || failed) {
-    return <span className={className} aria-hidden="true">{fallback}</span>;
-  }
-  return (
-    <span className={className} aria-hidden="true">
-      {/* Runtime SVGs intentionally retain the existing glyph fallback. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={imagePath} alt="" onError={() => setFailed(true)} />
-    </span>
-  );
-}
 
 export type ToastView = {
   id: number;
@@ -2323,7 +2302,10 @@ export function ResultsScreen({
                   <span>
                     <strong>{unit.name}</strong>
                     <b aria-label={`${unit.star} stars`}>{"★".repeat(unit.star)}</b>
-                    <small>{itemNames.join(" · ") || "NO TREASURE"}</small>
+                    <small>{unit.items.map((id, index) => {
+                      const item = view.itemsById.get(id);
+                      return <span key={`${id}-${index}`}><VisualIcon className="inline-game-icon" imagePath={item?.imagePath} fallback={item?.icon ?? "◆"} />{itemNames[index]}{index < itemNames.length - 1 ? " · " : ""}</span>;
+                    })}{!itemNames.length && "NO TREASURE"}</small>
                   </span>
                 </article>
               );
