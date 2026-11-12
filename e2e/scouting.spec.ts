@@ -25,6 +25,7 @@ test("captain standings provide accessible read-only scouting", async ({
   const intel = page.getByRole("complementary", {
     name: "Rival 1 captain intel",
   });
+  await rival.hover();
   await expect(intel).toContainText("READ ONLY");
   await expect(intel).toContainText("GOLD");
   await expect(intel).toContainText("RECENT BATTLES");

@@ -29,6 +29,7 @@ test("harbor food survives reload, serves accessibly once and remains frozen thr
   await page.reload(); await page.getByRole("button", { name: /CONTINUE/i }).click();
   await expect(card).toBeVisible(); await card.click();
   const galley = page.getByRole("region", { name: "Ship's galley" });
+  await page.getByRole("button", { name: "Open ship's galley", exact: true }).focus();
   const serve = galley.getByRole("button", { name: `Serve ${food.name} (1 portions)` });
   await expect(serve).toBeDisabled();
   await galley.getByRole("combobox", { name: "Meal recipient" }).selectOption("galley-zoro");
@@ -37,6 +38,7 @@ test("harbor food survives reload, serves accessibly once and remains frozen thr
   await expect.poll(async () => ((await readVoyageFixture(page))?.state as MatchState | undefined)?.players[0].foodInventory?.length).toBe(0);
   await page.screenshot({ path: `tmp/b09-galley-${testInfo.project.name}.png`, fullPage: true });
   await page.reload(); await page.getByRole("button", { name: /CONTINUE/i }).click();
+  await page.getByRole("button", { name: "Open ship's galley", exact: true }).focus();
   await expect(galley.getByRole("status")).toContainText(food.name); await expect(galley.getByRole("button")).toHaveCount(0);
   await page.getByRole("button", { name: /START BATTLE/ }).click();
   await expect(page.getByLabel("Battle meals")).toBeVisible();
@@ -62,6 +64,7 @@ test("full galley disables only food, explains the limit and permits sailing on"
   await expect(foodCard).toBeDisabled(); await expect(foodCard).toContainText("Galley stock is full");
   await expect(page.locator(".harbor-screen button.reward-card:enabled")).toHaveCount(2);
   await page.getByRole("button", { name: "SAIL ON WITHOUT SUPPLIES" }).click();
+  await page.getByRole("button", { name: "Open ship's galley", exact: true }).focus();
   await expect(page.getByRole("region", { name: "Ship's galley" })).toContainText("3/3");
 });
 

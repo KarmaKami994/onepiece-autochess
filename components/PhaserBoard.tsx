@@ -213,6 +213,8 @@ export function interactionAllowsDestination(
 }
 
 export type PhaserBoardProps = BoardPayload & {
+  highlightedUnitIds?: readonly string[];
+  onHoverUnit?: (unitId: string | null) => void;
   phase: string;
   combatEvents: CombatFxEvent[];
   eventSequence: number;
@@ -231,6 +233,7 @@ export type PhaserBoardProps = BoardPayload & {
 };
 
 type SceneBridge = {
+  highlightUnits: (ids: readonly string[]) => void;
   pausePlayback: (paused: boolean) => void;
   sync: (payload: BoardPayload, forceRebuild?: boolean) => void;
   refreshLayout: (width: number, height: number) => void;
@@ -269,6 +272,8 @@ export default function PhaserBoard({
   environment,
   units,
   selectedId,
+  highlightedUnitIds = [],
+  onHoverUnit,
   interactionMode,
   phase,
   capacity,
@@ -303,6 +308,8 @@ export default function PhaserBoard({
   });
   const moveRef = useRef(onMoveUnit);
   const selectRef = useRef(onSelectUnit);
+  const hoverRef = useRef(onHoverUnit);
+  useEffect(() => { hoverRef.current = onHoverUnit; }, [onHoverUnit]);
   const eventsRef = useRef(combatEvents);
   eventsRef.current = combatEvents;
   const playbackRef = useRef({ onPlaybackReset, onPlaybackEvent, onPlaybackComplete, onPlaybackUnavailable });
@@ -362,6 +369,12 @@ export default function PhaserBoard({
             }
           >();
           private unitFacings = new Map<string, BoardFacing>();
+          private highlightedUnitIds = new Set<string>();
+
+          highlightUnits(ids: readonly string[]) {
+            this.highlightedUnitIds = new Set(ids);
+            for (const [id, marker] of this.selectionMarkers) marker.setVisible(this.payload.selectedId === id || this.highlightedUnitIds.has(id));
+          }
           private unitBodies = new Map<string, {
             fallbacks: (Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image | Phaser.GameObjects.Text)[];
             overlay?: Phaser.GameObjects.Image;
@@ -1219,7 +1232,7 @@ export default function PhaserBoard({
               this.tokenObjects.set(unit.id, token);
             }
             for (const [unitId, marker] of this.selectionMarkers) {
-              marker.setVisible(next.selectedId === unitId);
+              marker.setVisible(next.selectedId === unitId || this.highlightedUnitIds.has(unitId));
             }
             this.refreshDestinationCues();
           }
@@ -1701,7 +1714,7 @@ export default function PhaserBoard({
                 },
               )
               .setOrigin(0.5)
-              .setVisible(isSelected);
+              .setVisible(isSelected || this.highlightedUnitIds.has(unit.id));
             this.selectionMarkers.set(unit.id, selectionMarker);
             const itemPips = unit.items.slice(0, 3).map((itemId, index) =>
               this.add
@@ -1763,6 +1776,8 @@ export default function PhaserBoard({
               Phaser.Geom.Rectangle.Contains,
             );
             if (container.input) container.input.cursor = "pointer";
+            container.on("pointerover", () => hoverRef.current?.(unit.id));
+            container.on("pointerout", () => hoverRef.current?.(null));
             let wasDragged = false;
             container.on("pointerup", () => {
               if (wasDragged) {
@@ -2549,6 +2564,7 @@ export default function PhaserBoard({
   ]);
 
   useEffect(() => { bridgeRef.current?.pausePlayback(paused); }, [isReady, paused]);
+  useEffect(() => { bridgeRef.current?.highlightUnits(highlightedUnitIds); }, [isReady, highlightedUnitIds, units]);
 
   if (failed) {
     return (
@@ -2556,6 +2572,7 @@ export default function PhaserBoard({
         environment={environment}
         units={units}
         selectedId={selectedId}
+        highlightedUnitIds={highlightedUnitIds}
         interactionMode={interactionMode}
         capacity={capacity}
         boardSkin={boardSkin}
@@ -2572,6 +2589,7 @@ export default function PhaserBoard({
       data-phase={phase}
       data-playback-paused={paused}
       data-event-sequence={eventSequence}
+      data-highlighted-units={highlightedUnitIds.join(" ")}
       data-interaction-mode={interactionMode}
       data-board-skin={boardSkin}
       data-weather={environment?.weather ?? "neutral"}
@@ -2609,6 +2627,7 @@ function CssBoardFallback({
   environment,
   units,
   selectedId,
+  highlightedUnitIds = [],
   interactionMode,
   capacity,
   boardSkin,
@@ -2619,6 +2638,7 @@ function CssBoardFallback({
   | "units"
   | "environment"
   | "selectedId"
+  | "highlightedUnitIds"
   | "interactionMode"
   | "capacity"
   | "boardSkin"
@@ -2669,7 +2689,7 @@ function CssBoardFallback({
               {fields.map(field => <small key={field.kind}>{field.kind === "charged-deck" ? "ϟ" : "❄"}</small>)}
               {unit && (
                 <span
-                  className={`css-token ${selectedId === unit.id ? "is-selected" : ""}`}
+                  className={`css-token ${selectedId === unit.id ? "is-selected" : ""} ${highlightedUnitIds.includes(unit.id) ? "is-synergy-highlighted" : ""}`}
                 >
                   {unit.shortName.slice(0, 2)}
                 </span>
