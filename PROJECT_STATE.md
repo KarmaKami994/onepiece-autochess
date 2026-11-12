@@ -23,10 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-PAC-parity HUD implemented on `codex/pac-hud-parity`, base `041741933e9459e669998c002dc5eff43356472f`. Normal PR CI is the integration gate; live remote status is reported on the PR. Compact synergy/item/recipe cards, persistent captain rail, PAC shop/typography and presentation-only hover markers replace the broad match panels. PAC visual reference `9ab1e9a89048bec9fcac591359fad9f59c4399a3`; gameplay pin unchanged. GameContent `1.34.0`, schema 6; no domain/tuning/soak work.
+One Piece HUD visual finish implemented as `1be52c2289d73d6c9e1305272734b91a289ff890` on `codex/one-piece-hud-polish`, base `5420340d0bf91bbf29d00ed92bff7f219c3c9fef` (PR #75 squash; source `28415fa`, CI #191 green). Owner retains PAC arrangement/interactions with timber/parchment/brass colors. Approved local checks passed; normal remote CI is the PR integration gate. GameContent `1.34.0`, schema 6; no gameplay/tuning/soak work.
 
 ## Last Completed Work
 
+- 2026-11-12 — Source `1be52c2289d73d6c9e1305272734b91a289ff890`, One Piece HUD finish: timber shells, parchment detail cards, brass controls/treasure, sea-blue recruit/medallion insets, coral battle action, readable focus/clock states. Corrected the floating inspector's inherited zero flex basis and added viewport assertions for the crew header/Special Defense tile. Material files: `app/hud/one-piece-hud.css`, stylesheet import in `GameScreens`, `e2e/pac-hud.spec.ts`, HUD docs/state and new browser captures. Existing layout/commands, assets, content/schema and gameplay retained. Verification below; live PR/CI status is reported on GitHub.
 - 2026-11-12 — Implemented the owner-approved PAC HUD port: compact synergies with tiers/crew markers; item and one-level recipe hover/focus cards; persistent captain/scout rail; on-demand Galley; PAC shop, stage strip, palette and local Jost font. Existing command/save/replay/battle-economy authority retained. Material files: `app/hud/*`, `components/HudTooltip.tsx`, `GameScreens`, selectors, Phaser hover/markers, focused/E2E fixtures, font/source notices, asset validator, HUD/provenance docs and browser captures. Verification details below; no gameplay/content/schema or production aggregate change.
 - 2026-11-12 — Owner corrected the HUD target to match PAC and authorized 1:1 reuse where useful. Read targeted PAC synergy/list/detail and item/detail/pointer sources; documented exact compact rows, 100ms hover, tier/crew highlighting, visual recipes and tooltip hand-off, plus local data/command adapters. Replaced the custom HUD proposal in `docs/HUD_PAC_ANALYSE.md`; updated this state only. No runtime implementation, tests or Git publication.
 - 2026-11-12 — HUD analysis records current layout/typography/interaction weaknesses, PAC evidence, a proposed stable HUD layout and adoption boundaries. Material files: `docs/HUD_PAC_ANALYSE.md`, this state. Source and existing 1280×720 / 1920×1080 captures inspected; no new runtime checks, implementation or Git publication. B12 PR #74 was previously squash-merged as `041741933e9459e669998c002dc5eff43356472f` after fully green CI #189; local main/origin-main were updated and clean at that merge handoff.
@@ -122,6 +123,8 @@ PAC-parity HUD implemented on `codex/pac-hud-parity`, base `041741933e9459e66999
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+One Piece HUD finish (owner-approved): PASS — lint, production build and 10 unique focused browser cases at both desktop sizes. Six hover/keyboard/scouting cases passed again after the inspector correction; final two hover/capture cases passed after typography changes, including crew-header/Special-Defense viewport assertions. Existing build notices/dev animation warnings retained; no weakened timeout/assertion. Remote CI status is reported on the PR. NOT RUN — local full unit suite, separate local production aggregate, baseline or 1,000-seed soak. Details: `docs/ONE_PIECE_HUD_FINISH.md`.
 
 PAC HUD (owner-approved scope): PASS — focused board/item tests 26/26, adapter test 1/1, typecheck, lint, asset validation, build and 22 unique focused browser cases across the desktop projects (hover/keyboard/recipes, crafting/fallback, scouting, battle economy, Food/resume, tutorial/layout and sprite picking/drag). One sprite-picking attempt failed, then passed unchanged in isolation. FAIL — the one local full-suite command: 1107 passed / six deadline failures under concurrent load; all six then PASS individually with original limits. No second local full-suite run. Remote CI status is reported on the PR separately. NOT RUN — separate local production aggregate, baseline, 1,000-seed soak. Full details/captures: `docs/PAC_HUD_PORT.md`.
 
@@ -839,6 +842,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- One Piece finish changes HUD materials/colors and readable detail/focus states only. The crew inspector now exposes its previously clipped scrollable portrait/stats; a focused E2E viewport regression preserves this. No game-state, command, content, schema or asset change.
 - PAC HUD changes presentation: compact contextual cards and persistent captain rail; F2/Right enters a card, Escape dismisses nested details and preserves scouting return. Existing deploy/sell/equip/craft/serve/pause/save callbacks remain authoritative. Hover highlights never rebuild the combat timeline. Separate Special Defense is displayed; no gameplay/content/schema change.
 - B12: presentation only. 90 icons refreshed; three accepted B10 pilots remain byte-identical. Existing item/trait/status IDs, recipes, glyphs and Food paths remain. Planner equipment, results crew and Chronicle inventory now show the same local item artwork beside their unchanged names, using the existing onError glyph fallback. No gameplay/content/schema change.
 - B11 changes presentation only: preferred semantic clip packages, own form bodies and matching static identities; sprite-only transform/Phoenix/replay updates preserve the active combat timeline and resource state. Visible-only loading includes actual future forms in that frozen battle; old identity-correct fallbacks remain. No gameplay/content/schema value changed.
@@ -910,6 +914,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- One Piece finish: visual review exposed inherited crew-detail clipping; fixed only the scoped flex basis. No new gameplay or interaction model, external assets or dependency.
 - PAC HUD: PAC's referenced Jost binary is absent from its pinned source tree; bundled the same font family from official Google Fonts under SIL OFL, with exact blob/hash. Adapted PAC portions retain upstream notices. Local full-suite concurrency caused six deadlines; only failed cases were retried, with no timeout/assertion changes. Verification was explicitly approved by the owner.
 - B12: none. Icons extend the accepted local native pixel/SVG workflow without an image provider, dependency, new catalogue or runtime downloader.
 - B11: PixelLab remains unavailable, so missing raster poses use the same accepted B10 frozen image_gen/local-curation process. Eleven native-vector motion drafts were rejected for flat appearance and retained as clearly excluded working-source evidence; production uses shaded pixel bodies with their existing palette/marks/equipment. Automatic approval review declined optional source deletion because of irreversible-loss risk; retention avoids that risk and does not block delivery.
@@ -982,7 +987,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
-- PAC HUD: normal PR CI remains the integration gate. Local full-suite command failed on deadlines despite green isolated retries; do not report it as a clean full run. Existing lazy-animation development warnings appeared during view switches without console errors. Visual comparison uses pinned PAC sources, not a recorded live PAC match; local desktop hover/keyboard/camera behavior was exercised directly.
+- One Piece finish: normal PR CI remains the integration gate. Prior PAC port CI #191 passed 1113 unit/coverage tests, assets, 50/50 ordinary smoke/zero crashes, build and 97 browser cases (three existing skips); its local deadline history remains recorded separately. Existing lazy-animation dev warnings appeared during view switches without browser errors; no sprite-loader work is included here.
 - B11 was explicitly squash-merged by owner instruction despite the documented external Browser E2E installation failure (CI #186 both attempts and #187: `azure.archive.ubuntu.com` DNS). All earlier steps passed; remote browser execution was not established. No project code or CI configuration was altered to bypass the environment failure. B12 normal CI remains separately reported.
 - B11 artistic acceptance depends on contact sheets and actual board review; hashes prove distinct/reproducible drawings, not anatomy. Exact provider model/seed are unavailable; only the pinned local export is reproducible. Short faithful original clips retain documented source limits. Normal PR CI is still required; the initial CI failure was the stale P9 fixture, corrected without changing behavior or removing assertions.
 - B10/B11 style was accepted through the owner's explicit squash/series instructions. Only frozen local character exports are repeatable; image generation exposes no model/seed or identical-regeneration guarantee. Legacy assets remain available; B11 completed the missing bodies. New B12 icon quality is inspectable in contrast sheets and real UI captures; technical hashes alone are not artistic approval.
@@ -1038,7 +1043,7 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
-- 2026-11-12 — HUD target is PAC visual/interaction parity, with color and One-Piece asset substitutions. Owner explicitly allows direct PAC code reuse where useful. Preserve compact synergy thresholds with hover tiers/crew highlighting and item/recipe detail hovers; adapt data/commands while keeping existing React/Phaser ownership and gameplay. Do not ask for another basic style decision or replace this with an original alternate layout.
+- 2026-11-12 — Preserve the accepted PAC arrangement/interactions; owner now requests a One Piece timber/parchment/brass finish. Keep compact synergy thresholds, tier/crew highlights and item/recipe hovers, existing React/Phaser ownership and gameplay. Direct PAC reuse remains authorized with its existing notices; the project-authored color/material layer is separate. Do not replace the accepted layout.
 - 2026-11-11 — Owner's explicit B10 squash/B11 instruction accepts the B10 pilot/style contract for series completion: keep Koala/Kaido/Demonio masters, source-first curation, frozen local exports and separate body/FX. No new style/provider experiment or automatic B12 work.
 - B09 separates consumable stock/meal facts from equipment, recipes and profile item collection. Freeze a meal once before pairings and reuse its immutable battle identity; no combat RNG draw or duplicate stock/reward mutation during replay/regeneration. One replaced harbor option and the existing price avoid adding reward stages or currency. Schema 6 uses additive empty defaults; saved legacy offers are never regenerated.
 - B08 uses four fixed status counters/plain helpers and explicit authored PvE environment data; no generic status/event framework or weather-voting infrastructure. Neutral is the default; no environment RNG draw. Only four documented ability changes and three PvE environments are authored. Fields, actual status end facts, schema-6 additive backfill, planner/Chronicle/observer integration are part of the same candidate. Content 1.33.0 / schema 6; verification remains explicitly withheld by the owner.
@@ -1099,7 +1104,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-Review the bounded PAC HUD PR and its normal CI/desktop captures. No automatic next feature, gameplay tuning or baseline task.
+Review the One Piece HUD finish, its desktop captures and normal PR CI. No automatic merge, next feature, tuning or baseline task.
 
 ## Codex Update Contract
 
