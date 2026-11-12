@@ -1052,3 +1052,13 @@ subpaths export the 48px grid exactly 2x without embedded raster or remote calls
 Normal export reads frozen sources, not the authoring program. Contact sheets
 at 24/32/48px on dark/light backgrounds, real browser captures and limitations:
 `art/qa/b12/`, `docs/B12_ICON_COMPLETION.md`.
+
+## PAC HUD font and source — 2026-11-12
+
+The offline Jost variable font is the official Google Fonts distribution of
+the same family referenced by PAC; PAC's pinned repository does not contain its
+referenced binary. Exact source blob, runtime SHA-256 and SIL OFL licence are in
+`third_party/jost/`. Asset validation checks the bundled font hash. Adapted HUD
+source paths at PAC `9ab1e9a89048bec9fcac591359fad9f59c4399a3` and the retained
+upstream licence are recorded in `third_party/pac-hud/`. No existing crew, icon,
+atlas or map bytes were changed. Actual HUD captures: `art/qa/pac-hud/browser/`.

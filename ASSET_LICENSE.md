@@ -1,5 +1,11 @@
 # Asset licensing
 
+The locally bundled Jost font at `public/assets/ui/Jost-VF.ttf` is distributed
+under SIL Open Font License 1.1. Its licence and exact source/hash record are in
+`third_party/jost/`. Adapted PAC HUD code has separate upstream notices under
+`third_party/pac-hud/`; the source-code MIT notice does not relicense those
+upstream portions.
+
 The MIT license in `LICENSE` applies to source code only. It does not apply to
 files under `art/` or `public/`, or to franchise names, character likenesses,
 sprites, maps, portraits, tokens, animation sheets, or other media assets.

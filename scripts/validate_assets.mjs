@@ -141,6 +141,10 @@ for (const output of foodProvenance.outputs) {
 }
 
 const iconProvenance = JSON.parse(await readFile(path.join(root, "art/production/b12/provenance.json"), "utf8"));
+const hudFont = JSON.parse(await readFile(path.join(root, "third_party/jost/provenance.json"), "utf8"));
+if (await sha256(path.join(root, hudFont.path)) !== hudFont.sha256) throw new Error("HUD font provenance mismatch");
+await requireFile(path.join(root, "third_party/jost/OFL.txt"));
+await requireFile(path.join(root, "third_party/pac-hud/LICENSE"));
 const expectedIcons = [
   ...itemIds.map(id => `items/${id}`), ...foodIds.map(id => `food/${id}`),
   ...traitIds.map(id => `traits/${id}`), ...statusSpecs.statuses.map(status => `status/${status.id}`),

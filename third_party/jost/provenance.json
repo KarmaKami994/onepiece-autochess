@@ -1,0 +1,12 @@
+{
+  "family": "Jost",
+  "licence": "SIL Open Font License 1.1; OFL.txt",
+  "publisher": "indestructible type / Owen Earl",
+  "sourceRepository": "https://github.com/google/fonts",
+  "sourcePath": "ofl/jost/Jost[wght].ttf",
+  "sourceGitBlob": "cdf8630280e37a7e8040dd5a32e3c13a9794e6d4",
+  "retrieved": "2026-11-12",
+  "path": "public/assets/ui/Jost-VF.ttf",
+  "sha256": "6343b70971000b04c5d401c96ae08ce371086135e999d5e1e1413039c0213076",
+  "note": "Same font family as PAC. PAC's referenced assets/ui/Jost-VF.ttf binary is not in its pinned source tree; this local variable-font distribution is from the official Google Fonts repository. Runtime is fully offline."
+}

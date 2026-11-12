@@ -376,6 +376,7 @@ describe("P4C item production integration", () => {
     ]);
     const markup = renderToStaticMarkup(createElement(InventoryTray, {
       items: [component, completedGrant],
+      itemsById: new Map(DEFAULT_CONTENT.items.map(item => [item.id, createItemView(item.id)])),
       units: [unit],
       selectedId: unit.id,
       selectedUnit: unit,

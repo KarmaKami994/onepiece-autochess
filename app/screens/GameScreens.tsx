@@ -2,6 +2,8 @@
 
 import {
   useState,
+  useRef,
+  useEffect,
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
@@ -12,6 +14,9 @@ import {
 } from "@/components/PhaserBoard";
 import BattleBoard from "@/components/BattleBoard";
 import { VisualIcon } from "@/components/VisualIcon";
+import { HudTooltip, HudTooltipProvider } from "@/components/HudTooltip";
+import { ItemTooltip, PacTraits } from "../hud/PacHud";
+import "../hud/pac-hud.css";
 import PhaseClockDisplay from "../PhaseClockDisplay";
 import { GalleyTray } from "../GalleyTray";
 import { MUSIC_TRACKS, type AudioSettings } from "../audioSettings";
@@ -34,7 +39,6 @@ import {
   type MatchView,
   type ShopUnitView,
   type StandingView,
-  type TraitView,
 } from "../selectors";
 
 export type Settings = AudioSettings & {
@@ -711,6 +715,11 @@ export function MatchScreen({
   onSettings: () => void;
 }) {
   const [previewShopIndex, setPreviewShopIndex] = useState<number | null>(null);
+  const [traitHighlight, setTraitHighlight] = useState<{ id: string; units: string[] } | null>(null);
+  const [hoveredUnitId, setHoveredUnitId] = useState<string | null>(null);
+  const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (hoverTimer.current) clearTimeout(hoverTimer.current); }, []);
+  const hoverUnit = (id: string | null) => { if (hoverTimer.current) clearTimeout(hoverTimer.current); hoverTimer.current = setTimeout(() => setHoveredUnitId(id), 100); };
   const planning = view.phase === "preparation";
   const scouting = planning && Boolean(scoutedStanding);
   const watching = view.phase === "battle" && Boolean(scoutedStanding);
@@ -724,6 +733,9 @@ export function MatchScreen({
     ? scoutedStanding?.traits ?? []
     : battlePresentation?.traits ?? view.traits;
   const tacticalCapacity = scoutedStanding?.level ?? view.capacity;
+  const tacticalDefinitions = scouting ? scoutedStanding!.selectedDefinitionByUnit : battlePresentation?.selectedDefinitionByUnit ?? view.selectedDefinitionByUnit;
+  const inspectedUnit = selectedUnit ?? tacticalUnits.find(unit => unit.id === hoveredUnitId);
+  const inspectedDefinition = selectedUnit ? selectedDefinition : inspectedUnit ? tacticalDefinitions.get(inspectedUnit.id) : undefined;
   const playerCrewCount = view.boardUnits.filter(
     (unit) => unit.team === "player",
   ).length;
@@ -767,12 +779,14 @@ export function MatchScreen({
   }
 
   return (
-    <section className="match-screen" hidden={hidden}>
+    <HudTooltipProvider resetKey={`${hidden}:${view.round}:${view.phase}`}>
+    <section className="match-screen pac-hud" hidden={hidden}>
       <header className="match-topbar">
         <div className="round-medallion">
           <span>STAGE</span>
           <strong>{view.stageLabel}</strong>
         </div>
+        <nav className="pac-stage-path" aria-label="Voyage route">{view.stagePath.map(stage => <HudTooltip key={stage.round} label={`Round ${stage.round} details`} side="top" content={<p>R{stage.round} · {stage.name} · {stage.kind}</p>}><span className={stage.round === view.round ? "current" : ""} aria-current={stage.round === view.round ? "step" : undefined}><span aria-hidden="true">{stage.kind === "pve" ? "⚔" : stage.kind === "carousel" ? "⚓" : stage.kind === "voyage-choice" ? "♜" : "⚑"}</span><small>{stage.round}</small></span></HudTooltip>)}</nav>
         <div className="opponent-banner">
           <span className="tiny-label">
             {watching
@@ -828,6 +842,8 @@ export function MatchScreen({
           environment={battlePresentation?.environment ?? view.environment}
           audio={settings}
           units={tacticalUnits}
+          highlightedUnitIds={traitHighlight?.units ?? []}
+          onHoverUnit={hoverUnit}
           selectedId={selectedUnit?.id ?? null}
           interactionMode={tacticalInteractionMode(
             view.phase,
@@ -848,14 +864,13 @@ export function MatchScreen({
           onSelectUnit={observing ? () => undefined : onSelectUnit}
         />
         <div className="left-rail">
-          <TraitsPanel traits={tacticalTraits} />
-          {!observing && <GalleyTray galley={view.galley} units={view.boardUnits} selected={selectedUnit}
-            planning={planning} onSelect={onSelectUnit} onServe={onServeFood} />}
-          {scoutedStanding ? (
-            <ScoutIntelPanel standing={scoutedStanding} itemsById={view.itemsById} />
-          ) : (
+          <PacTraits traits={tacticalTraits} units={tacticalUnits} definitions={tacticalDefinitions} itemsById={view.itemsById} onHighlight={(id, units) => setTraitHighlight(current => units ? { id, units } : current?.id === id ? null : current)} />
+          {!observing && (view.galley.stock.length > 0 || view.galley.meal) && <HudTooltip label="Ship's galley details" side="right" content={<GalleyTray galley={view.galley} units={view.boardUnits} selected={selectedUnit}
+            planning={planning} onSelect={onSelectUnit} onServe={onServeFood} />}><button type="button" className="galley-trigger" aria-label="Open ship's galley">🍱 GALLEY <small>{view.galley.meal ? "SERVED" : view.galley.stock.reduce((count, food) => count + food.count, 0)}</small></button></HudTooltip>}
+          {!observing && (
             <InventoryTray
               items={view.inventory}
+              itemsById={view.itemsById}
               units={view.boardUnits.filter((unit) => unit.team === "player")}
               selectedId={selectedUnit?.id ?? null}
               selectedUnit={selectedUnit ?? null}
@@ -956,26 +971,26 @@ export function MatchScreen({
           )}
         </div>
         <div className="right-rail">
-          {selectedUnit && selectedDefinition && (
+          {inspectedUnit && inspectedDefinition && (<div className="crew-inspector-float" onMouseEnter={() => { if (hoverTimer.current) clearTimeout(hoverTimer.current); }} onMouseLeave={() => hoverUnit(null)}>
             <UnitInspector
-              unit={selectedUnit}
-              definition={selectedDefinition}
+              unit={inspectedUnit}
+              definition={inspectedDefinition}
               itemsById={view.itemsById}
-              canMove={planning && !scouting}
+              canMove={Boolean(selectedUnit) && planning && !scouting}
               canSell={
-                !observing &&
-                (planning || (battleEconomy && selectedUnit.zone === "bench"))
+                Boolean(selectedUnit) && !observing &&
+                (planning || (battleEconomy && inspectedUnit.zone === "bench"))
               }
               allowSell={tutorialStep === null}
               quickMove={planning && !scouting ? quickMove : null}
-              onClose={() => onSelectUnit(null)}
+              onClose={() => { setHoveredUnitId(null); onSelectUnit(null); }}
               onSell={onSellSelected}
               onMove={() => quickMove && onMoveUnit(quickMove)}
             />
-          )}
-          {!selectedUnit && (
-            <StandingsPanel
+          </div>)}
+          <StandingsPanel
               standings={view.standings}
+              itemsById={view.itemsById}
               interaction={standingsInteraction(
                 view.phase,
                 tutorialStep !== null,
@@ -983,7 +998,6 @@ export function MatchScreen({
               observedPlayerId={scoutedStanding?.id ?? null}
               onScoutPlayer={onScoutPlayer}
             />
-          )}
         </div>
       </div>
 
@@ -1035,9 +1049,7 @@ export function MatchScreen({
               : ""
           }`}
         >
-          {economyPhase && previewShopIndex !== null && view.shop[previewShopIndex] && (
-            <ShopDecisionPreview unit={view.shop[previewShopIndex]} />
-          )}
+
           <div className="shop-heading">
             <span>RECRUITMENT DOCK</span>
             <small className="shop-help">
@@ -1118,76 +1130,7 @@ export function MatchScreen({
         </div>
       </footer>
     </section>
-  );
-}
-
-function TraitsPanel({ traits }: { traits: TraitView[] }) {
-  const active = traits.filter((trait) => trait.tier > 0);
-  const building = traits.filter((trait) => trait.tier === 0);
-  const renderTrait = (trait: TraitView) => (
-    <div
-      key={trait.id}
-      className={`trait-row ${trait.tier > 0 ? "active" : ""}`}
-      style={{ "--trait-color": trait.color } as CSSProperties}
-      tabIndex={0}
-      title={trait.semanticDescription}
-      aria-label={trait.semanticDescription}
-    >
-      <VisualIcon className="trait-icon" imagePath={trait.imagePath} fallback={trait.icon} />
-      <span className="trait-copy">
-        <strong>{trait.name}</strong>
-        <small>
-          {trait.next ? `${trait.count} / ${trait.next}` : `${trait.count} · MAX`}
-        </small>
-        <span className="trait-mechanics">
-          <small>{trait.category} · {trait.scopeLabel}</small>
-          <small>{trait.tier > 0 ? `Tier ${trait.tier}: ${trait.tierLabel}` : trait.tierLabel}</small>
-          <small>{trait.staticEffects.join(", ")}</small>
-          {trait.behaviorDescriptions.map((description) => (
-            <small key={description}>{description}</small>
-          ))}
-        </span>
-      </span>
-      <span className="trait-pips">
-        {Array.from(
-          { length: Math.max(1, Math.min(3, trait.tier + 1)) },
-          (_, index) => (
-            <i key={index} className={index < trait.tier ? "filled" : ""} />
-          ),
-        )}
-      </span>
-    </div>
-  );
-
-  return (
-    <aside className="side-panel traits-panel" aria-label="Active crew traits">
-      <div className="side-heading">
-        <span>CREW BONDS</span>
-        <small>{active.length} ACTIVE</small>
-      </div>
-      <div className="trait-list">
-        {active.length === 0 && (
-          <div className="empty-panel">
-            <span>◇</span>
-            <p>Field matching crew to activate a bond.</p>
-          </div>
-        )}
-        {active.length > 0 && (
-          <span className="trait-section-label">ACTIVE BONUSES</span>
-        )}
-        {active.map(renderTrait)}
-        {building.length > 0 && (
-          <details className="trait-building" open={active.length === 0}>
-            <summary>
-              BUILDING TOWARD
-              <span>{building.length}</span>
-            </summary>
-            <div>{building.map(renderTrait)}</div>
-          </details>
-        )}
-      </div>
-      <p className="panel-tip">Duplicates count once per evolution line.</p>
-    </aside>
+    </HudTooltipProvider>
   );
 }
 
@@ -1289,11 +1232,13 @@ function ScoutIntelPanel({
 
 function StandingsPanel({
   standings,
+  itemsById,
   interaction,
   observedPlayerId,
   onScoutPlayer,
 }: {
   standings: StandingView[];
+  itemsById: Map<string, ChoiceView>;
   interaction: "scout" | "watch" | null;
   observedPlayerId: string | null;
   onScoutPlayer: (playerId: string | null) => void;
@@ -1310,6 +1255,7 @@ function StandingsPanel({
             key={standing.id}
             className={`${standing.isHuman ? "is-player" : ""} ${!standing.alive ? "eliminated" : ""} ${observedPlayerId === standing.id ? "is-scouted" : ""}`}
           >
+            <HudTooltip label={`${standing.name} captain details`} side="left" onEscape={() => { if (observedPlayerId) onScoutPlayer(null); }} content={<div className="captain-detail"><h3>{standing.name} · {standing.hp} HP</h3><p>Level {standing.level} · {standing.gold} gold</p><ScoutIntelPanel standing={standing} itemsById={itemsById} /></div>}>
             <button
               type="button"
               disabled={
@@ -1318,6 +1264,7 @@ function StandingsPanel({
                 (standing.isHuman && observedPlayerId === null)
               }
               aria-pressed={observedPlayerId === standing.id}
+              style={{ "--captain-hp": Math.max(0, Math.min(100, standing.hp)) } as CSSProperties}
               aria-label={
                 standing.isHuman
                   ? `${interaction === "watch" ? "Return to your fight" : "Return to your crew"}, level ${standing.level}, ${standing.hp} health`
@@ -1336,7 +1283,7 @@ function StandingsPanel({
             >
               <span className="rank">{index + 1}</span>
               <span className="captain-avatar" aria-hidden="true">
-                {standing.name.slice(0, 1).toUpperCase()}
+                {standing.isHuman ? "YOU" : index + 1}
               </span>
               <span className="captain-copy">
                 <strong>{standing.isHuman ? "YOU" : standing.name}</strong>
@@ -1350,6 +1297,7 @@ function StandingsPanel({
                 <b>{standing.hp}</b>
               </span>
             </button>
+            </HudTooltip>
           </li>
         ))}
       </ol>
@@ -1434,6 +1382,7 @@ function ShopCard({
     .filter(Boolean)
     .join(" · ");
   return (
+    <HudTooltip label={`${unit.name} recruitment details`} side="top" content={<ShopDecisionPreview unit={unit} />}>
     <div
       className="shop-card-shell"
       role={disabled ? "group" : undefined}
@@ -1500,6 +1449,7 @@ function ShopCard({
         <span className="shop-cost">{unit.cost}<i>●</i></span>
       </button>
     </div>
+    </HudTooltip>
   );
 }
 
@@ -1558,6 +1508,7 @@ function ShopDecisionPreview({ unit }: { unit: ShopUnitView }) {
 
 export function InventoryTray({
   items,
+  itemsById,
   units,
   selectedId,
   selectedUnit,
@@ -1569,6 +1520,7 @@ export function InventoryTray({
   onEquip,
 }: {
   items: ChoiceView[];
+  itemsById: Map<string, ChoiceView>;
   units: BoardUnit[];
   selectedId: string | null;
   selectedUnit: BoardUnit | null;
@@ -1633,10 +1585,9 @@ export function InventoryTray({
           const recipeSummary = item?.recipeResults
             ?.map((result) => `+ ${result.componentName} → ${result.resultName}`)
             .join(" · ");
-          return (
+          const button = (
             <button
               type="button"
-              key={item ? `${item.id}-${index}` : `empty-${index}`}
               className={item ? "has-item" : ""}
               style={
                 item
@@ -1675,6 +1626,7 @@ export function InventoryTray({
               {item && <VisualIcon imagePath={item.imagePath} fallback={item.icon} />}
             </button>
           );
+          return item ? <ItemTooltip key={`${item.id}-${index}`} item={item} itemsById={itemsById} side="left">{button}</ItemTooltip> : <span key={`empty-${index}`} className="empty-item-slot">{button}</span>;
         })}
       </div>
       <div className="sr-only">
@@ -1817,6 +1769,7 @@ function UnitInspector({
             ["HP", `${Math.max(0, Math.round(unit.hp))}/${health}`],
             ["ATK", attack],
             ["DEF", defense],
+            ["SP. DEF", Math.round((definition.stats.specialDefense ?? definition.stats.defense) * starScale) + effectTotal("special-defense-flat")],
             ["RANGE", range],
             ["SPEED", `${attacksPerSecond.toFixed(2)}/s`],
             ["POWER", abilityPower],
@@ -1851,7 +1804,7 @@ function UnitInspector({
           {Array.from({ length: 3 }, (_, index) => {
             const item = equippedItems[index];
             return item ? (
-              <div className="equipped-item" key={`${item.id}-${index}`}>
+              <ItemTooltip item={item} itemsById={itemsById} key={`${item.id}-${index}`} focusable side="left"><div className="equipped-item">
                 <VisualIcon className="equipped-item-icon" imagePath={item.imagePath} fallback={item.icon} />
                 <span>
                   <strong>{item.name}</strong>
@@ -1860,7 +1813,7 @@ function UnitInspector({
                       item.description}
                   </small>
                 </span>
-              </div>
+              </div></ItemTooltip>
             ) : (
               <div className="equipped-item empty-item" key={`empty-${index}`}>
                 <b aria-hidden="true">◇</b>

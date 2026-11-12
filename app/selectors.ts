@@ -75,6 +75,8 @@ export type TraitView = {
   behaviorDescriptions: string[];
   semanticDescription: string;
   color: string;
+  thresholds: Array<{ required: number; label: string; scope: string; effects: string[] }>;
+  members: Array<{ id: string; name: string; cost: number; portrait: string }>;
 };
 
 export type RecentBattleView = RecentBattleRecord & {
@@ -120,6 +122,7 @@ export type ShopUnitView = {
     health: number;
     attack: number;
     defense: number;
+    specialDefense?: number;
     range: number;
     attackIntervalMs: number;
   };
@@ -214,6 +217,7 @@ export type MatchView = {
   alive: boolean;
   round: number;
   stageLabel: string;
+  stagePath: Array<{ round: number; kind: string; name: string }>;
   gold: number;
   hp: number;
   level: number;
@@ -489,6 +493,7 @@ export function createUnitReferenceView(
       health: definition.stats.health,
       attack: definition.stats.attack,
       defense: definition.stats.defense,
+      specialDefense: definition.stats.specialDefense ?? definition.stats.defense,
       range: definition.stats.range,
       attackIntervalMs: definition.stats.attackIntervalMs,
     },
@@ -876,6 +881,14 @@ export function createTraitViews(
           behaviorDescriptions.join(" "),
         ].filter(Boolean).join(" "),
         color: visual.imagePath ? visual.color : cssColor(active.traitId),
+        thresholds: definition?.tiers.map(tier => ({
+          required: tier.required, label: tier.label,
+          scope: (tier.effectScope ?? "team") === "team" ? "Crew-wide" : "Trait holders only",
+          effects: [...tier.effects.map(describeTraitEffect), ...(tier.behaviors?.map(describeTraitBehavior) ?? [])],
+        })) ?? [],
+        members: content.units.filter(unit => unit.traits.includes(active.traitId))
+          .sort((a, b) => a.cost - b.cost || a.id.localeCompare(b.id))
+          .map(unit => ({ id: unit.id, name: unit.name, cost: unit.cost, portrait: createUnitReferenceView(unit, content).portrait })),
       };
     })
     .sort(
@@ -1626,6 +1639,10 @@ export function selectMatchView(
     alive: player.alive,
     round: state.round,
     stageLabel: `${Math.floor((state.round - 1) / 5) + 1}-${((state.round - 1) % 5) + 1}`,
+    stagePath: Array.from({ length: 7 }, (_, index) => Math.max(1, state.round - 3) + index).map(round => {
+      const definition = getStageDefinition(round, content);
+      return { round, kind: definition.kind, name: definition.name };
+    }),
     gold: player.gold,
     hp: Math.max(0, player.hp),
     level: player.level,
