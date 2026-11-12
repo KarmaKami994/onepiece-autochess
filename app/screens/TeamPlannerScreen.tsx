@@ -7,6 +7,8 @@ import { formRequirementText } from "../crewReference";
 import { deleteTeamPlan, downloadTeamPlan, readTeamPlans, storeTeamPlan } from "../plannerStorage";
 import { plannerPresentation } from "../plannerPresentation";
 import BattleBoard from "../../components/BattleBoard";
+import { VisualIcon } from "../../components/VisualIcon";
+import { itemVisual } from "../../components/gameVisualManifest";
 import type { Settings } from "./GameScreens";
 import { FIELD_HELP, WEATHER_HELP } from "../battleEnvironmentPresentation";
 import type { BoardFieldKind, WeatherKind } from "../../game";
@@ -49,6 +51,10 @@ function TeamEditor({ side, plan, content, update }: { side: "a" | "b"; plan: Te
       {Array.from({ length: content.config.itemCap }, (_, slot) => <label key={slot}>{label} item {slot + 1}<select value={selected.items[slot] ?? ""} onChange={(event) => {
         const items = [...selected.items]; items[slot] = event.target.value; edit({ items: items.filter(Boolean) });
       }}><option value="">Empty</option>{content.items.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.kind}</option>)}</select></label>)}
+      <div className="equipment-art-preview" aria-label={`${label} equipment preview`}>{selected.items.map((id, index) => {
+        const item = content.items.find(item => item.id === id);
+        return <span key={`${id}-${index}`}><VisualIcon className="inline-game-icon" imagePath={itemVisual(id).imagePath} fallback={item?.icon ?? "◆"} />{item?.name ?? id}</span>;
+      })}</div>
       <label>{label} meal<select value={selected.foodId ?? ""} onChange={event => {
         const foodId = event.target.value || undefined;
         update(units.map(unit => unit.id === selected.id ? { ...unit, foodId } : { ...unit, foodId: foodId ? undefined : unit.foodId }));

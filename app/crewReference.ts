@@ -1,6 +1,6 @@
 import { describeTraitBehavior, describeTraitEffect, getStageDefinition, resolveUnitDefinition } from "../game";
 import type { AbilityDefinition, GameContent, StarLevel, UnitStats } from "../game";
-import { STATUS_VISUALS } from "../components/gameVisualManifest";
+import { STATUS_VISUALS, traitVisual } from "../components/gameVisualManifest";
 import { createItemView, createUnitReferenceView, titleCase } from "./selectors";
 import { resolvePlannedUnit } from "../game/teamPlanner";
 import { FIELD_HELP, WEATHER_HELP } from "./battleEnvironmentPresentation";
@@ -98,7 +98,7 @@ export function crewReference(content: GameContent, star: StarLevel = 1): Refere
       "One meal per preparation, next battle only. Selling, benching or merging away the recipient before battle forfeits it. Replays do not consume another portion.",
     ] });
   for (const trait of content.traits) entries.push({
-    id: trait.id, category: "traits", name: trait.name, description: trait.description, traits: [trait.id],
+    id: trait.id, category: "traits", name: trait.name, description: trait.description, traits: [trait.id], imagePath: traitVisual(trait.id).imagePath,
     details: trait.tiers.map((tier) => `${tier.required} distinct crew · ${tier.effectScope ?? "team"}: ${tier.label}. ${tier.effects.map(describeTraitEffect).join("; ")}${tier.behaviors?.length ? `; ${tier.behaviors.map(describeTraitBehavior).join("; ")}` : ""}`),
   });
   for (const form of content.forms) {

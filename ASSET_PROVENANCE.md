@@ -1033,3 +1033,22 @@ Three project-authored 48px icon masters (Sea-Prism Shard, Black Blade, Emperor'
 | `zoro-b11-v2` | `art/production/b11/zoro/body-poses.png` | `802610e9686f56852e1a458bfb3a50c5c9f007e1e4e59b3cec3281a4c4c4ab1e` | `5f3b7525de500860bc60f7a24fa8987b960dee9c23b32f45ea819c2795e1ff7f` | `art/production/b11/zoro/body.aseprite` |
 
 Source limitations, retained good drawings and verification status: `docs/B11_CHARACTER_ANIMATION_COMPLETION.md`. Existing Luffy pivot 40/116, other bodies 64/116; all six clip timings and gameplay remain unchanged.
+
+## B12 fixed icon family — 2026-11-12
+
+93 project-authored local pixel identities: 65 equipment items (10 components,
+55 completed; 55 recipes unchanged), 3 separate Foods, 13 traits and 12 statuses.
+Sea-Prism Shard, Black Blade and Emperor's Jolly Roger reuse their accepted B10
+master/runtime bytes. The other 90 icons extend that style using explicit local
+48px drawings; no external sheet, tracing, AI provider or new licence dependency.
+The existing `art/ui-icons/*-icons.json` remain the sole catalogues.
+
+Editable palette/rows, PNG and SVG masters live at
+`art/production/b12/<family>/<id>.{json,png,svg}`. Exact catalogue, authoring,
+exporter, source, master and runtime SHA-256 records are in
+`art/production/b12/provenance.json`; Food retains
+`art/ui-icons/food-provenance.json`. Runtime paths are unchanged; rectangle
+subpaths export the 48px grid exactly 2x without embedded raster or remote calls.
+Normal export reads frozen sources, not the authoring program. Contact sheets
+at 24/32/48px on dark/light backgrounds, real browser captures and limitations:
+`art/qa/b12/`, `docs/B12_ICON_COMPLETION.md`.

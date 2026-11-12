@@ -1,0 +1,2465 @@
+{
+  "author": "One Piece Auto Chess project",
+  "permission": "Original project-authored pixel artwork; no external download, tracing, provider or new licence dependency. Three accepted B10 icon masters retained byte-for-byte at runtime.",
+  "contract": "48px editable palette/rows; upper-left light, warm outline, up to four tones per material; exact integer 2x rectangle SVG export, transparent margin; no embedded raster or external requests.",
+  "catalogue": "Existing art/ui-icons/*-icons.json only; IDs, kind, traitBadge and fallback mapping unchanged. Outputs are evidence, not a second maintained item catalogue.",
+  "inputs": [
+    {
+      "path": "art/ui-icons/item-icons.json",
+      "bytes": 6455,
+      "sha256": "2f1914bca8442e1b1f1cb87ea7d3e92357621005a0de281b1041df93af518ae5"
+    },
+    {
+      "path": "art/ui-icons/food-icons.json",
+      "bytes": 453,
+      "sha256": "9bc8f8b30573a6deb4870a661daffe736de024a36f9abe60cf367d6613b3a6db"
+    },
+    {
+      "path": "art/ui-icons/trait-icons.json",
+      "bytes": 1494,
+      "sha256": "368664a7de529e88d6cda45e7278f22a1610d0cbeeb404944ed36315e397cc9d"
+    },
+    {
+      "path": "art/ui-icons/status-icons.json",
+      "bytes": 1339,
+      "sha256": "11045c9c7688d9da96999ee168495350c6379c48f0b2ce914875beea9d51b893"
+    },
+    {
+      "path": "scripts/assets/author_b12_icons.mjs",
+      "bytes": 26297,
+      "sha256": "9bc7a624af76811ee5efd9f288f77316a9c712b32720385d18e6098a2b29c728"
+    },
+    {
+      "path": "scripts/assets/pixel_icon_source.mjs",
+      "bytes": 2577,
+      "sha256": "46cd9d2fcf70d40d236cf277b4e3060fcecf57ae2ff3dae2a5d915f951a3fc6f"
+    },
+    {
+      "path": "scripts/assets/build_b12_icons.mjs",
+      "bytes": 5332,
+      "sha256": "617d4ccf2b260946740fe5e5b3a716a231b7ecad41dbd30cc6aa8695819303d1"
+    },
+    {
+      "path": "scripts/assets/build_food_icons.mjs",
+      "bytes": 1385,
+      "sha256": "c6130e7ae1950b57321f8c3f1d0ce3e111820e04c2a912d4b0179c522440b50b"
+    }
+  ],
+  "outputs": [
+    {
+      "family": "items",
+      "id": "black-blade",
+      "kind": "completed",
+      "retainedPilot": true,
+      "source": {
+        "path": "art/production/b12/items/black-blade.json",
+        "bytes": 2930,
+        "sha256": "397d78a9e5b7156e7be95ba8a5001eba93317bda6af1c8af74fab012b7cd17c9"
+      },
+      "master": {
+        "path": "art/production/b12/items/black-blade.png",
+        "bytes": 431,
+        "sha256": "1e906798667fe6231eee4fbe19e05f2f081510c8749bf2601942e51ca7f3eabd"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/black-blade.svg",
+        "bytes": 1866,
+        "sha256": "bc0925999470ddb76c0dabc1af12198d891a8d82ad6f6b3e0cb483370dd7bb7c"
+      },
+      "original": {
+        "path": "art/production/b10/icons/black-blade.svg",
+        "bytes": 1008,
+        "sha256": "481c01d9dfd1f0c653e64aa597ba0be5ee75bbd31ecfc7c5808d525b03ed292c"
+      },
+      "output": {
+        "path": "public/assets/items/black-blade.svg",
+        "bytes": 1008,
+        "sha256": "fe8605db8d84b967c9dac2be4e664cd6b9da5ba07ed932d6c9f03ba71b9851bf"
+      }
+    },
+    {
+      "family": "items",
+      "id": "meat-platter",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/meat-platter.json",
+        "bytes": 3065,
+        "sha256": "a6c478873c2fa236658aefb00afb1eccfb73feedbf61fb9ac2ccc0f0054f2e01"
+      },
+      "master": {
+        "path": "art/production/b12/items/meat-platter.png",
+        "bytes": 713,
+        "sha256": "5ef65b3096d32ce54b13fd41ca7e413b6cef4c72b66bbd6a5e609e26a68ba420"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/meat-platter.svg",
+        "bytes": 5116,
+        "sha256": "25536dc665f39af2745b08c7ded394e7c90ffd462cfe78a0f94f77e8b91e56eb"
+      },
+      "output": {
+        "path": "public/assets/items/meat-platter.svg",
+        "bytes": 5310,
+        "sha256": "c5d819646e55bb650e75cd0e636531fe2c7320f9f1659e4701d8c8e72871d07d"
+      }
+    },
+    {
+      "family": "items",
+      "id": "clima-tact",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/clima-tact.json",
+        "bytes": 2930,
+        "sha256": "416555c0832c6c03df5bc91531238ba1e00c7a3a22f11f52ba710a3e7bd227a9"
+      },
+      "master": {
+        "path": "art/production/b12/items/clima-tact.png",
+        "bytes": 560,
+        "sha256": "ff4abf2fa6cbd86e00a5c695600ebdc753663756b1b5c80e87977cec5e817336"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/clima-tact.svg",
+        "bytes": 4026,
+        "sha256": "0e504684f10e9529f6fe982f4680f32996e3af7d226f7c9e5489da75ef2c7419"
+      },
+      "output": {
+        "path": "public/assets/items/clima-tact.svg",
+        "bytes": 4180,
+        "sha256": "d7d370ef4f4e69b939f70742839574dd2e68eb1497cf6c38b02b03788dac98fc"
+      }
+    },
+    {
+      "family": "items",
+      "id": "sniper-goggles",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/sniper-goggles.json",
+        "bytes": 2975,
+        "sha256": "b0efda6ca1a346c259f3b9d7bb1a3d295115ab53e5a4226849bd949b611fe535"
+      },
+      "master": {
+        "path": "art/production/b12/items/sniper-goggles.png",
+        "bytes": 567,
+        "sha256": "ce315f470b72b980780aee064dced2dc945a6c163d6fc4ff8702a7eb365b5637"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/sniper-goggles.svg",
+        "bytes": 4020,
+        "sha256": "7f399e4cde97f9010af888b5bd8eed1ccaf29f03fd12779173ad25a2ee4b40db"
+      },
+      "output": {
+        "path": "public/assets/items/sniper-goggles.svg",
+        "bytes": 4127,
+        "sha256": "85f61bd53d71acf0dbf191bf3dcb0bbbd337b2ce52aafec9107de5008e1510e8"
+      }
+    },
+    {
+      "family": "items",
+      "id": "sea-prism-stone",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/sea-prism-stone.json",
+        "bytes": 3035,
+        "sha256": "18fe0f9df560dc46751f504f271838d1608c77332c69875370193db0075624ce"
+      },
+      "master": {
+        "path": "art/production/b12/items/sea-prism-stone.png",
+        "bytes": 639,
+        "sha256": "6c4a45a37479b2ebc777ccacf7fae7d14a8d7744a14fe25fbac620467ba5139b"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/sea-prism-stone.svg",
+        "bytes": 4206,
+        "sha256": "267bf3c0a2baa77d6b2b7eed423aeb89ff4d2be0e975f02156f3bee9f772eb1e"
+      },
+      "output": {
+        "path": "public/assets/items/sea-prism-stone.svg",
+        "bytes": 4358,
+        "sha256": "8bd04b175d0a5f833d8f96e2cac8c41d3e8bb919aeed06162a0b1715b142d512"
+      }
+    },
+    {
+      "family": "items",
+      "id": "armament-wraps",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/armament-wraps.json",
+        "bytes": 2975,
+        "sha256": "ae7805406913d65d8040ea2cc8fc688b3175b76ceef3e5b1208cd8f1f7c0f68a"
+      },
+      "master": {
+        "path": "art/production/b12/items/armament-wraps.png",
+        "bytes": 576,
+        "sha256": "b5178911fcac8824fc4db94ae6e3b8a2db80f1933d6433d898238be19d4423a4"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/armament-wraps.svg",
+        "bytes": 3482,
+        "sha256": "4dee6c8602e0676d018758e249b18040400d30deb5f90480867c4c38acaa79b1"
+      },
+      "output": {
+        "path": "public/assets/items/armament-wraps.svg",
+        "bytes": 3630,
+        "sha256": "f37bca9b3e5e082d7a98b2a273148e25740863c4329064c73d54a30049877771"
+      }
+    },
+    {
+      "family": "items",
+      "id": "den-den-mushi",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/den-den-mushi.json",
+        "bytes": 3125,
+        "sha256": "3773af7bff8b99417fc5e39dd9dc2ef2a1f16086273fdfc8f0eef39eba7fb2ee"
+      },
+      "master": {
+        "path": "art/production/b12/items/den-den-mushi.png",
+        "bytes": 709,
+        "sha256": "84450a675941b5edca23d2a2cc0c684bb4a7b96cb07ee3514239888cb0817fe6"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/den-den-mushi.svg",
+        "bytes": 4719,
+        "sha256": "f42cb25e95767df4ffd565dde4c5488e609ad627ef7dc8dd40c145b9eb422102"
+      },
+      "output": {
+        "path": "public/assets/items/den-den-mushi.svg",
+        "bytes": 4876,
+        "sha256": "27e13d7f18e4524f80d9efd16c7172222fc3eaaebd7a1fa65be9109bd980cfda"
+      }
+    },
+    {
+      "family": "items",
+      "id": "cola-engine",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/cola-engine.json",
+        "bytes": 2990,
+        "sha256": "c25b9a1d15b45e06e01f3c2dadb48a7f6c6fbfd037dd4f55b482a995b475f793"
+      },
+      "master": {
+        "path": "art/production/b12/items/cola-engine.png",
+        "bytes": 712,
+        "sha256": "08b8037a7614bebedfaf601f2ccfb9471d0d1e48b171433bd83b358d1d6eb709"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/cola-engine.svg",
+        "bytes": 4852,
+        "sha256": "99a571836cdd4c7897fe949213dea4e3ee14b73876067eac82bbb37a51b455cf"
+      },
+      "output": {
+        "path": "public/assets/items/cola-engine.svg",
+        "bytes": 5030,
+        "sha256": "c44f8d10cf89f802bdfaa72c0f98c10a7cee4e066c3bda75d9f33173002aea8d"
+      }
+    },
+    {
+      "family": "items",
+      "id": "jolly-roger-fragment",
+      "kind": "component",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/jolly-roger-fragment.json",
+        "bytes": 2915,
+        "sha256": "649b1231ed39c5e379f4ca6dfe61393dbe7434eafaf083a5a0d40caedec8d30a"
+      },
+      "master": {
+        "path": "art/production/b12/items/jolly-roger-fragment.png",
+        "bytes": 557,
+        "sha256": "380e913d44237545bf3b286014f70367fbb08d1b50c9af5573a657e0770d9611"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/jolly-roger-fragment.svg",
+        "bytes": 3497,
+        "sha256": "9c7750d8fbd9c7cba73ec580aa58602865afcf21553b91369cd43344584367e6"
+      },
+      "output": {
+        "path": "public/assets/items/jolly-roger-fragment.svg",
+        "bytes": 3622,
+        "sha256": "85a744c37c6dc58f479e66921d8a34cc62ae950cee297b39be0d49d5d9264250"
+      }
+    },
+    {
+      "family": "items",
+      "id": "devil-fruit-essence",
+      "kind": "component",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/devil-fruit-essence.json",
+        "bytes": 2975,
+        "sha256": "e47c54a019173133cb5c9cc833a74d86216e5e4f782d7921c3fcd4c8d6174c2e"
+      },
+      "master": {
+        "path": "art/production/b12/items/devil-fruit-essence.png",
+        "bytes": 575,
+        "sha256": "cd7de3eab74ccda46ea2d6f22e7d4ff45c8d8923e49c46d76233457162a68b01"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/devil-fruit-essence.svg",
+        "bytes": 3878,
+        "sha256": "6f109ba97f7686a44d0f322a90ff5905254c29c9d3cd49621b249c5653a735a2"
+      },
+      "output": {
+        "path": "public/assets/items/devil-fruit-essence.svg",
+        "bytes": 4045,
+        "sha256": "bc280a7f18bf05f5dd2e6fab5a3d53d74dbfc6e25f905cc152716bb6c56c98b8"
+      }
+    },
+    {
+      "family": "items",
+      "id": "cola-canister",
+      "kind": "component",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/cola-canister.json",
+        "bytes": 3005,
+        "sha256": "d57a11e2faca0858b788ad334ed1e44090ae3d157422afdcbddd2c32c20da4c0"
+      },
+      "master": {
+        "path": "art/production/b12/items/cola-canister.png",
+        "bytes": 530,
+        "sha256": "3f8a411742139bfdad0c71bdb6645cd8e9ff75d80fe4555762198d7ab14e1036"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/cola-canister.svg",
+        "bytes": 2967,
+        "sha256": "870d2df1666f57e4115bc21c97558bdc72e95a38c815285bf0613834b9f75493"
+      },
+      "output": {
+        "path": "public/assets/items/cola-canister.svg",
+        "bytes": 3071,
+        "sha256": "86b26db6a757741f0ee25132dd77a5e24ff86a51ffcd4be904a63a03aa9e5018"
+      }
+    },
+    {
+      "family": "items",
+      "id": "jet-dial",
+      "kind": "component",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/jet-dial.json",
+        "bytes": 2975,
+        "sha256": "582468882ce6de650b36f23d675ff12efb4bdc5894efa0a509bbeb588c430a5e"
+      },
+      "master": {
+        "path": "art/production/b12/items/jet-dial.png",
+        "bytes": 606,
+        "sha256": "6d7d109289bfb167177ec97eef082b9daf25c564e6afe0143b94523d7d3630d5"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/jet-dial.svg",
+        "bytes": 4529,
+        "sha256": "c8f8612c870ad4d88111c4fa088a89905dfdc40a81d9c6945c8388dae7650539"
+      },
+      "output": {
+        "path": "public/assets/items/jet-dial.svg",
+        "bytes": 4681,
+        "sha256": "73eca272fba1b954117498f684a81fd1f40663838b4777172ccbf7c000a81e5a"
+      }
+    },
+    {
+      "family": "items",
+      "id": "sniper-lens",
+      "kind": "component",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/sniper-lens.json",
+        "bytes": 2990,
+        "sha256": "db51a2ad4a0b45fccb021910c662a544a9caf1a64a03c0d9975dc469f17f74c4"
+      },
+      "master": {
+        "path": "art/production/b12/items/sniper-lens.png",
+        "bytes": 615,
+        "sha256": "4e758b715adabc5423a493c980007023fd587601d339552357f2107420919fad"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/sniper-lens.svg",
+        "bytes": 4233,
+        "sha256": "938d417f542f563c0ca01cca0f7e346c7c09830f4928128f606c68657ae92303"
+      },
+      "output": {
+        "path": "public/assets/items/sniper-lens.svg",
+        "bytes": 4400,
+        "sha256": "672214d7ac4b7edf8d3c97bac4bfff353fb61952286852348cf9383dbadec4cd"
+      }
+    },
+    {
+      "family": "items",
+      "id": "sea-king-meat",
+      "kind": "component",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/sea-king-meat.json",
+        "bytes": 3065,
+        "sha256": "51860bb7ea8b8d2997bf20dc208fbdcbd5a990c82a05feaf94c5b3e0f73c4272"
+      },
+      "master": {
+        "path": "art/production/b12/items/sea-king-meat.png",
+        "bytes": 635,
+        "sha256": "359f913569e409d5dd431dbab4a7b0bbc6c6fcd97f8885a6c135de4e63a4b47a"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/sea-king-meat.svg",
+        "bytes": 4691,
+        "sha256": "f35e884654049fb978d46e6f1e6b3c0f0d46d2764cdf5dd3b50f7b04f2224448"
+      },
+      "output": {
+        "path": "public/assets/items/sea-king-meat.svg",
+        "bytes": 4848,
+        "sha256": "0b70e18bc1b9664aa7f6b1da6e16669af961f8fda42da6ea64b9b2bd21d761da"
+      }
+    },
+    {
+      "family": "items",
+      "id": "sea-prism-shard",
+      "kind": "component",
+      "retainedPilot": true,
+      "source": {
+        "path": "art/production/b12/items/sea-prism-shard.json",
+        "bytes": 2885,
+        "sha256": "1c0eef80ee44fef81ffee1e86a1565b7198b94f5ad403fa859c1d926c400714b"
+      },
+      "master": {
+        "path": "art/production/b12/items/sea-prism-shard.png",
+        "bytes": 418,
+        "sha256": "624ef482c452bfa6fbc05c40e71c6f56e0b5c9326d3e3e3bf2f6c8182ae729eb"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/sea-prism-shard.svg",
+        "bytes": 1779,
+        "sha256": "6095f8e06683e243a2fa191c6d49b0b62617cfeee71ccd682c2259692979c52f"
+      },
+      "original": {
+        "path": "art/production/b10/icons/sea-prism-shard.svg",
+        "bytes": 860,
+        "sha256": "8f377fb39c07ad9b4b7725097eb4cc6e1a14843a164d0f7cacc05c37e6d617c7"
+      },
+      "output": {
+        "path": "public/assets/items/sea-prism-shard.svg",
+        "bytes": 860,
+        "sha256": "ac4734a620de12f7ac318283e6364d05ab18071f34b6692bef3efe3fe0306955"
+      }
+    },
+    {
+      "family": "items",
+      "id": "black-blade-shard",
+      "kind": "component",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/black-blade-shard.json",
+        "bytes": 2855,
+        "sha256": "d0087d6edc002d774e54863325f78e033231fe45ae6af16293febfca94f7b13c"
+      },
+      "master": {
+        "path": "art/production/b12/items/black-blade-shard.png",
+        "bytes": 421,
+        "sha256": "d7289134e5c9c594f2afe078d84f4b52216cbcc09845194c246ce00ccbea1be7"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/black-blade-shard.svg",
+        "bytes": 2839,
+        "sha256": "40fd69f846f4a8b7f1508258f0b2af1619e202d9b0f6795ff9927d16c1dc44be"
+      },
+      "output": {
+        "path": "public/assets/items/black-blade-shard.svg",
+        "bytes": 2965,
+        "sha256": "c09b0955fc89c94e091b7f4b35481bbb60304c1c5a36c567c3ebbfe242aa2350"
+      }
+    },
+    {
+      "family": "items",
+      "id": "armament-plate",
+      "kind": "component",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/armament-plate.json",
+        "bytes": 2960,
+        "sha256": "5270ac10df270f6a4d3f0139fa16e7493221eb5cf67011b479bebea49f53580f"
+      },
+      "master": {
+        "path": "art/production/b12/items/armament-plate.png",
+        "bytes": 578,
+        "sha256": "c9a816a15628b429ed91895d5f4aaf3dbb7e1f795e719ccb01a866e46f069942"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/armament-plate.svg",
+        "bytes": 3755,
+        "sha256": "3ff418c17db66e613df73df02b6c0fec22eabc14fe9a472d58805656063f7927"
+      },
+      "output": {
+        "path": "public/assets/items/armament-plate.svg",
+        "bytes": 3899,
+        "sha256": "7738b6d2587a30d66282f918ce3808873903d11ecb2cc2a5f8845cab1197a6b1"
+      }
+    },
+    {
+      "family": "items",
+      "id": "captains-sash",
+      "kind": "component",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/captains-sash.json",
+        "bytes": 3050,
+        "sha256": "7df7e7e9e8d465b9f95216adcfe94db5dde78740c386c8396a324a8c48c45032"
+      },
+      "master": {
+        "path": "art/production/b12/items/captains-sash.png",
+        "bytes": 561,
+        "sha256": "e188baa818729b0814c7841f2add59605e11d9ed7b636ba68b1bfd72f41d7cdf"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/captains-sash.svg",
+        "bytes": 3820,
+        "sha256": "3d371faf2ecfb4c3c405ae1016038b35dddace77f05525ec8f5bac5233d826cf"
+      },
+      "output": {
+        "path": "public/assets/items/captains-sash.svg",
+        "bytes": 3949,
+        "sha256": "f987e03286f83f9655b6abf2a525dfb069b768fc4cf3155c739eaa35eaeed548"
+      }
+    },
+    {
+      "family": "items",
+      "id": "emperors-jolly-roger",
+      "kind": "completed",
+      "traitBadge": "emperor",
+      "retainedPilot": true,
+      "source": {
+        "path": "art/production/b12/items/emperors-jolly-roger.json",
+        "bytes": 2915,
+        "sha256": "346d3782ce15164cb7a5fdcdcbd95e36f76793848194a942ffae757a3c033179"
+      },
+      "master": {
+        "path": "art/production/b12/items/emperors-jolly-roger.png",
+        "bytes": 411,
+        "sha256": "e8aaf9e15f30cab2aa60ef9918081ea5a34ed8434e4857ba91cdead127858753"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/emperors-jolly-roger.svg",
+        "bytes": 1742,
+        "sha256": "1a7977e9fd7fa9c5e2d2285826c720e362992fc92d8dc332f141c38772022524"
+      },
+      "original": {
+        "path": "art/production/b10/icons/emperors-jolly-roger.svg",
+        "bytes": 934,
+        "sha256": "e25cc936abcc536c2217a11ebd09a0489597217bf43a797eba7c9bd6b786f41f"
+      },
+      "output": {
+        "path": "public/assets/items/emperors-jolly-roger.svg",
+        "bytes": 934,
+        "sha256": "078c4cae6c7f4c583d3d3e88a19bec12d27dcfe0ebad5d09919cbc88c86c5cb2"
+      }
+    },
+    {
+      "family": "items",
+      "id": "specialists-log-pose",
+      "kind": "completed",
+      "traitBadge": "specialist",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/specialists-log-pose.json",
+        "bytes": 3065,
+        "sha256": "d6537d8b75379cb1540d897330ea37018c8c4df3160fdc9c8425ba378c6a00eb"
+      },
+      "master": {
+        "path": "art/production/b12/items/specialists-log-pose.png",
+        "bytes": 709,
+        "sha256": "529fdac3ba8fd0af39ce748b64f434201956dd7942e9ec09d8ebb54987f1c012"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/specialists-log-pose.svg",
+        "bytes": 5330,
+        "sha256": "9bf4a0cee1f0c85471f82e09a99e53b042c25666390169b47a004f698cfd2fd7"
+      },
+      "output": {
+        "path": "public/assets/items/specialists-log-pose.svg",
+        "bytes": 5510,
+        "sha256": "5699922f8be4502151c9013f342110dd4ba07905fce140df5f3a10f7d570db46"
+      }
+    },
+    {
+      "family": "items",
+      "id": "marine-justice-coat",
+      "kind": "completed",
+      "traitBadge": "navy",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/marine-justice-coat.json",
+        "bytes": 3095,
+        "sha256": "268acc41b699d50fac43bd32a41ed34d3f6f0a24aa28c5ff7ed717477f722612"
+      },
+      "master": {
+        "path": "art/production/b12/items/marine-justice-coat.png",
+        "bytes": 759,
+        "sha256": "675578a3cce19193647852f0c6a803fff21242dc5dce07162b4a3780ab04cf6a"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/marine-justice-coat.svg",
+        "bytes": 4893,
+        "sha256": "9f4ca29a1fbad936e44a43d7168abd20764f3ab42f8d097a6b25238cd4fbc745"
+      },
+      "output": {
+        "path": "public/assets/items/marine-justice-coat.svg",
+        "bytes": 5076,
+        "sha256": "3991ee8f0774395f60ee6048a46d16d352611f8627a16a4126fdbb3ce486ad26"
+      }
+    },
+    {
+      "family": "items",
+      "id": "marksmans-thunder-dial",
+      "kind": "completed",
+      "traitBadge": "marksman",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/marksmans-thunder-dial.json",
+        "bytes": 3005,
+        "sha256": "e66bea908cbd70da363d90adee821b5db858b9d8a12797781499c4ac6a5f8968"
+      },
+      "master": {
+        "path": "art/production/b12/items/marksmans-thunder-dial.png",
+        "bytes": 700,
+        "sha256": "0c65b5012401d5aaa58d56b887c2fca3790829fdee17e5b75c3d26a7b1514b30"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/marksmans-thunder-dial.svg",
+        "bytes": 5393,
+        "sha256": "d7fff83ec2e9b7f26b18f6873f5193163904ec780113766fa5bf59a8ba0698d8"
+      },
+      "output": {
+        "path": "public/assets/items/marksmans-thunder-dial.svg",
+        "bytes": 5585,
+        "sha256": "7618bbaa3a2ab819734bf66dec68bb4a7ed075ccf4267677408ad728a198f0ee"
+      }
+    },
+    {
+      "family": "items",
+      "id": "captains-logbook",
+      "kind": "completed",
+      "traitBadge": "captain",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/captains-logbook.json",
+        "bytes": 3140,
+        "sha256": "546285fe34ab9fcbe89fc1e345bfa2dc95f777f654357ac521076b3ff76445f9"
+      },
+      "master": {
+        "path": "art/production/b12/items/captains-logbook.png",
+        "bytes": 730,
+        "sha256": "a45fb260ca440a4b8270c11a08b6ff318f6c3970f6191d29edf8b0492f46ba15"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/captains-logbook.svg",
+        "bytes": 4686,
+        "sha256": "49d82de84a03776fbe7737d3195c32bcff7a313338dd035f7969e98a028f8b62"
+      },
+      "output": {
+        "path": "public/assets/items/captains-logbook.svg",
+        "bytes": 4797,
+        "sha256": "ba13c0eccc2079ed30d00a97069febbc14899df53194e82de7b23de7d42b49e3"
+      }
+    },
+    {
+      "family": "items",
+      "id": "brawlers-rumble-emblem",
+      "kind": "completed",
+      "traitBadge": "brawler",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/brawlers-rumble-emblem.json",
+        "bytes": 3050,
+        "sha256": "3710eaa2b8ef6bdeab8c72a5176804a9ffc006393109e5cad5a463c91baed6a0"
+      },
+      "master": {
+        "path": "art/production/b12/items/brawlers-rumble-emblem.png",
+        "bytes": 652,
+        "sha256": "88e73c65eb49ed89c7d56cc0f7a8e6bde9b63aaca4657bcefcee3f16dda8445c"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/brawlers-rumble-emblem.svg",
+        "bytes": 4127,
+        "sha256": "d08f30d32103541998eb68cb64365ea0d0d20c9d0a517c7541139115724f9435"
+      },
+      "output": {
+        "path": "public/assets/items/brawlers-rumble-emblem.svg",
+        "bytes": 4284,
+        "sha256": "c44fa937410da78e18b0011d093278be9fa933346fc4d43aeb340d94281bc4fa"
+      }
+    },
+    {
+      "family": "items",
+      "id": "guardians-sea-prism-crest",
+      "kind": "completed",
+      "traitBadge": "guardian",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/guardians-sea-prism-crest.json",
+        "bytes": 3035,
+        "sha256": "1d88fc522264e4f5b98c18eccfced81338c51178dbd0e23a12e8418dd7c18514"
+      },
+      "master": {
+        "path": "art/production/b12/items/guardians-sea-prism-crest.png",
+        "bytes": 674,
+        "sha256": "46a2d8240d033c3a174c344b50bad68979115fe060612bb43fb03bcdb959b37e"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/guardians-sea-prism-crest.svg",
+        "bytes": 4364,
+        "sha256": "900e368dc5358608d5a1382e21074ed48da0856bd46419f4e2859e7e2ff66da2"
+      },
+      "output": {
+        "path": "public/assets/items/guardians-sea-prism-crest.svg",
+        "bytes": 4530,
+        "sha256": "36c12249d13ccfec7db03ea8bf8466cd4697f653edbfa0d7627865c24c478377"
+      }
+    },
+    {
+      "family": "items",
+      "id": "revolutionary-flame",
+      "kind": "completed",
+      "traitBadge": "revolutionary",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/revolutionary-flame.json",
+        "bytes": 3020,
+        "sha256": "6bb54a7db285015802c849e1b1c90e6313e541462531bb37612c0d318fcf276e"
+      },
+      "master": {
+        "path": "art/production/b12/items/revolutionary-flame.png",
+        "bytes": 670,
+        "sha256": "86413522cc0320c94068068fdbc123133df59c5edaf34a76e626354ee0818fcc"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/revolutionary-flame.svg",
+        "bytes": 4438,
+        "sha256": "c115a37119d1d47ba59a8ca6b7f4a1afdad2b84d98c6b7f81857363d8cdd397e"
+      },
+      "output": {
+        "path": "public/assets/items/revolutionary-flame.svg",
+        "bytes": 4595,
+        "sha256": "f0fdb87f4ea96f71587f6241c85ef763e4a685137a61382b79e41070ef099139"
+      }
+    },
+    {
+      "family": "items",
+      "id": "straw-hat-token",
+      "kind": "completed",
+      "traitBadge": "straw-hat",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/straw-hat-token.json",
+        "bytes": 2915,
+        "sha256": "333f0d0de9395b206c68ac467b328b41e03bc8fead4415746220751cc43822c5"
+      },
+      "master": {
+        "path": "art/production/b12/items/straw-hat-token.png",
+        "bytes": 547,
+        "sha256": "4c00ed08e908498281ce781832bd17fa231b8ac225f4e726988f01ff3a0375d7"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/straw-hat-token.svg",
+        "bytes": 3622,
+        "sha256": "6260119faa37c8f1326cb70fe6f919a78f23d8adb84a163b37e8e2dd876c1072"
+      },
+      "output": {
+        "path": "public/assets/items/straw-hat-token.svg",
+        "bytes": 3796,
+        "sha256": "0f23ae4d7e879c7629ac6bf56c19750c1edfb89f76b825f18c3748093b3232d8"
+      }
+    },
+    {
+      "family": "items",
+      "id": "swordsmans-knot",
+      "kind": "completed",
+      "traitBadge": "swordsman",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/swordsmans-knot.json",
+        "bytes": 2945,
+        "sha256": "cf4657d5424d2270920b493908101c6cf92a25809cbb4a8c4091a189611a6d75"
+      },
+      "master": {
+        "path": "art/production/b12/items/swordsmans-knot.png",
+        "bytes": 716,
+        "sha256": "f67d5ac15d01b20d1f1fd40a724af5d6e374fb3a6c26c649d376c9233c1f400f"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/swordsmans-knot.svg",
+        "bytes": 5931,
+        "sha256": "ec9bce93258b8c794e142b87c6641cd41ab8fea50a31f924aa29960fef14f348"
+      },
+      "output": {
+        "path": "public/assets/items/swordsmans-knot.svg",
+        "bytes": 6105,
+        "sha256": "6947d7f6c7e98718e9ed0fca429f7aad0307b13be32400445fbc88f61dc0e9d5"
+      }
+    },
+    {
+      "family": "items",
+      "id": "devil-fruit-codex",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/devil-fruit-codex.json",
+        "bytes": 3050,
+        "sha256": "2d05a3b2ec9b45b3ee074c10b3d172ce319f90a16c5e255de5a278c46f3cbc08"
+      },
+      "master": {
+        "path": "art/production/b12/items/devil-fruit-codex.png",
+        "bytes": 706,
+        "sha256": "8df845856f093f8c390ea0c598e8afbb9f99e474a3697533af412ed6d630ddd5"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/devil-fruit-codex.svg",
+        "bytes": 4717,
+        "sha256": "d023bc784a35699aa8644bf03596ad0db3a2a617b73069c35bd0d343dcc30f3d"
+      },
+      "output": {
+        "path": "public/assets/items/devil-fruit-codex.svg",
+        "bytes": 4844,
+        "sha256": "28766dcf4dece8759a9a149699f585492d7ec4014676f158a01b9b632bda99bd"
+      }
+    },
+    {
+      "family": "items",
+      "id": "observation-haki-mantle",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/observation-haki-mantle.json",
+        "bytes": 2945,
+        "sha256": "3dfaa015b12d22524f2eace32ed60ecf2dc2c25105fbcd3dbfd3df43cef8e923"
+      },
+      "master": {
+        "path": "art/production/b12/items/observation-haki-mantle.png",
+        "bytes": 577,
+        "sha256": "806e52143b83eb9c4916cc2db4d91c18d2a51a7c578d5c9de56dc33a1fdfb123"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/observation-haki-mantle.svg",
+        "bytes": 3846,
+        "sha256": "b461eb9bb084beb7331ae2a5af99921ee5461ede6f6f8fe2714e89f692941db8"
+      },
+      "output": {
+        "path": "public/assets/items/observation-haki-mantle.svg",
+        "bytes": 3995,
+        "sha256": "b20421b1717f5939675bf2e0584bfdb48fdfead62dc0f018224fca2f5c032206"
+      }
+    },
+    {
+      "family": "items",
+      "id": "barrier-bubble",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/barrier-bubble.json",
+        "bytes": 2930,
+        "sha256": "b4182d27712fdb66811518cd1aeb9187a82c4f81427ea003767b974eb18258d8"
+      },
+      "master": {
+        "path": "art/production/b12/items/barrier-bubble.png",
+        "bytes": 563,
+        "sha256": "36b560ac822f109246c4f3d5c5261f49fc52fe8451587d6ce8113ec829b8741c"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/barrier-bubble.svg",
+        "bytes": 3280,
+        "sha256": "10127fe1651fb200ffe52042e271d55650190a1191552a7b2dabb56f714a727d"
+      },
+      "output": {
+        "path": "public/assets/items/barrier-bubble.svg",
+        "bytes": 3444,
+        "sha256": "98afca652b8de59106b01770fac7a88a3faaebf915cffed1dbab82f28c367301"
+      }
+    },
+    {
+      "family": "items",
+      "id": "reflect-dial",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/reflect-dial.json",
+        "bytes": 2990,
+        "sha256": "518f7266502499f21ea8e23a38db966061a95ee84555bb18d712c8ec8265d1a6"
+      },
+      "master": {
+        "path": "art/production/b12/items/reflect-dial.png",
+        "bytes": 672,
+        "sha256": "0fb7f63af795dd884595e308faf2ffb32073f0b1731f95a298c259664fa55d96"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/reflect-dial.svg",
+        "bytes": 4887,
+        "sha256": "66333a83289b69a2bde958db53564a84c47736b4cade6cc435bb7fb0d3d59238"
+      },
+      "output": {
+        "path": "public/assets/items/reflect-dial.svg",
+        "bytes": 5050,
+        "sha256": "15ddc71f0143c8505b6dba002f6175763f6cf5dbb7d7813f5c0952d2974ef6e0"
+      }
+    },
+    {
+      "family": "items",
+      "id": "flame-flame-grimoire",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/flame-flame-grimoire.json",
+        "bytes": 3080,
+        "sha256": "15ad690e635b6c69fe0db63c5808ca225f07955513cf4dabc0414844493839f4"
+      },
+      "master": {
+        "path": "art/production/b12/items/flame-flame-grimoire.png",
+        "bytes": 714,
+        "sha256": "b262e43b127260b111a79d98ce061024c6eafffc34c7fafc056548e2d8f35ed2"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/flame-flame-grimoire.svg",
+        "bytes": 5008,
+        "sha256": "e65dbc769bd6e2e4a68594ede119712e2823cbf1e888607d5f850288e2469d2b"
+      },
+      "output": {
+        "path": "public/assets/items/flame-flame-grimoire.svg",
+        "bytes": 5164,
+        "sha256": "45575a7412df2876ba3a88091253ccf6a27f1b5bb16149762e5b6ce19bf62f46"
+      }
+    },
+    {
+      "family": "items",
+      "id": "sea-prism-boots",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/sea-prism-boots.json",
+        "bytes": 2975,
+        "sha256": "2f63b5accfebcac8d1501555700eb7297bafca1867aae8917a8ea4777503971a"
+      },
+      "master": {
+        "path": "art/production/b12/items/sea-prism-boots.png",
+        "bytes": 579,
+        "sha256": "ca45e72efa6e6617bb5ccfa66fad64e3177c27530e9e7d39ef3b434adadef115"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/sea-prism-boots.svg",
+        "bytes": 3850,
+        "sha256": "4e09381e188024a4eb174595f166338dfdd1a4ef4ac74fcbbb0467a63acbbc2c"
+      },
+      "output": {
+        "path": "public/assets/items/sea-prism-boots.svg",
+        "bytes": 3969,
+        "sha256": "1aba1a41ffe12d3e579f15dd7fb7b77bac89e55838a882dfc24325314f0197c7"
+      }
+    },
+    {
+      "family": "items",
+      "id": "lucky-pirate-ribbon",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/lucky-pirate-ribbon.json",
+        "bytes": 2915,
+        "sha256": "6e22a7caad6c1e049a760dc29f0cea7242ab7a0d71b2aad0736dfc8b64574bd4"
+      },
+      "master": {
+        "path": "art/production/b12/items/lucky-pirate-ribbon.png",
+        "bytes": 628,
+        "sha256": "64b60ecf5463aaa670959ab6861fbcc59107be2932ee99b88aee92e39c2c3102"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/lucky-pirate-ribbon.svg",
+        "bytes": 4703,
+        "sha256": "23745e3eb91e149062249e98a8410a005e3aea22495f71c88473fadaa0495b6b"
+      },
+      "output": {
+        "path": "public/assets/items/lucky-pirate-ribbon.svg",
+        "bytes": 4860,
+        "sha256": "9e1cf917a1d25c13307149d5e89e40e8c1f39ec0dd2f256dc6badecc1e709598"
+      }
+    },
+    {
+      "family": "items",
+      "id": "cola-reservoir",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/cola-reservoir.json",
+        "bytes": 3065,
+        "sha256": "95407c0c9c8d406cd8f8be71e8be18800b081063346f6ba05cacb7dac130c47e"
+      },
+      "master": {
+        "path": "art/production/b12/items/cola-reservoir.png",
+        "bytes": 656,
+        "sha256": "d89ae401e801438ca6ead7ce7c1f6625a73ad69edb984ef9fb668928811e4949"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/cola-reservoir.svg",
+        "bytes": 4187,
+        "sha256": "8cd3ee1511a50485dfbd79c0f084c95cea9a34b03eee1ea8b10a3d2cf871848d"
+      },
+      "output": {
+        "path": "public/assets/items/cola-reservoir.svg",
+        "bytes": 4320,
+        "sha256": "6e8d571cd2eed73415881a2a7e49e357d7288327c0d024f6fc9f217c9ace025a"
+      }
+    },
+    {
+      "family": "items",
+      "id": "energy-siphon-scope",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/energy-siphon-scope.json",
+        "bytes": 3155,
+        "sha256": "6e1f591d208bf6bdc0a9388eaedd4f7f228bfa933e5d32632d2b1cd753ac51d6"
+      },
+      "master": {
+        "path": "art/production/b12/items/energy-siphon-scope.png",
+        "bytes": 679,
+        "sha256": "d9abb434efc3be839455902f415522096b0bc6bac9fe1f51eb3388e6390f6c25"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/energy-siphon-scope.svg",
+        "bytes": 4689,
+        "sha256": "fd8a59a21ec79f69a22f741868f77ce23e035bd5d7e447f3d2facb871d88fd2c"
+      },
+      "output": {
+        "path": "public/assets/items/energy-siphon-scope.svg",
+        "bytes": 4849,
+        "sha256": "f1518c0ca3a5e03446ff15f25d879affbfb74df2b37a99cb972c5c96dd9b75a3"
+      }
+    },
+    {
+      "family": "items",
+      "id": "healing-bubble",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/healing-bubble.json",
+        "bytes": 2990,
+        "sha256": "af6dfbdebe8dba5fafe1f61ee39994f1f41a717b0c2890c07894efcc23b35bae"
+      },
+      "master": {
+        "path": "art/production/b12/items/healing-bubble.png",
+        "bytes": 635,
+        "sha256": "7d899dd32b6c579e6611155e12680cc68df42eae71beccb02ce13b997db6c12d"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/healing-bubble.svg",
+        "bytes": 3984,
+        "sha256": "b75139dc936443112c386eaa88a9a52773b8647e7929fd5888bea59900553b0e"
+      },
+      "output": {
+        "path": "public/assets/items/healing-bubble.svg",
+        "bytes": 4159,
+        "sha256": "a71a704ad0ec0594c6df072f132df27cba78a6160df200573072a6adf9afe19b"
+      }
+    },
+    {
+      "family": "items",
+      "id": "star-shield-dial",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/star-shield-dial.json",
+        "bytes": 2945,
+        "sha256": "56850f07f5e09eac5e73c78c193318f7286132362c557f38cc0e90eba290777f"
+      },
+      "master": {
+        "path": "art/production/b12/items/star-shield-dial.png",
+        "bytes": 571,
+        "sha256": "45c75103edd169f2b18fc3e2090937c3b3df7b3e0a39e57c7b8bd275fff1d035"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/star-shield-dial.svg",
+        "bytes": 3767,
+        "sha256": "cd7ecc5e3afbd4955e7d49ad293d867a22e10fda805dc1667aedda71c7286410"
+      },
+      "output": {
+        "path": "public/assets/items/star-shield-dial.svg",
+        "bytes": 3924,
+        "sha256": "39376ea2a9cdee73cac495c30f6cb4d08bf1d08e2e69e61a5e293393ae77028b"
+      }
+    },
+    {
+      "family": "items",
+      "id": "shark-tooth-charm",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/shark-tooth-charm.json",
+        "bytes": 2915,
+        "sha256": "a064182d45637bbda2cbd57631e0a74b8a8bd8f4c53c46ff345d58ac197e953e"
+      },
+      "master": {
+        "path": "art/production/b12/items/shark-tooth-charm.png",
+        "bytes": 469,
+        "sha256": "e85087c1759ef3f8c6bbeb9058e32fac6a99e51c6a0d24791e168cba4d9282db"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/shark-tooth-charm.svg",
+        "bytes": 2441,
+        "sha256": "2d392a05c3da7572409b9a7239196e7a7d413dfc64e1b7c5ebfa2149c1670b31"
+      },
+      "output": {
+        "path": "public/assets/items/shark-tooth-charm.svg",
+        "bytes": 2557,
+        "sha256": "b78906a3c32185be3fa94d24a59dc9050ade2259c164c634f112b74f7326064b"
+      }
+    },
+    {
+      "family": "items",
+      "id": "miracle-talisman",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/miracle-talisman.json",
+        "bytes": 2990,
+        "sha256": "4e05381238c509607564fb9c50c3cc4afc6c7061336ccbc8ef43047209c96ffd"
+      },
+      "master": {
+        "path": "art/production/b12/items/miracle-talisman.png",
+        "bytes": 539,
+        "sha256": "9ba167d0bcce7ea376328f5ade29e081b6eb2af711661c3c93bd1e6aaa30b62c"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/miracle-talisman.svg",
+        "bytes": 3051,
+        "sha256": "23410119d339f6f4f13a8a1bf7f3e1becaa360d43bf0af495fc79fb3f69174dc"
+      },
+      "output": {
+        "path": "public/assets/items/miracle-talisman.svg",
+        "bytes": 3166,
+        "sha256": "281a0b9cb25b36ecad0484ea8826c4159b081ab0f6b53642fab94a22af824658"
+      }
+    },
+    {
+      "family": "items",
+      "id": "efficient-bandanna",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/efficient-bandanna.json",
+        "bytes": 2945,
+        "sha256": "d92fc52db446bc24c766a99c2b859e941d1ae08a2522eaf8119d1f609c875c52"
+      },
+      "master": {
+        "path": "art/production/b12/items/efficient-bandanna.png",
+        "bytes": 543,
+        "sha256": "c99344bbb31501a837a5b464c3f4697380e16763cd477dbbda3b9a0b7d2cbe32"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/efficient-bandanna.svg",
+        "bytes": 3411,
+        "sha256": "f6ceb8c4889a0e4245977262d03650bf65622f8091df467b78524ccb33f3e7e2"
+      },
+      "output": {
+        "path": "public/assets/items/efficient-bandanna.svg",
+        "bytes": 3543,
+        "sha256": "f1f77a98a5c58d289101e30d0d7de2c0e23bcd53885a69e9192a34279ed18dca"
+      }
+    },
+    {
+      "family": "items",
+      "id": "observation-goggles",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/observation-goggles.json",
+        "bytes": 2975,
+        "sha256": "a29c5f4c9d99dac777bfa86b6987704a563fe4682a0d57f9ef9af4bc568e2bfb"
+      },
+      "master": {
+        "path": "art/production/b12/items/observation-goggles.png",
+        "bytes": 650,
+        "sha256": "fbd987ab36f51d4ed5b5cc4d13adcfb1124dfb689aff73ece512330712a189d5"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/observation-goggles.svg",
+        "bytes": 4510,
+        "sha256": "c8b30866ed65e0ca93ea27c0571f5b950599a09ce665bd4ecbaaecf41a88dec7"
+      },
+      "output": {
+        "path": "public/assets/items/observation-goggles.svg",
+        "bytes": 4634,
+        "sha256": "9165490487d542e964fe22d91f398ba030d36c07c557f30fa7a1c4e4536ea39d"
+      }
+    },
+    {
+      "family": "items",
+      "id": "armor-piercing-scope",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/armor-piercing-scope.json",
+        "bytes": 3110,
+        "sha256": "4c06fe9d3c57b95f06885140eaba7f26ef346c67e75d9a2fefa055f3700ab570"
+      },
+      "master": {
+        "path": "art/production/b12/items/armor-piercing-scope.png",
+        "bytes": 651,
+        "sha256": "f40309e871b971897b528834741ec95357e9db09cedad9e7ba78746cbd8eb37f"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/armor-piercing-scope.svg",
+        "bytes": 4400,
+        "sha256": "f6e0dcb2c1211e82168b82b6f1ef668bd2b24b3e436caeaad76c8dc9b670974f"
+      },
+      "output": {
+        "path": "public/assets/items/armor-piercing-scope.svg",
+        "bytes": 4545,
+        "sha256": "bece0b567e7b3370d76f653f9ee17be911133045799f99236dc343f935853a85"
+      }
+    },
+    {
+      "family": "items",
+      "id": "rush-flag",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/rush-flag.json",
+        "bytes": 2930,
+        "sha256": "a3b1782777e70fa200a953376e42e6edbfbab7b53d314c60684952bf176a4b57"
+      },
+      "master": {
+        "path": "art/production/b12/items/rush-flag.png",
+        "bytes": 484,
+        "sha256": "b8cf4986be683aee87e67477ed2276542b1150e0534780937f21d7530db1b47c"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/rush-flag.svg",
+        "bytes": 2443,
+        "sha256": "9a8a42eb855e2c7e11b9fd4454090523c94ecedd02f43edaa8625950a892044f"
+      },
+      "output": {
+        "path": "public/assets/items/rush-flag.svg",
+        "bytes": 2547,
+        "sha256": "967e300223559c903535d0c70db4083bec491560764536062ffb75385964c706"
+      }
+    },
+    {
+      "family": "items",
+      "id": "ricochet-dial",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/ricochet-dial.json",
+        "bytes": 2930,
+        "sha256": "4d3c7f8fd097737b63ee7d54cf90f781b6b541ce17cac4b1d3371cd8a5a71649"
+      },
+      "master": {
+        "path": "art/production/b12/items/ricochet-dial.png",
+        "bytes": 648,
+        "sha256": "84ccf4b4434ad1adbdae61b7feb68425a911d899b0decbf575e0d1d9f13bd976"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/ricochet-dial.svg",
+        "bytes": 4627,
+        "sha256": "0fe19213ab1fbbb8f18326f2151cc7fdbabe9a7b41f18b2263972778a8490bff"
+      },
+      "output": {
+        "path": "public/assets/items/ricochet-dial.svg",
+        "bytes": 4788,
+        "sha256": "e71c9071b99af6a4dc2fdbe6f6eee965c2333a06142bebe2d999a98635447ba8"
+      }
+    },
+    {
+      "family": "items",
+      "id": "impact-dial",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/impact-dial.json",
+        "bytes": 2960,
+        "sha256": "11ec13f0b436c00b5d2dfac4e3d85be1073f8a1f3569058510584a0da66ca45d"
+      },
+      "master": {
+        "path": "art/production/b12/items/impact-dial.png",
+        "bytes": 681,
+        "sha256": "804b2941669fb161232d860f27376288be569fb9037b8a0995bfccb167b95220"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/impact-dial.svg",
+        "bytes": 5180,
+        "sha256": "051b8c73948d29d77a0cade2bf6c26dea27b43c048da3d41834c669b13fa4db1"
+      },
+      "output": {
+        "path": "public/assets/items/impact-dial.svg",
+        "bytes": 5334,
+        "sha256": "47c390e5eb920b14cf101b42dc8545aa2604957e69c6e878d4ff9cc138313dd3"
+      }
+    },
+    {
+      "family": "items",
+      "id": "jet-sash",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/jet-sash.json",
+        "bytes": 2975,
+        "sha256": "2c6a6b85c51b5d4aefb3fb3c104dd857ec0c0084cd40db1ce74a621302e1c86f"
+      },
+      "master": {
+        "path": "art/production/b12/items/jet-sash.png",
+        "bytes": 538,
+        "sha256": "d561474d0fc34dd416414000c49d9d411b6e162f06722de259630b7d17701e71"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/jet-sash.svg",
+        "bytes": 3190,
+        "sha256": "cb379ea94d01cbd99953b4168eac35ea9ced761dc818f6c8975fcfa9e6c4aab4"
+      },
+      "output": {
+        "path": "public/assets/items/jet-sash.svg",
+        "bytes": 3314,
+        "sha256": "ca126ca4935a1d2bf8fa01685368bd6d62130f218dc0eff1f1d6b7d179e466dc"
+      }
+    },
+    {
+      "family": "items",
+      "id": "mystery-treasure-chest",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/mystery-treasure-chest.json",
+        "bytes": 2930,
+        "sha256": "de596733a0ba3a2d00d30d442ea1084d6681c8d95309cf6cf479306ac1acea52"
+      },
+      "master": {
+        "path": "art/production/b12/items/mystery-treasure-chest.png",
+        "bytes": 593,
+        "sha256": "426a61b3f3d48ba69e851bda0f56c06df9303fcd6ce64182e665831fa129a32d"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/mystery-treasure-chest.svg",
+        "bytes": 3333,
+        "sha256": "2cb19887b33ec17b15f18b55e11b184e6acadae3923db47e2c6b3ac59a077503"
+      },
+      "output": {
+        "path": "public/assets/items/mystery-treasure-chest.svg",
+        "bytes": 3443,
+        "sha256": "5bfdc7cb63e5fc92508a00bb0de6c8d3091e5a8dbbbb10dc4c78facae323e99e"
+      }
+    },
+    {
+      "family": "items",
+      "id": "smoke-star-escape",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/smoke-star-escape.json",
+        "bytes": 2975,
+        "sha256": "95e654a65fcd180c7304ac98e29fe54dee0d710daba3285e592b863a75855323"
+      },
+      "master": {
+        "path": "art/production/b12/items/smoke-star-escape.png",
+        "bytes": 633,
+        "sha256": "36ec129022ba69738a530657d375fa24a1cbab29d334bcb61913a574eb508a28"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/smoke-star-escape.svg",
+        "bytes": 4709,
+        "sha256": "681e6e5a20944005db71ec146a8c73666b6052b5446073e3f4b8ecd5f6b8fc6d"
+      },
+      "output": {
+        "path": "public/assets/items/smoke-star-escape.svg",
+        "bytes": 4887,
+        "sha256": "0c122246c412c83d57f2ffbc3ad6fb5d6cdb20d7da3d4dbbb5f54d390e925800"
+      }
+    },
+    {
+      "family": "items",
+      "id": "gas-mask",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/gas-mask.json",
+        "bytes": 3035,
+        "sha256": "df78c25584a0c780598f9063d94c459f28caa061d4a3705f9d86cc18da62362f"
+      },
+      "master": {
+        "path": "art/production/b12/items/gas-mask.png",
+        "bytes": 667,
+        "sha256": "d7ddeaf3579e30b5807b166ba11ca5211cfdd4767bb21282e5a19050e0696d20"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/gas-mask.svg",
+        "bytes": 5420,
+        "sha256": "aeed580e5a5eb79cefdd8f64c090428b62848cb997be46591b0fbcaa0a3f17b4"
+      },
+      "output": {
+        "path": "public/assets/items/gas-mask.svg",
+        "bytes": 5563,
+        "sha256": "e7a33e54d8b53d75500f60005a696bc19d364ca381f908f235d64eb3ff52e23f"
+      }
+    },
+    {
+      "family": "items",
+      "id": "armament-sash",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/armament-sash.json",
+        "bytes": 3005,
+        "sha256": "81b21dc1f6b74b0427586d94d97333b169127bad235d26d72b660d1130f0e6ad"
+      },
+      "master": {
+        "path": "art/production/b12/items/armament-sash.png",
+        "bytes": 620,
+        "sha256": "cda7d294a117e7a27102982bca4cef350218c7ea80a3c6740ffe091cf895fedb"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/armament-sash.svg",
+        "bytes": 4777,
+        "sha256": "61461234a1574e7548138691c47c1b7ade599a912448d3417c8f97658880fc6a"
+      },
+      "output": {
+        "path": "public/assets/items/armament-sash.svg",
+        "bytes": 4965,
+        "sha256": "c989962ab55ec9907f01705fa952cccc31d3f219ebcf23317f171fc5a17309b3"
+      }
+    },
+    {
+      "family": "items",
+      "id": "spiked-armament",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/spiked-armament.json",
+        "bytes": 2975,
+        "sha256": "c5b97687eb9b24c6baed0ca0462d58446f75a8816f71d7f805278ae4f1dab9b7"
+      },
+      "master": {
+        "path": "art/production/b12/items/spiked-armament.png",
+        "bytes": 601,
+        "sha256": "03272c6119a3981c083ac99450f32136ffad7fcdfb310a67829511e976d17247"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/spiked-armament.svg",
+        "bytes": 4148,
+        "sha256": "524fc05da0af2b08467353258ff8319647747dc2afdb290535025e82130e43b9"
+      },
+      "output": {
+        "path": "public/assets/items/spiked-armament.svg",
+        "bytes": 4315,
+        "sha256": "2eeb04b0c56062eba884fb7eb4afc963c3334c18cc332717d7e53cd2477b81bc"
+      }
+    },
+    {
+      "family": "items",
+      "id": "impact-proof-gauntlets",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/impact-proof-gauntlets.json",
+        "bytes": 2975,
+        "sha256": "65ba6320ff34830cdb65f5b968eb75c28bd9990fbdacd9fb98c87719a71523bf"
+      },
+      "master": {
+        "path": "art/production/b12/items/impact-proof-gauntlets.png",
+        "bytes": 628,
+        "sha256": "08226c1871613c05ce2870a363ec210e429de9af2dea5019fa4124e9702e3fd3"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/impact-proof-gauntlets.svg",
+        "bytes": 4373,
+        "sha256": "4cd157075323ae08b67fb108ba801c43d84f9f6e064ef59c809f9fbac17575ee"
+      },
+      "output": {
+        "path": "public/assets/items/impact-proof-gauntlets.svg",
+        "bytes": 4538,
+        "sha256": "88b717c4f9b5c4073d4d415da04d3fdc8029f84a35295242a807ef093d5e0cad"
+      }
+    },
+    {
+      "family": "items",
+      "id": "phoenix-feather",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/phoenix-feather.json",
+        "bytes": 2885,
+        "sha256": "edcb7570d1278313c5df2e2a9b3788e873a42e53fa27d95faa69da23e72bcbb3"
+      },
+      "master": {
+        "path": "art/production/b12/items/phoenix-feather.png",
+        "bytes": 529,
+        "sha256": "039d16961f5c1dac910bb91e1ee48f7e446ecf49e5a95075021b701287e3a8dd"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/phoenix-feather.svg",
+        "bytes": 3318,
+        "sha256": "abc5f17a645c421bdc585b5f6caeed1b0e2663dd6b40becc6ec04175a8b2a411"
+      },
+      "output": {
+        "path": "public/assets/items/phoenix-feather.svg",
+        "bytes": 3458,
+        "sha256": "887eb1d091b1111cedb101bcfefacea29f4b5aeb6b2458592005d9df918c1af7"
+      }
+    },
+    {
+      "family": "items",
+      "id": "banquet-belt",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/banquet-belt.json",
+        "bytes": 3005,
+        "sha256": "a25eff06582bad7aa174b3ab5b13672f53aa24eecd7863aec38cb3fd1e5a51ce"
+      },
+      "master": {
+        "path": "art/production/b12/items/banquet-belt.png",
+        "bytes": 583,
+        "sha256": "b15f71e5c63b9a647f9888dd85a0a3eba2bfc074222f3ae01ab44264104cc987"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/banquet-belt.svg",
+        "bytes": 3203,
+        "sha256": "4ce965143f479fd5e79e45025e90ad79c81b6ed77be92edce5062c72feeb8e9c"
+      },
+      "output": {
+        "path": "public/assets/items/banquet-belt.svg",
+        "bytes": 3339,
+        "sha256": "cef7c301941d30ad08af922822d79f03b2e21f98ccdf7fda2c80f713d88e153b"
+      }
+    },
+    {
+      "family": "items",
+      "id": "healing-dial",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/healing-dial.json",
+        "bytes": 2990,
+        "sha256": "3952b0d9e88d2d398e7469e16bd1b6b068b7c6e8b6874b645c4dfaef3b336bde"
+      },
+      "master": {
+        "path": "art/production/b12/items/healing-dial.png",
+        "bytes": 649,
+        "sha256": "efba1f2f664fe6ca01e0b841146d9cb46d5633a418b71312fc408a0256684af2"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/healing-dial.svg",
+        "bytes": 4580,
+        "sha256": "2b66e9e5607f240f4ac55e4f784853982ead590f163d95b5d6457696a00f5276"
+      },
+      "output": {
+        "path": "public/assets/items/healing-dial.svg",
+        "bytes": 4745,
+        "sha256": "9589debdbd1a3b8977c473607c7b8badf9984452a0241c7c09706707294606c5"
+      }
+    },
+    {
+      "family": "items",
+      "id": "guard-point-dummy",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/guard-point-dummy.json",
+        "bytes": 3035,
+        "sha256": "5e4eb9b6a110f4cbf52325b31f7f9405e13cb303c589ae1a52f43885c26916c9"
+      },
+      "master": {
+        "path": "art/production/b12/items/guard-point-dummy.png",
+        "bytes": 545,
+        "sha256": "7d4c2476ae9e663da1d0807fbb0ae7fe699500d5c44924554231a5d305daa975"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/guard-point-dummy.svg",
+        "bytes": 3159,
+        "sha256": "3324b9367d7abda390b2865be241d7441b62a2389b301b22a0c6055b9902ece9"
+      },
+      "output": {
+        "path": "public/assets/items/guard-point-dummy.svg",
+        "bytes": 3340,
+        "sha256": "3d19cc4b3fe652deeefdde9d46fd8bca0bb882db49eb66b6e77d4e78386b1232"
+      }
+    },
+    {
+      "family": "items",
+      "id": "reversal-band",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/reversal-band.json",
+        "bytes": 2915,
+        "sha256": "a37dd1d492002dbbf1c55d01718c59fc1a485ca1c29c9249c04feb3aa61b8b8b"
+      },
+      "master": {
+        "path": "art/production/b12/items/reversal-band.png",
+        "bytes": 591,
+        "sha256": "d0413cde12882389f14448eb333d1ca71c05830f971c3a7d7920989796ae921c"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/reversal-band.svg",
+        "bytes": 3743,
+        "sha256": "61396ad48584b213846841186735ff9c0dc11b6e10cf570a47e9451b14deb062"
+      },
+      "output": {
+        "path": "public/assets/items/reversal-band.svg",
+        "bytes": 3903,
+        "sha256": "2c87236b2a3f73c4e1868592a325f0a40b163be58bc5e2a14db1a1594f74011b"
+      }
+    },
+    {
+      "family": "items",
+      "id": "advanced-armament-orb",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/advanced-armament-orb.json",
+        "bytes": 2960,
+        "sha256": "742ee6428d4be1580a2aea4be0322c897992cc3892314dbd4c736760887f987b"
+      },
+      "master": {
+        "path": "art/production/b12/items/advanced-armament-orb.png",
+        "bytes": 585,
+        "sha256": "96b15648a755655904628b0d649580c6aad1cad9e4f5514b5335d460549c62a5"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/advanced-armament-orb.svg",
+        "bytes": 4109,
+        "sha256": "94bd7d41ec10c029f285a734ded6644774669887e468d22e955336e8d3e6ea7f"
+      },
+      "output": {
+        "path": "public/assets/items/advanced-armament-orb.svg",
+        "bytes": 4284,
+        "sha256": "35b8c4685b8820143c7b746e8aa556f5954ed318475386a5e7524b597219dc86"
+      }
+    },
+    {
+      "family": "items",
+      "id": "mera-mera-ember",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/mera-mera-ember.json",
+        "bytes": 2945,
+        "sha256": "fe0dc52434c8c81db18f0b54affcb22c5a1b2adce41f3dd481d7eae435beb5bc"
+      },
+      "master": {
+        "path": "art/production/b12/items/mera-mera-ember.png",
+        "bytes": 586,
+        "sha256": "ef5232bec2058eaf84d0bcadc024dfff11dd68e81fb96d728c67f4dd37c0592a"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/mera-mera-ember.svg",
+        "bytes": 3885,
+        "sha256": "4d4cdc96e037e3b99e10adc2fdd31b1ea604e416c3648272cc159121e74de476"
+      },
+      "output": {
+        "path": "public/assets/items/mera-mera-ember.svg",
+        "bytes": 4031,
+        "sha256": "2c84589c25709131aca918ad42062a9a15f7fabb1b39ad22931787f1a4872d5d"
+      }
+    },
+    {
+      "family": "items",
+      "id": "bombardier-band",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/bombardier-band.json",
+        "bytes": 3035,
+        "sha256": "86dcd3f1acfd9979887698e9947984c8e7828becdab797ed78e4b63fea274f1f"
+      },
+      "master": {
+        "path": "art/production/b12/items/bombardier-band.png",
+        "bytes": 633,
+        "sha256": "1636443d8077e4939ba5bdf423c3a696f7dbad4f366614d8a98b1344f476afc9"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/bombardier-band.svg",
+        "bytes": 4393,
+        "sha256": "36d8456be44d213d3214a17241f8778f9a8cae41e91a88fb6e487fc5d8cc95a2"
+      },
+      "output": {
+        "path": "public/assets/items/bombardier-band.svg",
+        "bytes": 4565,
+        "sha256": "0bdbfdd41ccdfb178f44521cbda2cdca895bc699abc548a689151ede1a8d8609"
+      }
+    },
+    {
+      "family": "items",
+      "id": "iron-pirate-helm",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/iron-pirate-helm.json",
+        "bytes": 2990,
+        "sha256": "7d71a2abcb9ec3df65a434ba1dcc1baa90b6ce47234c50e06999d2da035e7eb3"
+      },
+      "master": {
+        "path": "art/production/b12/items/iron-pirate-helm.png",
+        "bytes": 594,
+        "sha256": "1dd82476d9cd8d34752c4c083e042ca623783f248f105b7ad20e0959f2fee634"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/iron-pirate-helm.svg",
+        "bytes": 3422,
+        "sha256": "45d7d1c8cfeb4936b039ca9413653f08f717ba15f5c30ae9c6a78131599dc37e"
+      },
+      "output": {
+        "path": "public/assets/items/iron-pirate-helm.svg",
+        "bytes": 3576,
+        "sha256": "e2763b3ef4bd43ef9882fdad7c7c6da5c2461afbabf0ffb4823f97b81e10c4e0"
+      }
+    },
+    {
+      "family": "items",
+      "id": "bodyguard-band",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/bodyguard-band.json",
+        "bytes": 2975,
+        "sha256": "7d91638797dc930e43ebcefe75da025b94dca50ccd11e979fe087f442eadd126"
+      },
+      "master": {
+        "path": "art/production/b12/items/bodyguard-band.png",
+        "bytes": 581,
+        "sha256": "d8e5a5615eeeceee765deb1ab1641d8d56242adcaf2553c702f8e1f266572f3f"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/bodyguard-band.svg",
+        "bytes": 3649,
+        "sha256": "43d4962fd12b94ed653b052ae36d0bf59650ed0b998162ad3bd0c0a481eb0694"
+      },
+      "output": {
+        "path": "public/assets/items/bodyguard-band.svg",
+        "bytes": 3804,
+        "sha256": "d95911b912b6f277c4b3b7886a8df891e9463bbcf4a39579e3c25f6052582796"
+      }
+    },
+    {
+      "family": "items",
+      "id": "nullification-bandanna",
+      "kind": "completed",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/items/nullification-bandanna.json",
+        "bytes": 2990,
+        "sha256": "21494813cdcf7cec31190700bc460f2599989733138eb8816a9ae0f195c4e52c"
+      },
+      "master": {
+        "path": "art/production/b12/items/nullification-bandanna.png",
+        "bytes": 620,
+        "sha256": "4d398e592fdb698405905624975ccdfb56cf66bbfcfce650f6c48b25b2f88558"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/items/nullification-bandanna.svg",
+        "bytes": 4176,
+        "sha256": "5bafcee293d45cf3d68e0f023f5cf06fe9f94200151626dfbe4596afe94c1651"
+      },
+      "output": {
+        "path": "public/assets/items/nullification-bandanna.svg",
+        "bytes": 4306,
+        "sha256": "94f84bea4f2255fcad417ecc3404845c0a6298f5c21b53714a5328955f381c5c"
+      }
+    },
+    {
+      "family": "food",
+      "id": "sea-king-bento",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/food/sea-king-bento.json",
+        "bytes": 3050,
+        "sha256": "37924710d47df3604cf62632e0628de90a029f224e9ac875671fdd9209542fd2"
+      },
+      "master": {
+        "path": "art/production/b12/food/sea-king-bento.png",
+        "bytes": 582,
+        "sha256": "df44bc8f95c2ec050b7e129b999de48d92f861772b264cb41e401ce25912a83c"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/food/sea-king-bento.svg",
+        "bytes": 3451,
+        "sha256": "e06a3a98b5f064ec65c8a90adb7520aaae692baa45cb18326e0b8feeda380fc0"
+      },
+      "output": {
+        "path": "public/assets/food/sea-king-bento.svg",
+        "bytes": 3562,
+        "sha256": "97b6651a9b1160f53ce1a23811a4c86dec77412e7b9f6426191f1571be31cd2b"
+      }
+    },
+    {
+      "family": "food",
+      "id": "cola-tonic",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/food/cola-tonic.json",
+        "bytes": 2990,
+        "sha256": "8a98e639676eab336897dac6b52447d472410e6f5516223dbf246e4947b67410"
+      },
+      "master": {
+        "path": "art/production/b12/food/cola-tonic.png",
+        "bytes": 515,
+        "sha256": "a88f8a38f84619816497fd5c4cb0b3e87a81c2468af085f113df8c8aee56bf84"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/food/cola-tonic.svg",
+        "bytes": 3007,
+        "sha256": "3828d4ed01ceaf48d37e311617d7d149e6ab1fc896bf66b104a8c8ef73e3472e"
+      },
+      "output": {
+        "path": "public/assets/food/cola-tonic.svg",
+        "bytes": 3126,
+        "sha256": "df72b000a780afdfc34f97f069815a05cfe9d8c782533196f2e93671539b2890"
+      }
+    },
+    {
+      "family": "food",
+      "id": "pirate-curry",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/food/pirate-curry.json",
+        "bytes": 2915,
+        "sha256": "896de8350d407c0e09f73d46a506f670bfd5a880391613fef616eddc3560cfb4"
+      },
+      "master": {
+        "path": "art/production/b12/food/pirate-curry.png",
+        "bytes": 555,
+        "sha256": "c0854d6d4abebc7fdfacb9df23f764bef2836e418cda0019fff113d0689bd8b8"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/food/pirate-curry.svg",
+        "bytes": 3834,
+        "sha256": "6cf035e6eae23505418de8221e74aa67b0914f1c05823e6cbea3453578742af4"
+      },
+      "output": {
+        "path": "public/assets/food/pirate-curry.svg",
+        "bytes": 4001,
+        "sha256": "8837aeb854ca658865f395664a64645d2f424f063148b3bd2dc85c17b00de268"
+      }
+    },
+    {
+      "family": "traits",
+      "id": "straw-hat",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/traits/straw-hat.json",
+        "bytes": 2960,
+        "sha256": "998f0d418bcaea5b794323f497ed9cee0a68ac8c60a4451277edbf8723fe71a2"
+      },
+      "master": {
+        "path": "art/production/b12/traits/straw-hat.png",
+        "bytes": 592,
+        "sha256": "fc9c301418998d530a1c84aabc20ee8183e0f08101ebb55a4dd90792364d3f73"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/traits/straw-hat.svg",
+        "bytes": 4381,
+        "sha256": "cfab3913da2c20be36d6a8d302415145f0f6ee9496ed4f54bdb652e69f696b2c"
+      },
+      "output": {
+        "path": "public/assets/traits/straw-hat.svg",
+        "bytes": 4587,
+        "sha256": "67030bf66ebf35d0116491a7a36850af5aa6a8c583ccb817362e91965c3e9745"
+      }
+    },
+    {
+      "family": "traits",
+      "id": "navy",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/traits/navy.json",
+        "bytes": 2900,
+        "sha256": "c8587f96215acee4e870161a02c9f4d0d91f6d2f288043905dee07604e8857c7"
+      },
+      "master": {
+        "path": "art/production/b12/traits/navy.png",
+        "bytes": 658,
+        "sha256": "ff48571b65b8d1fb57c638ee46576a652e9eca1bed571bb5c0bb0449486ab0b2"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/traits/navy.svg",
+        "bytes": 5027,
+        "sha256": "71018e397553b2865ab7e485a985ba85fa01ea6069801d69f798d59d7284b5c3"
+      },
+      "output": {
+        "path": "public/assets/traits/navy.svg",
+        "bytes": 5226,
+        "sha256": "8d5d85295f24121c0b25d0e0c82b7a09ec8b1e5a89dac0ea3ec9431a3a44465f"
+      }
+    },
+    {
+      "family": "traits",
+      "id": "warlord",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/traits/warlord.json",
+        "bytes": 2945,
+        "sha256": "0d614b6ee2ecdea44f24c6dbcebe8022852dde09c8320f2453b22bbe94cc321a"
+      },
+      "master": {
+        "path": "art/production/b12/traits/warlord.png",
+        "bytes": 626,
+        "sha256": "9b44c7c66bcef811fd0b09053afde936c1a9282572edc7cf6f2272701cf99926"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/traits/warlord.svg",
+        "bytes": 4527,
+        "sha256": "d75cc02e58dccd6d87dbb5ee5f8032a274fc15b0bb654606750a5126351089fb"
+      },
+      "output": {
+        "path": "public/assets/traits/warlord.svg",
+        "bytes": 4699,
+        "sha256": "b3431936ae30ea65995e868a2dbdf292315365a2be0404f36f85c796f10f36ae"
+      }
+    },
+    {
+      "family": "traits",
+      "id": "supernova",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/traits/supernova.json",
+        "bytes": 2945,
+        "sha256": "1425a2f4a719eae61d01ec8d1dccbc8d58dfd88be10162b03e7c9c54d542cdd2"
+      },
+      "master": {
+        "path": "art/production/b12/traits/supernova.png",
+        "bytes": 676,
+        "sha256": "49c6a95502ed721e7d3d4a9df13d52e73536da3b4bafb866e9a4aebea28034ba"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/traits/supernova.svg",
+        "bytes": 5234,
+        "sha256": "7363d110d94663c82053dabce12cb6d2e6ef341949abaddb2cb0aefc548a3fbf"
+      },
+      "output": {
+        "path": "public/assets/traits/supernova.svg",
+        "bytes": 5429,
+        "sha256": "3c0ab6834f84a1a497714c261d79c1121a886415b2d78e23bb4e3a9c6018957d"
+      }
+    },
+    {
+      "family": "traits",
+      "id": "brotherhood",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/traits/brotherhood.json",
+        "bytes": 2960,
+        "sha256": "327a8a239497615e845080724452c1c71d825559a1aeb952a4afea31e1c77a1f"
+      },
+      "master": {
+        "path": "art/production/b12/traits/brotherhood.png",
+        "bytes": 664,
+        "sha256": "db641ca98f2af5448febe34453c68867a5fe082e44553d6409813944386addcd"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/traits/brotherhood.svg",
+        "bytes": 5088,
+        "sha256": "846d09ffe4273168fb41d3aac2f132197768068a09bc16aa41b2ce68a599408b"
+      },
+      "output": {
+        "path": "public/assets/traits/brotherhood.svg",
+        "bytes": 5314,
+        "sha256": "84acfd5ef1c90a463c2a926154470c42dd81d4a4d397335820d45c0624b538ab"
+      }
+    },
+    {
+      "family": "traits",
+      "id": "revolutionary",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/traits/revolutionary.json",
+        "bytes": 2960,
+        "sha256": "478b52cfe3e93c8bf3c988a610f132d1913f3f37da690903bb304b4e6d03abeb"
+      },
+      "master": {
+        "path": "art/production/b12/traits/revolutionary.png",
+        "bytes": 768,
+        "sha256": "025e233d67c70988696c7b8632b4410ab5ff7007872524c2fb56d5cfa394641e"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/traits/revolutionary.svg",
+        "bytes": 6385,
+        "sha256": "e4ef47b27e6857795cd4d3f59d723022d6c44290f891ac45010068da13fb8a1d"
+      },
+      "output": {
+        "path": "public/assets/traits/revolutionary.svg",
+        "bytes": 6597,
+        "sha256": "9fe7ec9c9a2489a6f1eab7a7778bd26b78971cf49f8d61aad432b74bfd0336e3"
+      }
+    },
+    {
+      "family": "traits",
+      "id": "emperor",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/traits/emperor.json",
+        "bytes": 2960,
+        "sha256": "614b8726ed0dd750f5924e7a262215a73341b5b8f8de1f8d9d647726fc085d6d"
+      },
+      "master": {
+        "path": "art/production/b12/traits/emperor.png",
+        "bytes": 657,
+        "sha256": "3032729b6f12e7c4974ff3ab14c70439b667eda3f3d05683a237b3d123c42521"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/traits/emperor.svg",
+        "bytes": 4734,
+        "sha256": "48a5ca96684f239526edc1289f2f646009d30dde4aa9d2d517a89bb4f4bac2b1"
+      },
+      "output": {
+        "path": "public/assets/traits/emperor.svg",
+        "bytes": 4914,
+        "sha256": "0660c6496ff5ab0e17c8425671cea43dfc7b4efaa32db18b005ee57267a4fdb4"
+      }
+    },
+    {
+      "family": "traits",
+      "id": "captain",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/traits/captain.json",
+        "bytes": 2885,
+        "sha256": "2c9d542857b058fab10ed65c2d367a92d203c5d326efdf027c063f330dcb312b"
+      },
+      "master": {
+        "path": "art/production/b12/traits/captain.png",
+        "bytes": 658,
+        "sha256": "5e409cac7658df6194565c9615d68b20dde3e8dede837cd8822ddf05768bca52"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/traits/captain.svg",
+        "bytes": 4988,
+        "sha256": "15ac219166ef8db7940e3b0a11d62da1418279f832b9b38e2bde0f2e36d3c326"
+      },
+      "output": {
+        "path": "public/assets/traits/captain.svg",
+        "bytes": 5191,
+        "sha256": "d8c9272a9d91422fa374fe8ae1fd80cde4893130821d78fc82c7de7439ccddef"
+      }
+    },
+    {
+      "family": "traits",
+      "id": "brawler",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/traits/brawler.json",
+        "bytes": 2915,
+        "sha256": "0bb56378283c957fafcf399761d15ebf181949ebef1e2efaa138f50252ea7a3d"
+      },
+      "master": {
+        "path": "art/production/b12/traits/brawler.png",
+        "bytes": 634,
+        "sha256": "86f2f812cb079bb79a66e101ea47e0d352d389b910f2a3b6cbdb4460e6f249c0"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/traits/brawler.svg",
+        "bytes": 4644,
+        "sha256": "d8d481d7180908ccf311e8f6ce809a15ee8f23b5e428db35026ef48a21d7ccc5"
+      },
+      "output": {
+        "path": "public/assets/traits/brawler.svg",
+        "bytes": 4837,
+        "sha256": "0c0ee70f375cdf395bd9f69df4f71076eb6d0e966c5513d66dc77c647c8cf6b3"
+      }
+    },
+    {
+      "family": "traits",
+      "id": "swordsman",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/traits/swordsman.json",
+        "bytes": 2990,
+        "sha256": "7e00423087a2af7497919c79837a984cfdb4ddc736b69dff417913204767db12"
+      },
+      "master": {
+        "path": "art/production/b12/traits/swordsman.png",
+        "bytes": 732,
+        "sha256": "28902818525b4abc39f2b930d3b9b7bc551337e3ad69a69d9ef8113696ffbc39"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/traits/swordsman.svg",
+        "bytes": 6421,
+        "sha256": "c4550bf9186c1cc8741d12b2ff89558a91ffe2451287136938aa32eeb973d6a9"
+      },
+      "output": {
+        "path": "public/assets/traits/swordsman.svg",
+        "bytes": 6607,
+        "sha256": "223dedbd844551937ce0cad2abc57f2db4e4cf626683ed4824762114fcee753a"
+      }
+    },
+    {
+      "family": "traits",
+      "id": "marksman",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/traits/marksman.json",
+        "bytes": 2915,
+        "sha256": "d268e4c84c765f4b345ce0ef3e97e6a0b1830b93ed97b5d394d1b7d022aa95d0"
+      },
+      "master": {
+        "path": "art/production/b12/traits/marksman.png",
+        "bytes": 666,
+        "sha256": "11ed49fe5177687e7b61646117c8f31cb85560274a8b490ead500104df867d9e"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/traits/marksman.svg",
+        "bytes": 4897,
+        "sha256": "a2c24f6724e5bc0e9409126ea2bf240f997ade06b41e7214c52139367f911129"
+      },
+      "output": {
+        "path": "public/assets/traits/marksman.svg",
+        "bytes": 5113,
+        "sha256": "9045636ba244066b47e99a82787c5d85849efbe813e6e39ad0eb41b4ac63e507"
+      }
+    },
+    {
+      "family": "traits",
+      "id": "specialist",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/traits/specialist.json",
+        "bytes": 2915,
+        "sha256": "e5ba280fe7257dd934a4fd994cd474ebbc9df9d3835f7b71fdb0d1778aca5b49"
+      },
+      "master": {
+        "path": "art/production/b12/traits/specialist.png",
+        "bytes": 654,
+        "sha256": "a7609734889ca7bcc68e71066f24c6cbe713653a2c0e98ceb31932af89879ef0"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/traits/specialist.svg",
+        "bytes": 5022,
+        "sha256": "e55ec924873108bbda631fbee97260e354b0b3447fc94322efabee00a3ae83e6"
+      },
+      "output": {
+        "path": "public/assets/traits/specialist.svg",
+        "bytes": 5226,
+        "sha256": "bef06fb4beac822df64bcf932a29f5080660354d53f2dbc6b384c378cf440ab2"
+      }
+    },
+    {
+      "family": "traits",
+      "id": "guardian",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/traits/guardian.json",
+        "bytes": 2900,
+        "sha256": "a6d68b7b176a57c02dddf61e91a299e1493a86690d2a561441c9b728698ba135"
+      },
+      "master": {
+        "path": "art/production/b12/traits/guardian.png",
+        "bytes": 634,
+        "sha256": "23979bd169cdbb305acd02b950adf43840295204a1fe82ed4c82ea672959ee75"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/traits/guardian.svg",
+        "bytes": 4721,
+        "sha256": "f9903d6b7ced1e1d2fccb4e34638d5f0735b9ffe620ffe192fda629532417384"
+      },
+      "output": {
+        "path": "public/assets/traits/guardian.svg",
+        "bytes": 4925,
+        "sha256": "7eaa17420d1ac5265d9df657608691a60855bbcf7d5c40a38279182dd81efb62"
+      }
+    },
+    {
+      "family": "status",
+      "id": "poison",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/status/poison.json",
+        "bytes": 2855,
+        "sha256": "8564e433aca75ee76e48be258abf07174bf302e7d09a28582c512019aa8a4df9"
+      },
+      "master": {
+        "path": "art/production/b12/status/poison.png",
+        "bytes": 504,
+        "sha256": "9863206eb32d8f569a1a751ea7df484ab944d504a6e071cc8a87e447164db5e4"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/status/poison.svg",
+        "bytes": 3216,
+        "sha256": "4004b7c482b0d781cdfc83d938af5a666ba84453d1f99cc70ea6f445a77b7157"
+      },
+      "output": {
+        "path": "public/assets/status/poison.svg",
+        "bytes": 3377,
+        "sha256": "18b2485d4b10ad03c935adc2c1580d50ed878b46b7cb6a28cd88e4d94e671ca3"
+      }
+    },
+    {
+      "family": "status",
+      "id": "freeze",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/status/freeze.json",
+        "bytes": 2885,
+        "sha256": "88255fba7d8179907b8a7455f9ce4d783abee15eef5bb08771bc87773dd311ce"
+      },
+      "master": {
+        "path": "art/production/b12/status/freeze.png",
+        "bytes": 474,
+        "sha256": "7e3ea7264abda7123c87168189f57da21f237fca72bfb306fe12f5e1e2e0677a"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/status/freeze.svg",
+        "bytes": 2542,
+        "sha256": "15dae0d9f0c883f9c6eed03a6679d4f6b8919b6c97647ebcc318586f159f1ec6"
+      },
+      "output": {
+        "path": "public/assets/status/freeze.svg",
+        "bytes": 2683,
+        "sha256": "8e15ca85e97b6b029726bacfdc29bb3de5628703a458287eecc096e94b8ad02f"
+      }
+    },
+    {
+      "family": "status",
+      "id": "sleep",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/status/sleep.json",
+        "bytes": 2840,
+        "sha256": "48ffccf9d643289b41383c1a81f489399c8d9288f94c5e16558561b162e98688"
+      },
+      "master": {
+        "path": "art/production/b12/status/sleep.png",
+        "bytes": 362,
+        "sha256": "00d8279e33a5e7d24d69ddfc448c4df8f39d878a42a4589f86c07c26edd99ba7"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/status/sleep.svg",
+        "bytes": 1727,
+        "sha256": "46753d1754761f7af79d4691695feb3ab591c7aecc3e804200028a13c5e991da"
+      },
+      "output": {
+        "path": "public/assets/status/sleep.svg",
+        "bytes": 1850,
+        "sha256": "fef1c82c31765236980cb01fe4307f1dd0ad47f3f6b1de2d0d9e7b69e74527e8"
+      }
+    },
+    {
+      "family": "status",
+      "id": "locked",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/status/locked.json",
+        "bytes": 2900,
+        "sha256": "89f3b5fe88e79f1eb101919e1d6b8a68a47e28f57199e78ecab5ab87e59d1948"
+      },
+      "master": {
+        "path": "art/production/b12/status/locked.png",
+        "bytes": 485,
+        "sha256": "51f776a82c8a5280ff4982a98fbab3da8cccf222045c3390292fce70ce48b229"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/status/locked.svg",
+        "bytes": 2763,
+        "sha256": "19e63c731754977d7ecf10cf04d2d2be1a6b4c3bf2e0ae68e519e2fe1619026d"
+      },
+      "output": {
+        "path": "public/assets/status/locked.svg",
+        "bytes": 2904,
+        "sha256": "7a0ff5f0667080fb4694060ac06f2162ab9e2bc8ad5e2e46a61068f30d2e7e22"
+      }
+    },
+    {
+      "family": "status",
+      "id": "stun",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/status/stun.json",
+        "bytes": 2960,
+        "sha256": "86e41e873a165e2ee2b042ee960c49db372d4eb4a5197f782fd889b3a7ac3726"
+      },
+      "master": {
+        "path": "art/production/b12/status/stun.png",
+        "bytes": 572,
+        "sha256": "ad6f88e55d440a303a79c20dcb9e341e87af286a9bf3d7661d35967c7c58fff7"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/status/stun.svg",
+        "bytes": 3927,
+        "sha256": "98afb81ee38ae561062743718151143878cdee812bb1216684c378dcd05c1bbf"
+      },
+      "output": {
+        "path": "public/assets/status/stun.svg",
+        "bytes": 4076,
+        "sha256": "e9855db8cc01421cd9165880c2c0dc57ad4d325acb042a9fd991f7af456843f8"
+      }
+    },
+    {
+      "family": "status",
+      "id": "burn",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/status/burn.json",
+        "bytes": 2900,
+        "sha256": "2616e9b2a658109d760e8e62cc1c8bc53f85f066cfac4917f992ff8c96ed7b4f"
+      },
+      "master": {
+        "path": "art/production/b12/status/burn.png",
+        "bytes": 514,
+        "sha256": "0effbeb4a9977878b06cf5d72ec1dfc373015df2574974c918fc3d5d60251476"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/status/burn.svg",
+        "bytes": 3475,
+        "sha256": "930849c55f19c6a29b2056103809397c7ff23a370f939947b156bdfd24fe80ee"
+      },
+      "output": {
+        "path": "public/assets/status/burn.svg",
+        "bytes": 3617,
+        "sha256": "0f2b6f97ebf5758b852076773244b80562964c2f63e61cfe95bd786c2ff9db41"
+      }
+    },
+    {
+      "family": "status",
+      "id": "wound",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/status/wound.json",
+        "bytes": 2855,
+        "sha256": "66fda4a4a76e898499cbce27ebce66dffd7d88f1875fe0955a3fdf1339ec5baf"
+      },
+      "master": {
+        "path": "art/production/b12/status/wound.png",
+        "bytes": 475,
+        "sha256": "a903c2ffca5b3579453aa2fdb49f8b861f281aa282b79b6f8fb455bac5a129e3"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/status/wound.svg",
+        "bytes": 3893,
+        "sha256": "e0840b4e5fe303375345c804a921f5402729492c9bef06f20c02fcb07dfcda54"
+      },
+      "output": {
+        "path": "public/assets/status/wound.svg",
+        "bytes": 4010,
+        "sha256": "181358d98e6b00fa6505451fd095800ab8e770a8bc9e1a095082898200f9ab83"
+      }
+    },
+    {
+      "family": "status",
+      "id": "protect",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/status/protect.json",
+        "bytes": 2900,
+        "sha256": "5b6e410e03ab8ae3a10f097ce5a11217813176060f798033a41ce83b070fb224"
+      },
+      "master": {
+        "path": "art/production/b12/status/protect.png",
+        "bytes": 534,
+        "sha256": "49e6f218d270e4d085060284e42218298ca491a1d132a74983c305e08488b66c"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/status/protect.svg",
+        "bytes": 3459,
+        "sha256": "153bd1c6acbd26cce7f094b749c4896713de219ae8fb78996cde76f6e6a8aa13"
+      },
+      "output": {
+        "path": "public/assets/status/protect.svg",
+        "bytes": 3606,
+        "sha256": "f5efc2411d6aa599a762c3721cd86bb6cfc36326f5f3f31e472a2beab36bc3b0"
+      }
+    },
+    {
+      "family": "status",
+      "id": "blind",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/status/blind.json",
+        "bytes": 2870,
+        "sha256": "317d44049d047c359445afe1f346630469503edcb3761e57b5c495d70952d0e2"
+      },
+      "master": {
+        "path": "art/production/b12/status/blind.png",
+        "bytes": 456,
+        "sha256": "affb82fbbe34a41a2859fc36eefd8f194c320eecf30723244b0940bde3d3fdb4"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/status/blind.svg",
+        "bytes": 2565,
+        "sha256": "62cf70cd0959af5a07d2bb674744ea7fc6a3291071efbc18b272fa8395b952fa"
+      },
+      "output": {
+        "path": "public/assets/status/blind.svg",
+        "bytes": 2704,
+        "sha256": "7f2656dbf1b72cd1968c72a8709243af20d6ee4719bcdb3df9ca67273e56bc11"
+      }
+    },
+    {
+      "family": "status",
+      "id": "paralysis",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/status/paralysis.json",
+        "bytes": 2855,
+        "sha256": "ca2a5af4de800e62926480e7c22c583d5457bebd31b4f652ee62cc182c72d017"
+      },
+      "master": {
+        "path": "art/production/b12/status/paralysis.png",
+        "bytes": 419,
+        "sha256": "90eec61dd480da1609f3feac44060ef98989247913df941cc12b6fb23d2140da"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/status/paralysis.svg",
+        "bytes": 2776,
+        "sha256": "0b4420be2183bd63575e03d79dffaff0f1ccf8566e9be633353f496ba7f0d253"
+      },
+      "output": {
+        "path": "public/assets/status/paralysis.svg",
+        "bytes": 2923,
+        "sha256": "001997bf657fd40777ea82de1fb91dd9de442e9996a242440655a9cafc184678"
+      }
+    },
+    {
+      "family": "status",
+      "id": "resistance-reduction",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/status/resistance-reduction.json",
+        "bytes": 2855,
+        "sha256": "6a44f75d04561da478f7975d1add328c2dc36cffec3b129c1ca39a76c5505b06"
+      },
+      "master": {
+        "path": "art/production/b12/status/resistance-reduction.png",
+        "bytes": 521,
+        "sha256": "df4dea3ac414330a182b418759c846dc8955ed6707d10e4d615e4ab7ce79d081"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/status/resistance-reduction.svg",
+        "bytes": 3539,
+        "sha256": "c980b67d9b7b51f959c83f2edb3b9d71fe970fdb4ef9e498dfec42fcaaeb948a"
+      },
+      "output": {
+        "path": "public/assets/status/resistance-reduction.svg",
+        "bytes": 3699,
+        "sha256": "bedc8b1b6e6dd0aaf83329e09cfb96f9a903b526ccd00951e87dd0d3efbe7ca3"
+      }
+    },
+    {
+      "family": "status",
+      "id": "resurrecting",
+      "retainedPilot": false,
+      "source": {
+        "path": "art/production/b12/status/resurrecting.json",
+        "bytes": 2870,
+        "sha256": "5ade7294985562968e19a119084b2354e91fbec4978222c5f42134ffafaac6ce"
+      },
+      "master": {
+        "path": "art/production/b12/status/resurrecting.png",
+        "bytes": 525,
+        "sha256": "8a26fa877596cc00d85e1facb2f0303be78e16fdb25e4b560acd4a2b28a89bf4"
+      },
+      "editableSvg": {
+        "path": "art/production/b12/status/resurrecting.svg",
+        "bytes": 3436,
+        "sha256": "1941d10f59e44889aa62f772ba8df599ace12041f643a84beac8f0c6cec47292"
+      },
+      "output": {
+        "path": "public/assets/status/resurrecting.svg",
+        "bytes": 3573,
+        "sha256": "fa08d77e2d8dadfc11ccefa258f01d48e7cbc732a456e6eacb65ccd6289148b2"
+      }
+    }
+  ]
+}

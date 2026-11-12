@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 import { preferredV2AssetKeys } from "./preferred_v2_source.mjs";
+import { readPixelIcon } from "./pixel_icon_source.mjs";
 
 const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(SCRIPT_DIRECTORY, "..", "..");
@@ -10,14 +11,6 @@ const PUBLIC = path.join(ROOT, "public", "assets");
 const UI_SOURCE = path.join(ROOT, "art", "ui-icons");
 const QA = path.join(ROOT, "art", "qa");
 const SOURCES_ONLY = process.argv.includes("--sources-only");
-const B10_ICON_PILOTS = new Set(["sea-prism-shard", "black-blade", "emperors-jolly-roger"]);
-
-async function itemSvg(spec) {
-  if (!B10_ICON_PILOTS.has(spec.id)) return frameSvg(spec, "item");
-  // Hand-edited 48px vector/pixel master; never replace with the old motif.
-  return (await readFile(path.join(ROOT, "art/production/b10/icons", `${spec.id}.svg`), "utf8"))
-    .replace('width="48" height="48"', 'width="96" height="96"');
-}
 
 const NEW_CREW = [
   "koby", "koala", "franky", "brook", "ivankov", "jinbe",
@@ -102,23 +95,6 @@ function motif(name, color) {
   return shared[name] ?? `<path ${fill} d="m48 12 35 38-35 38-35-38z"/><circle cx="48" cy="50" r="12" fill="#fff" fill-opacity=".55"/>`;
 }
 
-function frameSvg(spec, category) {
-  const completed = spec.kind === "completed";
-  const border = completed ? "#f3c75d" : "#93a7bc";
-  const badge = spec.traitBadge
-    ? `<g transform="translate(66 66)"><path d="m14 0 12 7v14l-12 8L2 21V7z" fill="#172033" stroke="#fff" stroke-width="2"/><path d="M8 15h12M14 9v12" stroke="${spec.accent}" stroke-width="3"/></g>`
-    : "";
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img"><path d="M8 3h80l5 8v74l-8 8H11l-8-8V11z" fill="#111a2b" stroke="${border}" stroke-width="${completed ? 4 : 3}"/>${completed ? '<path d="M13 12h70v72H13z" fill="none" stroke="#ffffff" stroke-opacity=".16" stroke-width="2"/>' : ''}${motif(spec.motif, spec.accent)}${badge}<title>${escapeXml(spec.id)} ${category}</title></svg>\n`;
-}
-
-function traitSvg(spec) {
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img"><circle cx="48" cy="48" r="43" fill="#111a2b" stroke="${spec.color}" stroke-width="5"/>${motif(spec.motif, spec.color)}<title>${escapeXml(spec.name)}</title></svg>\n`;
-}
-
-function statusSvg(spec) {
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img"><path d="M12 8h72l4 8v64l-8 8H16l-8-8V16z" fill="#101827" stroke="${spec.color}" stroke-width="5"/>${motif(spec.motif, spec.color)}<title>${escapeXml(spec.name)}</title></svg>\n`;
-}
-
 function formSvg(id, size, overlay = false) {
   const definitions = {
     "robin-demonio-fleur": { color: "#8e45c7", motif: "flame", secondary: "#e679d6" },
@@ -190,9 +166,9 @@ async function writeIconFamilies() {
     readFile(path.join(UI_SOURCE, "status-icons.json"), "utf8").then(JSON.parse),
   ]);
   for (const directory of ["items", "traits", "status", "forms"]) await mkdir(path.join(PUBLIC, directory), { recursive: true });
-  for (const spec of items.items) await writeFile(path.join(PUBLIC, "items", `${spec.id}.svg`), await itemSvg(spec));
-  for (const spec of traits.traits) await writeFile(path.join(PUBLIC, "traits", `${spec.id}.svg`), traitSvg(spec));
-  for (const spec of statuses.statuses) await writeFile(path.join(PUBLIC, "status", `${spec.id}.svg`), statusSvg(spec));
+  for (const spec of items.items) await writeFile(path.join(PUBLIC, "items", `${spec.id}.svg`), await readPixelIcon(ROOT, "items", spec));
+  for (const spec of traits.traits) await writeFile(path.join(PUBLIC, "traits", `${spec.id}.svg`), await readPixelIcon(ROOT, "traits", spec));
+  for (const spec of statuses.statuses) await writeFile(path.join(PUBLIC, "status", `${spec.id}.svg`), await readPixelIcon(ROOT, "status", spec));
   for (const id of ["robin-demonio-fleur", "luffy-gear-4-boundman", "luffy-gear-4-snakeman", "chopper-monster-point"]) {
     const directory = path.join(PUBLIC, "forms", id);
     await mkdir(directory, { recursive: true });

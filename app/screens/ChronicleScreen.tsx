@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import type { GameContent } from "../../game";
 import BattleBoard from "../../components/BattleBoard";
+import { VisualIcon } from "../../components/VisualIcon";
+import { itemVisual } from "../../components/gameVisualManifest";
 import { selectBattlePresentation, selectMatchView } from "../selectors";
 import { ACHIEVEMENTS, MAX_REPLAY_BYTES, MAX_ARCHIVE_BYTES, emptyProfile, replayCompatible, replayFrameState, replayStageName, type CaptainProfile, type StoredReplay } from "../chronicle";
 import { deleteReplay, downloadChronicle, importReplay, importReplayArchive, readProfile, readReplay, readReplayHeaders, updateProfile, type ReplayHeader } from "../chronicleStorage";
@@ -41,7 +43,10 @@ function ReplayViewer({ record, content, settings }: { record: StoredReplay; con
     <h3>R{frame.round} · {replayStageName(frame, content)} · {frame.phase}</h3>
     {captain && <p>{captain.name}: {captain.hp} Captain HP · level {captain.level} · {captain.gold} gold · {captain.placement ? `placement ${captain.placement}` : "voyage in progress"}</p>}
     {!battle && <p>This phase has no recorded combat for this captain. The board shows the recorded crew. {frame.phase === "carousel" ? "Bounty Regatta / item selection." : frame.phase === "voyage-choice" ? "Voyage Recruitment choice." : frame.phase === "item-choice" ? "Item reward selection." : "Preparation or voyage result."}</p>}
-    {captain && <div className="replay-snapshot-details"><p>Reserve: {captain.bench.flatMap((id) => id && captain.units[id] ? [content.units.find((unit) => unit.id === captain.units[id].definitionId)?.name ?? captain.units[id].definitionId] : []).join(", ") || "Empty"}</p><p>Inventory: {captain.inventory.map((id) => content.items.find((item) => item.id === id)?.name ?? id).join(", ") || "Empty"}</p>
+    {captain && <div className="replay-snapshot-details"><p>Reserve: {captain.bench.flatMap((id) => id && captain.units[id] ? [content.units.find((unit) => unit.id === captain.units[id].definitionId)?.name ?? captain.units[id].definitionId] : []).join(", ") || "Empty"}</p><p>Inventory: {captain.inventory.map((id, index) => {
+      const item = content.items.find(item => item.id === id);
+      return <span key={`${id}-${index}`}><VisualIcon className="inline-game-icon" imagePath={itemVisual(id).imagePath} fallback={item?.icon ?? "◆"} />{item?.name ?? id}{index < captain.inventory.length - 1 ? ", " : ""}</span>;
+    })}{!captain.inventory.length && "Empty"}</p>
       <p>Recruit offers: {(frame.recruitOffers[perspective] ?? []).map((id) => content.units.find((unit) => unit.id === id)?.name ?? id).join(", ") || "None"}</p><p>Item offers: {(frame.itemOffers[perspective] ?? []).map((id) => content.items.find((item) => item.id === id)?.name ?? id).join(", ") || "None"}</p>
       <p>Harbor offers: {(frame.harborOffers?.[perspective] ?? []).map(offer => `${offer.kind === "food" ? content.foods?.find(food => food.id === offer.foodId)?.name ?? offer.foodId : content.items.find(item => item.id === offer.itemId)?.name ?? offer.itemId} · ${offer.goldCost} gold`).join(", ") || "None"}</p>
       <p>Galley: {(captain.foodInventory ?? []).map(id => content.foods?.find(food => food.id === id)?.name ?? id).join(", ") || "Empty"}</p>

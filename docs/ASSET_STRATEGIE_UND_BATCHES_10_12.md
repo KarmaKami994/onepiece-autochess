@@ -6,7 +6,9 @@ Prüf-/Abnahmestand: [B10_ASSET_PRODUKTION.md](B10_ASSET_PRODUKTION.md).
 B10 wurde am 11.11.2026 über PR #72 als `4555674` squash-gemergt.
 B11 wurde im selben Auftrag freigegeben; Umsetzung und Prüfstand:
 [B11_CHARACTER_ANIMATION_COMPLETION.md](B11_CHARACTER_ANIMATION_COMPLETION.md).
-B12 bleibt ein späterer, gesonderter Auftrag.
+B11 wurde auf Besitzerauftrag über PR #73 als `b40b68f` squash-gemergt.
+B12 ist jetzt separat beauftragt; Umsetzung und Prüfstand:
+[B12_ICON_COMPLETION.md](B12_ICON_COMPLETION.md).
 
 ## 1. Ziel und Grenze
 
