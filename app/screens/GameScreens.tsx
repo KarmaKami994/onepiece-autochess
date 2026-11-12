@@ -17,6 +17,7 @@ import { VisualIcon } from "@/components/VisualIcon";
 import { HudTooltip, HudTooltipProvider } from "@/components/HudTooltip";
 import { ItemTooltip, PacTraits } from "../hud/PacHud";
 import "../hud/pac-hud.css";
+import "../hud/one-piece-hud.css";
 import PhaseClockDisplay from "../PhaseClockDisplay";
 import { GalleyTray } from "../GalleyTray";
 import { MUSIC_TRACKS, type AudioSettings } from "../audioSettings";

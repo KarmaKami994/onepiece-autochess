@@ -1,5 +1,11 @@
 # PAC HUD presentation port
 
+The accepted layout/interaction port was squash-merged in PR #75 as
+`5420340d0bf91bbf29d00ed92bff7f219c3c9fef` (CI #191 green). The owner's subsequent
+wood/parchment/brass finish is documented in
+[`ONE_PIECE_HUD_FINISH.md`](ONE_PIECE_HUD_FINISH.md); the original grey port below
+remains its source/history record.
+
 Owner instruction: implement the PAC appearance and interactions, with direct
 code reuse allowed. Base: `041741933e9459e669998c002dc5eff43356472f` (B12).
 Branch: `codex/pac-hud-parity`. Visual reference is pinned to

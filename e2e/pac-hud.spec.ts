@@ -43,6 +43,9 @@ test("PAC HUD keeps captains, six offers and synergy/recipe hovers readable with
   await inventory.getByRole("combobox", { name: "Select crew for orders" }).selectOption("hud-zoro");
   await expect(page.locator(".unit-inspector")).toBeVisible(); await expect(captains).toBeVisible();
   await expect(page.locator(".unit-inspector")).toContainText("SP. DEF");
+  await expect(page.locator(".inspector-header")).toBeInViewport();
+  await expect(page.locator(".inspector-stat").filter({ hasText: "SP. DEF" })).toBeInViewport();
+  await page.screenshot({ path: info.outputPath("crew-details.png") });
   const item = inventory.getByRole("button", { name: /^Equip Jolly Roger Fragment/ });
   await item.hover();
   const itemCard = page.getByRole("dialog", { name: "Jolly Roger Fragment details", exact: true });
