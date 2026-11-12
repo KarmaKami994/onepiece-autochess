@@ -4,6 +4,7 @@ Stand: 12.11.2026. Basis: B11-Squash `b40b68fbca7a47b9b2d9f11380c40a4f21d39656`
 (PR #73, auf ausdrücklichen Besitzerauftrag gemergt). Dessen letzte CI #187
 scheiterte beim Playwright-Systempaketdownload an Ubuntu-Mirror-DNS; das ist
 keine Behauptung einer vollständig grünen B11-CI. Branch: `codex/b12-item-food-ui-icons`.
+Quell-/Test-/Asset-Commit: `3f62843c9f6721b11d79dd7443b4c0a23860a42b`.
 
 ## Umfang und Legende
 
