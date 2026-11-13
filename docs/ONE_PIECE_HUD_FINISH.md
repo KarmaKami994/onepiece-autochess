@@ -33,6 +33,42 @@ the original state, inventory, gold, recipe and keyboard assertions remain.
 No domain, gameplay, balance, save/replay, RNG, bot, content or schema change.
 GameContent **1.34.0**, save schema **6**. No version bump.
 
+## CI input-boundary correction — 2026-11-13
+
+PR #76 CI #193 passed unit/coverage (1113 each), assets, ordinary 50-match smoke
+and build, but failed Browser E2E (two failures, three flaky cases). The local
+reproduction confirmed the Voyage reward failure. Phaser's installed mouse
+manager also listens for window-level mouse down/up events, including presses
+on HTML overlays. With crew details expanded over the deck, a Deploy/Sell
+press could also move/select a fighter underneath before its React click.
+
+The match-screen capture boundary now stops mouse down/up originating in the
+HUD from reaching that window listener. Canvas-originated presses and their
+release over the HUD still pass through so drags can finish normally. This is
+ephemeral React input routing; no authority callback or game rule changed.
+A focused regression deploys/sells the selected reserve and checks its exact
+destination, gold and unchanged positions of the other crew. Existing voyage,
+battle-economy, report and drag assertions remain unchanged.
+
+The failure investigation also exposed two test-foundation assumptions: two
+wall-clock-random recruits do not guarantee the Round-2 win required by the
+reward assertion, and a newly bought sprite is not necessarily decoded when
+the initial board loader is hidden. The voyage test now resumes a standard
+`createVoyage("e2e-complete-voyage")` checkpoint before legally skipping the
+starter choice, and asserts its seed. Bench validation waits for the original
+`>4` sprite-pixel signal within the existing expectation budget, then keeps all
+original sprite/name/HP checks. No reward, outcome, pixel threshold, timeout or
+game value was changed.
+
+Focused correction verification: 15 unique affected browser cases passed across
+the targeted runs: battle economy, viewed reports, complete voyage, selected
+crew actions, hover/keyboard at both desktop sizes and all three explicit bench
+viewports. Initial reproduction/fixture failures are retained in the work log;
+the final complete-voyage/hover/keyboard run passed 6/6, and bench readiness
+passed 3/3. Final lint and production build passed. No local full unit suite,
+production aggregate or baseline was run. Exact-head remote CI/merge status is
+reported on PR #76; the owner authorized the final squash after green CI.
+
 ## Verification
 
 Owner approved lint/build, focused hover/keyboard/crafting/scouting/layout

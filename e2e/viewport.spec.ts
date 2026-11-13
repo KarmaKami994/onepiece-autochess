@@ -148,6 +148,8 @@ for (const viewport of BENCH_VIEWPORTS) {
     );
     await expect(tacticalUnits).toContainText(`${unitName}, 1 star, player, bench slot 1`);
 
+    // Newly purchased crew load lazily after the board's initial readiness.
+    await expect.poll(async () => (await renderedBenchSignals(page, contentId!)).sprite).toBeGreaterThan(4);
     const signals = await renderedBenchSignals(page, contentId!);
     expect(signals.sprite, `bench rendering: ${JSON.stringify(signals)}`).toBeGreaterThan(4);
     expect(signals.hp, `bench rendering: ${JSON.stringify(signals)}`).toBe(0);
