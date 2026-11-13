@@ -388,6 +388,7 @@ export default function PhaserBoard({
             }
           >();
           private draggingUnitId: string | null = null;
+          private textureRefreshPending = false;
           private hoverDestinationKey: string | null = null;
           private invalidDropNotice?: Phaser.GameObjects.Text;
           private resourceBars = new Map<
@@ -536,6 +537,13 @@ export default function PhaserBoard({
             this.sync(latestRef.current);
             bridgeRef.current = this;
             if (!cancelled) setIsReady(true);
+          }
+
+          update() {
+            if (!this.textureRefreshPending || this.draggingUnitId || this.input.activePointer.isDown) return;
+            this.textureRefreshPending = false;
+            this.payload.units.forEach(unit => this.refreshUnitBody(unit.id));
+            this.sync(this.payload, this.payload.phase !== "battle");
           }
 
           private createCrewAnimations(definition: CrewAnimationDefinition) {
@@ -1141,6 +1149,8 @@ export default function PhaserBoard({
           }
 
           sync(payload: BoardPayload, forceRebuild = false) {
+            // Keep ordinary formation clicks out of drag/tween selection.
+            this.input.dragDistanceThreshold = payload.interactionMode === "formation" ? 4 : 0;
             if (
               !forceRebuild &&
               this.tokenObjects.size > 0 &&
@@ -1173,6 +1183,8 @@ export default function PhaserBoard({
             this.resourceBars.forEach((bar) => {
               this.tweens.killTweensOf(bar.display);
             });
+            this.draggingUnitId = null;
+            this.textureRefreshPending = false;
             this.tokenLayer.removeAll(true);
             this.tokenObjects.clear();
             this.selectionMarkers.clear();
@@ -1297,6 +1309,11 @@ export default function PhaserBoard({
                 pending.forEach((definition) =>
                   this.createCrewAnimations(definition),
                 );
+                // Do not replace the input object held by a formation pointer.
+                if (this.payload.interactionMode === "formation" && (this.draggingUnitId || this.input.activePointer.isDown)) {
+                  this.textureRefreshPending = true;
+                  return;
+                }
                 this.payload.units.forEach(unit => this.refreshUnitBody(unit.id));
                 this.sync(this.payload, this.payload.phase !== "battle");
               },
@@ -1330,6 +1347,10 @@ export default function PhaserBoard({
             this.load.once(
               "complete",
               () => {
+                if (this.payload.interactionMode === "formation" && (this.draggingUnitId || this.input.activePointer.isDown)) {
+                  this.textureRefreshPending = true;
+                  return;
+                }
                 this.sync(this.payload);
               },
               this,
@@ -1773,7 +1794,18 @@ export default function PhaserBoard({
                 hitArea.width,
                 hitArea.height,
               ),
-              Phaser.Geom.Rectangle.Contains,
+              (area: Phaser.Geom.Rectangle, localX: number, localY: number) => {
+                if (!Phaser.Geom.Rectangle.Contains(area, localX, localY)) return false;
+                if (this.payload.interactionMode !== "formation") return true;
+                if (this.draggingUnitId) return this.draggingUnitId === unit.id;
+                // A tall neighbouring sprite must not steal an occupied cell.
+                // Keep the existing upper-body reach over otherwise empty cells.
+                const destination = boardDestinationAtPoint(container.x + localX, container.y + localY);
+                const occupant = destination && this.payload.units.find(candidate =>
+                  isSameDestination(candidate, destination),
+                );
+                return !occupant || occupant.id === unit.id;
+              },
             );
             if (container.input) container.input.cursor = "pointer";
             container.on("pointerover", () => hoverRef.current?.(unit.id));
