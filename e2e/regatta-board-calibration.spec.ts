@@ -109,6 +109,8 @@ test("a late-loaded animated recruit keeps upper-body picking and dragging", asy
     await page.getByRole("button", { name: "DEPLOY", exact: true }).click();
     const crew = page.getByRole("list", { name: "Units on the tactical board" });
     await expect(crew).toContainText("Zoro, 1 star, player, column 1, row 6");
+    // React's accessible roster updates before Phaser draws the deployed actor.
+    await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
     const animation = preferredAnimation("zoro")!;
     const loaded = page.waitForResponse(response => new URL(response.url()).pathname === animation.sheetPath && response.ok());
     const source = await boardWorldPoint(page, cell(0, 5).x, cell(0, 5).y);

@@ -2,6 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import path from "node:path";
 import sharp from "sharp";
 import type { VoyageSaveEnvelope } from "../app/voyagePersistence";
+import { preferredAnimation } from "../components/boardAssets";
 import {
   BOARD_GEOMETRY,
   gameplayCameraFrame,
@@ -192,18 +193,12 @@ export async function boardWorldPoint(
 }
 
 async function firstFramePalette(contentId: string): Promise<Set<number>> {
-  const key = `${contentId}-v2`;
+  const animation = preferredAnimation(contentId);
+  if (!animation) throw new Error(`No crew animation for ${contentId}`);
   const { data } = await sharp(
-    path.join(
-      process.cwd(),
-      "public",
-      "assets",
-      "animations",
-      key,
-      `${key}.png`,
-    ),
+    path.join(process.cwd(), "public", animation.sheetPath.slice(1)),
   )
-    .extract({ left: 0, top: 0, width: 128, height: 128 })
+    .extract({ left: 0, top: 0, width: animation.frameWidth, height: animation.frameHeight })
     .ensureAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
