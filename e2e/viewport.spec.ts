@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { BOARD_GEOMETRY } from "../components/boardGeometry";
+import { preferredAnimation } from "../components/boardAssets";
 import {
   BENCH_VIEWPORTS,
   boardWorldPoint,
@@ -48,6 +49,9 @@ test("full-playfield map keeps sprite picking and drag placement calibrated", as
     .filter({ has: page.locator('img[src^="/assets/portraits/"]') })
     .first();
   await expect(animatedRecruit).toBeVisible();
+  const portraitSrc = await animatedRecruit.locator("img").getAttribute("src");
+  const contentId = portraitSrc?.match(/\/portraits\/([^/.]+)\./)?.[1];
+  expect(contentId).toBeTruthy();
   await animatedRecruit.click();
   const inspector = page.locator(".unit-inspector");
   await expect(inspector).toBeVisible();
@@ -60,6 +64,10 @@ test("full-playfield map keeps sprite picking and drag placement calibrated", as
     .locator('ul[aria-label="Units on the tactical board"] li')
     .filter({ hasText: unitName });
   await expect(accessibleUnit).toContainText("column 1, row 6");
+  // Purchase-time animation loading is separate from initial board readiness.
+  const animation = preferredAnimation(contentId!);
+  expect(animation).not.toBeNull();
+  await expect(page.locator(".phaser-stage-frame")).toHaveAttribute("data-presented-animations", new RegExp(animation!.assetKey));
   await page
     .getByRole("button", { name: "Return to captain standings" })
     .click();
@@ -149,6 +157,9 @@ for (const viewport of BENCH_VIEWPORTS) {
     await expect(tacticalUnits).toContainText(`${unitName}, 1 star, player, bench slot 1`);
 
     // Newly purchased crew load lazily after the board's initial readiness.
+    const animation = preferredAnimation(contentId!);
+    expect(animation).not.toBeNull();
+    await expect(page.locator(".phaser-stage-frame")).toHaveAttribute("data-presented-animations", new RegExp(animation!.assetKey));
     await expect.poll(async () => (await renderedBenchSignals(page, contentId!)).sprite).toBeGreaterThan(4);
     const signals = await renderedBenchSignals(page, contentId!);
     expect(signals.sprite, `bench rendering: ${JSON.stringify(signals)}`).toBeGreaterThan(4);
