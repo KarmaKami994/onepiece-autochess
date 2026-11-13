@@ -1,9 +1,12 @@
 import { expect, test } from "@playwright/test";
+import { createVoyage } from "../game";
+import { createVoyageSaveEnvelope } from "../app/voyagePersistence";
 import {
   advanceVisiblePhase,
   cameraFrameForStage,
   installRuntimeBoundaryChecks,
-  openFreshVoyage,
+  readVoyageFixture,
+  storeVoyageFixture,
 } from "./helpers";
 
 installRuntimeBoundaryChecks();
@@ -12,7 +15,22 @@ test("complete voyage covers PvE reward, carousel, PvP, resume, and results", as
   page,
 }) => {
   test.setTimeout(180_000);
-  await openFreshVoyage(page);
+  await page.addInitScript(() => {
+    localStorage.clear();
+    localStorage.setItem("grand-line-auto-chess.first-voyage.v1", "complete");
+  });
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: /GRAND LINE/i })).toBeVisible();
+  // Pin the shop/battle RNG: the reward assertion requires a known PvE win,
+  // rather than whichever two recruits a wall-clock seed happens to offer.
+  const seed = "e2e-complete-voyage";
+  await storeVoyageFixture(page, createVoyageSaveEnvelope(createVoyage(seed), seed, Date.now()));
+  await page.reload();
+  await page.getByRole("button", { name: /CONTINUE/i }).click();
+  await expect(page.locator(".starter-recruitment-screen")).toBeVisible();
+  await page.getByRole("button", { name: "SAIL WITHOUT A STARTER", exact: true }).click();
+  await expect(page.locator(".match-screen")).toBeVisible();
+  expect((await readVoyageFixture(page))?.seed).toBe(seed);
 
   const recruit = page.locator("button.shop-card:not([disabled])").first();
   await expect(recruit).toBeVisible();

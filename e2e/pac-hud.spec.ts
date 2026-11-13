@@ -43,6 +43,9 @@ test("PAC HUD keeps captains, six offers and synergy/recipe hovers readable with
   await inventory.getByRole("combobox", { name: "Select crew for orders" }).selectOption("hud-zoro");
   await expect(page.locator(".unit-inspector")).toBeVisible(); await expect(captains).toBeVisible();
   await expect(page.locator(".unit-inspector")).toContainText("SP. DEF");
+  await expect(page.locator(".inspector-header")).toBeInViewport();
+  await expect(page.locator(".inspector-stat").filter({ hasText: "SP. DEF" })).toBeInViewport();
+  await page.screenshot({ path: info.outputPath("crew-details.png") });
   const item = inventory.getByRole("button", { name: /^Equip Jolly Roger Fragment/ });
   await item.hover();
   const itemCard = page.getByRole("dialog", { name: "Jolly Roger Fragment details", exact: true });
@@ -75,4 +78,19 @@ test("keyboard recipe inspection and galley remain accessible through PAC cards"
   await expect(galley).toBeVisible(); await expect(galley.getByRole("button", { name: /Serve / })).toHaveCount(3);
   await expect(galley.getByRole("combobox", { name: "Meal recipient" })).toBeVisible();
   await page.screenshot({ path: info.outputPath("galley-card.png") });
+});
+
+test("floating crew actions deploy and sell only the selected recruit without clicking the board behind", async ({ page }) => {
+  const state = fixture(); state.players[0].level = 3;
+  await resume(page, state);
+  await page.getByRole("combobox", { name: "Select crew for orders" }).selectOption("hud-chopper");
+  const crew = page.getByRole("list", { name: "Units on the tactical board" });
+  await page.getByRole("button", { name: "DEPLOY", exact: true }).click();
+  await expect(crew).toContainText("Chopper, 1 star, player, column 1, row 6");
+  await expect(crew).not.toContainText("bench slot 1");
+  await page.locator(".unit-inspector").getByRole("button", { name: /SELL/ }).click();
+  await expect(crew).not.toContainText("Chopper");
+  await expect(crew).toContainText("Zoro, 1 star, player, column 3, row 6");
+  await expect(crew).toContainText("Nami, 1 star, player, column 4, row 6");
+  await expect(page.locator(".gold-pouch strong")).toHaveText("41");
 });

@@ -17,6 +17,7 @@ import { VisualIcon } from "@/components/VisualIcon";
 import { HudTooltip, HudTooltipProvider } from "@/components/HudTooltip";
 import { ItemTooltip, PacTraits } from "../hud/PacHud";
 import "../hud/pac-hud.css";
+import "../hud/one-piece-hud.css";
 import PhaseClockDisplay from "../PhaseClockDisplay";
 import { GalleyTray } from "../GalleyTray";
 import { MUSIC_TRACKS, type AudioSettings } from "../audioSettings";
@@ -718,6 +719,9 @@ export function MatchScreen({
   const [traitHighlight, setTraitHighlight] = useState<{ id: string; units: string[] } | null>(null);
   const [hoveredUnitId, setHoveredUnitId] = useState<string | null>(null);
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Phaser listens on window too. Isolate HUD presses, but let canvas drags
+  // release over the HUD so the board can finish them normally.
+  const hudMousePress = useRef(false);
   useEffect(() => () => { if (hoverTimer.current) clearTimeout(hoverTimer.current); }, []);
   const hoverUnit = (id: string | null) => { if (hoverTimer.current) clearTimeout(hoverTimer.current); hoverTimer.current = setTimeout(() => setHoveredUnitId(id), 100); };
   const planning = view.phase === "preparation";
@@ -780,7 +784,15 @@ export function MatchScreen({
 
   return (
     <HudTooltipProvider resetKey={`${hidden}:${view.round}:${view.phase}`}>
-    <section className="match-screen pac-hud" hidden={hidden}>
+    <section className="match-screen pac-hud" hidden={hidden}
+      onMouseDownCapture={event => {
+        hudMousePress.current = !(event.target instanceof HTMLCanvasElement);
+        if (hudMousePress.current) event.stopPropagation();
+      }}
+      onMouseUpCapture={event => {
+        if (hudMousePress.current) event.stopPropagation();
+        hudMousePress.current = false;
+      }}>
       <header className="match-topbar">
         <div className="round-medallion">
           <span>STAGE</span>

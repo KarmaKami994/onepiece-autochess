@@ -1,0 +1,225 @@
+/* Project-authored finish over the retained PAC layout. No new assets. */
+.pac-hud, .pac-hud-tooltip, .game-shell:has(.pac-hud:not([hidden])) .action-toast {
+  --hud-ink: #302018;
+  --hud-cream: #fff0d0;
+  --hud-muted: #dcc5a0;
+  --hud-brass: #c99a53;
+  --hud-gold: #ffe09a;
+  --hud-sea: #235b64;
+  --hud-paper: #f2e3c4;
+  --hud-wood: repeating-linear-gradient(2deg, #fff1cb05 0 1px, transparent 1px 8px), linear-gradient(100deg, #65452f, #39291f 52%, #573b29);
+  --hud-bevel: inset 0 0 0 1px #f6d69085, inset 0 2px 0 #fff4d21a, 0 3px 8px #160c0780;
+  --color-bg-primary: #513a2a;
+  --color-bg-secondary: #3d3027;
+  --color-bg-tertiary: #2c2520;
+  --color-bg-accent: #235b64;
+  --color-fg-primary: #fff0d0;
+  --color-fg-secondary: #dcc5a0;
+  --color-fg-gold: #ffe09a;
+  --border-thick: 4px solid #302018;
+  --border-thin: 2px solid #302018;
+}
+
+/* Carved timber, restrained grain and brass edging keep the deck readable. */
+.pac-hud .match-topbar, .pac-hud .match-footer, .pac-hud .side-panel:not(.standings-panel),
+.pac-hud .galley-trigger, .pac-hud .combat-hud, .pac-hud .combat-report,
+.pac-hud .battle-environment, .pac-hud .board-ribbon {
+  color: var(--hud-cream);
+  border-color: var(--hud-ink);
+  background: var(--hud-wood);
+  box-shadow: var(--hud-bevel);
+}
+.pac-hud .side-heading, .pac-hud .inspector-heading {
+  color: var(--hud-gold);
+  background: linear-gradient(90deg, #201a1670, transparent);
+  text-shadow: 0 1px 1px #160d08;
+}
+.pac-hud .side-heading small, .pac-hud .opponent-banner .tiny-label,
+.pac-hud .round-medallion span, .pac-hud .crew-capacity span { color: var(--hud-muted); }
+.pac-hud .round-medallion strong, .pac-hud .opponent-banner strong,
+.pac-hud .level-block > span, .pac-hud .level-block small { color: var(--hud-cream); }
+.pac-hud .save-indicator { color: #e4efd7; text-shadow: 0 1px 3px #16140c; }
+.pac-hud .inventory-heading { color: var(--hud-cream); text-shadow: 0 1px 3px #160d08, 0 0 5px #160d08; }
+
+/* Synergies resemble compact crew emblems, with a parchment active row. */
+.pac-hud .trait-row { color: var(--hud-muted); }
+.pac-hud .trait-row.active {
+  color: var(--hud-ink);
+  border-color: var(--hud-brass);
+  background: linear-gradient(110deg, #faedcd, #d8be8e);
+  box-shadow: inset 0 0 0 1px #fff3d2a0, 0 2px 3px #160d0840;
+}
+.pac-hud .trait-count { color: var(--hud-cream); text-shadow: 0 2px 1px #1c130d; }
+.pac-hud .trait-row.active .trait-count { color: #493122; text-shadow: 0 1px 0 #fff5db; }
+.pac-hud .trait-thresholds { color: #dcc5a0; }
+.pac-hud .trait-row.active .trait-thresholds { color: #715337; }
+.pac-hud .trait-thresholds .current { color: #154d59; font-weight: 800; }
+.pac-hud .trait-row:not(.active) .trait-thresholds .current { color: var(--hud-gold); }
+.pac-hud .trait-row.active .trait-thresholds .reached { color: #493122; }
+
+/* Sea-glass route tiles, a coral current-stage stamp and an ivory clock face. */
+.pac-hud .pac-stage-path > .hud-tooltip-anchor > span {
+  color: var(--hud-cream); background: #213b40; box-shadow: inset 0 0 0 1px #bca67955;
+}
+.pac-hud .pac-stage-path .current { background: #a14431 !important; border-color: #edc37e !important; }
+.pac-hud .phase-clock {
+  color: #6b472c; background: linear-gradient(#fff0ce, #dec295); box-shadow: inset 0 0 0 1px #a77b44;
+}
+.pac-hud .phase-clock strong { color: var(--hud-ink); }
+.pac-hud .phase-clock span { color: #6b472c; }
+.pac-hud .phase-clock i { background: #af4d37; }
+.pac-hud .phase-clock.is-warning { outline: 2px solid #f29d73; }
+.pac-hud .phase-clock.is-warning strong { color: #9e3726; }
+
+/* Captain medallions retain their health arc and readable numeric receipts. */
+.pac-hud .standings-list button {
+  border-color: #4b2d18;
+  background: conic-gradient(#edc577 calc(var(--captain-hp, 100) * 1%), #30251e 0);
+  box-shadow: inset 0 0 0 1px #ffe4a2, 0 2px 5px #170d09b0;
+}
+.pac-hud .standings-list .is-player button {
+  background: conic-gradient(#81c7a4 calc(var(--captain-hp, 100) * 1%), #30251e 0);
+}
+.pac-hud .standings-list .captain-avatar {
+  background: radial-gradient(circle at 40% 25%, #385d63, #182f36);
+  color: var(--hud-cream); box-shadow: inset 0 0 0 1px #17282d;
+}
+.pac-hud .standings-list .is-scouted button { outline-color: #fff0b6; }
+.pac-hud .captain-health {
+  background: linear-gradient(#f6e4bf, #dcc093); border-color: #493020; box-shadow: 0 1px 2px #170d09;
+}
+.pac-hud .captain-health b { color: #35251c; }
+
+/* Brass-framed treasure and controls, with unmistakable focus and pressed states. */
+.pac-hud .inventory-slots button, .pac-hud .crew-order-select,
+.pac-hud .topbar-tools .icon-button, .pac-hud .control-button,
+.pac-hud .economy-button, .pac-hud .inspector-actions button,
+.pac-hud .combat-hud select, .pac-hud .close-inspector {
+  color: var(--hud-cream); border-color: #2b1c14;
+  background: linear-gradient(#765438, #493326);
+  box-shadow: inset 0 0 0 1px #bd925b, inset 0 2px 0 #fff1c11a, 0 2px 3px #160d0855;
+}
+.pac-hud .inventory-slots button { background: radial-gradient(circle at 35% 25%, #816039, #342b24); }
+.pac-hud .control-button[aria-pressed="true"], .pac-hud .control-button.is-active {
+  background: linear-gradient(#356f76, #1a424c); box-shadow: inset 0 0 0 1px #a4c3b7;
+}
+.pac-hud .control-button[aria-pressed="false"] { background: linear-gradient(#765438, #493326); }
+.pac-hud .control-button kbd, .pac-hud .economy-button kbd {
+  color: #e9d7b2; background: #2c221b; box-shadow: inset 0 0 0 1px #997b4f60;
+}
+.pac-hud .control-button small, .pac-hud .economy-button small,
+.pac-hud .galley-trigger small { color: var(--hud-gold); }
+.pac-hud .sail-button {
+  background: linear-gradient(#b85c3c, #853c2a); color: #fff4d8;
+  box-shadow: inset 0 0 0 1px #efbd78, inset 0 2px 0 #ffe4ab33, 0 3px 6px #1a0d0880;
+  text-shadow: 0 1px 1px #4b2118;
+}
+.pac-hud .health-orb, .pac-hud .gold-pouch, .pac-hud .crew-capacity {
+  background: var(--hud-wood); border-color: var(--hud-ink); box-shadow: var(--hud-bevel);
+}
+.pac-hud .health-orb strong { color: var(--hud-cream); }
+.pac-hud .health-orb::before { color: #ffa18a; }
+.pac-hud .gold-pouch strong, .pac-hud .crew-capacity strong, .pac-hud .shop-cost { color: var(--hud-gold); }
+.pac-hud .xp-track { border-color: #281c15; background: #241f1b; box-shadow: 0 1px 0 #c49b6140; }
+.pac-hud .xp-track i { background: linear-gradient(#7ec5b1, #397c80); }
+
+/* Recruit portraits stay unchanged, seated in sea-blue bounty-card insets. */
+.pac-hud .shop-card {
+  background: linear-gradient(#284952 58%, #213b42 58%, #172c33);
+  box-shadow: inset 0 0 0 1px #e4c48050, 0 2px 3px #120c0880;
+}
+.pac-hud .shop-card .crew-portrait { background: radial-gradient(ellipse at 50% 85%, #647f7b, #243b43 75%); }
+.pac-hud .shop-unit-copy strong { color: #fff1d0; text-shadow: 0 1px 1px #102128; }
+.pac-hud .shop-unit-copy small { color: #d2dfd7; }
+.pac-hud .shop-card > kbd { color: #ffebba; background: #2d261f; border-color: #b99259; }
+.pac-hud .merge-badge { color: #ffe3a1; background: #342b1f; border-color: #c49b58; }
+.pac-hud .bond-badge { color: #e1f1d2; background: #214a41; border-color: #7cab83; }
+.pac-hud .cost-warning { color: #ffe5cd; background: #78372b; border-color: #dfa179; }
+
+/* Inspector panels and battle receipts use the same materials as the HUD. */
+.pac-hud .inspector-header strong, .pac-hud .inspector-stat strong,
+.pac-hud .ability-card strong, .pac-hud .equipped-item strong,
+.pac-hud .merge-progress strong { color: var(--hud-cream); }
+.pac-hud .inspector-header small, .pac-hud .inspector-stat small,
+.pac-hud .ability-card > span, .pac-hud .ability-card > small { color: var(--hud-muted); }
+.pac-hud .inspector-stat, .pac-hud .ability-card,
+.pac-hud .merge-progress, .pac-hud .equipped-item {
+  background: #2c302b; box-shadow: inset 0 0 0 1px #b1905940;
+}
+.pac-hud .ability-card p, .pac-hud .equipped-item small, .pac-hud .merge-progress small { color: #f1e3c7; }
+.pac-hud .inspector-portrait { background: radial-gradient(ellipse at bottom, #537978, #243c42); }
+/* An auto-height floating card needs content, rather than a zero flex basis. */
+.pac-hud .inspector-scroll { flex-basis: auto; }
+.pac-hud .stat-note { color: var(--hud-muted) !important; font: 400 12px/1.3 Jost, sans-serif !important; }
+.pac-hud .inspector-actions > small { color: var(--hud-muted); font: 400 12px/1.3 Jost, sans-serif; }
+.pac-hud .combat-report-content { color: #f3e4c7; background: #2e302a; }
+.pac-hud .combat-hud select { color: var(--hud-cream); }
+.pac-hud .phaser-stage-frame .battle-meals {
+  color: #fff0ce; background: #263d37; border-color: #b68d54; box-shadow: 0 2px 5px #160d0880;
+}
+
+/* Parchment information cards keep long synergy, recipe and scout text legible. */
+.pac-hud-tooltip {
+  color: var(--hud-ink); border-color: #5a3924;
+  background: radial-gradient(ellipse at top left, #fff4d980, transparent 70%), var(--hud-paper);
+  box-shadow: inset 0 0 0 1px #d6ad6b, 0 5px 16px #140b08a0;
+}
+.pac-hud-tooltip.is-nested { background: #fff0d3; border-color: #8a6337; }
+.pac-hud-tooltip h3, .pac-hud-tooltip h4, .pac-hud-tooltip .game-item-detail,
+.pac-hud-tooltip .side-panel, .pac-hud-tooltip .side-heading,
+.pac-hud-tooltip .scout-intel-section { color: var(--hud-ink); }
+.pac-hud-tooltip .game-item-detail-name strong { color: #38271c; }
+.pac-hud-tooltip .game-item-detail-stats > i, .pac-hud-tooltip .detail-note { color: #70563b; }
+.pac-hud-tooltip .game-item-detail-description {
+  background: #dfcba3; box-shadow: inset 0 1px 0 #c8ab7955, inset 0 -1px 0 #fff3d480;
+}
+.pac-hud-tooltip .recipe-inspect { border-color: #967344; background: #e7d3ac; box-shadow: inset 0 0 0 1px #fff1cc; }
+.pac-hud-tooltip .game-item-detail-combination > span { color: #75532c; }
+.pac-hud-tooltip .pac-synergy-detail section { color: #70563b; }
+.pac-hud-tooltip .pac-synergy-detail .current-tier { color: #33271d; border-color: #a97a3c; background: #e5cda2; }
+.pac-hud-tooltip .synergy-members > span { background: #e0cead; border-color: #ae9269; opacity: .7; }
+.pac-hud-tooltip .synergy-members .acquired { background: #fff0cd; border-color: #99682d; opacity: 1; box-shadow: inset 0 0 0 1px #e0b05a; }
+.pac-hud-tooltip .shop-decision-preview, .pac-hud-tooltip .shop-preview-identity strong,
+.pac-hud-tooltip .shop-preview-identity em, .pac-hud-tooltip .shop-preview-identity small,
+.pac-hud-tooltip .shop-preview-stats, .pac-hud-tooltip .shop-preview-ability strong,
+.pac-hud-tooltip .shop-preview-ability p, .pac-hud-tooltip .shop-preview-bonds li,
+.pac-hud-tooltip .galley-tray, .pac-hud-tooltip .galley-tray h3,
+.pac-hud-tooltip .galley-tray p, .pac-hud-tooltip .galley-tray label,
+.pac-hud-tooltip .galley-stock span, .pac-hud-tooltip .galley-stock strong { color: var(--hud-ink); }
+.pac-hud-tooltip .shop-preview-ability { background: #e2ceaa; }
+.pac-hud-tooltip .galley-stock button { color: #fff0d0; background: #35615c; border-color: #294238; }
+.pac-hud-tooltip .galley-stock button strong, .pac-hud-tooltip .galley-stock button span { color: #fff0d0; }
+.pac-hud-tooltip select, .pac-hud-tooltip .galley-tray select { color: #38271c; background: #fff1d4; border-color: #a77e47; }
+.pac-hud-tooltip .scout-summary > span, .pac-hud-tooltip .scout-item-list li {
+  color: #38271c; background: #e5d1ad; border-color: #b29363; font: 600 13px/1.25 Jost, sans-serif;
+}
+.pac-hud-tooltip .scout-summary small, .pac-hud-tooltip .scout-item-list small,
+.pac-hud-tooltip .scout-intel-section > strong, .pac-hud-tooltip .scout-intel-section > p { color: #70563b; }
+.pac-hud-tooltip .scout-summary small, .pac-hud-tooltip .scout-intel-section > strong,
+.pac-hud-tooltip .scout-intel-section > p { font: 500 12px/1.3 Jost, sans-serif; }
+.pac-hud-tooltip .recent-battle-list li { color: #70563b; background: #e5d1ad; font: 500 12px/1.3 Jost, sans-serif; }
+.pac-hud-tooltip .recent-battle-list b { color: #38271c; }
+.pac-hud-tooltip .recent-battle-list small { color: #70522b; }
+
+.game-shell:has(.pac-hud:not([hidden])) .action-toast {
+  color: var(--hud-cream); border-color: var(--hud-ink); background: var(--hud-wood); box-shadow: var(--hud-bevel);
+}
+.game-shell:has(.pac-hud:not([hidden])) .action-toast strong,
+.game-shell:has(.pac-hud:not([hidden])) .action-toast p { color: var(--hud-cream); }
+
+.pac-hud button, .pac-hud select, .pac-hud-tooltip button,
+.pac-hud .hud-tooltip-anchor { transition: border-color 120ms ease, box-shadow 120ms ease, background-color 120ms ease; }
+.pac-hud button:not(:disabled):hover, .pac-hud .hud-tooltip-anchor:focus-visible,
+.pac-hud-tooltip button:not(:disabled):hover {
+  border-color: #f6d393; box-shadow: inset 0 0 0 1px #ffe4a580, 0 0 0 1px #b18b4a80;
+}
+.pac-hud button:focus-visible, .pac-hud select:focus-visible,
+.pac-hud .hud-tooltip-anchor:focus-visible, .pac-hud-tooltip button:focus-visible,
+.pac-hud-tooltip select:focus-visible {
+  outline: 3px solid #c96f3d; outline-offset: 2px;
+}
+.pac-hud button:focus-visible, .pac-hud select:focus-visible,
+.pac-hud .hud-tooltip-anchor:focus-visible { outline-color: #ffe09a; }
+@media (prefers-reduced-motion: reduce) {
+  .pac-hud *, .pac-hud-tooltip * { transition: none; }
+}
