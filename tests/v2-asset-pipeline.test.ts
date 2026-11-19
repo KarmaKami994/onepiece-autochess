@@ -241,7 +241,7 @@ async function expectRuntimeBundle(entry: SourceEntry) {
   expect(transparentFrameBorders).toBe(true);
 
   const editable = await stat(
-    entry.editableSource === "licensed-reference-png" || p12VisualIds.includes(entry.id)
+    entry.editableSource === "licensed-reference-png" || entry.editableSource === "authored-pose-board" || p12VisualIds.includes(entry.id)
       ? path.join(projectRoot, entry.source.localPath)
       : path.join(
           projectRoot,
@@ -466,7 +466,7 @@ describe("animation v2 asset pipeline", () => {
     for (const entry of matrix.entries) {
       expect(notes).toContain(`\`${entry.outputAssetKey}\``);
       expect(notes).toContain(
-        entry.productionFor ? `art/production/b11/${entry.productionFor}/body.aseprite` : entry.editableSource === "licensed-reference-png" || p12VisualIds.includes(entry.id)
+        entry.productionFor ? `art/production/b11/${entry.productionFor}/body.aseprite` : entry.editableSource === "licensed-reference-png" || entry.editableSource === "authored-pose-board" || p12VisualIds.includes(entry.id)
           ? entry.source.localPath
           : `art/libresprite/${entry.outputAssetKey}.aseprite`,
       );

@@ -332,7 +332,7 @@ describe("Roster Expansion Pack F content", () => {
       ),
     ).toEqual([7, 9, 8, 8, 5]);
     expect(DEFAULT_CONTENT.traits).toHaveLength(14);
-    expect(DEFAULT_CONTENT.version).toBe("1.35.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.38.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
 
     const state = createMatch("pack-f-pool", DEFAULT_CONTENT);

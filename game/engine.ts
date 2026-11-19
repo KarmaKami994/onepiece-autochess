@@ -16,6 +16,10 @@ import { prepareStarterOffers, prepareVoyageRecruitOffers, resolveVoyageRecruit,
 import { getHarborEncounter, prepareHarborOffers, resolveHarborOffer } from "./voyageEncounters";
 import { canReceiveFood, foodUseError, freezeBattleMeals, mealForUnit, serveFood } from "./food";
 import {
+  getKobyTrainingBattles,
+  getUnitFormDefinition,
+  KOBY_HONESTY_IMPACT_FORM_ID,
+  KOBY_TRAINING_BATTLES_REQUIRED,
   reconcileProductionFormProgression,
   resolvePersistentFormId,
 } from "./forms";
@@ -587,6 +591,26 @@ export function regenerateBattleResults(
   return next;
 }
 
+function recordKobyTraining(state: MatchState, content: GameContent): void {
+  const form = getUnitFormDefinition(KOBY_HONESTY_IMPACT_FORM_ID, content);
+  if (form?.baseDefinitionId !== "koby" || form.lifecycle !== "persistent") return;
+
+  const participants = new Set(state.lastResults.flatMap(({ playerAId, playerBId }) =>
+    playerBId ? [playerAId, playerBId] : [playerAId],
+  ));
+  for (const player of state.players) {
+    if (!participants.has(player.id)) continue;
+    for (const id of new Set(Object.values(player.board))) {
+      const instance = player.units[id];
+      if (instance?.definitionId !== "koby") continue;
+      const battles = getKobyTrainingBattles(instance);
+      if (battles >= KOBY_TRAINING_BATTLES_REQUIRED) continue;
+      instance.kobyTrainingBattles = battles + 1;
+      reconcileProductionFormProgression(instance, content);
+    }
+  }
+}
+
 function beginBattle(
   state: MatchState,
   content: GameContent,
@@ -604,6 +628,7 @@ function beginBattle(
   } else {
     simulatePvpRound(next, content);
   }
+  recordKobyTraining(next, content);
   next.phase = "battle";
   return next;
 }

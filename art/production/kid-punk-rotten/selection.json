@@ -1,0 +1,10 @@
+{
+  "sourceSha256": "42b74dfc24424e29e282c135a3feaac530e8d528a637506b360bc8495bbe415a",
+  "dimensions": { "width": 1774, "height": 887 },
+  "sourceType": "project-authored-imagegen-assembly",
+  "parts": {
+    "leftFist": { "left": 0, "top": 0, "width": 564, "height": 887 },
+    "torso": { "left": 564, "top": 0, "width": 676, "height": 887 },
+    "rightFist": { "left": 1240, "top": 0, "width": 534, "height": 887 }
+  }
+}

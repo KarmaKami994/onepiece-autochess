@@ -6,6 +6,7 @@ import {
   getActiveTraits,
   getActiveTraitsForUnits,
   getEffectiveUnitTraits,
+  getKobyTrainingBattles,
   getStageDefinition,
   getUnitDefinition,
   getUnitFormDefinition,
@@ -119,6 +120,7 @@ export type ShopUnitView = {
   token: string;
   color: string;
   description: string;
+  kobyTrainingBattles?: number;
   stats: {
     health: number;
     attack: number;
@@ -704,7 +706,9 @@ function buildBoardUnits(
         content,
       );
       const maxHp = planningMaxHp(instance, content);
-      views.set(id, view);
+      views.set(id, team === "player" && instance.definitionId === "koby" && !formId
+        ? { ...view, kobyTrainingBattles: getKobyTrainingBattles(instance) }
+        : view);
       units.push({
         id,
         contentId: instance.definitionId,

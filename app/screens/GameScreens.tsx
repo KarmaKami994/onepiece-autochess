@@ -7,6 +7,7 @@ import {
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
+import { KOBY_TRAINING_BATTLES_REQUIRED } from "@/game";
 import {
   type BoardMove,
   type BoardInteractionMode,
@@ -1808,6 +1809,13 @@ function UnitInspector({
             <span>EVOLUTION LINE</span>
             <strong>{definition.mergeProgress}</strong>
             <small>{definition.ownedCopies} equivalent copies owned</small>
+          </div>
+        )}
+        {definition.kobyTrainingBattles !== undefined && (
+          <div className="merge-progress">
+            <span>HONESTY IMPACT</span>
+            <strong>{definition.kobyTrainingBattles}/{KOBY_TRAINING_BATTLES_REQUIRED} battles</strong>
+            <small>Deploy Koby to train.</small>
           </div>
         )}
 

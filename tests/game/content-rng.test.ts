@@ -16,7 +16,7 @@ describe("canonical game content", () => {
     const newIds = ["hatchan", "kuroobi", "fisher-tiger"];
     const previousContent = {
       ...DEFAULT_CONTENT,
-      version: "1.34.0",
+      version: "1.38.0",
       units: DEFAULT_CONTENT.units.filter(unit => !newIds.includes(unit.id)).map(unit =>
         unit.id === "jinbe" ? { ...unit, traits: ["straw-hat", "guardian"] } : unit,
       ),

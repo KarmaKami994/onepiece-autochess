@@ -18,6 +18,30 @@ The project owner confirmed the applicable game-source permission and supplied t
 
 `art/animation-v2/source-matrix.json` records pages, contributors, dimensions and frame-map pins. `art/production/fish-man-crew/outputs.json` pins the local runtime exports and the project-authored Fish-Man trait SVG. Run `npm run assets:fish-man-crew` to repack the selected original poses and generate portraits and tokens offline. Kuroobi is mirrored to the project's canonical facing. Fisher Tiger is scaled with nearest-neighbour at 40% to fit the v2 frame. Original pose holds fill transitions where a sheet has fewer usable frames than the game requests.
 
+## Kid — Punk Rotten
+
+`kid-punk-rotten-v2` uses the project-generated three-piece Punk Rotten master.
+The normalized pose input `art/production/kid-punk-rotten/poses.png` has SHA-256
+`de077d5571bceef7e086586c150967f8ba040583c897b3324a6d456c852f4b05`. The runtime
+atlas SHA-256 is `a8d872ed5130b5b6cb69c982ea737cb4fb1f8012b38f6d65675062519116140d`.
+The [forms source notes](docs/SABO_KID_FORMS.md) record the visual references,
+generation prompt, normalized inputs, exports and the reuse basis.
+
+## Kuzan and Blackbeard battle forms
+
+The three forms reuse the existing B11 character bodies and original *One Piece:
+Gigant Battle!* effects. The [forms source record](docs/KUZAN_BLACKBEARD_FORMS.md)
+identifies the sheets, contributors, export command and SHA-256 hashes.
+
+## Koby — Honesty Impact
+
+`koby-honesty-impact-v2` uses the owner-supplied Treasure Cruise #4250 sheet.
+Its frozen pose input, `art/production/koby-honesty-impact/poses.png`, has SHA-256
+`c2246cd2b950ebecc912a08f43746c3990f19f4ffe6d0a6f7853a2254c93c53f`. The runtime
+atlas SHA-256 is `05da57cb76e795fb8102fcf593be359d00f45c4a238ef0628e940c9e328d3f76`.
+The [source notes](docs/KOBY_HONESTY_IMPACT.md) record both export commands, the
+original source and the static presentation hashes.
+
 ## B03 original offline audio
 
 Two original instrumental loops, **Harbor at Dawn** (96 BPM, 20 seconds) and

@@ -1,5 +1,6 @@
 import { parseCell } from "./state";
 import {
+  getKobyTrainingBattles,
   reconcileProductionFormProgression,
   resolvePersistentFormId,
 } from "./forms";
@@ -152,6 +153,10 @@ function mergeUnits(
         if (unit.id !== anchor.id) delete player.units[unit.id];
       }
       anchor.star = (star + 1) as StarLevel;
+      if (anchor.definitionId === "koby") {
+        const mostTraining = Math.max(...consumed.map(getKobyTrainingBattles));
+        if (mostTraining > 0) anchor.kobyTrainingBattles = mostTraining;
+      }
       let mergedItems = resolveMergedItems(combinedItems, content);
       anchor.items = mergedItems.retained;
       reconcileProductionFormProgression(anchor, content);

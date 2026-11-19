@@ -107,6 +107,12 @@ export const FORM_VISUALS = {
   "luffy-gear-4-boundman": formVisual("luffy-gear-4-boundman", "✊", "#a82e38"),
   "luffy-gear-4-snakeman": formVisual("luffy-gear-4-snakeman", "↝", "#d94b3f"),
   "chopper-monster-point": formVisual("chopper-monster-point", "▲", "#8a674e"),
+  "sabo-flame-emperor": formVisual("sabo-flame-emperor", "♨", "#ec782d"),
+  "kid-punk-rotten": formVisual("kid-punk-rotten", "✦", "#da91ff"),
+  "kuzan-ice-form": formVisual("kuzan-ice-form", "❄", "#81deff"),
+  "blackbeard-darkness": formVisual("blackbeard-darkness", "◉", "#a48acf"),
+  "blackbeard-quake": formVisual("blackbeard-quake", "✦", "#f0e8a8"),
+  "koby-honesty-impact": formVisual("koby-honesty-impact", "✦", "#beb6ff"),
 } as const satisfies Record<string, FormVisualDefinition>;
 
 export function formVisualDefinition(formId: string | undefined): FormVisualDefinition | null {

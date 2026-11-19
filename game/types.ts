@@ -499,6 +499,7 @@ export interface UnitInstance {
   id: string;
   definitionId: string;
   formId?: string;
+  kobyTrainingBattles?: number;
   star: StarLevel;
   items: string[];
   acquiredOrder: number;

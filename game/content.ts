@@ -1049,6 +1049,112 @@ export const FORM_DEFINITIONS: UnitFormDefinition[] = [
       { stunMs: 600 },
     ),
   },
+  {
+    id: "sabo-flame-emperor",
+    baseDefinitionId: "sabo",
+    name: "Sabo — Flame Emperor",
+    lifecycle: "battle-temporary",
+    presentation: {
+      portrait: "/assets/forms/sabo-flame-emperor/portrait.svg",
+      token: "/assets/forms/sabo-flame-emperor/token.svg",
+    },
+    ability: ability(
+      "sabo-fire-fist",
+      "Fire Fist",
+      "Sends fire through the nearest enemy's line, damaging and burning enemies in its path.",
+      190,
+      "nearest-enemy",
+      "line",
+      { damageType: "special", burnPower: 16, burnDurationMs: 3_000 },
+    ),
+  },
+  {
+    id: "kid-punk-rotten",
+    baseDefinitionId: "kid",
+    name: "Kid — Punk Rotten",
+    lifecycle: "battle-temporary",
+    presentation: {
+      portrait: "/assets/forms/kid-punk-rotten/portrait.svg",
+      token: "/assets/forms/kid-punk-rotten/token.svg",
+    },
+    stats: { defense: 44, specialDefense: 40, range: 1 },
+    ability: ability(
+      "punk-vise",
+      "Punk Vise",
+      "Crushes the nearest enemy between two metal fists, damaging and briefly stunning them.",
+      275,
+      "nearest-enemy",
+      "single",
+      { damageType: "physical", stunMs: 600 },
+    ),
+  },
+  {
+    id: "kuzan-ice-form",
+    baseDefinitionId: "kuzan",
+    name: "Kuzan — Ice Form",
+    lifecycle: "battle-temporary",
+    presentation: {
+      portrait: "/assets/forms/kuzan-ice-form/portrait.svg",
+      token: "/assets/forms/kuzan-ice-form/token.svg",
+    },
+    ability: ability(
+      "ice-age-snow",
+      "Ice Age: Deep Freeze",
+      "Freezes the nearest enemy and enemies around them. In Snow, affected enemies stay Frozen for up to 1.3 seconds before thaw modifiers.",
+      190,
+      "nearest-enemy",
+      "adjacent",
+      { freezeMs: 1_000, castAnimationMs: 650 },
+    ),
+  },
+  {
+    id: "blackbeard-darkness",
+    baseDefinitionId: "blackbeard",
+    name: "Blackbeard — Darkness",
+    lifecycle: "battle-temporary",
+    presentation: {
+      portrait: "/assets/forms/blackbeard-darkness/portrait.svg",
+      token: "/assets/forms/blackbeard-darkness/token.svg",
+    },
+  },
+  {
+    id: "blackbeard-quake",
+    baseDefinitionId: "blackbeard",
+    name: "Blackbeard — Quake",
+    lifecycle: "battle-temporary",
+    presentation: {
+      portrait: "/assets/forms/blackbeard-quake/portrait.svg",
+      token: "/assets/forms/blackbeard-quake/token.svg",
+    },
+    ability: ability(
+      "tremor-crush",
+      "Tremor Crush",
+      "Cracks the air with a quake punch, damaging the nearest enemy and enemies around them.",
+      220,
+      "nearest-enemy",
+      "adjacent",
+      { castAnimationMs: 700 },
+    ),
+  },
+  {
+    id: "koby-honesty-impact",
+    baseDefinitionId: "koby",
+    name: "Koby — Honesty Impact",
+    lifecycle: "persistent",
+    presentation: {
+      portrait: "/assets/forms/koby-honesty-impact/portrait.svg",
+      token: "/assets/forms/koby-honesty-impact/token.svg",
+    },
+    ability: ability(
+      "honesty-impact",
+      "Honesty Impact",
+      "Strikes the nearest enemy with an Armament Haki shockwave that also damages enemies around them.",
+      165,
+      "nearest-enemy",
+      "adjacent",
+      { damageType: "physical" },
+    ),
+  },
 ];
 
 export const TRAIT_DEFINITIONS: TraitDefinition[] = [
@@ -2718,7 +2824,7 @@ export const FOOD_DEFINITIONS: NonNullable<GameContent["foods"]> = [
 ];
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.35.0",
+  version: "1.38.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,

@@ -120,7 +120,7 @@ const specTraitIds = traitSpecs.traits.map((trait) => trait.id).sort();
 if (JSON.stringify(traitIds) !== JSON.stringify([...specTraitIds, "fish-man"].sort())) throw new Error("Trait visuals must exactly cover the catalogue");
 for (const traitId of traitIds) await validateSvg(path.join(publicRoot, "assets", "traits", `${traitId}.svg`));
 
-if (DEFAULT_CONTENT.forms.length !== 4) throw new Error(`Expected four forms, found ${DEFAULT_CONTENT.forms.length}`);
+if (DEFAULT_CONTENT.forms.length !== 10) throw new Error(`Expected ten forms, found ${DEFAULT_CONTENT.forms.length}`);
 for (const form of DEFAULT_CONTENT.forms) {
   if (!form.presentation?.portrait || !form.presentation?.token) throw new Error(`${form.id} lacks form presentation paths`);
   await validateSvg(path.join(publicRoot, form.presentation.portrait.replace(/^\//, "")));
@@ -159,6 +159,9 @@ for (const entry of sourceMatrix.entries) {
   await requireFile(source);
   if (await sha256(source) !== entry.source.sha256) throw new Error(`${entry.id} source SHA-256 does not match the source matrix`);
   if (entry.source.frameMapSha256 && await sha256(path.join(root, entry.source.frameMap)) !== entry.source.frameMapSha256) throw new Error(`${entry.id} frame map SHA-256 does not match the source matrix`);
+  if (entry.originalSource && await sha256(path.join(root, entry.originalSource.localPath)) !== entry.originalSource.sha256) {
+    throw new Error(`${entry.id} original source SHA-256 does not match the source matrix`);
+  }
   if (!entry.permission?.status || !entry.permission?.note) throw new Error(`${entry.id} lacks permission provenance`);
   if (entry.source.sheetUrl && (!entry.source.contributor || !entry.source.dimensions)) throw new Error(`${entry.id} lacks source-page provenance`);
 }

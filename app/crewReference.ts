@@ -11,13 +11,18 @@ export type ReferenceEntry = {
   imagePath?: string; details: string[]; traits: string[]; cost?: number; kind?: string;
 };
 
-// Help text for the four production pilots; unlock legality is resolved by game/forms.ts.
 export function formRequirementText(id: string): string {
   switch (id) {
     case "robin-demonio-fleur": return "Automatic on 3-star Robin. The normal nine-copy merge unlocks Demonio Fleur.";
     case "luffy-gear-4-boundman": return "3-star Luffy with retained Armament Wraps. The first retained catalyst selects the branch; an unlocked branch then stays locked.";
     case "luffy-gear-4-snakeman": return "3-star Luffy with retained Sniper Goggles. The first retained catalyst selects the branch; an unlocked branch then stays locked.";
     case "chopper-monster-point": return "Battle-temporary: base Chopper transforms after 8 seconds when the frozen starting team has an active Straw Hat tier. It resets after combat; it cannot be selected as a starting form.";
+    case "sabo-flame-emperor": return "Once per battle, Sabo becomes Flame Emperor if he survives an enemy attack or ability that deals HP damage and leaves him below 30% HP. A knockout ends the form.";
+    case "kid-punk-rotten": return "Deploy Kid orthogonally adjacent to an allied Killer. Kid starts that battle in Punk Rotten with higher defenses, shorter range and Punk Vise.";
+    case "kuzan-ice-form": return "Kuzan starts in Ice Form during Snow. Ice Age freezes a smaller group for longer.";
+    case "blackbeard-darkness": return "Blackbeard starts each battle in Darkness. Black Hole pulls enemies closer and switches him to Quake.";
+    case "blackbeard-quake": return "After Black Hole, Blackbeard uses Tremor Crush against a group of enemies, then returns to Darkness.";
+    case "koby-honesty-impact": return "Deploy the same Koby in four voyage battles. From his next battle, Honesty Impact strikes a group at close range. Star merges carry the highest training progress among the copies.";
     default: return "Uses the production form's lifecycle and progression rules.";
   }
 }

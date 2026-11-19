@@ -9,6 +9,15 @@ import type {
 const ROBIN_DEMONIO_FLEUR_FORM_ID = "robin-demonio-fleur";
 const LUFFY_GEAR_4_BOUNDMAN_FORM_ID = "luffy-gear-4-boundman";
 const LUFFY_GEAR_4_SNAKEMAN_FORM_ID = "luffy-gear-4-snakeman";
+export const KOBY_HONESTY_IMPACT_FORM_ID = "koby-honesty-impact";
+export const KOBY_TRAINING_BATTLES_REQUIRED = 4;
+
+export function getKobyTrainingBattles(instance: Pick<UnitInstance, "kobyTrainingBattles">): number {
+  const battles = instance.kobyTrainingBattles ?? 0;
+  return Number.isSafeInteger(battles)
+    ? Math.max(0, Math.min(battles, KOBY_TRAINING_BATTLES_REQUIRED))
+    : 0;
+}
 
 export function getUnitFormDefinition(
   formId: string | null | undefined,
@@ -52,6 +61,15 @@ export function reconcileProductionFormProgression(
   instance: UnitInstance,
   content: Pick<GameContent, "forms"> = DEFAULT_CONTENT,
 ): void {
+  if (instance.definitionId === "koby") {
+    if (getKobyTrainingBattles(instance) === KOBY_TRAINING_BATTLES_REQUIRED) {
+      const form = getUnitFormDefinition(KOBY_HONESTY_IMPACT_FORM_ID, content);
+      if (form?.baseDefinitionId === "koby" && form.lifecycle === "persistent") {
+        instance.formId = form.id;
+      }
+    }
+    return;
+  }
   if (instance.definitionId === "robin") {
     if (instance.star === 3) {
       const form = getUnitFormDefinition(ROBIN_DEMONIO_FLEUR_FORM_ID, content);
