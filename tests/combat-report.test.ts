@@ -53,7 +53,7 @@ describe("playback-only combat contributions", () => {
     expect(recordCombatEvent(report, { ...drain, sourceId: "target" }).units.every((unit) => unit.energyDrained === 0)).toBe(true);
     for (const kind of ["lunge", "pull", "knockback", "escape"]) expect(combatEventCue(event({ kind: "displace", movementKind: kind, unitId: "target" }), report.units)).toContain(movementCue(kind).label.toLowerCase().replace(/^./, (value) => value.toUpperCase()));
     expect(new Set(["lunge", "pull", "knockback", "escape"].map((kind) => movementCue(kind).color)).size).toBe(4);
-    expect(new Set(DEFAULT_CONTENT.forms.map((form) => formAccent(form.id))).size).toBe(4);
+    expect(new Set(DEFAULT_CONTENT.forms.map((form) => formAccent(form.id))).size).toBe(10);
     expect(combatPresentationStyle("luffy", "cast", "luffy-gear-4-snakeman")).toBe("slash");
     expect(combatPresentationStyle("chopper", "cast", "chopper-monster-point")).toBe("impact");
   });
@@ -80,7 +80,7 @@ describe("additive Energy Drain reporting", () => {
     const legacy = structuredClone(state);
     for (const entry of legacy.lastResults[0].events) if (entry.type === "energy") delete entry.sourceId;
     expect(selectBattlePresentation(legacy, b.id)?.events.find((entry) => entry.kind === "energy" && entry.reason === "ability-drain")).toMatchObject({ sourceId: "b-fighter", targetId: "b-fighter" });
-    expect(DEFAULT_CONTENT.version).toBe("1.34.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.38.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 

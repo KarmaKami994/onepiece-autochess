@@ -34,16 +34,19 @@ function trimmedCellHash(pixels: Buffer, width: number, rect: Rect): string {
 }
 
 describe("B11 complete character/form/PvE presentation", () => {
-  it("covers all 34 crew, four own form bodies and 29 PvE definitions without introducing gameplay identities", () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.34.0");
-    expect(DEFAULT_CONTENT.units).toHaveLength(34);
+  it("covers the current crew, six dedicated form bodies and 29 PvE definitions", () => {
+    expect(DEFAULT_CONTENT.version).toBe("1.38.0");
+    expect(DEFAULT_CONTENT.units).toHaveLength(37);
     expect(DEFAULT_CONTENT.enemies).toHaveLength(29);
-    expect(DEFAULT_CONTENT.forms).toHaveLength(4);
+    expect(DEFAULT_CONTENT.forms).toHaveLength(10);
     expect(productionSources).toHaveLength(58);
     expect(Object.keys(B11_ANIMATION_MANIFEST)).toHaveLength(60);
     const preferred = [...DEFAULT_CONTENT.units, ...DEFAULT_CONTENT.enemies].map(unit => getCrewAnimationDefinitions(unit.id).at(-1));
     expect(preferred.every(definition => definition?.frameCount === 46)).toBe(true);
-    for (const form of DEFAULT_CONTENT.forms) {
+    const ownBodies = ["robin-demonio-fleur", "luffy-gear-4-boundman", "luffy-gear-4-snakeman", "chopper-monster-point", "kid-punk-rotten", "koby-honesty-impact"];
+    for (const id of ownBodies) {
+      const form = DEFAULT_CONTENT.forms.find((candidate) => candidate.id === id);
+      if (!form) throw new Error(`Missing form body: ${id}`);
       const base = getCrewAnimationDefinitions(form.baseDefinitionId);
       const variants = getCrewAnimationDefinitions(form.baseDefinitionId, form.id);
       expect(variants.slice(0, -1)).toEqual(base);
@@ -51,7 +54,10 @@ describe("B11 complete character/form/PvE presentation", () => {
       expect(FORM_ANIMATION_MANIFEST[form.id]).toEqual(variants.at(-1));
       expect(getCrewAnimationDefinitions("zoro", form.id)).toEqual(getCrewAnimationDefinitions("zoro"));
     }
-    expect(new Set([...preferred, ...Object.values(FORM_ANIMATION_MANIFEST)].map(definition => definition?.assetKey)).size).toBe(62);
+    for (const form of DEFAULT_CONTENT.forms.filter(({ id }) => !ownBodies.includes(id))) {
+      expect(getCrewAnimationDefinitions(form.baseDefinitionId, form.id)).toEqual(getCrewAnimationDefinitions(form.baseDefinitionId));
+    }
+    expect(new Set([...preferred, ...Object.values(FORM_ANIMATION_MANIFEST)].map(definition => definition?.assetKey)).size).toBe(67);
     expect(animationCandidates("luffy").map(definition => definition.assetKey)).toEqual(["luffy-v2", "luffy"]);
     expect(animationCandidates("luffy")[0].originX).toBe(40 / 128);
     expect(animationCandidates("koala")[0].assetKey).toBe("koala-b10-v2");

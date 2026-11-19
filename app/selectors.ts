@@ -6,6 +6,7 @@ import {
   getActiveTraits,
   getActiveTraitsForUnits,
   getEffectiveUnitTraits,
+  getKobyTrainingBattles,
   getStageDefinition,
   getUnitDefinition,
   getUnitFormDefinition,
@@ -28,6 +29,7 @@ import type {
   PlayerState,
   PvEEnemyDefinition,
   RecentBattleRecord,
+  TraitTier,
   UnitDefinition,
   UnitInstance,
 } from "@/game";
@@ -70,7 +72,7 @@ export type TraitView = {
   description: string;
   category: "Origin" | "Role";
   tierLabel: string;
-  scopeLabel: "Crew-wide" | "Trait holders only";
+  scopeLabel: "Crew-wide" | "Trait holders only" | "Triggered effect";
   staticEffects: string[];
   behaviorDescriptions: string[];
   semanticDescription: string;
@@ -118,6 +120,7 @@ export type ShopUnitView = {
   token: string;
   color: string;
   description: string;
+  kobyTrainingBattles?: number;
   stats: {
     health: number;
     attack: number;
@@ -703,7 +706,9 @@ function buildBoardUnits(
         content,
       );
       const maxHp = planningMaxHp(instance, content);
-      views.set(id, view);
+      views.set(id, team === "player" && instance.definitionId === "koby" && !formId
+        ? { ...view, kobyTrainingBattles: getKobyTrainingBattles(instance) }
+        : view);
       units.push({
         id,
         contentId: instance.definitionId,
@@ -820,6 +825,11 @@ function buildBoardUnits(
   return { units, views };
 }
 
+function traitScopeLabel(tier: TraitTier | null): TraitView["scopeLabel"] {
+  if (tier && tier.effects.length === 0 && tier.behaviors?.length) return "Triggered effect";
+  return tier?.effectScope === "holders" ? "Trait holders only" : "Crew-wide";
+}
+
 export function createTraitViews(
   activeTraits: readonly ActiveTrait[],
   content: GameContent,
@@ -834,10 +844,7 @@ export function createTraitViews(
         (tier) => tier.required > active.count,
       );
       const presentationTier = active.tier ?? nextTier ?? null;
-      const scopeLabel =
-        (presentationTier?.effectScope ?? "team") === "team"
-          ? "Crew-wide" as const
-          : "Trait holders only" as const;
+      const scopeLabel = traitScopeLabel(presentationTier);
       const staticEffects =
         presentationTier?.effects.map(describeTraitEffect) ?? [];
       const behaviorDescriptions =
@@ -883,7 +890,7 @@ export function createTraitViews(
         color: visual.imagePath ? visual.color : cssColor(active.traitId),
         thresholds: definition?.tiers.map(tier => ({
           required: tier.required, label: tier.label,
-          scope: (tier.effectScope ?? "team") === "team" ? "Crew-wide" : "Trait holders only",
+          scope: traitScopeLabel(tier),
           effects: [...tier.effects.map(describeTraitEffect), ...(tier.behaviors?.map(describeTraitBehavior) ?? [])],
         })) ?? [],
         members: content.units.filter(unit => unit.traits.includes(active.traitId))

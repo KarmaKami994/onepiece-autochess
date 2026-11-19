@@ -136,6 +136,7 @@ export type TraitEffectScope = "team" | "holders";
 
 export type TraitBehavior =
   | { kind: "first-straw-hat-cast-rally"; energy: number }
+  | { kind: "first-ability-knockback-tidal-guard"; shield: number; shareWithAdjacentAllies: boolean }
   | {
       kind: "start-navy-formation-shield";
       shieldPerAdjacentHolder: number;
@@ -498,6 +499,7 @@ export interface UnitInstance {
   id: string;
   definitionId: string;
   formId?: string;
+  kobyTrainingBattles?: number;
   star: StarLevel;
   items: string[];
   acquiredOrder: number;

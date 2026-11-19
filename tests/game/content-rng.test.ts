@@ -5,12 +5,31 @@ import {
   createMatch,
   getStageDefinition,
   hashSeed,
+  migrateMatchState,
   nextRandom,
   randomInt,
   shuffleDeterministic,
 } from "../../game";
 
 describe("canonical game content", () => {
+  it("fills the new shared pool entries when resuming an existing schema-6 voyage", () => {
+    const newIds = ["hatchan", "kuroobi", "fisher-tiger"];
+    const previousContent = {
+      ...DEFAULT_CONTENT,
+      version: "1.38.0",
+      units: DEFAULT_CONTENT.units.filter(unit => !newIds.includes(unit.id)).map(unit =>
+        unit.id === "jinbe" ? { ...unit, traits: ["straw-hat", "guardian"] } : unit,
+      ),
+      traits: DEFAULT_CONTENT.traits.filter(trait => trait.id !== "fish-man"),
+    };
+    const saved = createMatch("fish-man-pool-backfill", previousContent);
+    const restored = migrateMatchState(saved, DEFAULT_CONTENT);
+    expect(restored.schemaVersion).toBe(6);
+    expect(restored.rngState).toBe(saved.rngState);
+    expect(restored.players.map(player => player.shop)).toEqual(saved.players.map(player => player.shop));
+    expect(restored.pool).toEqual({ ...saved.pool, hatchan: 27, kuroobi: 22, "fisher-tiger": 18 });
+  });
+
   it("contains the complete requested roster and supporting content", () => {
     expect(CONTENT).toBe(DEFAULT_CONTENT);
     expect(DEFAULT_CONTENT.units.map((unit) => unit.id)).toEqual([
@@ -48,6 +67,9 @@ describe("canonical game content", () => {
       "shanks",
       "blackbeard",
       "whitebeard",
+      "hatchan",
+      "kuroobi",
+      "fisher-tiger",
     ]);
     expect(DEFAULT_CONTENT.units.map((unit) => unit.cost)).toEqual([
       1, 1, 1, 1, 1, 1,
@@ -55,8 +77,9 @@ describe("canonical game content", () => {
       3, 3, 3, 3, 3, 3, 3,
       4, 4, 4, 4, 4, 4, 4, 4,
       5, 5, 5, 5, 5,
+      1, 2, 3,
     ]);
-    expect(DEFAULT_CONTENT.traits).toHaveLength(13);
+    expect(DEFAULT_CONTENT.traits).toHaveLength(14);
     expect(DEFAULT_CONTENT.items).toHaveLength(65);
     expect(DEFAULT_CONTENT.enemies).toHaveLength(29);
     expect(
@@ -117,8 +140,12 @@ describe("canonical game content", () => {
       "Divine Departure",
       "Black Hole",
       "Seaquake",
+      "Six-Arm Sweep",
+      "Tidal Palm",
+      "Sun Pirates' Vow",
     ]);
     expect(DEFAULT_CONTENT.traits.map((trait) => trait.name)).toEqual([
+      "Fish-Man",
       "Straw Hat",
       "Navy",
       "Warlord",

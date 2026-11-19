@@ -39,7 +39,7 @@ function TraitDetail({ trait, matching }: { trait: TraitView; matching: readonly
   return <div className="pac-synergy-detail"><h3><VisualIcon imagePath={trait.imagePath} fallback={trait.icon} />{trait.name} <small>{trait.count}</small></h3><p>{trait.description}</p>
     {trait.thresholds.map((tier, i) => <section key={tier.required} aria-label={`${tier.required}: ${tier.label}`} className={i + 1 === trait.tier ? "current-tier" : ""}><h4>({tier.required}) {tier.scope}</h4><p>{tier.effects.join(" ") || tier.label}</p></section>)}
     <div className="synergy-members" aria-label={`${trait.name} crew`}>{trait.members.map(unit => <span key={unit.id} className={owned.has(unit.id) ? "acquired" : ""} title={`${unit.name} · ${unit.cost} gold${owned.has(unit.id) ? " · owned" : ""}`}><Image src={unit.portrait} alt={unit.name} width={40} height={40} unoptimized /><small>{unit.name}</small></span>)}</div>
-    <p className="detail-note">{trait.semanticDescription} Distinct deployed evolution lines count; reserve portraits do not add to the active count.</p>
+    <p className="detail-note">{trait.semanticDescription} Each distinct deployed crew member counts once. Bench units do not contribute.</p>
     {matching.some(unit => !trait.members.some(member => member.id === unit.contentId)) && <p>Additional holders from equipment: {matching.filter(unit => !trait.members.some(member => member.id === unit.contentId)).map(unit => unit.name).join(", ")}.</p>}
   </div>;
 }

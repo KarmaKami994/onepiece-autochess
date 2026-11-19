@@ -177,6 +177,8 @@ export function describeTraitBehavior(behavior: TraitBehavior): string {
   switch (behavior.kind) {
     case "first-straw-hat-cast-rally":
       return `First Straw Hat cast: living Straw Hat holders gain ${behavior.energy} Energy once per battle.`;
+    case "first-ability-knockback-tidal-guard":
+      return `First successful ability Knockback by each holder: gain ${behavior.shield} Shield.${behavior.shareWithAdjacentAllies ? ` Adjacent allies each gain ${behavior.shield} Shield.` : ""}`;
     case "start-navy-formation-shield":
       return `Battle start: each Navy holder gains ${behavior.shieldPerAdjacentHolder} Shield per adjacent Navy holder, up to ${behavior.adjacentHolderCap}.`;
     case "on-warlord-kill-sustain":

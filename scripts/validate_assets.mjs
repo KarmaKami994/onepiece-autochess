@@ -87,7 +87,7 @@ const itemSpecs = JSON.parse(await readFile(path.join(root, "art", "ui-icons", "
 const traitSpecs = JSON.parse(await readFile(path.join(root, "art", "ui-icons", "trait-icons.json"), "utf8"));
 const statusSpecs = JSON.parse(await readFile(path.join(root, "art", "ui-icons", "status-icons.json"), "utf8"));
 
-if (DEFAULT_CONTENT.units.length !== 34) throw new Error(`Expected 34 units, found ${DEFAULT_CONTENT.units.length}`);
+if (DEFAULT_CONTENT.units.length !== 37) throw new Error(`Expected 37 units, found ${DEFAULT_CONTENT.units.length}`);
 for (const unit of DEFAULT_CONTENT.units) {
   if (unit.assetPath.endsWith("/placeholder.svg")) throw new Error(`${unit.id} still uses the production placeholder`);
   await requireFile(path.join(publicRoot, unit.assetPath.replace(/^\//, "")));
@@ -117,10 +117,10 @@ for (const itemId of itemIds) await validateSvg(path.join(publicRoot, "assets", 
 
 const traitIds = DEFAULT_CONTENT.traits.map((trait) => trait.id).sort();
 const specTraitIds = traitSpecs.traits.map((trait) => trait.id).sort();
-if (traitIds.length !== 13 || JSON.stringify(traitIds) !== JSON.stringify(specTraitIds)) throw new Error("Trait visuals must exactly cover all 13 traits");
+if (JSON.stringify(traitIds) !== JSON.stringify([...specTraitIds, "fish-man"].sort())) throw new Error("Trait visuals must exactly cover the catalogue");
 for (const traitId of traitIds) await validateSvg(path.join(publicRoot, "assets", "traits", `${traitId}.svg`));
 
-if (DEFAULT_CONTENT.forms.length !== 4) throw new Error(`Expected four forms, found ${DEFAULT_CONTENT.forms.length}`);
+if (DEFAULT_CONTENT.forms.length !== 10) throw new Error(`Expected ten forms, found ${DEFAULT_CONTENT.forms.length}`);
 for (const form of DEFAULT_CONTENT.forms) {
   if (!form.presentation?.portrait || !form.presentation?.token) throw new Error(`${form.id} lacks form presentation paths`);
   await validateSvg(path.join(publicRoot, form.presentation.portrait.replace(/^\//, "")));
@@ -147,7 +147,7 @@ await requireFile(path.join(root, "third_party/jost/OFL.txt"));
 await requireFile(path.join(root, "third_party/pac-hud/LICENSE"));
 const expectedIcons = [
   ...itemIds.map(id => `items/${id}`), ...foodIds.map(id => `food/${id}`),
-  ...traitIds.map(id => `traits/${id}`), ...statusSpecs.statuses.map(status => `status/${status.id}`),
+  ...specTraitIds.map(id => `traits/${id}`), ...statusSpecs.statuses.map(status => `status/${status.id}`),
 ].sort();
 if (JSON.stringify(iconProvenance.outputs.map(record => `${record.family}/${record.id}`).sort()) !== JSON.stringify(expectedIcons)) throw new Error("B12 provenance must exactly cover the existing icon catalogues");
 for (const pinned of [...iconProvenance.inputs, ...iconProvenance.outputs.flatMap(record => [record.source, record.master, record.editableSvg, record.output, ...(record.original ? [record.original] : [])])]) {
@@ -158,8 +158,17 @@ for (const entry of sourceMatrix.entries) {
   const source = path.join(root, entry.source.localPath);
   await requireFile(source);
   if (await sha256(source) !== entry.source.sha256) throw new Error(`${entry.id} source SHA-256 does not match the source matrix`);
+  if (entry.source.frameMapSha256 && await sha256(path.join(root, entry.source.frameMap)) !== entry.source.frameMapSha256) throw new Error(`${entry.id} frame map SHA-256 does not match the source matrix`);
+  if (entry.originalSource && await sha256(path.join(root, entry.originalSource.localPath)) !== entry.originalSource.sha256) {
+    throw new Error(`${entry.id} original source SHA-256 does not match the source matrix`);
+  }
   if (!entry.permission?.status || !entry.permission?.note) throw new Error(`${entry.id} lacks permission provenance`);
   if (entry.source.sheetUrl && (!entry.source.contributor || !entry.source.dimensions)) throw new Error(`${entry.id} lacks source-page provenance`);
+}
+
+const fishManOutputs = JSON.parse(await readFile(path.join(root, "art/production/fish-man-crew/outputs.json"), "utf8"));
+for (const output of fishManOutputs) {
+  if (await sha256(path.join(root, output.path)) !== output.sha256) throw new Error(`Fish-Man asset provenance mismatch: ${output.path}`);
 }
 
 await Promise.all([

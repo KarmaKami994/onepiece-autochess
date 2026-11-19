@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" shape-rendering="crispEdges">
+  <title>Fish-Man</title>
+  <path fill="#122b35" d="M28 8h40v8h12v12h8v40h-8v12H68v8H28v-8H16V68H8V28h8V16h12Z"/>
+  <path fill="#24494a" d="M28 12h40v8h12v12h4v32h-8v12H64v8H32v-8H20V64h-8V32h8V20h8Z"/>
+  <path fill="#347c7c" d="M20 52h8v-8h8v-8h20v-8h8v8h8v8h-8v4h-8v4h-8v8H28v8h-8Z"/>
+  <path fill="#58cdc0" d="M20 56h8v-8h12v-8h16v-8h8v8h8v8H56v4H44v8H28v8h-8Z"/>
+  <path fill="#b6f0d2" d="M36 48h8v-8h12v-8h8v8h4v4H52v4h-8v4h-8Z"/>
+  <path fill="#58a7b0" d="M20 68h12v-4h12v-4h12v4h8v4h12v4H64v-4H56v-4H44v4H32v4H20Z"/>
+</svg>

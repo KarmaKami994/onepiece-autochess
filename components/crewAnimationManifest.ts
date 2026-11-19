@@ -92,6 +92,9 @@ const V2_IDLE_VISUAL_TOP_PX: Record<string, number> = {
   buggy: 53,
   "capone-bege": 44,
   whitebeard: 7,
+  hatchan: 40,
+  kuroobi: 43,
+  "fisher-tiger": 34,
   "marine-recruit": 8,
   "rifle-marine": 9,
   "pirate-raider": 8,
@@ -260,6 +263,9 @@ export const CREW_V2_ANIMATIONS = {
   buggy: crewV2Definition("buggy"),
   "capone-bege": crewV2Definition("capone-bege"),
   whitebeard: crewV2Definition("whitebeard"),
+  hatchan: crewV2Definition("hatchan"),
+  kuroobi: crewV2Definition("kuroobi"),
+  "fisher-tiger": crewV2Definition("fisher-tiger"),
 } as const satisfies Record<string, CrewAnimationDefinition>;
 
 function pveV2Definition(
@@ -368,6 +374,23 @@ export const FORM_ANIMATION_MANIFEST: Readonly<Record<string, CrewAnimationDefin
   "luffy-gear-4-boundman": b11Definition(LUFFY_V2_ANIMATION, "luffy-gear-4-boundman", "luffy-gear-4-boundman"),
   "luffy-gear-4-snakeman": b11Definition(LUFFY_V2_ANIMATION, "luffy-gear-4-snakeman", "luffy-gear-4-snakeman"),
   "chopper-monster-point": b11Definition(CREW_V2_ANIMATIONS.chopper, "chopper-monster-point", "chopper-monster-point"),
+  "kid-punk-rotten": {
+    ...CREW_V2_ANIMATIONS.kid,
+    formId: "kid-punk-rotten",
+    assetKey: "kid-punk-rotten-v2",
+    sheetPath: "/assets/animations/kid-punk-rotten-v2/kid-punk-rotten-v2.png",
+    idleVisualTopPx: 46,
+    displaySize: 100,
+  },
+  "koby-honesty-impact": {
+    ...CREW_V2_ANIMATIONS.koby,
+    formId: "koby-honesty-impact",
+    assetKey: "koby-honesty-impact-v2",
+    sheetPath: "/assets/animations/koby-honesty-impact-v2/koby-honesty-impact-v2.png",
+    idleVisualTopPx: 37,
+    originX: 64 / 128,
+    originY: 116 / 128,
+  },
 };
 
 export const ANIMATION_CONTENT_MANIFEST = {
@@ -414,6 +437,9 @@ const CREW_VARIANT_OVERRIDES: Partial<Record<string, CrewAnimationDefinition[]>>
   buggy: [CREW_V2_ANIMATIONS.buggy],
   "capone-bege": [CREW_V2_ANIMATIONS["capone-bege"]],
   whitebeard: [CREW_V2_ANIMATIONS.whitebeard],
+  hatchan: [CREW_V2_ANIMATIONS.hatchan],
+  kuroobi: [CREW_V2_ANIMATIONS.kuroobi],
+  "fisher-tiger": [CREW_V2_ANIMATIONS["fisher-tiger"]],
 };
 
 export function resolveAnimationCandidates(

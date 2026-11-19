@@ -177,6 +177,7 @@ interface CastIntent {
   kind: "cast";
   sourceId: string;
   targetIds: string[];
+  ability: AbilityDefinition;
 }
 
 interface MoveIntent {
@@ -190,6 +191,11 @@ type CombatIntent = AttackIntent | CastIntent | MoveIntent;
 
 const MONSTER_POINT_FORM_ID = "chopper-monster-point";
 const MONSTER_POINT_DELAY_MS = 8_000;
+const FLAME_EMPEROR_FORM_ID = "sabo-flame-emperor";
+const PUNK_ROTTEN_FORM_ID = "kid-punk-rotten";
+const ICE_FORM_ID = "kuzan-ice-form";
+const DARKNESS_FORM_ID = "blackbeard-darkness";
+const QUAKE_FORM_ID = "blackbeard-quake";
 type CombatStat =
   | "attack"
   | "defense"
@@ -1388,6 +1394,23 @@ export function simulateBattle(
     ...createMutableUnits(teamA, content, drawIndex),
     ...createMutableUnits(teamB, content, drawIndex),
   ].sort((left, right) => left.id.localeCompare(right.id));
+  for (const unit of units) {
+    if (unit.formId) continue;
+    if (unit.definitionId === "kid") {
+      const hasAdjacentKiller = units.some((ally) =>
+        ally.definitionId === "killer" &&
+        ally.teamId === unit.teamId &&
+        alive(ally) &&
+        distance(unit, ally) === 1,
+      );
+      if (hasAdjacentKiller) transformBattleUnit(unit, PUNK_ROTTEN_FORM_ID, content);
+    } else if (unit.definitionId === "kuzan" && environment.weather === "snow") {
+      transformBattleUnit(unit, ICE_FORM_ID, content);
+    } else if (unit.definitionId === "blackbeard" && unit.ability?.id === "black-hole") {
+      transformBattleUnit(unit, DARKNESS_FORM_ID, content);
+    }
+  }
+  const flameEmperorUsed = new Set<string>();
   applyStartOfBattleItemSupport(units, content.config.combatTickMs);
   const monsterPointTriggerTick = Math.ceil(
     MONSTER_POINT_DELAY_MS / Math.max(1, content.config.combatTickMs),
@@ -1413,6 +1436,7 @@ export function simulateBattle(
       { strawHatRallyUsed: false, captainCommandUsed: false },
     ]),
   );
+  const tidalGuardUsed = new Set<MutableBattleUnit>();
   const hasEffectiveTrait = (
     unit: MutableBattleUnit,
     traitId: string,
@@ -1732,6 +1756,21 @@ export function simulateBattle(
       targetId: target.id,
       amount,
     });
+  };
+
+  const applyTidalGuard = (tick: number, source: MutableBattleUnit): void => {
+    if (!alive(source) || !hasEffectiveTrait(source, "fish-man") || tidalGuardUsed.has(source)) return;
+    const behavior = traitBehavior(source.teamId, "fish-man", "first-ability-knockback-tidal-guard");
+    if (behavior?.kind !== "first-ability-knockback-tidal-guard") return;
+
+    tidalGuardUsed.add(source);
+    applyShield(tick, source, source, behavior.shield);
+    if (!behavior.shareWithAdjacentAllies) return;
+    const neighbours = units.filter(unit =>
+      unit !== source && unit.teamId === source.teamId && alive(unit) &&
+      Math.max(Math.abs(unit.x - source.x), Math.abs(unit.y - source.y)) <= 1,
+    ).sort((left, right) => left.id.localeCompare(right.id));
+    for (const ally of neighbours) applyShield(tick, source, ally, behavior.shield);
   };
 
   const applyStartOfBattleTraitBehaviors = (): void => {
@@ -2282,6 +2321,26 @@ export function simulateBattle(
       (damageKind === "attack" || damageKind === "ability") &&
       dealt > 0
     ) {
+      if (
+        target.definitionId === "sabo" &&
+        !target.formId &&
+        healthDamage > 0 &&
+        alive(target) &&
+        target.hp * 100 < target.maxHp * 30 &&
+        !flameEmperorUsed.has(target.id) &&
+        transformBattleUnit(target, FLAME_EMPEROR_FORM_ID, content)
+      ) {
+        flameEmperorUsed.add(target.id);
+        emit({
+          type: "unit-transform",
+          tick,
+          unitId: target.id,
+          fromFormId: null,
+          toFormId: FLAME_EMPEROR_FORM_ID,
+          hp: target.hp,
+          maxHp: target.maxHp,
+        });
+      }
       if (damageKind === "attack" && options.basicDirectReactionCollector) {
         const previous = options.basicDirectReactionCollector.get(target.id);
         options.basicDirectReactionCollector.set(target.id, {
@@ -3276,6 +3335,7 @@ export function simulateBattle(
             kind: "cast",
             sourceId: source.id,
             targetIds: targets.map((target) => target.id),
+            ability: source.ability,
           });
           continue;
         }
@@ -3321,7 +3381,7 @@ export function simulateBattle(
         (source.lockedUntilTick > tick && hasSignatureMechanic(source.ability, "lunge"))) {
         continue;
       }
-      const intent = source.lockedUntilTick > tick
+      const intent = source.lockedUntilTick > tick || source.ability !== queuedIntent.ability
         ? { ...queuedIntent, targetIds: abilityTargets(source, units, content).map(unit => unit.id) }
         : queuedIntent;
       if (!intent.targetIds.length) continue;
@@ -3514,6 +3574,7 @@ export function simulateBattle(
         }
       }
       if (hasSignatureMechanic(abilityDefinition, "knockback")) {
+        let enemyDisplaced = false;
         for (const targetId of [...intent.targetIds].sort((left, right) =>
           left.localeCompare(right),
         )) {
@@ -3551,7 +3612,9 @@ export function simulateBattle(
             from,
             to: destination,
           });
+          if (target.teamId !== source.teamId) enemyDisplaced = true;
         }
+        if (enemyDisplaced) applyTidalGuard(tick, source);
       }
       if (hasSignatureMechanic(abilityDefinition, "pull")) {
         for (const targetId of [...intent.targetIds].sort((left, right) =>
@@ -3616,6 +3679,23 @@ export function simulateBattle(
         }
       }
       applyPostCastTraitBehaviors(tick, source);
+      const previousForm = source.formId;
+      const nextForm = previousForm === DARKNESS_FORM_ID && abilityDefinition.id === "black-hole"
+        ? QUAKE_FORM_ID
+        : previousForm === QUAKE_FORM_ID && abilityDefinition.id === "tremor-crush"
+          ? DARKNESS_FORM_ID
+          : null;
+      if (nextForm && alive(source) && transformBattleUnit(source, nextForm, content)) {
+        emit({
+          type: "unit-transform",
+          tick,
+          unitId: source.id,
+          fromFormId: previousForm ?? null,
+          toFormId: nextForm,
+          hp: source.hp,
+          maxHp: source.maxHp,
+        });
+      }
     }
 
     for (const intent of intents.filter(

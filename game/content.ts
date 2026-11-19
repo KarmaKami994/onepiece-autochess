@@ -502,7 +502,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     id: "jinbe",
     name: "Jinbe",
     cost: 3,
-    traits: ["straw-hat", "guardian"],
+    traits: ["straw-hat", "guardian", "fish-man"],
     stats: {
       health: 1_020,
       attack: 76,
@@ -905,6 +905,46 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     ),
     assetPath: "/assets/characters/whitebeard.png",
   },
+  {
+    id: "hatchan",
+    name: "Hatchan",
+    cost: 1,
+    traits: ["fish-man", "swordsman"],
+    stats: { health: 660, attack: 50, defense: 20, range: 1, attackIntervalMs: 1_150, moveIntervalMs: 500 },
+    ability: ability(
+      "six-arm-sweep", "Six-Arm Sweep",
+      "Sweeps his six arms through the nearest enemy and surrounding foes, dealing Physical damage.",
+      155, "nearest-enemy", "adjacent", { damageType: "physical" },
+    ),
+    assetPath: "/assets/characters/hatchan.png",
+  },
+  {
+    id: "kuroobi",
+    name: "Kuroobi",
+    cost: 2,
+    traits: ["fish-man", "brawler"],
+    stats: { health: 830, attack: 64, defense: 27, range: 1, attackIntervalMs: 1_200, moveIntervalMs: 500 },
+    ability: ability(
+      "tidal-palm", "Tidal Palm",
+      "Strikes the nearest enemy with a Physical palm thrust and knocks them back if they survive.",
+      210, "nearest-enemy", "single",
+      { damageType: "physical", signatureMechanics: [{ kind: "knockback" }] },
+    ),
+    assetPath: "/assets/characters/kuroobi.png",
+  },
+  {
+    id: "fisher-tiger",
+    name: "Fisher Tiger",
+    cost: 3,
+    traits: ["fish-man", "captain"],
+    stats: { health: 990, attack: 68, defense: 31, specialDefense: 32, range: 1, attackIntervalMs: 1_200, moveIntervalMs: 500 },
+    ability: ability(
+      "sun-pirates-vow", "Sun Pirates' Vow",
+      "Shields the lowest-health ally in reach and allies adjacent to them.",
+      210, "lowest-health-ally", "adjacent", { effect: "shield" },
+    ),
+    assetPath: "/assets/characters/fisher-tiger.png",
+  },
 ];
 
 export const FORM_DEFINITIONS: UnitFormDefinition[] = [
@@ -1009,9 +1049,137 @@ export const FORM_DEFINITIONS: UnitFormDefinition[] = [
       { stunMs: 600 },
     ),
   },
+  {
+    id: "sabo-flame-emperor",
+    baseDefinitionId: "sabo",
+    name: "Sabo — Flame Emperor",
+    lifecycle: "battle-temporary",
+    presentation: {
+      portrait: "/assets/forms/sabo-flame-emperor/portrait.svg",
+      token: "/assets/forms/sabo-flame-emperor/token.svg",
+    },
+    ability: ability(
+      "sabo-fire-fist",
+      "Fire Fist",
+      "Sends fire through the nearest enemy's line, damaging and burning enemies in its path.",
+      190,
+      "nearest-enemy",
+      "line",
+      { damageType: "special", burnPower: 16, burnDurationMs: 3_000 },
+    ),
+  },
+  {
+    id: "kid-punk-rotten",
+    baseDefinitionId: "kid",
+    name: "Kid — Punk Rotten",
+    lifecycle: "battle-temporary",
+    presentation: {
+      portrait: "/assets/forms/kid-punk-rotten/portrait.svg",
+      token: "/assets/forms/kid-punk-rotten/token.svg",
+    },
+    stats: { defense: 44, specialDefense: 40, range: 1 },
+    ability: ability(
+      "punk-vise",
+      "Punk Vise",
+      "Crushes the nearest enemy between two metal fists, damaging and briefly stunning them.",
+      275,
+      "nearest-enemy",
+      "single",
+      { damageType: "physical", stunMs: 600 },
+    ),
+  },
+  {
+    id: "kuzan-ice-form",
+    baseDefinitionId: "kuzan",
+    name: "Kuzan — Ice Form",
+    lifecycle: "battle-temporary",
+    presentation: {
+      portrait: "/assets/forms/kuzan-ice-form/portrait.svg",
+      token: "/assets/forms/kuzan-ice-form/token.svg",
+    },
+    ability: ability(
+      "ice-age-snow",
+      "Ice Age: Deep Freeze",
+      "Freezes the nearest enemy and enemies around them. In Snow, affected enemies stay Frozen for up to 1.3 seconds before thaw modifiers.",
+      190,
+      "nearest-enemy",
+      "adjacent",
+      { freezeMs: 1_000, castAnimationMs: 650 },
+    ),
+  },
+  {
+    id: "blackbeard-darkness",
+    baseDefinitionId: "blackbeard",
+    name: "Blackbeard — Darkness",
+    lifecycle: "battle-temporary",
+    presentation: {
+      portrait: "/assets/forms/blackbeard-darkness/portrait.svg",
+      token: "/assets/forms/blackbeard-darkness/token.svg",
+    },
+  },
+  {
+    id: "blackbeard-quake",
+    baseDefinitionId: "blackbeard",
+    name: "Blackbeard — Quake",
+    lifecycle: "battle-temporary",
+    presentation: {
+      portrait: "/assets/forms/blackbeard-quake/portrait.svg",
+      token: "/assets/forms/blackbeard-quake/token.svg",
+    },
+    ability: ability(
+      "tremor-crush",
+      "Tremor Crush",
+      "Cracks the air with a quake punch, damaging the nearest enemy and enemies around them.",
+      220,
+      "nearest-enemy",
+      "adjacent",
+      { castAnimationMs: 700 },
+    ),
+  },
+  {
+    id: "koby-honesty-impact",
+    baseDefinitionId: "koby",
+    name: "Koby — Honesty Impact",
+    lifecycle: "persistent",
+    presentation: {
+      portrait: "/assets/forms/koby-honesty-impact/portrait.svg",
+      token: "/assets/forms/koby-honesty-impact/token.svg",
+    },
+    ability: ability(
+      "honesty-impact",
+      "Honesty Impact",
+      "Strikes the nearest enemy with an Armament Haki shockwave that also damages enemies around them.",
+      165,
+      "nearest-enemy",
+      "adjacent",
+      { damageType: "physical" },
+    ),
+  },
 ];
 
 export const TRAIT_DEFINITIONS: TraitDefinition[] = [
+  {
+    id: "fish-man",
+    name: "Fish-Man",
+    category: "origin",
+    description: "Tidal Guard protects Fish-Men after they successfully knock an enemy back with an ability.",
+    tiers: [
+      {
+        required: 2,
+        effects: [],
+        effectScope: "holders",
+        behaviors: [{ kind: "first-ability-knockback-tidal-guard", shield: 55, shareWithAdjacentAllies: false }],
+        label: "Tidal Guard: 55 Shield after the holder's first successful ability Knockback",
+      },
+      {
+        required: 4,
+        effects: [],
+        effectScope: "holders",
+        behaviors: [{ kind: "first-ability-knockback-tidal-guard", shield: 80, shareWithAdjacentAllies: true }],
+        label: "Tidal Guard: 80 Shield for the holder and adjacent allies after their first successful ability Knockback",
+      },
+    ],
+  },
   {
     id: "straw-hat",
     name: "Straw Hat",
@@ -2656,7 +2824,7 @@ export const FOOD_DEFINITIONS: NonNullable<GameContent["foods"]> = [
 ];
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.34.0",
+  version: "1.38.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,

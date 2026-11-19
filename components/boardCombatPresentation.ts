@@ -48,6 +48,12 @@ export function formAccent(formId?: string): number {
     case "luffy-gear-4-boundman": return 0xff846f;
     case "luffy-gear-4-snakeman": return 0xa9f3ff;
     case "chopper-monster-point": return 0xffd075;
+    case "sabo-flame-emperor": return 0xffaa43;
+    case "kid-punk-rotten": return 0xda91ff;
+    case "kuzan-ice-form": return 0x81deff;
+    case "blackbeard-darkness": return 0xa48acf;
+    case "blackbeard-quake": return 0xf0e8a8;
+    case "koby-honesty-impact": return 0xbeb6ff;
     default: return 0xffffff;
   }
 }

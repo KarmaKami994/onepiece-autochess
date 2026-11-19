@@ -4607,6 +4607,204 @@
         "status": "confirmed",
         "note": "Project-owner attestation in the Codex project conversation on 2026-08-14 explicitly permits use, adaptation, and public-repository collaboration for this source and its derived runtime atlas; no downstream asset license is granted."
       }
+    },
+    {
+      "id": "hatchan",
+      "kind": "crew",
+      "outputAssetKey": "hatchan-v2",
+      "editableSource": "licensed-reference-png",
+      "source": {
+        "strategy": "licensed-frame-map",
+        "localPath": "art/licensed-reference/fish-man-crew/hatchan.png",
+        "sha256": "3a8bffbbe0b411f49200cb275db025d521cbb70521e9abbac04c593cb2be7968",
+        "dimensions": {
+          "width": 319,
+          "height": 594
+        },
+        "game": "One Piece (Game Boy Advance)",
+        "gameUrl": "https://www.spriters-resource.com/game_boy_advance/onepiece/",
+        "sheetUrl": "https://www.spriters-resource.com/game_boy_advance/onepiece/asset/15775/",
+        "fileId": 15775,
+        "sourceCharacterName": "Hachi",
+        "contributor": "Paddy",
+        "contributorBasis": "The Spriters Resource asset info and the credit visible on the user-provided sheet.",
+        "frameMap": "art/production/fish-man-crew/hatchan-frame-map.json",
+        "frameMapSha256": "c28ce6f3d55c8194b39eb44b78cf49271bc36cecb93e69e7efe8f2790353a13e",
+        "derivedFrameMap": "public/assets/animations/hatchan-v2/hatchan-v2.json#frames"
+      },
+      "pivot": {
+        "x": 64,
+        "y": 116
+      },
+      "processing": [
+        "exact white background removal",
+        "manual original-pose selection and holds",
+        "integer-pivot placement"
+      ],
+      "permission": {
+        "status": "confirmed",
+        "note": "Project owner confirmed on 2026-11-18 that authorization for this project covers the One Piece games used here and supplied this source file. No downstream asset license is granted."
+      }
+    },
+    {
+      "id": "kuroobi",
+      "kind": "crew",
+      "outputAssetKey": "kuroobi-v2",
+      "editableSource": "licensed-reference-png",
+      "source": {
+        "strategy": "licensed-frame-map",
+        "localPath": "art/licensed-reference/fish-man-crew/kuroobi.png",
+        "sha256": "cc536a2236e674c481c493c99c3b88dfca83351285797b4cd950bf604b9df68e",
+        "dimensions": {
+          "width": 327,
+          "height": 410
+        },
+        "game": "One Piece (Game Boy Advance)",
+        "gameUrl": "https://www.spriters-resource.com/game_boy_advance/onepiece/",
+        "sheetUrl": "https://www.spriters-resource.com/game_boy_advance/onepiece/asset/15777/",
+        "fileId": 15777,
+        "sourceCharacterName": "Kuroobi",
+        "contributor": "Paddy",
+        "contributorBasis": "The Spriters Resource asset info and the credit visible on the user-provided sheet.",
+        "frameMap": "art/production/fish-man-crew/kuroobi-frame-map.json",
+        "frameMapSha256": "fb09830ee7b119e7db03f9f1b73da42092f319b963ba35a6265822ae4f7913f7",
+        "derivedFrameMap": "public/assets/animations/kuroobi-v2/kuroobi-v2.json#frames"
+      },
+      "pivot": {
+        "x": 64,
+        "y": 116
+      },
+      "processing": [
+        "exact white background removal",
+        "mirror to canonical right-facing direction",
+        "manual original-pose selection and holds",
+        "integer-pivot placement"
+      ],
+      "permission": {
+        "status": "confirmed",
+        "note": "Project owner confirmed on 2026-11-18 that authorization for this project covers the One Piece games used here and supplied this source file. No downstream asset license is granted."
+      }
+    },
+    {
+      "id": "fisher-tiger",
+      "kind": "crew",
+      "outputAssetKey": "fisher-tiger-v2",
+      "editableSource": "licensed-reference-png",
+      "source": {
+        "strategy": "licensed-frame-map",
+        "localPath": "art/licensed-reference/fish-man-crew/fisher-tiger.png",
+        "sha256": "956a25f7c21578919dc07cbda5734d46b3d8a404ca49ab165166ac7612863c70",
+        "dimensions": {
+          "width": 1017,
+          "height": 729
+        },
+        "game": "One Piece: Treasure Cruise",
+        "gameUrl": "https://www.spriters-resource.com/mobile/onepiecetreasurecruise/",
+        "sheetUrl": "https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/275333/",
+        "fileId": 275333,
+        "sourceCharacterName": "#4203 Fisher Tiger - Under the Sign of the Sun",
+        "contributor": "Original rip contributor unconfirmed",
+        "contributorBasis": "The exact user-provided bytes match the independently retrieved OPTC Team Builder character-sheet mirror. The original rip contributor was not visible on the accessible source.",
+        "verifiedMirror": "https://optcteambuilder.com/assets/exact-character-images/4203.png",
+        "frameMap": "art/production/fish-man-crew/fisher-tiger-frame-map.json",
+        "frameMapSha256": "2b900ab9b5e2b2d707cb2f3c41de058cf3ce6bd87357e0974fa45601018b2ebb",
+        "derivedFrameMap": "public/assets/animations/fisher-tiger-v2/fisher-tiger-v2.json#frames"
+      },
+      "pivot": {
+        "x": 64,
+        "y": 116
+      },
+      "processing": [
+        "40% nearest-neighbour reduction",
+        "manual original-pose selection and holds",
+        "integer-pivot placement"
+      ],
+      "permission": {
+        "status": "confirmed",
+        "note": "Project owner confirmed on 2026-11-18 that authorization for this project covers the One Piece games used here and supplied this source file. No downstream asset license is granted."
+      }
+    },
+    {
+      "id": "kid-punk-rotten",
+      "kind": "form",
+      "outputAssetKey": "kid-punk-rotten-v2",
+      "fallbackAssetKey": "kid-b11-v2",
+      "editableSource": "authored-pose-board",
+      "source": {
+        "strategy": "authored-frame-map",
+        "localPath": "art/production/kid-punk-rotten/poses.png",
+        "sha256": "de077d5571bceef7e086586c150967f8ba040583c897b3324a6d456c852f4b05",
+        "dimensions": {
+          "width": 1024,
+          "height": 768
+        },
+        "frameMap": "art/production/kid-punk-rotten/frame-map.json",
+        "frameMapSha256": "d21b6991913b0cf71ca82712b2afcf6cf09da794e611260780a43cf9c941523d"
+      },
+      "originalSource": {
+        "localPath": "art/production/kid-punk-rotten/master.png",
+        "sha256": "42b74dfc24424e29e282c135a3feaac530e8d528a637506b360bc8495bbe415a",
+        "dimensions": {
+          "width": 1774,
+          "height": 887
+        },
+        "sourceType": "project-authored-imagegen-assembly"
+      },
+      "pivot": {
+        "x": 64,
+        "y": 116
+      },
+      "processing": [
+        "Frozen ImageGen master of three separated parts",
+        "Nearest-neighbor scaling and independent integer offsets",
+        "Six semantic clips at the standard 46-frame v2 timing"
+      ],
+      "permission": {
+        "status": "project-owned",
+        "note": "Generated art for this repository from researched One Piece design details under the owner attestation of 2026-11-18. The new drawing does not grant third parties rights to the original character design."
+      }
+    },
+    {
+      "id": "koby-honesty-impact",
+      "kind": "form",
+      "outputAssetKey": "koby-honesty-impact-v2",
+      "fallbackAssetKey": "koby-b11-v2",
+      "editableSource": "licensed-reference-png",
+      "source": {
+        "strategy": "authored-frame-map",
+        "localPath": "art/production/koby-honesty-impact/poses.png",
+        "sha256": "c2246cd2b950ebecc912a08f43746c3990f19f4ffe6d0a6f7853a2254c93c53f",
+        "dimensions": {
+          "width": 768,
+          "height": 384
+        },
+        "frameMap": "art/production/koby-honesty-impact/frame-map.json",
+        "frameMapSha256": "7690247ed1e552f2fbc58404c4be04c4a3bd1b6e6252978edc4f528b0389bf96"
+      },
+      "originalSource": {
+        "localPath": "art/licensed-reference/treasure-cruise/Coby-4250.png",
+        "sha256": "85e3455d437298754df1f9681a847acfef68c1ad53ea5e02c44c3b161a3d5d8a",
+        "dimensions": {
+          "width": 1032,
+          "height": 2060
+        },
+        "game": "One Piece: Treasure Cruise",
+        "sourcePage": "https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/264077/",
+        "contributor": "The Spriters Resource upload; individual submitter unconfirmed"
+      },
+      "pivot": {
+        "x": 64,
+        "y": 116
+      },
+      "processing": [
+        "Original hand-selected character, impact and Haki effects",
+        "One nearest-neighbor source scale and planted-foot pivots",
+        "Deterministic hold/offset supplements for hit and defeat"
+      ],
+      "permission": {
+        "status": "confirmed",
+        "note": "Project-owner reuse attestation for One Piece game assets dated 2026-11-18. The owner supplied this exact PNG on 2026-11-19. Provenance does not grant downstream reuse rights."
+      }
     }
   ]
 }

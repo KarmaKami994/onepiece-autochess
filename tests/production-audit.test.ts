@@ -196,7 +196,7 @@ describe("production configuration audit", () => {
       "36",
       "40",
     ]);
-    expect(Object.keys(report.characterPresence)).toHaveLength(34);
+    expect(Object.keys(report.characterPresence)).toHaveLength(37);
     expect(Object.keys(report.costBands)).toEqual(["1", "2", "3", "4", "5"]);
     expect(Object.keys(report.shopPoolAvailability.byCost)).toEqual([
       "1",
@@ -205,7 +205,7 @@ describe("production configuration audit", () => {
       "4",
       "5",
     ]);
-    expect(Object.keys(report.characterCombatExpression)).toHaveLength(34);
+    expect(Object.keys(report.characterCombatExpression)).toHaveLength(37);
     expect(report.characterPresence["robin-demonio-fleur"]).toBeUndefined();
     expect(
       report.characterCombatExpression["chopper-monster-point"],
@@ -253,8 +253,8 @@ describe("production configuration audit", () => {
         0,
       ),
     ).toBeLessThanOrEqual(report.seeds * 8 * 9);
-    expect(Object.keys(report.traitReachability)).toHaveLength(13);
-    expect(Object.keys(report.traitTierReachability)).toHaveLength(13);
+    expect(Object.keys(report.traitReachability)).toHaveLength(14);
+    expect(Object.keys(report.traitTierReachability)).toHaveLength(14);
     expect(report.traitTierReachability.emperor).toMatchObject([
       { tier: 1, required: 1 },
       { tier: 2, required: 2 },

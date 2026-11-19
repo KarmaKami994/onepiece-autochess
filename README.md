@@ -59,6 +59,8 @@ can be rebuilt reproducibly with `npm run assets:carousel`.
 The named PvE bosses and faction crews for rounds 9–40 can be rebuilt from
 local, SHA-pinned sources with `npm run assets:p12`; their source and permission
 records are in [ASSET_PROVENANCE.md](ASSET_PROVENANCE.md).
+Rebuild the Fish-Man crew atlases, portraits and tokens from the supplied
+original sheets with `npm run assets:fish-man-crew`.
 
 ## Controls
 

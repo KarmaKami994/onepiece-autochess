@@ -91,9 +91,9 @@ async function expectFile(relativePath: string): Promise<void> {
 
 describe("P7 major asset production", () => {
   it("completes real static and preferred v2 presentation for all crew", async () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.34.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.38.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
-    expect(DEFAULT_CONTENT.units).toHaveLength(34);
+    expect(DEFAULT_CONTENT.units).toHaveLength(37);
     expect(DEFAULT_CONTENT.units.some((unit) =>
       unit.assetPath.endsWith("/placeholder.svg"),
     )).toBe(false);
@@ -158,14 +158,14 @@ describe("P7 major asset production", () => {
     }
   });
 
-  it("pins the cumulative content contract after B09 food", () => {
+  it("pins the cumulative gameplay content contract", () => {
     const normalized = JSON.stringify(DEFAULT_CONTENT, (key, value) =>
       ["version", "assetPath", "presentation"].includes(key)
         ? undefined
         : value,
     );
     expect(createHash("sha256").update(normalized).digest("hex"))
-      .toBe("6bf4b1a2b130dc9699b047926be72a60587f6275d315713f0c32a9e128198613");
+      .toBe("b78bab5149aa9cad7f61fff9933126b1dabe53444693081dc33d065d5c69b923");
   });
 
   it("maps all 65 item identities and preserves recipes and glyph fallback", async () => {
@@ -197,7 +197,7 @@ describe("P7 major asset production", () => {
   });
 
   it("maps all traits, statuses, and forms with explicit safe fallbacks", async () => {
-    expect(DEFAULT_CONTENT.traits).toHaveLength(13);
+    expect(DEFAULT_CONTENT.traits).toHaveLength(14);
     expect(Object.keys(TRAIT_VISUALS).sort()).toEqual(
       DEFAULT_CONTENT.traits.map((trait) => trait.id).sort(),
     );
@@ -207,7 +207,7 @@ describe("P7 major asset production", () => {
       fallbackGlyph: "◆",
     });
     expect(Object.keys(STATUS_VISUALS)).toHaveLength(12);
-    expect(Object.keys(FORM_VISUALS)).toHaveLength(4);
+    expect(Object.keys(FORM_VISUALS)).toHaveLength(10);
     for (const form of DEFAULT_CONTENT.forms) {
       const visual = formVisualDefinition(form.id);
       expect(form.presentation).toMatchObject({
@@ -236,7 +236,7 @@ describe("P7 major asset production", () => {
       `public/assets/forms/${id}/overlay.svg`,
     ]));
 
-    expect(files).toHaveLength(65 + 13 + 12 + 12);
+    expect(files).toHaveLength(65 + 14 + 12 + 30);
     for (const file of files) {
       const source = await readFile(path.join(projectRoot, file), "utf8");
       const lower = source.toLowerCase();

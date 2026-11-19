@@ -1,0 +1,66 @@
+[
+  {
+    "path": "public/assets/animations/fisher-tiger-v2/fisher-tiger-v2.json",
+    "sha256": "7932da4e7163ee5e178c00199af07c2ef5141a58f5bebc743b4cc7c05af4b371"
+  },
+  {
+    "path": "public/assets/animations/fisher-tiger-v2/fisher-tiger-v2.png",
+    "sha256": "935d61a82e8e9a9aeb1f501d3f32c16e165e6fb790bf073c07609c537c1a6d4a"
+  },
+  {
+    "path": "public/assets/animations/hatchan-v2/hatchan-v2.json",
+    "sha256": "38b37f7f315bfbaf60f33495a12cfe25e3657f1e920221e96a25d4427293feef"
+  },
+  {
+    "path": "public/assets/animations/hatchan-v2/hatchan-v2.png",
+    "sha256": "8a6e369a1b365e8c3fb851d9c60d4ac58dac0c174b773944e7e75b1202c96e44"
+  },
+  {
+    "path": "public/assets/animations/kuroobi-v2/kuroobi-v2.json",
+    "sha256": "556aec18d10f2b040b37f0b2c2061fa08b9c1fd00832499534b54ecb17478b05"
+  },
+  {
+    "path": "public/assets/animations/kuroobi-v2/kuroobi-v2.png",
+    "sha256": "c9574a66f7fd02f4e15abb4a7a91878cf2a02576d7cb9f61d56765806a17ea82"
+  },
+  {
+    "path": "public/assets/characters/fisher-tiger.png",
+    "sha256": "85f14b89bbeebb5ae1ea95acfb7783cad617022bb754d75ae2072f43800c6b57"
+  },
+  {
+    "path": "public/assets/characters/hatchan.png",
+    "sha256": "b0d72209391b8520dd06c4466e1c2e2df1a53dfeb002dbb38fc850389698028f"
+  },
+  {
+    "path": "public/assets/characters/kuroobi.png",
+    "sha256": "8f7b3d687218784ab729ba1096200f81dac051294f826da8f52ac71f207159da"
+  },
+  {
+    "path": "public/assets/portraits/fisher-tiger.png",
+    "sha256": "0b1268f5db23ac3b5467242d2f74ada94a9b07f3525e718db78db9ce6144f958"
+  },
+  {
+    "path": "public/assets/portraits/hatchan.png",
+    "sha256": "d9d90dd9c9ef472493abc36e2caf8a7b3b139e6240333c968da6129d0f174c1c"
+  },
+  {
+    "path": "public/assets/portraits/kuroobi.png",
+    "sha256": "f745ff90202025654dd8b9849ef32ddaf06fa6b042690fa43f077ba388fefdb8"
+  },
+  {
+    "path": "public/assets/tokens/fisher-tiger.png",
+    "sha256": "c9c473013ac42d022a6edce1b47f7f99689f220cdfa042dbd9efd2d5921770c6"
+  },
+  {
+    "path": "public/assets/tokens/hatchan.png",
+    "sha256": "30132fdaec0cd94c304e65c28a8d896318bec29645e9ab373b3844552959de76"
+  },
+  {
+    "path": "public/assets/tokens/kuroobi.png",
+    "sha256": "80bff4da153b77c91525dd6d174ea02a67157d99153145b11f45305aeaa693f6"
+  },
+  {
+    "path": "public/assets/traits/fish-man.svg",
+    "sha256": "0eda21bfd71aabd61662c6f376c746c425151e876671317cd22d27f120a8ac95"
+  }
+]
