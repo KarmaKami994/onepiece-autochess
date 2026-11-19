@@ -602,6 +602,10 @@ async function renderFrameMap(status, options) {
   }
   const sourceMetadata = await sharp(sourcePath).metadata();
   const backgroundRgb = mapping.backgroundRgb ?? null;
+  const sourceScale = mapping.sourceScale ?? 1;
+  if (!Number.isFinite(sourceScale) || sourceScale <= 0 || sourceScale > 1) {
+    throw new Error(`${entry.id} sourceScale must be greater than zero and at most one`);
+  }
   const frames = [];
   await mkdir(options.framesDir, { recursive: true });
   for (const [index, frame] of mapping.frames.entries()) {
@@ -626,15 +630,29 @@ async function renderFrameMap(status, options) {
         ) rgba[offset + 3] = 0;
       }
     }
-    const left = entry.pivot.x - (frame.sourcePivot.x - frame.sourceRect.x);
-    const top = entry.pivot.y - (frame.sourcePivot.y - frame.sourceRect.y);
-    if (left < 0 || top < 0 || left + extracted.info.width > 128 || top + extracted.info.height > 128) {
+    const raw = {
+      width: Math.max(1, Math.round(extracted.info.width * sourceScale)),
+      height: Math.max(1, Math.round(extracted.info.height * sourceScale)),
+      channels: 4,
+    };
+    const pivotX = frame.sourcePivot.x - frame.sourceRect.x;
+    const pivotY = frame.sourcePivot.y - frame.sourceRect.y;
+    const left = entry.pivot.x - Math.round((mapping.flipX ? extracted.info.width - pivotX : pivotX) * sourceScale);
+    const top = entry.pivot.y - Math.round(pivotY * sourceScale);
+    if (left < 0 || top < 0 || left + raw.width > 128 || top + raw.height > 128) {
       throw new Error(`${entry.id} frame ${index} does not fit the 128x128 canvas`);
+    }
+    let pixels = rgba;
+    if (sourceScale !== 1 || mapping.flipX) {
+      let sprite = sharp(rgba, { raw: extracted.info });
+      if (mapping.flipX) sprite = sprite.flop();
+      if (sourceScale !== 1) sprite = sprite.resize(raw.width, raw.height, { kernel: "nearest", fit: "fill" });
+      pixels = await sprite.raw().toBuffer();
     }
     const png = await sharp({
       create: { width: 128, height: 128, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } },
     })
-      .composite([{ input: rgba, raw: extracted.info, left, top }])
+      .composite([{ input: pixels, raw, left, top }])
       .png({ palette: true, colours: 256, dither: 0 })
       .toBuffer();
     const state = stateForFrame(index);

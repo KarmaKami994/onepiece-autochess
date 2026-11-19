@@ -23,10 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-Post-Regatta crew input fix, source `9ba8139084dd13fa5f7745a54cfd06f6c610e3c9` on `codex/fix-regatta-board-calibration`, PR #77, base `b8e965ea3d76dfba76b628586f410f0e5f508bfa` (PR #76 squash after green CI #194). Corrected formation hit ownership, click/drag separation and texture-refresh timing. CI #196 exposed the bench pixel test's legacy-sheet assumption; corrected it to await/sample the preferred sprite without weakening assertions. Live final CI is recorded on PR #77. GameContent `1.34.0`, schema 6; no gameplay/balance/save change.
+Fish-Man crew pack implemented locally on `codex/fish-man-crew-pack`, based on PR #77 squash `e149d3b6c07f26967b0c270507bbd2e5cfef4729` (green CI #197). Three recruits, 2/4 Fish-Man synergy and the owner-supplied source art are integrated. Verification and publication are pending. GameContent `1.35.0`, save schema 6.
 
 ## Last Completed Work
 
+- 2026-11-18 — Fish-Man pack: Hatchan (1 cost), Kuroobi (2), Fisher Tiger (3) and the added bond on Jinbe. Tidal Guard responds once per holder to successful ability Knockback. The owner confirmed source permission and supplied the matching GBA and Treasure Cruise sheets. Material changes in `game/{content,types,traits,combat}.ts`, HUD/codex and visual manifests, `art` source/frame maps, `public/assets` atlases/static sprites/icon, asset scripts, focused regressions and current content assertions. Pinned PAC comparison and production details in `docs/FISH_MAN_CREW_PACK.md`. No commit or PR yet.
 - 2026-11-13 — PR #77, source `9ba8139`: reproduced Koala selecting Chopper after a real Regatta with the screenshot's crew arrangement. Occupied cells now win over neighbouring tall hit areas; a 4px formation drag threshold separates clicks, active drags retain their actor, and texture refresh waits for pointer release. Material files: `components/PhaserBoard.tsx`, `e2e/regatta-board-calibration.spec.ts`, `e2e/viewport.spec.ts`, `e2e/helpers.ts`, this state. Existing upper-body/bench assertions retained; await the preferred animation and sample its actual sheet rather than legacy colors (Killer's B11/legacy palettes have zero overlap). Local verification below; no domain/content/schema/asset values changed.
 - 2026-11-13 — PR #76 CI correction: prevent HUD-originated mouse down/up from also reaching Phaser's window input; preserve canvas-originated drag release. Added exact deploy/sell/gold/other-crew regression; pinned the complete-voyage checkpoint seed and awaited lazy sprite readiness without removing assertions or changing thresholds/timeouts. Material files: `GameScreens`, `e2e/pac-hud.spec.ts`, `e2e/match-flow.spec.ts`, `e2e/viewport.spec.ts`, finish doc/state. Fifteen unique affected browser cases, final lint and build PASS. User authorized squash after green CI; exact remote CI/merge outcome is recorded on PR #76. No domain/content/schema changes.
 - 2026-11-12 — Source `1be52c2289d73d6c9e1305272734b91a289ff890`, One Piece HUD finish: timber shells, parchment detail cards, brass controls/treasure, sea-blue recruit/medallion insets, coral battle action, readable focus/clock states. Corrected the floating inspector's inherited zero flex basis and added viewport assertions for the crew header/Special Defense tile. Material files: `app/hud/one-piece-hud.css`, stylesheet import in `GameScreens`, `e2e/pac-hud.spec.ts`, HUD docs/state and new browser captures. Existing layout/commands, assets, content/schema and gameplay retained. Verification below; live PR/CI status is reported on GitHub.
@@ -125,6 +126,8 @@ Post-Regatta crew input fix, source `9ba8139084dd13fa5f7745a54cfd06f6c610e3c9` o
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+Fish-Man pack: PASS — dedicated offline asset export produced the three atlases, static sprite sets and output hash manifest. Fisher Tiger's supplied and alternate download SHA-256 values match. NOT RUN — tests, typecheck, lint, build, browsers, asset validation or production runs. The normalized content hash was computed for the P7 fixture.
 
 Regatta input fix: PASS — final typecheck/lint, production build and final targeted Browser E2E (9 passed / three existing viewport-matrix skips, 1.4m). Covers real Regatta return, the screenshot's stacked roster, exact persistent positions, bank↔field/field↔field moves and delayed animation during a held drag at both desktop sizes. Before fix: FAIL — Koala selected Chopper. CI #196: PASS — 1113 unit tests, 1113 coverage tests, assets, smoke 50/50 with zero crashes, build/dependency review; FAIL — bench pixel test (one other browser case passed on automatic retry). Corrected legacy-sheet sampling without weakening assertions. Intermediate focused run: 7 passed / two late-loading failures / three skips; final run uses explicit Phaser render readiness and ignored local trace output. Live final CI is recorded on PR #77. NOT RUN — local full unit suite, separate production aggregate, baseline or 1,000-seed soak.
 
@@ -848,6 +851,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- Fish-Man adds three shop definitions, 2/4 distinct deployed Fish-Man thresholds and the Tidal Guard shield trigger. Jinbe keeps his existing ability and gains the trait. Schema remains 6 and the existing load path fills new pool keys. The existing Chronicle version/hash gate applies to old recordings.
 - Formation input prioritizes the unit occupying the pointed cell while retaining upper-body reach over empty cells. Clicks require 4px movement to become drags; the dragged actor keeps mouse ownership through release. Formation texture completions refresh after the press ends instead of cancelling its input object. Command authority, battle playback/hit behavior, camera projection, gameplay and save/schema remain unchanged.
 - PR #76 correction isolates React HUD mouse presses from Phaser's window listener; valid canvas drags can still release over the HUD. Deploy/sell targets and battle economy use their unchanged authoritative callbacks. Only E2E initialization/readiness became deterministic; gameplay, rewards and content remain unchanged.
 - One Piece finish changes HUD materials/colors and readable detail/focus states only. The crew inspector now exposes its previously clipped scrollable portrait/stats; a focused E2E viewport regression preserves this. No game-state, command, content, schema or asset change.
@@ -922,6 +926,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- ImageGen drafts missed character likeness and were excluded. Production uses the owner-supplied original sprites for all three recruits.
 - Regatta report initially suggested a camera offset. Browser hit-coordinate tracing confirmed overlapping sprite hit rectangles and release ownership; late image completion also interrupted drags. Corrected those renderer input paths without camera offsets or gameplay changes. Existing viewport tests now await/sample the actual preferred animation, including B11 sheets, rather than assuming legacy artwork. All original assertions and limits remain.
 - One Piece finish: visual review exposed crew-detail clipping; corrected its scoped flex basis. Expanded details then exposed HUD mouse presses leaking into Phaser window input; corrected the React boundary. Remaining E2E failures exposed a random-recruit reward assumption and lazy-image readiness; fixed the fixtures with all assertions/thresholds/timeouts retained. No new gameplay model, external asset or dependency.
 - PAC HUD: PAC's referenced Jost binary is absent from its pinned source tree; bundled the same font family from official Google Fonts under SIL OFL, with exact blob/hash. Adapted PAC portions retain upstream notices. Local full-suite concurrency caused six deadlines; only failed cases were retried, with no timeout/assertion changes. Verification was explicitly approved by the owner.
@@ -996,6 +1001,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- The supplied sheets have uneven pose coverage. Holds and available poses cover missing transitions. More recruits in the first three cost bands lower individual recruit availability at unchanged shop odds.
 - Regatta input: 96px-tall hit areas overlap 48px rows; immediate drag starts and texture-triggered actor rebuilds compounded the apparent miscalibration. The reported layout and delayed-loading case pass locally. CI #196's bench pixel failure exposed a legacy-sheet palette assumption, now corrected; final normal PR CI remains the integration gate. PR #76 is already squash-merged as `b8e965e` after CI #194 passed on an unchanged retry; historical failures remain recorded separately.
 - B11 was explicitly squash-merged by owner instruction despite the documented external Browser E2E installation failure (CI #186 both attempts and #187: `azure.archive.ubuntu.com` DNS). All earlier steps passed; remote browser execution was not established. No project code or CI configuration was altered to bypass the environment failure. B12 normal CI remains separately reported.
 - B11 artistic acceptance depends on contact sheets and actual board review; hashes prove distinct/reproducible drawings, not anatomy. Exact provider model/seed are unavailable; only the pinned local export is reproducible. Short faithful original clips retain documented source limits. Normal PR CI is still required; the initial CI failure was the stale P9 fixture, corrected without changing behavior or removing assertions.
@@ -1113,7 +1119,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-Review the bounded Regatta/stacked-crew input fix and its normal PR CI. No automatic next feature, tuning or baseline task.
+Verify the Fish-Man pack within the owner-approved scope, then publish for review.
 
 ## Codex Update Contract
 

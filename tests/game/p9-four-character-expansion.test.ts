@@ -222,7 +222,7 @@ describe("P9 four-character expansion content", () => {
         assetPath: "/assets/characters/whitebeard.png",
       },
     } as const;
-    expect(DEFAULT_CONTENT.version).toBe("1.34.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.35.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(DEFAULT_CONTENT.units.filter((unit) => P9_ID_SET.has(unit.id)).map((unit) => unit.id))
       .toEqual(P9_IDS);
@@ -237,10 +237,10 @@ describe("P9 four-character expansion content", () => {
   });
 
   it("locks the 34-unit cost and trait topology without changing thresholds", () => {
-    expect(DEFAULT_CONTENT.units).toHaveLength(34);
+    expect(DEFAULT_CONTENT.units).toHaveLength(37);
     expect([1, 2, 3, 4, 5].map((cost) =>
       DEFAULT_CONTENT.units.filter((unit) => unit.cost === cost).length))
-      .toEqual([6, 8, 7, 8, 5]);
+      .toEqual([7, 9, 8, 8, 5]);
     const counts = Object.fromEntries(DEFAULT_CONTENT.traits.map((trait) => [
       trait.id,
       DEFAULT_CONTENT.units.filter((unit) => unit.traits.includes(trait.id)).length,
@@ -473,7 +473,7 @@ describe("P9 economy, items, bots, save, and P8 integration", () => {
       "historical-unknown": 3,
     });
     expect(restored).toMatchObject({
-      contentVersion: "1.34.0",
+      contentVersion: "1.35.0",
       schemaVersion: 6,
       round: 17,
       phase: anchors.phase,

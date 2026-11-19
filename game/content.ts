@@ -502,7 +502,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     id: "jinbe",
     name: "Jinbe",
     cost: 3,
-    traits: ["straw-hat", "guardian"],
+    traits: ["straw-hat", "guardian", "fish-man"],
     stats: {
       health: 1_020,
       attack: 76,
@@ -905,6 +905,46 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     ),
     assetPath: "/assets/characters/whitebeard.png",
   },
+  {
+    id: "hatchan",
+    name: "Hatchan",
+    cost: 1,
+    traits: ["fish-man", "swordsman"],
+    stats: { health: 660, attack: 50, defense: 20, range: 1, attackIntervalMs: 1_150, moveIntervalMs: 500 },
+    ability: ability(
+      "six-arm-sweep", "Six-Arm Sweep",
+      "Sweeps his six arms through the nearest enemy and surrounding foes, dealing Physical damage.",
+      155, "nearest-enemy", "adjacent", { damageType: "physical" },
+    ),
+    assetPath: "/assets/characters/hatchan.png",
+  },
+  {
+    id: "kuroobi",
+    name: "Kuroobi",
+    cost: 2,
+    traits: ["fish-man", "brawler"],
+    stats: { health: 830, attack: 64, defense: 27, range: 1, attackIntervalMs: 1_200, moveIntervalMs: 500 },
+    ability: ability(
+      "tidal-palm", "Tidal Palm",
+      "Strikes the nearest enemy with a Physical palm thrust and knocks them back if they survive.",
+      210, "nearest-enemy", "single",
+      { damageType: "physical", signatureMechanics: [{ kind: "knockback" }] },
+    ),
+    assetPath: "/assets/characters/kuroobi.png",
+  },
+  {
+    id: "fisher-tiger",
+    name: "Fisher Tiger",
+    cost: 3,
+    traits: ["fish-man", "captain"],
+    stats: { health: 990, attack: 68, defense: 31, specialDefense: 32, range: 1, attackIntervalMs: 1_200, moveIntervalMs: 500 },
+    ability: ability(
+      "sun-pirates-vow", "Sun Pirates' Vow",
+      "Shields the lowest-health ally in reach and allies adjacent to them.",
+      210, "lowest-health-ally", "adjacent", { effect: "shield" },
+    ),
+    assetPath: "/assets/characters/fisher-tiger.png",
+  },
 ];
 
 export const FORM_DEFINITIONS: UnitFormDefinition[] = [
@@ -1012,6 +1052,28 @@ export const FORM_DEFINITIONS: UnitFormDefinition[] = [
 ];
 
 export const TRAIT_DEFINITIONS: TraitDefinition[] = [
+  {
+    id: "fish-man",
+    name: "Fish-Man",
+    category: "origin",
+    description: "Tidal Guard protects Fish-Men after they successfully knock an enemy back with an ability.",
+    tiers: [
+      {
+        required: 2,
+        effects: [],
+        effectScope: "holders",
+        behaviors: [{ kind: "first-ability-knockback-tidal-guard", shield: 55, shareWithAdjacentAllies: false }],
+        label: "Tidal Guard: 55 Shield after the holder's first successful ability Knockback",
+      },
+      {
+        required: 4,
+        effects: [],
+        effectScope: "holders",
+        behaviors: [{ kind: "first-ability-knockback-tidal-guard", shield: 80, shareWithAdjacentAllies: true }],
+        label: "Tidal Guard: 80 Shield for the holder and adjacent allies after their first successful ability Knockback",
+      },
+    ],
+  },
   {
     id: "straw-hat",
     name: "Straw Hat",
@@ -2656,7 +2718,7 @@ export const FOOD_DEFINITIONS: NonNullable<GameContent["foods"]> = [
 ];
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.34.0",
+  version: "1.35.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,

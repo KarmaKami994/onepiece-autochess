@@ -1413,6 +1413,7 @@ export function simulateBattle(
       { strawHatRallyUsed: false, captainCommandUsed: false },
     ]),
   );
+  const tidalGuardUsed = new Set<MutableBattleUnit>();
   const hasEffectiveTrait = (
     unit: MutableBattleUnit,
     traitId: string,
@@ -1732,6 +1733,21 @@ export function simulateBattle(
       targetId: target.id,
       amount,
     });
+  };
+
+  const applyTidalGuard = (tick: number, source: MutableBattleUnit): void => {
+    if (!alive(source) || !hasEffectiveTrait(source, "fish-man") || tidalGuardUsed.has(source)) return;
+    const behavior = traitBehavior(source.teamId, "fish-man", "first-ability-knockback-tidal-guard");
+    if (behavior?.kind !== "first-ability-knockback-tidal-guard") return;
+
+    tidalGuardUsed.add(source);
+    applyShield(tick, source, source, behavior.shield);
+    if (!behavior.shareWithAdjacentAllies) return;
+    const neighbours = units.filter(unit =>
+      unit !== source && unit.teamId === source.teamId && alive(unit) &&
+      Math.max(Math.abs(unit.x - source.x), Math.abs(unit.y - source.y)) <= 1,
+    ).sort((left, right) => left.id.localeCompare(right.id));
+    for (const ally of neighbours) applyShield(tick, source, ally, behavior.shield);
   };
 
   const applyStartOfBattleTraitBehaviors = (): void => {
@@ -3514,6 +3530,7 @@ export function simulateBattle(
         }
       }
       if (hasSignatureMechanic(abilityDefinition, "knockback")) {
+        let enemyDisplaced = false;
         for (const targetId of [...intent.targetIds].sort((left, right) =>
           left.localeCompare(right),
         )) {
@@ -3551,7 +3568,9 @@ export function simulateBattle(
             from,
             to: destination,
           });
+          if (target.teamId !== source.teamId) enemyDisplaced = true;
         }
+        if (enemyDisplaced) applyTidalGuard(tick, source);
       }
       if (hasSignatureMechanic(abilityDefinition, "pull")) {
         for (const targetId of [...intent.targetIds].sort((left, right) =>

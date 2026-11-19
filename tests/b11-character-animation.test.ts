@@ -34,9 +34,9 @@ function trimmedCellHash(pixels: Buffer, width: number, rect: Rect): string {
 }
 
 describe("B11 complete character/form/PvE presentation", () => {
-  it("covers all 34 crew, four own form bodies and 29 PvE definitions without introducing gameplay identities", () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.34.0");
-    expect(DEFAULT_CONTENT.units).toHaveLength(34);
+  it("covers the current crew, four own form bodies and 29 PvE definitions", () => {
+    expect(DEFAULT_CONTENT.version).toBe("1.35.0");
+    expect(DEFAULT_CONTENT.units).toHaveLength(37);
     expect(DEFAULT_CONTENT.enemies).toHaveLength(29);
     expect(DEFAULT_CONTENT.forms).toHaveLength(4);
     expect(productionSources).toHaveLength(58);
@@ -51,7 +51,7 @@ describe("B11 complete character/form/PvE presentation", () => {
       expect(FORM_ANIMATION_MANIFEST[form.id]).toEqual(variants.at(-1));
       expect(getCrewAnimationDefinitions("zoro", form.id)).toEqual(getCrewAnimationDefinitions("zoro"));
     }
-    expect(new Set([...preferred, ...Object.values(FORM_ANIMATION_MANIFEST)].map(definition => definition?.assetKey)).size).toBe(62);
+    expect(new Set([...preferred, ...Object.values(FORM_ANIMATION_MANIFEST)].map(definition => definition?.assetKey)).size).toBe(65);
     expect(animationCandidates("luffy").map(definition => definition.assetKey)).toEqual(["luffy-v2", "luffy"]);
     expect(animationCandidates("luffy")[0].originX).toBe(40 / 128);
     expect(animationCandidates("koala")[0].assetKey).toBe("koala-b10-v2");

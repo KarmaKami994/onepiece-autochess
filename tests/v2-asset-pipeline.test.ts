@@ -17,6 +17,7 @@ const matrixPath = path.join(
   "animation-v2",
   "source-matrix.json",
 );
+const fishManCrewIds = new Set(["hatchan", "kuroobi", "fisher-tiger"]);
 const crewIds = [
   "ace",
   "akainu",
@@ -27,9 +28,11 @@ const crewIds = [
   "chopper",
   "crocodile",
   "doflamingo",
+  "fisher-tiger",
   "franky",
   "garp",
   "hancock",
+  "hatchan",
   "ivankov",
   "jinbe",
   "kid",
@@ -38,6 +41,7 @@ const crewIds = [
   "koala",
   "koby",
   "kuma",
+  "kuroobi",
   "kuzan",
   "law",
   "mihawk",
@@ -133,6 +137,7 @@ type SourceEntry = {
     contributor: string | null;
     contributorBasis?: string;
     frameMap: string | null;
+    frameMapSha256?: string;
     derivedFrameMap?: string;
     referenceCandidate?: { usedInRuntime: boolean } | null;
   };
@@ -284,19 +289,27 @@ describe("animation v2 asset pipeline", () => {
       expect(entry.permission.note.length).toBeGreaterThan(40);
       expect(entry.source.localPath).not.toMatch(/^https?:/);
       if (entry.source.sheetUrl) {
-        expect(entry.source.sheetUrl).toMatch(
-          /^https:\/\/spritedatabase\.net\/file\/\d+$/,
-        );
+        const sourcePage = fishManCrewIds.has(entry.id)
+          ? /^https:\/\/www\.spriters-resource\.com\/(game_boy_advance\/onepiece|mobile\/onepiecetreasurecruise)\/asset\/\d+\/$/
+          : /^https:\/\/spritedatabase\.net\/file\/\d+$/;
+        expect(entry.source.sheetUrl).toMatch(sourcePage);
       }
     }
 
     for (const entry of crew) {
       expect(entry.permission.status).toBe("confirmed");
-      expect(entry.permission.note).toContain("Project-owner attestation");
-      expect(entry.source.strategy).toBe("auto-frame-map");
-      expect(entry.source.frameMap).toBe("auto:connected-components-v1");
       expect(entry.source.contributor).toBeTruthy();
-      expect(entry.source.contributorBasis).toContain("file page read");
+      if (fishManCrewIds.has(entry.id)) {
+        expect(entry.permission.note).toContain("2026-11-18");
+        expect(entry.source.strategy).toBe("licensed-frame-map");
+        const map = await readFile(path.join(projectRoot, entry.source.frameMap!));
+        expect(sha256(map)).toBe(entry.source.frameMapSha256);
+      } else {
+        expect(entry.permission.note).toContain("Project-owner attestation");
+        expect(entry.source.strategy).toBe("auto-frame-map");
+        expect(entry.source.frameMap).toBe("auto:connected-components-v1");
+        expect(entry.source.contributorBasis).toContain("file page read");
+      }
       expect(entry.source.derivedFrameMap).toBe(
         `public/assets/animations/${entry.outputAssetKey}/${entry.outputAssetKey}.json#frames`,
       );
@@ -316,20 +329,18 @@ describe("animation v2 asset pipeline", () => {
       (candidate) => candidate.kind === "crew" && !candidate.pilotFor && !candidate.productionFor,
     )) {
       const metadata = await expectRuntimeBundle(entry);
+      const curated = fishManCrewIds.has(entry.id);
       expect(metadata).toMatchObject({
         schemaVersion: 2,
-        pipeline: "auto-connected-components-v1",
+        pipeline: curated ? "licensed-frame-map-v1" : "auto-connected-components-v1",
         sourceSha256: entry.source.sha256,
-        sourcePage: entry.source.sheetUrl,
-        contributor: entry.source.contributor,
+        ...(curated ? {} : { sourcePage: entry.source.sheetUrl, contributor: entry.source.contributor }),
         permission: { status: "confirmed" },
         frameCount: 46,
         frame: { destinationPivot: { x: 64, y: 116 } },
       });
       expect(metadata.sourceDimensions).toEqual(entry.source.dimensions);
-      expect(metadata.detection?.characterCandidateCount).toBeGreaterThanOrEqual(
-        entry.recipe?.minimumCandidateCount ?? 6,
-      );
+      if (!curated) expect(metadata.detection?.characterCandidateCount).toBeGreaterThanOrEqual(entry.recipe?.minimumCandidateCount ?? 6);
       expect(metadata.frames.map((frame) => frame.index)).toEqual(
         Array.from({ length: 46 }, (_, index) => index),
       );
@@ -350,7 +361,7 @@ describe("animation v2 asset pipeline", () => {
         if (!rectangle) continue;
         expect(rectangle.width).toBeGreaterThan(0);
         expect(rectangle.height).toBeGreaterThan(0);
-        expect(rectangle.width / rectangle.height).toBeLessThanOrEqual(2.5);
+        expect(rectangle.width / rectangle.height).toBeLessThanOrEqual(curated ? 4 : 2.5);
         expect(rectangle.x + rectangle.width).toBeLessThanOrEqual(
           metadata.sourceDimensions.width,
         );
@@ -407,11 +418,11 @@ describe("animation v2 asset pipeline", () => {
     for (const contentId of crewIds) {
       const definitions = getCrewAnimationDefinitions(contentId);
       expect(definitions.map((definition) => definition.version)).toEqual(
-        contentId === "koala" ? ["v2", "v2"] : v1CrewIds.has(contentId) ? ["v1", "v2", "v2"] : ["v2", "v2"],
+        fishManCrewIds.has(contentId) ? ["v2"] : v1CrewIds.has(contentId) ? ["v1", "v2", "v2"] : ["v2", "v2"],
       );
       expect(definitions.at(-1)).toMatchObject({
         contentId,
-        assetKey: contentId === "koala" ? "koala-b10-v2" : `${contentId}-b11-v2`,
+        assetKey: fishManCrewIds.has(contentId) ? `${contentId}-v2` : contentId === "koala" ? "koala-b10-v2" : `${contentId}-b11-v2`,
         kind: "crew",
         frameWidth: 128,
         frameHeight: 128,

@@ -227,6 +227,10 @@ const expectedTraits: Record<
     behaviors: TraitBehavior[];
   }> }
 > = {
+  "fish-man": { category: "origin", tiers: [
+    { required: 2, scope: "holders", effects: [], behaviors: [{ kind: "first-ability-knockback-tidal-guard", shield: 55, shareWithAdjacentAllies: false }] },
+    { required: 4, scope: "holders", effects: [], behaviors: [{ kind: "first-ability-knockback-tidal-guard", shield: 80, shareWithAdjacentAllies: true }] },
+  ] },
   "straw-hat": { category: "origin", tiers: [
     { required: 2, scope: "team", effects: [{ kind: "max-health-percent", value: 10 }], behaviors: [{ kind: "first-straw-hat-cast-rally", energy: 8 }] },
     { required: 4, scope: "team", effects: [{ kind: "max-health-percent", value: 15 }, { kind: "attack-speed-percent", value: 10 }], behaviors: [{ kind: "first-straw-hat-cast-rally", energy: 12 }] },
@@ -283,7 +287,7 @@ const expectedTraits: Record<
 };
 
 describe("P6 trait content and scope", () => {
-  it("locks all 13 identities, thresholds, static values, scopes, behaviors, and versions", () => {
+  it("locks the trait identities, thresholds, static values, scopes, behaviors, and versions", () => {
     expect(DEFAULT_CONTENT.traits.map((trait) => trait.id)).toEqual(Object.keys(expectedTraits));
     for (const trait of DEFAULT_CONTENT.traits) {
       const expected = expectedTraits[trait.id];
@@ -295,7 +299,7 @@ describe("P6 trait content and scope", () => {
         behaviors: tier.behaviors ?? [],
       }))).toEqual(expected.tiers);
     }
-    expect(DEFAULT_CONTENT.version).toBe("1.34.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.35.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 
@@ -343,9 +347,18 @@ describe("P6 trait content and scope", () => {
       tier: trait.tiers[0],
     }));
     const views = createTraitViews(active, DEFAULT_CONTENT);
-    expect(views).toHaveLength(13);
+    expect(views).toHaveLength(14);
     expect(views.every((view) => view.semanticDescription.includes(view.scopeLabel))).toBe(true);
-    expect(views.every((view) => view.staticEffects.length > 0)).toBe(true);
+    expect(views.filter(view => view.id !== "fish-man").every(view => view.staticEffects.length > 0)).toBe(true);
+    expect(views.find(view => view.id === "fish-man")).toMatchObject({
+      scopeLabel: "Triggered effect",
+      staticEffects: [],
+      behaviorDescriptions: [expect.stringContaining("55 Shield")],
+      thresholds: [
+        expect.objectContaining({ required: 2, scope: "Triggered effect" }),
+        expect.objectContaining({ required: 4, effects: [expect.stringContaining("Adjacent allies each gain 80 Shield")] }),
+      ],
+    });
     expect(views.find((view) => view.id === "emperor")).toMatchObject({
       category: "Origin",
       scopeLabel: "Crew-wide",
@@ -393,6 +406,58 @@ describe("P6 trait content and scope", () => {
         "Current count: 1. Inactive. Next threshold: 2.",
       ),
     ]);
+  });
+});
+
+describe("Fish-Man Tidal Guard", () => {
+  const caster: FixtureUnit = {
+    id: "caster", teamId: "a", x: 2, y: 3, traits: ["fish-man"],
+    items: [START_100.id, POST_CAST_ONE_HUNDRED.id],
+    ability: { power: 5, signatureMechanics: [{ kind: "knockback" }] },
+  };
+  const nearby: FixtureUnit = { id: "nearby", teamId: "a", x: 1, y: 4, traits: ["fish-man"] };
+  const target: FixtureUnit = { id: "target", teamId: "b", x: 2, y: 2 };
+
+  it("uses distinct deployed definitions to reach the two thresholds", () => {
+    const trait = (...ids: string[]) => getActiveTraitsForUnits(ids.map(definitionId => ({ definitionId })))
+      .find(active => active.traitId === "fish-man");
+    expect(trait("jinbe", "jinbe")).toMatchObject({ count: 1, tierIndex: -1 });
+    expect(trait("jinbe", "kuroobi")).toMatchObject({ count: 2, tierIndex: 0 });
+    expect(trait("jinbe", "kuroobi", "hatchan", "fisher-tiger")).toMatchObject({ count: 4, tierIndex: 1 });
+  });
+
+  it("grants Tier 2 Shield after the first successful Knockback, even when the holder succeeds again", () => {
+    const result = run([caster, nearby, target], { maxTicks: 15 });
+    const displacements = events(result, "unit-displace").filter(event => event.sourceId === "caster");
+    expect(displacements.length).toBeGreaterThan(1);
+    expect(events(result, "shield")).toEqual([
+      { type: "shield", tick: displacements[0].tick, sourceId: "caster", targetId: "caster", amount: 55 },
+    ]);
+  });
+
+  it("shares Tier 4 Shield with adjacent allies, including non-holders, in stable order", () => {
+    const lineup: FixtureUnit[] = [
+      caster, nearby, target,
+      { id: "outside", teamId: "a", x: 7, y: 5, traits: ["fish-man"] },
+      { id: "fourth", teamId: "a", x: 6, y: 5, traits: ["fish-man"] },
+      { id: "ally", teamId: "a", x: 3, y: 3 },
+    ];
+    const result = run(lineup);
+    expect(events(result, "shield").map(({ targetId, amount }) => [targetId, amount])).toEqual([
+      ["caster", 80], ["ally", 80], ["nearby", 80],
+    ]);
+    expect(run(lineup)).toEqual(result);
+  });
+
+  it("does not proc against an immune or immovable target", () => {
+    for (const heldTarget of [
+      { ...target, items: ["sea-prism-boots"] },
+      { ...target, y: 0 },
+    ]) {
+      const result = run([caster, nearby, heldTarget]);
+      expect(events(result, "unit-displace")).toHaveLength(0);
+      expect(events(result, "shield")).toHaveLength(0);
+    }
   });
 });
 

@@ -99,7 +99,15 @@ export function crewReference(content: GameContent, star: StarLevel = 1): Refere
     ] });
   for (const trait of content.traits) entries.push({
     id: trait.id, category: "traits", name: trait.name, description: trait.description, traits: [trait.id], imagePath: traitVisual(trait.id).imagePath,
-    details: trait.tiers.map((tier) => `${tier.required} distinct crew · ${tier.effectScope ?? "team"}: ${tier.label}. ${tier.effects.map(describeTraitEffect).join("; ")}${tier.behaviors?.length ? `; ${tier.behaviors.map(describeTraitBehavior).join("; ")}` : ""}`),
+    details: trait.tiers.map((tier) => {
+      const behaviors = tier.behaviors?.map(describeTraitBehavior) ?? [];
+      if (tier.effects.length === 0 && behaviors.length > 0) {
+        return `${tier.required} distinct crew · ${behaviors.join(" ")}`;
+      }
+      return `${tier.required} distinct crew · ${tier.effectScope ?? "team"}: ${tier.label}. ${[
+        ...tier.effects.map(describeTraitEffect), ...behaviors,
+      ].join("; ")}`;
+    }),
   });
   for (const form of content.forms) {
     const unit = resolveUnitDefinition(form.baseDefinitionId, form.id, content);

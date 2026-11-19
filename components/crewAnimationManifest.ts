@@ -92,6 +92,9 @@ const V2_IDLE_VISUAL_TOP_PX: Record<string, number> = {
   buggy: 53,
   "capone-bege": 44,
   whitebeard: 7,
+  hatchan: 40,
+  kuroobi: 43,
+  "fisher-tiger": 34,
   "marine-recruit": 8,
   "rifle-marine": 9,
   "pirate-raider": 8,
@@ -260,6 +263,9 @@ export const CREW_V2_ANIMATIONS = {
   buggy: crewV2Definition("buggy"),
   "capone-bege": crewV2Definition("capone-bege"),
   whitebeard: crewV2Definition("whitebeard"),
+  hatchan: crewV2Definition("hatchan"),
+  kuroobi: crewV2Definition("kuroobi"),
+  "fisher-tiger": crewV2Definition("fisher-tiger"),
 } as const satisfies Record<string, CrewAnimationDefinition>;
 
 function pveV2Definition(
@@ -414,6 +420,9 @@ const CREW_VARIANT_OVERRIDES: Partial<Record<string, CrewAnimationDefinition[]>>
   buggy: [CREW_V2_ANIMATIONS.buggy],
   "capone-bege": [CREW_V2_ANIMATIONS["capone-bege"]],
   whitebeard: [CREW_V2_ANIMATIONS.whitebeard],
+  hatchan: [CREW_V2_ANIMATIONS.hatchan],
+  kuroobi: [CREW_V2_ANIMATIONS.kuroobi],
+  "fisher-tiger": [CREW_V2_ANIMATIONS["fisher-tiger"]],
 };
 
 export function resolveAnimationCandidates(

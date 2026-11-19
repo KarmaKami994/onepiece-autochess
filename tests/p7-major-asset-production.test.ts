@@ -91,9 +91,9 @@ async function expectFile(relativePath: string): Promise<void> {
 
 describe("P7 major asset production", () => {
   it("completes real static and preferred v2 presentation for all crew", async () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.34.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.35.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
-    expect(DEFAULT_CONTENT.units).toHaveLength(34);
+    expect(DEFAULT_CONTENT.units).toHaveLength(37);
     expect(DEFAULT_CONTENT.units.some((unit) =>
       unit.assetPath.endsWith("/placeholder.svg"),
     )).toBe(false);
@@ -158,14 +158,14 @@ describe("P7 major asset production", () => {
     }
   });
 
-  it("pins the cumulative content contract after B09 food", () => {
+  it("pins the cumulative content contract after the Fish-Man crew pack", () => {
     const normalized = JSON.stringify(DEFAULT_CONTENT, (key, value) =>
       ["version", "assetPath", "presentation"].includes(key)
         ? undefined
         : value,
     );
     expect(createHash("sha256").update(normalized).digest("hex"))
-      .toBe("6bf4b1a2b130dc9699b047926be72a60587f6275d315713f0c32a9e128198613");
+      .toBe("765bef833ed3e8b6f0aa97d2462a5cbc5a1423d52a19718614e7b277a63eb90e");
   });
 
   it("maps all 65 item identities and preserves recipes and glyph fallback", async () => {
@@ -197,7 +197,7 @@ describe("P7 major asset production", () => {
   });
 
   it("maps all traits, statuses, and forms with explicit safe fallbacks", async () => {
-    expect(DEFAULT_CONTENT.traits).toHaveLength(13);
+    expect(DEFAULT_CONTENT.traits).toHaveLength(14);
     expect(Object.keys(TRAIT_VISUALS).sort()).toEqual(
       DEFAULT_CONTENT.traits.map((trait) => trait.id).sort(),
     );
@@ -236,7 +236,7 @@ describe("P7 major asset production", () => {
       `public/assets/forms/${id}/overlay.svg`,
     ]));
 
-    expect(files).toHaveLength(65 + 13 + 12 + 12);
+    expect(files).toHaveLength(65 + 14 + 12 + 12);
     for (const file of files) {
       const source = await readFile(path.join(projectRoot, file), "utf8");
       const lower = source.toLowerCase();

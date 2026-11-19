@@ -6,6 +6,18 @@ This non-commercial, localhost-only fan prototype has both original generated pr
 
 On `2026-08-14`, the project owner explicitly attested in the project conversation that the initial 17 listed source sheets may be used, adapted, and distributed in this public collaboration repository. Later source additions record their own permission basis in `art/animation-v2/source-matrix.json`. An owner attestation is not independent verification of chain of title; a Sprite Database URL is not treated as permission, and this repository grants no downstream asset license. The MIT license applies to code only. Reuse, redistribution, or commercialization of franchise or imported art requires its own appropriate rights clearance.
 
+## Fish-Man crew pack — 2026-11-18
+
+The project owner confirmed the applicable game-source permission and supplied the exact source PNGs. Paddy is credited on the two Game Boy Advance sheets. Fisher Tiger is Treasure Cruise unit #4203. The supplied Fisher Tiger PNG is byte-identical to the OPTC Team Builder mirror, and the original rip contributor is unconfirmed. The finished figures use existing source poses. The discarded generated drafts are not part of the repository.
+
+| Atlas | Archived source | Source SHA-256 | Atlas SHA-256 |
+| --- | --- | --- | --- |
+| `hatchan-v2` | `art/licensed-reference/fish-man-crew/hatchan.png` | `3a8bffbbe0b411f49200cb275db025d521cbb70521e9abbac04c593cb2be7968` | `8a6e369a1b365e8c3fb851d9c60d4ac58dac0c174b773944e7e75b1202c96e44` |
+| `kuroobi-v2` | `art/licensed-reference/fish-man-crew/kuroobi.png` | `cc536a2236e674c481c493c99c3b88dfca83351285797b4cd950bf604b9df68e` | `c9574a66f7fd02f4e15abb4a7a91878cf2a02576d7cb9f61d56765806a17ea82` |
+| `fisher-tiger-v2` | `art/licensed-reference/fish-man-crew/fisher-tiger.png` | `956a25f7c21578919dc07cbda5734d46b3d8a404ca49ab165166ac7612863c70` | `935d61a82e8e9a9aeb1f501d3f32c16e165e6fb790bf073c07609c537c1a6d4a` |
+
+`art/animation-v2/source-matrix.json` records pages, contributors, dimensions and frame-map pins. `art/production/fish-man-crew/outputs.json` pins the local runtime exports and the project-authored Fish-Man trait SVG. Run `npm run assets:fish-man-crew` to repack the selected original poses and generate portraits and tokens offline. Kuroobi is mirrored to the project's canonical facing. Fisher Tiger is scaled with nearest-neighbour at 40% to fit the v2 frame. Original pose holds fill transitions where a sheet has fewer usable frames than the game requests.
+
 ## B03 original offline audio
 
 Two original instrumental loops, **Harbor at Dawn** (96 BPM, 20 seconds) and

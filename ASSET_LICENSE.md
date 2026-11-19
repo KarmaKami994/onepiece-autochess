@@ -20,6 +20,10 @@ include the archived Gigant Battle, Gigant Battle! 2, and Great Pirate
 Colosseum source sheets identified in `art/animation-v2/source-matrix.json`,
 the earlier Luffy source sheet, and their v2 derivatives in this public
 repository. A Sprite Database page alone is not treated as that permission.
+On 2026-11-18, the repository owner confirmed that the project's permission
+also covers the One Piece games used for the Fish-Man crew pack and supplied
+the Hachi, Kuroobi and Fisher Tiger source files. Their exact source records
+are in `art/animation-v2/source-matrix.json`.
 This project record does not itself grant downstream users a license to reuse,
 redistribute, sublicense, or commercialize those files.
 
