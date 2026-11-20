@@ -232,7 +232,7 @@ describe("Roster Expansion Pack E content", () => {
     expect(definition(DEFAULT_CONTENT, "jinbe")).toMatchObject({
       name: "Jinbe",
       cost: 3,
-      traits: ["straw-hat", "guardian"],
+      traits: ["straw-hat", "guardian", "fish-man"],
       stats: {
         health: 1_020,
         attack: 76,

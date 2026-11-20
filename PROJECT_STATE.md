@@ -23,10 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-B13 is implemented on `codex/b13-minks-crew-and-trait-tiers` from `b417bb2`. GameContent `1.39.0`, save schema 6, 41 playable recruits, 15 traits and 10 forms. The remaining B14–B16 roadmap targets 55 recruits and 18 traits. See [B13](docs/B13_MINKS_AND_TRAIT_TIERS.md) and [the batch plan](docs/ROSTER_AUSBAU_BATCHES_13_16.md).
+B13 is implemented on `codex/b13-minks-crew-and-trait-tiers` from `b417bb2` and under review in [PR #79](https://github.com/KarmaKami994/onepiece-autochess/pull/79). GameContent `1.39.0`, save schema 6, 41 playable recruits, 15 traits and 10 forms. The remaining B14–B16 roadmap targets 55 recruits and 18 traits. See [B13](docs/B13_MINKS_AND_TRAIT_TIERS.md) and [the batch plan](docs/ROSTER_AUSBAU_BATCHES_13_16.md).
 
 ## Last Completed Work
 
+- 2026-11-20 — PR #79 CI fixture follow-up for the current crew catalogue, v2 anchors, static sprites, Jinbe's Fish-Man trait and Koby's ghost pairing. Updated five test files and provenance entries. The ghost regression now produces its pairing through normal match progression. Gameplay and asset bytes are unaffected.
 - 2026-11-20 — B13 adds Bepo, Carrot, Pedro and Pekoms with original source-mapped sprites, Minks 2/4 and new Straw Hat 8, Brawler 6 and Swordsman 5 tiers. Material changes cover game content/combat/traits, replay validation, visual manifests and asset exports, focused tests, provenance and the B13 handoff. The B07 test fixture reconstructs the original content with its prior hash intact.
 - 2026-11-19 — Revised the B13–B16 plan to stage larger trait thresholds alongside the same 18 recruits. Locked planned class assignments that give the new highest tiers lineup alternatives. Updated `docs/ROSTER_AUSBAU_BATCHES_13_16.md` and this state. Gameplay implementation and effect values remain pending.
 - 2026-11-19 — Mapped the current 14 traits to their tier thresholds, cheapest natural lineups and comparable effects at the pinned PAC revision. Electric's repeated attacks correspond closely to Marksman. PAC Paralysis also weakens Speed, while local Paralysis prevents dodges and is applied by Smoke-Star Escape. Recorded this comparison in the handoff. Gameplay changes and plan deviations: none.
@@ -131,6 +132,8 @@ B13 is implemented on `codex/b13-minks-crew-and-trait-tiers` from `b417bb2`. Gam
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+B13 CI follow-up — GitHub CI #201 passed typecheck, lint and dependency review and failed the unit step at 1139/1144. Local retests passed all 36 cases across the five affected files after their fixture and documentation corrections. Local lint and the scratch-excluding typecheck also passed. See [PR #79 checks](https://github.com/KarmaKami994/onepiece-autochess/pull/79/checks) for corrected-head CI.
 
 B13 — PASS for 260 distinct focused tests across the main run and two isolated provenance retests, asset validation (146 atlases), lint, build and Browser E2E at 1280×720 and 1920×1080 (2/2). Plain typecheck encountered old ignored files under `tmp/`. The same compiler settings passed with a temporary config excluding that scratch directory. NOT RUN locally for the full suite, a separate production run, a baseline or the 1,000-seed soak. GitHub reports standard PR CI separately.
 

@@ -19,6 +19,11 @@ The project owner attested to permission covering the One Piece game sources and
 
 The exact inputs are archived at `art/licensed-reference/b13-minks/`. The frame maps choose source combat poses and hold the final crouch or fall where the sheet has limited dedicated defeat poses. The shared v2 pipeline exports six clips, and the crew pack exporter derives static sprites, portraits and tokens. The Minks icon is project-authored. All runtime hashes are in `art/production/b13-minks/outputs.json`. Rebuild offline with `npm run assets:b13`.
 
+- Final asset: `public/assets/characters/bepo.png`
+- Final asset: `public/assets/characters/carrot.png`
+- Final asset: `public/assets/characters/pedro.png`
+- Final asset: `public/assets/characters/pekoms.png`
+
 ## Fish-Man crew pack — 2026-11-18
 
 The project owner confirmed the applicable game-source permission and supplied the exact source PNGs. Paddy is credited on the two Game Boy Advance sheets. Fisher Tiger is Treasure Cruise unit #4203. The supplied Fisher Tiger PNG is byte-identical to the OPTC Team Builder mirror, and the original rip contributor is unconfirmed. The finished figures use existing source poses. The discarded generated drafts are not part of the repository.
@@ -30,6 +35,10 @@ The project owner confirmed the applicable game-source permission and supplied t
 | `fisher-tiger-v2` | `art/licensed-reference/fish-man-crew/fisher-tiger.png` | `956a25f7c21578919dc07cbda5734d46b3d8a404ca49ab165166ac7612863c70` | `935d61a82e8e9a9aeb1f501d3f32c16e165e6fb790bf073c07609c537c1a6d4a` |
 
 `art/animation-v2/source-matrix.json` records pages, contributors, dimensions and frame-map pins. `art/production/fish-man-crew/outputs.json` pins the local runtime exports and the project-authored Fish-Man trait SVG. Run `npm run assets:fish-man-crew` to repack the selected original poses and generate portraits and tokens offline. Kuroobi is mirrored to the project's canonical facing. Fisher Tiger is scaled with nearest-neighbour at 40% to fit the v2 frame. Original pose holds fill transitions where a sheet has fewer usable frames than the game requests.
+
+- Final asset: `public/assets/characters/hatchan.png`
+- Final asset: `public/assets/characters/kuroobi.png`
+- Final asset: `public/assets/characters/fisher-tiger.png`
 
 ## Kid — Punk Rotten
 
