@@ -27,7 +27,7 @@ describe("B10 frozen art and presentation", () => {
       expect(DEFAULT_CONTENT.units.some((unit) => unit.id === `${entry.pilotFor}-b10`)).toBe(false);
       expect(DEFAULT_CONTENT.enemies.some((unit) => unit.id === `${entry.pilotFor}-b10`)).toBe(false);
     }
-    expect(DEFAULT_CONTENT.units).toHaveLength(37);
+    expect(DEFAULT_CONTENT.units).toHaveLength(41);
     expect(DEFAULT_CONTENT.forms).toHaveLength(10);
     expect(LUFFY_V2_ANIMATION.originX).toBe(40 / 128);
   });

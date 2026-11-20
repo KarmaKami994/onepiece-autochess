@@ -6,8 +6,14 @@ import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
-const ids = ["hatchan", "kuroobi", "fisher-tiger"];
-const outputPaths = ["public/assets/traits/fish-man.svg"];
+const packs = {
+  "fish-man-crew": { ids: ["hatchan", "kuroobi", "fisher-tiger"], trait: "fish-man" },
+  "b13-minks": { ids: ["bepo", "carrot", "pedro", "pekoms"], trait: "minks" },
+};
+const packId = process.argv[2];
+if (!Object.hasOwn(packs, packId)) throw new Error(`Unknown crew asset pack: ${packId}`);
+const { ids, trait } = packs[packId];
+const outputPaths = [`public/assets/traits/${trait}.svg`];
 const presentationOnly = process.argv.includes("--presentation-only");
 
 async function writeStaticSprite(id, directory, idle, width, height, maxWidth, maxHeight) {
@@ -39,4 +45,4 @@ const outputs = await Promise.all(outputPaths.sort().map(async filename => ({
   path: filename,
   sha256: createHash("sha256").update(await readFile(path.join(root, filename))).digest("hex"),
 })));
-await writeFile(path.join(root, "art/production/fish-man-crew/outputs.json"), `${JSON.stringify(outputs, null, 2)}\n`);
+await writeFile(path.join(root, `art/production/${packId}/outputs.json`), `${JSON.stringify(outputs, null, 2)}\n`);

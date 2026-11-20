@@ -6,6 +6,19 @@ This non-commercial, localhost-only fan prototype has both original generated pr
 
 On `2026-08-14`, the project owner explicitly attested in the project conversation that the initial 17 listed source sheets may be used, adapted, and distributed in this public collaboration repository. Later source additions record their own permission basis in `art/animation-v2/source-matrix.json`. An owner attestation is not independent verification of chain of title; a Sprite Database URL is not treated as permission, and this repository grants no downstream asset license. The MIT license applies to code only. Reuse, redistribution, or commercialization of franchise or imported art requires its own appropriate rights clearance.
 
+## B13 Minks crew — 2026-11-19
+
+The project owner attested to permission covering the One Piece game sources and supplied the three Treasure Cruise sheets from The Spriters Resource. Bepo's Gigant Battle 2 sheet credits Grim. The three Treasure Cruise PNGs contain no printed rip credit. The exact source pages, dimensions and frame-map pins are in `art/animation-v2/source-matrix.json`.
+
+| Atlas | Source page | Archived source | Source SHA-256 | Atlas SHA-256 |
+| --- | --- | --- | --- | --- |
+| `bepo-v2` | [Gigant Battle! 2 file 14453](https://spritedatabase.net/file/14453) | `art/licensed-reference/b13-minks/bepo.png` | `46ea2db608a8213e902a1902db8b77f4bee715de614496d4f06de42e5c3e5e86` | `a11bcea536511c2da5dccb15fc0e70ab22ec3e33a962db85083d32cd7aea5fac` |
+| `carrot-v2` | [Treasure Cruise #1656](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/552786/) | `art/licensed-reference/b13-minks/carrot.png` | `511c3a75ab283582246545a25a5f944eaa050a117464be921221ab6924c53ab4` | `59a07c3e6f98243697e002d6b13a8c17b32c29ef76523e3eb28273f21e5ba901` |
+| `pedro-v2` | [Treasure Cruise #1654](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/552772/) | `art/licensed-reference/b13-minks/pedro.png` | `67f72c0c97aee4d65791126ed53d364c7f5d447bcc9ea89612a1f034c9e161ce` | `c857b70ba92f6d58c7ca19c2e4f4aa1189477d9d1d28675c219960e118fa65a0` |
+| `pekoms-v2` | [Treasure Cruise #1357](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/533347/) | `art/licensed-reference/b13-minks/pekoms.png` | `df22bd566180b2994f882abb66321eb9b93a11f5233956de0703abbfdd60184e` | `6893c06d5862b7e3aa827418c7dccf9a6f3041b4a01e4f413160b255f920432e` |
+
+The exact inputs are archived at `art/licensed-reference/b13-minks/`. The frame maps choose source combat poses and hold the final crouch or fall where the sheet has limited dedicated defeat poses. The shared v2 pipeline exports six clips, and the crew pack exporter derives static sprites, portraits and tokens. The Minks icon is project-authored. All runtime hashes are in `art/production/b13-minks/outputs.json`. Rebuild offline with `npm run assets:b13`.
+
 ## Fish-Man crew pack — 2026-11-18
 
 The project owner confirmed the applicable game-source permission and supplied the exact source PNGs. Paddy is credited on the two Game Boy Advance sheets. Fisher Tiger is Treasure Cruise unit #4203. The supplied Fisher Tiger PNG is byte-identical to the OPTC Team Builder mirror, and the original rip contributor is unconfirmed. The finished figures use existing source poses. The discarded generated drafts are not part of the repository.

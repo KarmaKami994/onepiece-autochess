@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" shape-rendering="crispEdges">
+  <title>Minks</title>
+  <path fill="#232236" d="M11 4h26v4h7v7h2v18h-2v7h-7v4H11v-4H4v-7H2V15h2V8h7z"/>
+  <path fill="#786141" d="M11 4h26v4h7v7h-3v-4h-5V7H12v4H7v4H4V8h7zm30 29h3v7h-7v4H11v-4H4v-7h3v4h5v4h24v-4h5z"/>
+  <path fill="#514972" d="M9 18h6v6H9zm24 0h6v6h-6zM12 26h5v5h-5zm19 0h5v5h-5z"/>
+  <path fill="#a9653e" d="M25 8h10L23 23h10L17 41l3-14H11z"/>
+  <path fill="#efd66e" d="M24 8h8L20 23h10L16 37l3-11h-7z"/>
+  <path fill="#fff4b6" d="M25 10h5L19 23h-5zm-4 15h6l-8 8z"/>
+</svg>

@@ -137,6 +137,7 @@ export type TraitEffectScope = "team" | "holders";
 export type TraitBehavior =
   | { kind: "first-straw-hat-cast-rally"; energy: number }
   | { kind: "first-ability-knockback-tidal-guard"; shield: number; shareWithAdjacentAllies: boolean }
+  | { kind: "first-ability-hit-electro"; power: number }
   | {
       kind: "start-navy-formation-shield";
       shieldPerAdjacentHolder: number;
@@ -856,7 +857,7 @@ export type BattleEvent =
       amount: number;
       healthDamage: number;
       shieldDamage: number;
-      damageKind: "attack" | "ability" | "burn" | "poison" | "item";
+      damageKind: "attack" | "ability" | "burn" | "poison" | "item" | "trait";
     }
   | {
       type: "energy";

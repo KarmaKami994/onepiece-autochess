@@ -47,7 +47,7 @@ function event(value: unknown): value is BattleEvent {
     case "attack": return ids("sourceId", "targetId") && typeof value.critical === "boolean";
     case "cast": return ids("sourceId", "abilityId") && strings(value.targetIds);
     case "ability-hit": return ids("sourceId", "targetId", "abilityId") && integer(value.hitIndex) && integer(value.hitCount) && value.hitIndex >= 1 && value.hitIndex <= value.hitCount && typeof value.finisher === "boolean";
-    case "damage": return ids("sourceId", "targetId") && nums("amount", "healthDamage", "shieldDamage") && ["attack", "ability", "burn", "poison", "item"].includes(String(value.damageKind));
+    case "damage": return ids("sourceId", "targetId") && nums("amount", "healthDamage", "shieldDamage") && ["attack", "ability", "burn", "poison", "item", "trait"].includes(String(value.damageKind));
     case "energy": return ids("unitId") && (value.sourceId === undefined || text(value.sourceId)) && typeof value.amount === "number" && Number.isFinite(value.amount) && nums("value") && ["attack", "damaged", "cast-reset", "ability-drain", "item", "trait", "environment"].includes(String(value.reason));
     case "dodge": return ids("sourceId", "targetId");
     case "buff": return ids("sourceId", "targetId") && nums("amount", "value") && value.stat === "attack" && value.reason === "stacking-attack";
