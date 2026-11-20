@@ -227,6 +227,10 @@ const expectedTraits: Record<
     behaviors: TraitBehavior[];
   }> }
 > = {
+  minks: { category: "origin", tiers: [
+    { required: 2, scope: "holders", effects: [], behaviors: [{ kind: "first-ability-hit-electro", power: 35 }] },
+    { required: 4, scope: "holders", effects: [], behaviors: [{ kind: "first-ability-hit-electro", power: 70 }] },
+  ] },
   "fish-man": { category: "origin", tiers: [
     { required: 2, scope: "holders", effects: [], behaviors: [{ kind: "first-ability-knockback-tidal-guard", shield: 55, shareWithAdjacentAllies: false }] },
     { required: 4, scope: "holders", effects: [], behaviors: [{ kind: "first-ability-knockback-tidal-guard", shield: 80, shareWithAdjacentAllies: true }] },
@@ -235,6 +239,7 @@ const expectedTraits: Record<
     { required: 2, scope: "team", effects: [{ kind: "max-health-percent", value: 10 }], behaviors: [{ kind: "first-straw-hat-cast-rally", energy: 8 }] },
     { required: 4, scope: "team", effects: [{ kind: "max-health-percent", value: 15 }, { kind: "attack-speed-percent", value: 10 }], behaviors: [{ kind: "first-straw-hat-cast-rally", energy: 12 }] },
     { required: 6, scope: "team", effects: [{ kind: "max-health-percent", value: 25 }, { kind: "attack-speed-percent", value: 20 }], behaviors: [{ kind: "first-straw-hat-cast-rally", energy: 16 }] },
+    { required: 8, scope: "team", effects: [{ kind: "max-health-percent", value: 30 }, { kind: "attack-speed-percent", value: 24 }], behaviors: [{ kind: "first-straw-hat-cast-rally", energy: 20 }] },
   ] },
   navy: { category: "origin", tiers: [
     { required: 2, scope: "holders", effects: [{ kind: "defense-flat", value: 14 }], behaviors: [{ kind: "start-navy-formation-shield", shieldPerAdjacentHolder: 40, adjacentHolderCap: 2 }] },
@@ -267,10 +272,12 @@ const expectedTraits: Record<
   brawler: { category: "role", tiers: [
     { required: 2, scope: "holders", effects: [{ kind: "max-health-percent", value: 6 }, { kind: "attack-speed-percent", value: 4 }], behaviors: [{ kind: "every-n-direct-damage-counter", every: 10, attackDamagePercent: 50 }] },
     { required: 4, scope: "holders", effects: [{ kind: "max-health-percent", value: 25 }, { kind: "attack-speed-percent", value: 18 }], behaviors: [{ kind: "every-n-direct-damage-counter", every: 10, attackDamagePercent: 75 }] },
+    { required: 6, scope: "holders", effects: [{ kind: "max-health-percent", value: 30 }, { kind: "attack-speed-percent", value: 22 }], behaviors: [{ kind: "every-n-direct-damage-counter", every: 10, attackDamagePercent: 90 }] },
   ] },
   swordsman: { category: "role", tiers: [
     { required: 2, scope: "holders", effects: [{ kind: "critical-chance-percent", value: 18 }, { kind: "critical-power-percent", value: 25 }], behaviors: [] },
     { required: 3, scope: "holders", effects: [{ kind: "critical-chance-percent", value: 38 }, { kind: "critical-power-percent", value: 50 }], behaviors: [] },
+    { required: 5, scope: "holders", effects: [{ kind: "critical-chance-percent", value: 48 }, { kind: "critical-power-percent", value: 65 }], behaviors: [] },
   ] },
   marksman: { category: "role", tiers: [
     { required: 2, scope: "holders", effects: [{ kind: "range-flat", value: 1 }, { kind: "critical-chance-percent", value: 10 }], behaviors: [{ kind: "every-n-successful-basic-volley", every: 4, shots: 2, attackDamagePercent: 50 }] },
@@ -299,7 +306,7 @@ describe("P6 trait content and scope", () => {
         behaviors: tier.behaviors ?? [],
       }))).toEqual(expected.tiers);
     }
-    expect(DEFAULT_CONTENT.version).toBe("1.38.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.39.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 
@@ -347,9 +354,18 @@ describe("P6 trait content and scope", () => {
       tier: trait.tiers[0],
     }));
     const views = createTraitViews(active, DEFAULT_CONTENT);
-    expect(views).toHaveLength(14);
+    expect(views).toHaveLength(15);
     expect(views.every((view) => view.semanticDescription.includes(view.scopeLabel))).toBe(true);
-    expect(views.filter(view => view.id !== "fish-man").every(view => view.staticEffects.length > 0)).toBe(true);
+    expect(views.filter(view => view.staticEffects.length === 0).map(view => view.id).sort())
+      .toEqual(["fish-man", "minks"]);
+    expect(views.find(view => view.id === "minks")).toMatchObject({
+      scopeLabel: "Triggered effect",
+      behaviorDescriptions: [expect.stringContaining("35 base Special damage")],
+      thresholds: [
+        expect.objectContaining({ required: 2, scope: "Triggered effect" }),
+        expect.objectContaining({ required: 4, effects: [expect.stringContaining("70 base Special damage")] }),
+      ],
+    });
     expect(views.find(view => view.id === "fish-man")).toMatchObject({
       scopeLabel: "Triggered effect",
       staticEffects: [],
@@ -394,10 +410,19 @@ describe("P6 trait content and scope", () => {
         tierIndex: 2,
         tier: strawHat.tiers[2],
       },
+      {
+        traitId: "straw-hat",
+        count: 8,
+        tierIndex: 3,
+        tier: strawHat.tiers[3],
+      },
     ], DEFAULT_CONTENT);
     expect(views.map((view) => view.semanticDescription)).toEqual([
       expect.stringContaining(
-        "Current count: 6. Active threshold: 6. Maximum tier reached.",
+        "Current count: 8. Active threshold: 8. Maximum tier reached.",
+      ),
+      expect.stringContaining(
+        "Current count: 6. Active threshold: 6. Next threshold: 8.",
       ),
       expect.stringContaining(
         "Current count: 2. Active threshold: 2. Next threshold: 4.",
@@ -406,6 +431,67 @@ describe("P6 trait content and scope", () => {
         "Current count: 1. Inactive. Next threshold: 2.",
       ),
     ]);
+  });
+});
+
+describe("B13 Minks and expanded thresholds", () => {
+  const caster: FixtureUnit = {
+    id: "mink-caster", teamId: "a", x: 2, y: 2, traits: ["minks"],
+    items: [START_100.id, POST_CAST_ONE_HUNDRED.id],
+    stats: { attackIntervalMs: 100 },
+    ability: { hits: 2, pattern: "adjacent", damageType: "physical" },
+  };
+  const otherMinks: FixtureUnit[] = [
+    { id: "second-mink", teamId: "a", x: 0, y: 0, traits: ["minks"], items: [START_100.id] },
+    { id: "third-mink", teamId: "a", x: 1, y: 0, traits: ["minks"] },
+    { id: "fourth-mink", teamId: "a", x: 2, y: 0, traits: ["minks"] },
+  ];
+  const enemies: FixtureUnit[] = [
+    { id: "first-target", teamId: "b", x: 2, y: 3, stats: { health: 10_000 } },
+    { id: "nearby-target", teamId: "b", x: 3, y: 3, stats: { health: 10_000 } },
+  ];
+
+  it.each([[1, 0], [2, 35], [4, 70]])("applies Electro once per holder at %i Minks", (count, power) => {
+    const result = run([caster, ...otherMinks.slice(0, count - 1), ...enemies], { maxTicks: 4 });
+    const damage = events(result, "damage");
+    const firstHit = damage.find(event => event.sourceId === caster.id && event.damageKind === "ability");
+    const pulses = damage.filter(event => event.damageKind === "trait");
+    expect(damage.filter(event => event.sourceId === caster.id && event.damageKind === "ability").length)
+      .toBeGreaterThan(4);
+    expect(pulses).toHaveLength(power ? 2 : 0);
+    if (power) {
+      expect(pulses).toEqual([
+        expect.objectContaining({ sourceId: caster.id, targetId: firstHit?.targetId, amount: power }),
+        expect.objectContaining({ sourceId: otherMinks[0].id, amount: power }),
+      ]);
+    }
+  });
+
+  it("consumes Electro on a lethal first hit without redirecting to the other targets", () => {
+    const result = run([
+      caster,
+      { ...otherMinks[0], items: [] },
+      { ...enemies[0], stats: { health: 20 } },
+      enemies[1],
+    ]);
+    expect(events(result, "damage").find(event => event.sourceId === caster.id && event.damageKind === "ability"))
+      .toMatchObject({ targetId: "first-target", amount: 20 });
+    expect(events(result, "damage").some(event => event.damageKind === "trait")).toBe(false);
+  });
+
+  it.each([
+    ["straw-hat", 6, 8, 14],
+    ["brawler", 4, 6, 10],
+    ["swordsman", 3, 5, 9],
+  ] as const)("reaches the new %s tier with native crew and retains the previous tier below it", (id, previous, highest, gold) => {
+    const holders = DEFAULT_CONTENT.units.filter(unit => unit.traits.includes(id)).sort((a, b) => a.cost - b.cost);
+    const lineup = holders.slice(0, highest).map(unit => ({ definitionId: unit.id }));
+    const active = (units: typeof lineup) => getActiveTraitsForUnits(units).find(trait => trait.traitId === id);
+    expect(holders.length).toBeGreaterThan(highest);
+    expect(holders.slice(0, highest).reduce((sum, unit) => sum + unit.cost, 0)).toBe(gold);
+    expect(active(lineup)?.tier?.required).toBe(highest);
+    const below = lineup.slice(0, -1);
+    expect(active([...below, below[0]])).toMatchObject({ count: highest - 1, tier: { required: previous } });
   });
 });
 

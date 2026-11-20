@@ -12,6 +12,20 @@ import {
 } from "../../game";
 
 describe("canonical game content", () => {
+  it("backfills only the four B13 pool entries when resuming a 1.38 voyage", () => {
+    const newIds = new Set(["bepo", "carrot", "pedro", "pekoms"]);
+    const saved = createMatch("minks-pool-backfill", {
+      ...DEFAULT_CONTENT,
+      version: "1.38.0",
+      units: DEFAULT_CONTENT.units.filter(unit => !newIds.has(unit.id)),
+      traits: DEFAULT_CONTENT.traits.filter(trait => trait.id !== "minks"),
+    });
+    const restored = migrateMatchState(saved, DEFAULT_CONTENT);
+    expect(restored).toMatchObject({ schemaVersion: 6, contentVersion: "1.39.0", rngState: saved.rngState });
+    expect(restored.players.map(player => player.shop)).toEqual(saved.players.map(player => player.shop));
+    expect(restored.pool).toEqual({ ...saved.pool, bepo: 22, carrot: 22, pedro: 18, pekoms: 27 });
+  });
+
   it("fills the new shared pool entries when resuming an existing schema-6 voyage", () => {
     const newIds = ["hatchan", "kuroobi", "fisher-tiger"];
     const previousContent = {
@@ -70,6 +84,10 @@ describe("canonical game content", () => {
       "hatchan",
       "kuroobi",
       "fisher-tiger",
+      "bepo",
+      "carrot",
+      "pedro",
+      "pekoms",
     ]);
     expect(DEFAULT_CONTENT.units.map((unit) => unit.cost)).toEqual([
       1, 1, 1, 1, 1, 1,
@@ -78,8 +96,9 @@ describe("canonical game content", () => {
       4, 4, 4, 4, 4, 4, 4, 4,
       5, 5, 5, 5, 5,
       1, 2, 3,
+      2, 2, 3, 1,
     ]);
-    expect(DEFAULT_CONTENT.traits).toHaveLength(14);
+    expect(DEFAULT_CONTENT.traits).toHaveLength(15);
     expect(DEFAULT_CONTENT.items).toHaveLength(65);
     expect(DEFAULT_CONTENT.enemies).toHaveLength(29);
     expect(
@@ -143,8 +162,13 @@ describe("canonical game content", () => {
       "Six-Arm Sweep",
       "Tidal Palm",
       "Sun Pirates' Vow",
+      "Polar Roundhouse",
+      "Electro Claw",
+      "Jaguar Lightning Blade",
+      "Shell Charge",
     ]);
     expect(DEFAULT_CONTENT.traits.map((trait) => trait.name)).toEqual([
+      "Minks",
       "Fish-Man",
       "Straw Hat",
       "Navy",

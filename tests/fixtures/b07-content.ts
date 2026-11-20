@@ -5,6 +5,22 @@ import { DEFAULT_CONTENT, type GameContent } from "../../game";
 export function b07ReferenceContent(): GameContent {
   const content = structuredClone(DEFAULT_CONTENT);
   content.version = "1.32.0";
+  const laterCrew = new Set(["hatchan", "kuroobi", "fisher-tiger", "bepo", "carrot", "pedro", "pekoms"]);
+  const laterForms = new Set([
+    "sabo-flame-emperor", "kid-punk-rotten", "kuzan-ice-form",
+    "blackbeard-darkness", "blackbeard-quake", "koby-honesty-impact",
+  ]);
+  content.units = content.units.filter(unit => !laterCrew.has(unit.id));
+  const jinbe = content.units.find(unit => unit.id === "jinbe");
+  if (!jinbe) throw new Error("Missing Jinbe reference.");
+  jinbe.traits = jinbe.traits.filter(trait => trait !== "fish-man");
+  content.forms = content.forms?.filter(form => !laterForms.has(form.id));
+  content.traits = content.traits.filter(trait => trait.id !== "fish-man" && trait.id !== "minks");
+  for (const trait of content.traits) {
+    if (trait.id === "straw-hat") trait.tiers = trait.tiers.filter(tier => tier.required <= 6);
+    if (trait.id === "brawler") trait.tiers = trait.tiers.filter(tier => tier.required <= 4);
+    if (trait.id === "swordsman") trait.tiers = trait.tiers.filter(tier => tier.required <= 3);
+  }
   // Explicit undefined also clears the field when the control is assigned to DEFAULT_CONTENT.
   content.foods = undefined;
   for (const encounter of content.harborEncounters) delete encounter.foodOffer;

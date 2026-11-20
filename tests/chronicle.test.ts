@@ -50,7 +50,7 @@ describe("B04 bounded non-authoritative recording", () => {
     steps[0].players[0].gold = 999;
     expect(replay.frames[0].players[0].gold).not.toBe(999);
     expect(observeVoyage(replay, steps[2], 999)).toBe(replay);
-    expect(DEFAULT_CONTENT.version).toBe("1.38.0"); expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
+    expect(DEFAULT_CONTENT.version).toBe("1.39.0"); expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 
   it("replaces same-phase snapshots but preserves original battle fighters through live economy", () => {
@@ -93,6 +93,15 @@ describe("B04 bounded non-authoritative recording", () => {
 });
 
 describe("B04 untrusted replay boundaries and retention", () => {
+  it("round-trips the Electro trait damage event alongside existing combat events", () => {
+    const replay = completed();
+    const battle = replay.frames[1].battles[0];
+    const hit = battle.events.find(event => event.type === "damage");
+    if (!hit) throw new Error("Missing replay fixture damage.");
+    battle.events.splice(battle.events.indexOf(hit) + 1, 0, { ...hit, damageKind: "trait" });
+    expect(parseReplay(JSON.stringify(replay), DEFAULT_CONTENT)).toEqual(replay);
+  });
+
   it("round-trips full records and preserves incompatible metadata without enabling playback", () => {
     const replay = completed(); expect(parseReplay(JSON.stringify(replay), DEFAULT_CONTENT)).toEqual(replay);
     const changed = { ...replay, contentVersion: "old-content" };

@@ -1437,6 +1437,7 @@ export function simulateBattle(
     ]),
   );
   const tidalGuardUsed = new Set<MutableBattleUnit>();
+  const electroUsed = new Set<MutableBattleUnit>();
   const hasEffectiveTrait = (
     unit: MutableBattleUnit,
     traitId: string,
@@ -1975,7 +1976,7 @@ export function simulateBattle(
     source: MutableBattleUnit | null,
     target: MutableBattleUnit,
     rawAmount: number,
-    damageKind: "attack" | "ability" | "burn" | "poison" | "item",
+    damageKind: Extract<BattleEvent, { type: "damage" }>["damageKind"],
     damageType: DamageType,
     defensePiercePercent = 0,
     options: {
@@ -2375,6 +2376,24 @@ export function simulateBattle(
         0,
         { isRetaliation: true },
       );
+    }
+    if (
+      damageKind === "ability" &&
+      dealt > 0 &&
+      source &&
+      source.teamId !== target.teamId &&
+      hasEffectiveTrait(source, "minks") &&
+      !electroUsed.has(source)
+    ) {
+      const electro = traitBehavior(source.teamId, "minks", "first-ability-hit-electro");
+      if (electro?.kind === "first-ability-hit-electro") {
+        electroUsed.add(source);
+        if (alive(source) && alive(target)) {
+          applyDamage(tick, source, target, electro.power, "trait", "special", 0, {
+            suppressDamagedEnergy: true,
+          });
+        }
+      }
     }
     return dealt;
   };

@@ -23,10 +23,17 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-Fish-Man crew and battle forms integrated on `codex/crew-and-battle-forms`, based on PR #77 squash `e149d3b6c07f26967b0c270507bbd2e5cfef4729`. This is the combined handoff for the owner's requested squash merge. GameContent `1.38.0`, save schema 6, 37 crew, 14 traits and 10 forms. GitHub records the resulting squash SHA and CI status.
+B13 is implemented on `codex/b13-minks-crew-and-trait-tiers` from `b417bb2` and under review in [PR #79](https://github.com/KarmaKami994/onepiece-autochess/pull/79). GameContent `1.39.0`, save schema 6, 41 playable recruits, 15 traits and 10 forms. The remaining B14–B16 roadmap targets 55 recruits and 18 traits. See [B13](docs/B13_MINKS_AND_TRAIT_TIERS.md) and [the batch plan](docs/ROSTER_AUSBAU_BATCHES_13_16.md).
 
 ## Last Completed Work
 
+- 2026-11-20 — PR #79 CI coverage follow-up splits the two existing three-seed simulations in `tests/production-audit.test.ts` into separately timed fixtures and assertions. The test retains both three-seed runs, exact report equality and the existing 30-second per-case limit.
+- 2026-11-20 — PR #79 second CI follow-up updates two Browser E2E fixtures for 41 crew, 15 traits and 10 existing forms. The four affected browser cases passed locally at both desktop sizes.
+- 2026-11-20 — PR #79 CI fixture follow-up for the current crew catalogue, v2 anchors, static sprites, Jinbe's Fish-Man trait and Koby's ghost pairing. Updated five test files and provenance entries. The ghost regression now produces its pairing through normal match progression. Gameplay and asset bytes are unaffected.
+- 2026-11-20 — B13 adds Bepo, Carrot, Pedro and Pekoms with original source-mapped sprites, Minks 2/4 and new Straw Hat 8, Brawler 6 and Swordsman 5 tiers. Material changes cover game content/combat/traits, replay validation, visual manifests and asset exports, focused tests, provenance and the B13 handoff. The B07 test fixture reconstructs the original content with its prior hash intact.
+- 2026-11-19 — Revised the B13–B16 plan to stage larger trait thresholds alongside the same 18 recruits. Locked planned class assignments that give the new highest tiers lineup alternatives. Updated `docs/ROSTER_AUSBAU_BATCHES_13_16.md` and this state. Gameplay implementation and effect values remain pending.
+- 2026-11-19 — Mapped the current 14 traits to their tier thresholds, cheapest natural lineups and comparable effects at the pinned PAC revision. Electric's repeated attacks correspond closely to Marksman. PAC Paralysis also weakens Speed, while local Paralysis prevents dodges and is applied by Smoke-Star Escape. Recorded this comparison in the handoff. Gameplay changes and plan deviations: none.
+- 2026-11-19 — Prepared B13 Minks, B14 Kid and Heart Pirates, B15 Big Mom core crew at 50 playable recruits and B16 at 55 with the PAC-inspired 9-member tier. Updated `docs/ROSTER_AUSBAU_BATCHES_13_16.md` and this state. No behavioral changes or plan deviations. Extra definitions change relative shop availability within the existing cost bands.
 - 2026-11-19 — Combined Fish-Man source `10a5225`, Sabo/Kid source `f942e3d`, Kuzan/Blackbeard source `106791f` and Koby source `13433cf`. Resolved shared game-content, combat-start, UI, asset-manifest and fixture changes. Material files: `game/{content,combat,engine,forms,roster,traits,types}.ts`, crew UI and visual manifests, asset inputs/runtime outputs, build scripts, tests, asset provenance and the four batch notes under `docs/`.
 - 2026-11-18 — Fish-Man pack added Hatchan (1 cost), Kuroobi (2), Fisher Tiger (3) and the bond on Jinbe. Tidal Guard responds once per holder to successful ability Knockback. The owner supplied the GBA and Treasure Cruise sheets. PAC comparison and details are in `docs/FISH_MAN_CREW_PACK.md`.
 - 2026-11-13 — PR #77, source `9ba8139`: reproduced Koala selecting Chopper after a real Regatta with the screenshot's crew arrangement. Occupied cells now win over neighbouring tall hit areas; a 4px formation drag threshold separates clicks, active drags retain their actor, and texture refresh waits for pointer release. Material files: `components/PhaserBoard.tsx`, `e2e/regatta-board-calibration.spec.ts`, `e2e/viewport.spec.ts`, `e2e/helpers.ts`, this state. Existing upper-body/bench assertions retained; await the preferred animation and sample its actual sheet rather than legacy colors (Killer's B11/legacy palettes have zero overlap). Local verification below; no domain/content/schema/asset values changed.
@@ -127,6 +134,20 @@ Fish-Man crew and battle forms integrated on `codex/crew-and-battle-forms`, base
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+B13 coverage follow-up — CI #203 unit suite passed 1144/1144 on both attempts. Coverage failed at the existing 30-second limit around two sequential three-seed simulations. Scratch-excluding local typecheck passed after the test-only split. The corrected-head suite and Coverage run through standard PR CI.
+
+B13 browser follow-up — CI #202 passed 1144/1144 unit tests and coverage, assets, 50/50 smoke with zero crashes, build and dependency review. Browser E2E passed 103 cases with three skips and failed four stale codex count assertions. The corrected count fixtures passed 4/4 in the focused local browser run. The final checks are linked on PR #79.
+
+B13 CI follow-up — GitHub CI #201 passed typecheck, lint and dependency review and failed the unit step at 1139/1144. Local retests passed all 36 cases across the five affected files after their fixture and documentation corrections. Local lint and the scratch-excluding typecheck also passed. See [PR #79 checks](https://github.com/KarmaKami994/onepiece-autochess/pull/79/checks) for corrected-head CI.
+
+B13 — PASS for 260 distinct focused tests across the main run and two isolated provenance retests, asset validation (146 atlases), lint, build and Browser E2E at 1280×720 and 1920×1080 (2/2). Plain typecheck encountered old ignored files under `tmp/`. The same compiler settings passed with a temporary config excluding that scratch directory. NOT RUN locally for the full suite, a separate production run, a baseline or the 1,000-seed soak. GitHub reports standard PR CI separately.
+
+Revised roster plan — NOT RUN for tests, builds, asset checks, CI and production runs. Documentation uses the previously inspected local and pinned PAC sources.
+
+Trait comparison — read the 37 recruit definitions, local trait and status logic, and corresponding pinned PAC sources. NOT RUN for runtime checks.
+
+Roster expansion plan — NOT RUN for tests, builds, asset checks, CI and production runs. Read local trait counting and shop configuration and inspected thresholds and family counting at the pinned PAC reference.
 
 Combined handoff: NOT RUN locally — tests, typecheck, lint, build, asset validation, browsers and production runs. The source batches exported their runtime sprite assets. The combined content digest was recalculated for the P7 contract. GitHub reports CI separately.
 
@@ -854,6 +875,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- B13 adds four shared-pool definitions and three later tiers with the existing entry bonuses retained. Minks deals 35/70 base Special damage once per fighter after their first damaging ability hit when the target survives. The replay records the bonus as trait damage. Loading an older schema-6 save fills only missing pool keys.
 - Sabo changes after a surviving direct hit below 30% HP. Kid starts as Punk Rotten when deployed orthogonally next to allied Killer. Kuzan starts in Ice Form during Snow. Blackbeard alternates Darkness and Quake after resolved casts. Koby unlocks Honesty Impact after four deployed battles and retains the highest training count at star merge. Details and sources are in `docs/SABO_KID_FORMS.md`, `docs/KUZAN_BLACKBEARD_FORMS.md` and `docs/KOBY_HONESTY_IMPACT.md`.
 - Fish-Man adds three shop definitions, 2/4 distinct deployed Fish-Man thresholds and the Tidal Guard shield trigger. Jinbe keeps his existing ability and gains the trait. Schema remains 6 and the existing load path fills new pool keys. The existing Chronicle version/hash gate applies to old recordings.
 - Formation input prioritizes the unit occupying the pointed cell while retaining upper-body reach over empty cells. Clicks require 4px movement to become drags; the dragged actor keeps mouse ownership through release. Formation texture completions refresh after the press ends instead of cancelling its input object. Command authority, battle playback/hit behavior, camera projection, gameplay and save/schema remain unchanged.
@@ -1006,6 +1028,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- B13 Treasure Cruise PNGs have no printed contributor credit. Source links, owner-supplied bytes and hashes are recorded. The three affected cost bands have greater roster variety at existing shop odds.
 - The combined runtime has not been tested locally. Source and output hashes are documented for the imported and generated art.
 - The supplied sheets have uneven pose coverage. Holds and available poses cover missing transitions. More recruits in the first three cost bands lower individual recruit availability at unchanged shop odds.
 - Regatta input: 96px-tall hit areas overlap 48px rows; immediate drag starts and texture-triggered actor rebuilds compounded the apparent miscalibration. The reported layout and delayed-loading case pass locally. CI #196's bench pixel failure exposed a legacy-sheet palette assumption, now corrected; final normal PR CI remains the integration gate. PR #76 is already squash-merged as `b8e965e` after CI #194 passed on an unchanged retry; historical failures remain recorded separately.
@@ -1125,7 +1148,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-The combined squash handoff is the current task.
+Review B13, then take B14 Kid Pirates and Heart Pirates when approved.
 
 ## Codex Update Contract
 

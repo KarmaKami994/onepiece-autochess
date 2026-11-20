@@ -47,17 +47,21 @@ describe("Koby — Honesty Impact", () => {
 
   it("credits the real captain against a ghost and keeps the copied lineup in its starting form", () => {
     const { state, playerId, kobyId } = fixture();
-    state.players[0].units[kobyId].kobyTrainingBattles = 3;
-    const participant = state.players[2];
+    const [owner, opponent, participant] = state.players;
+    owner.units[kobyId].kobyTrainingBattles = 3;
+    for (const eliminated of state.players.slice(3)) eliminated.alive = false;
+    // Make the owner/opponent real pair and participant/owner ghost pair optimal.
+    owner.lastOpponents = [participant.id];
+    opponent.lastOpponents = [participant.id];
+    participant.lastOpponents = [opponent.id];
     const secondKoby = addUnitToPlayer(state, participant, "koby", DEFAULT_CONTENT);
     if (!secondKoby) throw new Error("Missing the ghost opponent fixture.");
     participant.bench[participant.bench.indexOf(secondKoby.id)] = null;
     participant.board["2,4"] = secondKoby.id;
-    const next = advanceMatchPhase({ ...preparation(state, 4), pairings: [
-      { playerAId: playerId, playerBId: state.players[1].id, ghostOfPlayerId: null },
-      { playerAId: participant.id, playerBId: null, ghostOfPlayerId: playerId },
-    ] });
-    const ghost = next.lastResults[1].initialUnits.find((unit) => unit.teamId === `ghost-${playerId}` && unit.definitionId === "koby");
+    const next = advanceMatchPhase(preparation(state, 6));
+    const ghostBattle = next.lastResults.find(result => result.playerAId === participant.id);
+    expect(ghostBattle).toMatchObject({ playerBId: null, ghostOfPlayerId: playerId });
+    const ghost = ghostBattle?.initialUnits.find((unit) => unit.teamId === `ghost-${playerId}` && unit.definitionId === "koby");
     expect(ghost).toBeDefined();
     expect(ghost?.formId).toBeUndefined();
     expect(next.players[2].units[secondKoby.id].kobyTrainingBattles).toBe(1);

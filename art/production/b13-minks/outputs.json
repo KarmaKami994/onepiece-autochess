@@ -1,0 +1,86 @@
+[
+  {
+    "path": "public/assets/animations/bepo-v2/bepo-v2.json",
+    "sha256": "5264d6cb6dc8d56165d30b063bcb310cc1861766d59cd016c84779995abbb759"
+  },
+  {
+    "path": "public/assets/animations/bepo-v2/bepo-v2.png",
+    "sha256": "a11bcea536511c2da5dccb15fc0e70ab22ec3e33a962db85083d32cd7aea5fac"
+  },
+  {
+    "path": "public/assets/animations/carrot-v2/carrot-v2.json",
+    "sha256": "89c8c8bac1fb012faf332a8c3c98a1dcd74c2ebd90e7ba65172b611ca78a2f05"
+  },
+  {
+    "path": "public/assets/animations/carrot-v2/carrot-v2.png",
+    "sha256": "59a07c3e6f98243697e002d6b13a8c17b32c29ef76523e3eb28273f21e5ba901"
+  },
+  {
+    "path": "public/assets/animations/pedro-v2/pedro-v2.json",
+    "sha256": "a32efc5ab767691bde7291446df473800500e0af0e2e54a1c2931f3a340f76ce"
+  },
+  {
+    "path": "public/assets/animations/pedro-v2/pedro-v2.png",
+    "sha256": "c857b70ba92f6d58c7ca19c2e4f4aa1189477d9d1d28675c219960e118fa65a0"
+  },
+  {
+    "path": "public/assets/animations/pekoms-v2/pekoms-v2.json",
+    "sha256": "d50ca6fd129094f9ab53964bf34646504fb7a8d9326444c5883c99acab97432b"
+  },
+  {
+    "path": "public/assets/animations/pekoms-v2/pekoms-v2.png",
+    "sha256": "6893c06d5862b7e3aa827418c7dccf9a6f3041b4a01e4f413160b255f920432e"
+  },
+  {
+    "path": "public/assets/characters/bepo.png",
+    "sha256": "546810ade73413e384ac02ec89b86c2ccde13c768b9717c1a3ed497825feb0dc"
+  },
+  {
+    "path": "public/assets/characters/carrot.png",
+    "sha256": "7574de7505a8a74a24e8d8214134698e36e70118a4e0f204e11b40a2dca4e661"
+  },
+  {
+    "path": "public/assets/characters/pedro.png",
+    "sha256": "cd3612c94d352dffd8ae66b17e2b8657fe0475fd6812e81b7566bf745219d6f1"
+  },
+  {
+    "path": "public/assets/characters/pekoms.png",
+    "sha256": "ffa09b44ba38a7c20e637d00d6ed1fd13be33290c6d8b9b291c1f1e67a389687"
+  },
+  {
+    "path": "public/assets/portraits/bepo.png",
+    "sha256": "76cf3997821a9907e5c0d2db64a3b522f0d70b9888364074aa1fe845ebbafab0"
+  },
+  {
+    "path": "public/assets/portraits/carrot.png",
+    "sha256": "7c50cf542a19d9e27234844414772275d428b96c1e2d5e509645ed6db08e2b70"
+  },
+  {
+    "path": "public/assets/portraits/pedro.png",
+    "sha256": "cd69ee16006d26a68c10d245dff97e1d6f7de857380709be1a805db6a97948c9"
+  },
+  {
+    "path": "public/assets/portraits/pekoms.png",
+    "sha256": "796ae864036579e2b06464d955eca15051d118550f50e9bb23813f02eb716ce2"
+  },
+  {
+    "path": "public/assets/tokens/bepo.png",
+    "sha256": "9413801d8755a7b35d7ebea4d1a11740bf1a12c58187d410e8d35e8e930982b3"
+  },
+  {
+    "path": "public/assets/tokens/carrot.png",
+    "sha256": "6ce8f9b39dbba50ba938fde79e6b7f195d3ef396f47889c13d8cc04588d20016"
+  },
+  {
+    "path": "public/assets/tokens/pedro.png",
+    "sha256": "ce798f0345a62973d05c2e84507faf5f85ec9546f27bf9650415d0ee918d805e"
+  },
+  {
+    "path": "public/assets/tokens/pekoms.png",
+    "sha256": "a632c0bb0f377043f0562f368d9c3e5dcad62fdd9857fb81c87bc35abd808f4c"
+  },
+  {
+    "path": "public/assets/traits/minks.svg",
+    "sha256": "284608f4222d600bb8b5a2e4cb46d8dedb3e3c156f8bb71880cf31d15b060dde"
+  }
+]

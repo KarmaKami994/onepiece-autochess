@@ -25,7 +25,7 @@ function examplePlan() {
 
 test("codex covers searchable crew, all recipes, forms, PvE and exact recruitment rounds", async ({ page }, testInfo) => {
   await openTools(page);
-  await expect(page.locator(".reference-card")).toHaveCount(34);
+  await expect(page.locator(".reference-card")).toHaveCount(41);
   await page.getByLabel("Search codex").fill("nami thunder");
   await expect(page.locator(".reference-card")).toHaveCount(1);
   await page.getByRole("combobox", { name: "Cost", exact: true }).selectOption("1");
@@ -41,7 +41,7 @@ test("codex covers searchable crew, all recipes, forms, PvE and exact recruitmen
   await wraps.locator("summary").click();
   await expect(wraps).toContainText("Recipe:");
   await sections.getByRole("button", { name: "Forms", exact: true }).click();
-  await expect(page.locator(".reference-card")).toHaveCount(4);
+  await expect(page.locator(".reference-card")).toHaveCount(10);
   await expect(page.locator('[data-reference-id="chopper-monster-point"]')).toContainText("8 seconds");
   await sections.getByRole("button", { name: "PvE", exact: true }).click();
   await page.getByLabel("Search codex").fill("kaido");

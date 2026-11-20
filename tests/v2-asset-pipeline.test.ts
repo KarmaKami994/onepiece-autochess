@@ -18,13 +18,17 @@ const matrixPath = path.join(
   "source-matrix.json",
 );
 const fishManCrewIds = new Set(["hatchan", "kuroobi", "fisher-tiger"]);
+const minkCrewIds = new Set(["bepo", "carrot", "pedro", "pekoms"]);
+const curatedCrewIds = new Set([...fishManCrewIds, ...minkCrewIds]);
 const crewIds = [
   "ace",
   "akainu",
+  "bepo",
   "blackbeard",
   "brook",
   "buggy",
   "capone-bege",
+  "carrot",
   "chopper",
   "crocodile",
   "doflamingo",
@@ -46,6 +50,8 @@ const crewIds = [
   "law",
   "mihawk",
   "nami",
+  "pedro",
+  "pekoms",
   "robin",
   "sabo",
   "sanji",
@@ -289,7 +295,7 @@ describe("animation v2 asset pipeline", () => {
       expect(entry.permission.note.length).toBeGreaterThan(40);
       expect(entry.source.localPath).not.toMatch(/^https?:/);
       if (entry.source.sheetUrl) {
-        const sourcePage = fishManCrewIds.has(entry.id)
+        const sourcePage = curatedCrewIds.has(entry.id) && entry.id !== "bepo"
           ? /^https:\/\/www\.spriters-resource\.com\/(game_boy_advance\/onepiece|mobile\/onepiecetreasurecruise)\/asset\/\d+\/$/
           : /^https:\/\/spritedatabase\.net\/file\/\d+$/;
         expect(entry.source.sheetUrl).toMatch(sourcePage);
@@ -299,8 +305,8 @@ describe("animation v2 asset pipeline", () => {
     for (const entry of crew) {
       expect(entry.permission.status).toBe("confirmed");
       expect(entry.source.contributor).toBeTruthy();
-      if (fishManCrewIds.has(entry.id)) {
-        expect(entry.permission.note).toContain("2026-11-18");
+      if (curatedCrewIds.has(entry.id)) {
+        expect(entry.permission.note).toContain(fishManCrewIds.has(entry.id) ? "2026-11-18" : "Project-owner attestation");
         expect(entry.source.strategy).toBe("licensed-frame-map");
         const map = await readFile(path.join(projectRoot, entry.source.frameMap!));
         expect(sha256(map)).toBe(entry.source.frameMapSha256);
@@ -329,7 +335,7 @@ describe("animation v2 asset pipeline", () => {
       (candidate) => candidate.kind === "crew" && !candidate.pilotFor && !candidate.productionFor,
     )) {
       const metadata = await expectRuntimeBundle(entry);
-      const curated = fishManCrewIds.has(entry.id);
+      const curated = curatedCrewIds.has(entry.id);
       expect(metadata).toMatchObject({
         schemaVersion: 2,
         pipeline: curated ? "licensed-frame-map-v1" : "auto-connected-components-v1",
@@ -418,11 +424,11 @@ describe("animation v2 asset pipeline", () => {
     for (const contentId of crewIds) {
       const definitions = getCrewAnimationDefinitions(contentId);
       expect(definitions.map((definition) => definition.version)).toEqual(
-        fishManCrewIds.has(contentId) ? ["v2"] : v1CrewIds.has(contentId) ? ["v1", "v2", "v2"] : ["v2", "v2"],
+        curatedCrewIds.has(contentId) ? ["v2"] : v1CrewIds.has(contentId) ? ["v1", "v2", "v2"] : ["v2", "v2"],
       );
       expect(definitions.at(-1)).toMatchObject({
         contentId,
-        assetKey: fishManCrewIds.has(contentId) ? `${contentId}-v2` : contentId === "koala" ? "koala-b10-v2" : `${contentId}-b11-v2`,
+        assetKey: curatedCrewIds.has(contentId) ? `${contentId}-v2` : contentId === "koala" ? "koala-b10-v2" : `${contentId}-b11-v2`,
         kind: "crew",
         frameWidth: 128,
         frameHeight: 128,

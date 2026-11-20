@@ -945,6 +945,59 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     ),
     assetPath: "/assets/characters/fisher-tiger.png",
   },
+  {
+    id: "bepo",
+    name: "Bepo",
+    cost: 2,
+    traits: ["minks", "brawler"],
+    stats: { health: 850, attack: 64, defense: 25, range: 1, attackIntervalMs: 1_050, moveIntervalMs: 450 },
+    ability: ability(
+      "polar-roundhouse", "Polar Roundhouse",
+      "Kicks the nearest enemy and surrounding foes for Physical damage.",
+      175, "nearest-enemy", "adjacent", { damageType: "physical" },
+    ),
+    assetPath: "/assets/characters/bepo.png",
+  },
+  {
+    id: "carrot",
+    name: "Carrot",
+    cost: 2,
+    traits: ["minks", "specialist"],
+    stats: { health: 680, attack: 63, defense: 17, range: 1, attackIntervalMs: 850, moveIntervalMs: 350 },
+    ability: ability(
+      "electro-claw", "Electro Claw",
+      "Lunges toward the farthest enemy and rakes them for Special damage.",
+      205, "farthest-enemy", "single", { signatureMechanics: [{ kind: "lunge" }] },
+    ),
+    assetPath: "/assets/characters/carrot.png",
+  },
+  {
+    id: "pedro",
+    name: "Pedro",
+    cost: 3,
+    traits: ["minks", "swordsman"],
+    stats: { health: 890, attack: 88, defense: 24, range: 1, attackIntervalMs: 950, moveIntervalMs: 400 },
+    ability: ability(
+      "jaguar-lightning-blade", "Jaguar Lightning Blade",
+      "Cuts through the nearest enemy and foes in line behind them for Physical damage.",
+      240, "nearest-enemy", "line", { damageType: "physical" },
+    ),
+    assetPath: "/assets/characters/pedro.png",
+  },
+  {
+    id: "pekoms",
+    name: "Pekoms",
+    cost: 1,
+    traits: ["minks", "guardian"],
+    stats: { health: 740, attack: 49, defense: 29, specialDefense: 25, range: 1, attackIntervalMs: 1_200, moveIntervalMs: 500 },
+    ability: ability(
+      "shell-charge", "Shell Charge",
+      "Barges into the nearest enemy for Physical damage and knocks them back if they survive.",
+      150, "nearest-enemy", "single",
+      { damageType: "physical", signatureMechanics: [{ kind: "knockback" }] },
+    ),
+    assetPath: "/assets/characters/pekoms.png",
+  },
 ];
 
 export const FORM_DEFINITIONS: UnitFormDefinition[] = [
@@ -1159,6 +1212,28 @@ export const FORM_DEFINITIONS: UnitFormDefinition[] = [
 
 export const TRAIT_DEFINITIONS: TraitDefinition[] = [
   {
+    id: "minks",
+    name: "Minks",
+    category: "origin",
+    description: "Electro adds one Special hit to each Mink's first damaging ability hit.",
+    tiers: [
+      {
+        required: 2,
+        effects: [],
+        effectScope: "holders",
+        behaviors: [{ kind: "first-ability-hit-electro", power: 35 }],
+        label: "Electro: first damaging ability hit per Mink adds 35 base Special damage",
+      },
+      {
+        required: 4,
+        effects: [],
+        effectScope: "holders",
+        behaviors: [{ kind: "first-ability-hit-electro", power: 70 }],
+        label: "Electro: first damaging ability hit per Mink adds 70 base Special damage",
+      },
+    ],
+  },
+  {
     id: "fish-man",
     name: "Fish-Man",
     category: "origin",
@@ -1212,6 +1287,16 @@ export const TRAIT_DEFINITIONS: TraitDefinition[] = [
         effectScope: "team",
         behaviors: [{ kind: "first-straw-hat-cast-rally", energy: 16 }],
         label: "Crew-wide: +25% Max HP, +20% Attack Speed; first cast grants holders 16 Energy",
+      },
+      {
+        required: 8,
+        effects: [
+          { kind: "max-health-percent", value: 30 },
+          { kind: "attack-speed-percent", value: 24 },
+        ],
+        effectScope: "team",
+        behaviors: [{ kind: "first-straw-hat-cast-rally", energy: 20 }],
+        label: "Crew-wide: +30% Max HP, +24% Attack Speed; first cast grants holders 20 Energy",
       },
     ],
   },
@@ -1417,6 +1502,16 @@ export const TRAIT_DEFINITIONS: TraitDefinition[] = [
         behaviors: [{ kind: "every-n-direct-damage-counter", every: 10, attackDamagePercent: 75 }],
         label: "Trait holders: +25% Max HP, +18% Attack Speed; every 10th direct hit counters for 75% Attack",
       },
+      {
+        required: 6,
+        effects: [
+          { kind: "max-health-percent", value: 30 },
+          { kind: "attack-speed-percent", value: 22 },
+        ],
+        effectScope: "holders",
+        behaviors: [{ kind: "every-n-direct-damage-counter", every: 10, attackDamagePercent: 90 }],
+        label: "Trait holders: +30% Max HP, +22% Attack Speed; every 10th direct hit counters for 90% Attack",
+      },
     ],
   },
   {
@@ -1442,6 +1537,15 @@ export const TRAIT_DEFINITIONS: TraitDefinition[] = [
         ],
         effectScope: "holders",
         label: "Trait holders: +38% Critical Chance and +50% Critical Power",
+      },
+      {
+        required: 5,
+        effects: [
+          { kind: "critical-chance-percent", value: 48 },
+          { kind: "critical-power-percent", value: 65 },
+        ],
+        effectScope: "holders",
+        label: "Trait holders: +48% Critical Chance and +65% Critical Power",
       },
     ],
   },
@@ -2824,7 +2928,7 @@ export const FOOD_DEFINITIONS: NonNullable<GameContent["foods"]> = [
 ];
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.38.0",
+  version: "1.39.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,

@@ -222,7 +222,7 @@ describe("P9 four-character expansion content", () => {
         assetPath: "/assets/characters/whitebeard.png",
       },
     } as const;
-    expect(DEFAULT_CONTENT.version).toBe("1.38.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.39.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
     expect(DEFAULT_CONTENT.units.filter((unit) => P9_ID_SET.has(unit.id)).map((unit) => unit.id))
       .toEqual(P9_IDS);
@@ -236,16 +236,18 @@ describe("P9 four-character expansion content", () => {
     }
   });
 
-  it("locks the 34-unit cost and trait topology without changing thresholds", () => {
-    expect(DEFAULT_CONTENT.units).toHaveLength(37);
+  it("locks the current cost and trait topology alongside the P9 crew additions", () => {
+    expect(DEFAULT_CONTENT.units).toHaveLength(41);
     expect([1, 2, 3, 4, 5].map((cost) =>
       DEFAULT_CONTENT.units.filter((unit) => unit.cost === cost).length))
-      .toEqual([7, 9, 8, 8, 5]);
+      .toEqual([8, 11, 9, 8, 5]);
     const counts = Object.fromEntries(DEFAULT_CONTENT.traits.map((trait) => [
       trait.id,
       DEFAULT_CONTENT.units.filter((unit) => unit.traits.includes(trait.id)).length,
     ]));
     expect(counts).toEqual({
+      minks: 4,
+      "fish-man": 4,
       "straw-hat": 10,
       navy: 7,
       warlord: 6,
@@ -253,21 +255,22 @@ describe("P9 four-character expansion content", () => {
       brotherhood: 3,
       revolutionary: 5,
       emperor: 4,
-      captain: 8,
-      brawler: 7,
-      swordsman: 6,
+      captain: 9,
+      brawler: 9,
+      swordsman: 8,
       marksman: 5,
-      specialist: 8,
-      guardian: 7,
+      specialist: 9,
+      guardian: 8,
     });
     expect(Object.fromEntries(DEFAULT_CONTENT.traits.map((trait) => [
       trait.id,
       trait.tiers.map((tier) => tier.required),
     ]))).toEqual({
-      "straw-hat": [2, 4, 6], navy: [2, 3], warlord: [2, 4],
+      minks: [2, 4], "fish-man": [2, 4],
+      "straw-hat": [2, 4, 6, 8], navy: [2, 3], warlord: [2, 4],
       supernova: [2, 4], brotherhood: [2, 3], revolutionary: [1, 2],
-      emperor: [1, 2], captain: [2, 3], brawler: [2, 4],
-      swordsman: [2, 3], marksman: [2, 3], specialist: [2, 4], guardian: [2, 3],
+      emperor: [1, 2], captain: [2, 3], brawler: [2, 4, 6],
+      swordsman: [2, 3, 5], marksman: [2, 3], specialist: [2, 4], guardian: [2, 3],
     });
   });
 
@@ -473,7 +476,7 @@ describe("P9 economy, items, bots, save, and P8 integration", () => {
       "historical-unknown": 3,
     });
     expect(restored).toMatchObject({
-      contentVersion: "1.38.0",
+      contentVersion: "1.39.0",
       schemaVersion: 6,
       round: 17,
       phase: anchors.phase,
