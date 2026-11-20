@@ -27,6 +27,7 @@ B13 is implemented on `codex/b13-minks-crew-and-trait-tiers` from `b417bb2` and 
 
 ## Last Completed Work
 
+- 2026-11-20 — PR #79 CI coverage follow-up splits the two existing three-seed simulations in `tests/production-audit.test.ts` into separately timed fixtures and assertions. The test retains both three-seed runs, exact report equality and the existing 30-second per-case limit.
 - 2026-11-20 — PR #79 second CI follow-up updates two Browser E2E fixtures for 41 crew, 15 traits and 10 existing forms. The four affected browser cases passed locally at both desktop sizes.
 - 2026-11-20 — PR #79 CI fixture follow-up for the current crew catalogue, v2 anchors, static sprites, Jinbe's Fish-Man trait and Koby's ghost pairing. Updated five test files and provenance entries. The ghost regression now produces its pairing through normal match progression. Gameplay and asset bytes are unaffected.
 - 2026-11-20 — B13 adds Bepo, Carrot, Pedro and Pekoms with original source-mapped sprites, Minks 2/4 and new Straw Hat 8, Brawler 6 and Swordsman 5 tiers. Material changes cover game content/combat/traits, replay validation, visual manifests and asset exports, focused tests, provenance and the B13 handoff. The B07 test fixture reconstructs the original content with its prior hash intact.
@@ -133,6 +134,8 @@ B13 is implemented on `codex/b13-minks-crew-and-trait-tiers` from `b417bb2` and 
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+B13 coverage follow-up — CI #203 unit suite passed 1144/1144 on both attempts. Coverage failed at the existing 30-second limit around two sequential three-seed simulations. Scratch-excluding local typecheck passed after the test-only split. The corrected-head suite and Coverage run through standard PR CI.
 
 B13 browser follow-up — CI #202 passed 1144/1144 unit tests and coverage, assets, 50/50 smoke with zero crashes, build and dependency review. Browser E2E passed 103 cases with three skips and failed four stale codex count assertions. The corrected count fixtures passed 4/4 in the focused local browser run. The final checks are linked on PR #79.
 

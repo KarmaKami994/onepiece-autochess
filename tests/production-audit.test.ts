@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import {
   createMatch,
   DEFAULT_CONTENT,
@@ -165,10 +165,15 @@ describe("production configuration audit", () => {
       expect(playerPersonalities).toEqual(expectedPersonalityIds);
     }
   });
+});
+
+describe("three-seed normalized production report", () => {
+  let report: ReturnType<typeof runProductionSoak>;
+  beforeAll(() => {
+    report = runProductionSoak(3);
+  }, 30_000);
 
   it("completes normalized production matches and returns bounded metrics", () => {
-    const report = runProductionSoak(3);
-
     expect(report.completeMatches).toBe(3);
     expect(report.crashes).toBe(0);
     expect(report.minRounds).toBeGreaterThanOrEqual(1);
@@ -388,7 +393,9 @@ describe("production configuration audit", () => {
     expectFiniteNonNegativeCounters(report.combatReadability);
 
     expect(JSON.parse(JSON.stringify(report))).toEqual(report);
+  }, 30_000);
 
+  it("repeats the complete report for the same three seeds", () => {
     const repeated = runProductionSoak(3);
     expect({ ...repeated, generatedAt: "deterministic" }).toEqual({
       ...report,
