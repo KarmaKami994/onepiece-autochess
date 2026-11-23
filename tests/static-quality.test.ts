@@ -42,7 +42,9 @@ const characterSlugs = [
   "fisher-tiger",
   "franky",
   "hatchan",
+  "heat",
   "ivankov",
+  "jean-bart",
   "jinbe",
   "killer",
   "kizaru",
@@ -53,8 +55,11 @@ const characterSlugs = [
   "kuzan",
   "pedro",
   "pekoms",
+  "penguin",
+  "shachi",
   "shanks",
   "whitebeard",
+  "wire",
 ].sort();
 const originalEnemySlugs = [
   "cipher-pol-agent",

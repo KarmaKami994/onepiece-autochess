@@ -4962,6 +4962,201 @@
         "status": "confirmed",
         "note": "Project-owner attestation covers the One Piece game sources used by this project. The owner supplied the Treasure Cruise source PNGs for B13. No downstream asset license is granted."
       }
+    },
+    {
+      "id": "heat",
+      "kind": "crew",
+      "outputAssetKey": "heat-v2",
+      "editableSource": "licensed-reference-png",
+      "source": {
+        "strategy": "licensed-frame-map",
+        "localPath": "art/licensed-reference/b14-pirate-crews/heat-wire.png",
+        "sha256": "a447892c3cee63c0001b0bb77df47e88c15116329fa15f50bc4498829159a661",
+        "dimensions": {
+          "width": 1032,
+          "height": 2374
+        },
+        "game": "One Piece: Treasure Cruise",
+        "gameUrl": "https://www.spriters-resource.com/mobile/onepiecetreasurecruise/",
+        "sheetUrl": "https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/475609/",
+        "fileId": 475609,
+        "sourceCharacterName": "#3632 Heat & Wire",
+        "contributor": "Original rip contributor unconfirmed",
+        "contributorBasis": "Owner supplied the exact PNG from the linked source page. No rip credit is printed on the sheet and the source page metadata was unavailable.",
+        "frameMap": "art/production/b14-pirate-crews/heat-frame-map.json",
+        "frameMapSha256": "08e916f2cb7bed40c6e7aa412bf9e1d08b43e04213733303dad1392f2cf07d5b",
+        "derivedFrameMap": "public/assets/animations/heat-v2/heat-v2.json#frames"
+      },
+      "pivot": {
+        "x": 64,
+        "y": 116
+      },
+      "processing": [
+        "Source alpha retained",
+        "28% nearest-neighbour reduction",
+        "Selected solo combat poses with short holds where necessary",
+        "Integer-pivot placement"
+      ],
+      "permission": {
+        "status": "confirmed",
+        "note": "Project-owner attestation covers the One Piece game sources used by this project. The owner supplied this exact Treasure Cruise sheet for B14. No downstream asset license is granted."
+      }
+    },
+    {
+      "id": "wire",
+      "kind": "crew",
+      "outputAssetKey": "wire-v2",
+      "editableSource": "licensed-reference-png",
+      "source": {
+        "strategy": "licensed-frame-map",
+        "localPath": "art/licensed-reference/b14-pirate-crews/heat-wire.png",
+        "sha256": "a447892c3cee63c0001b0bb77df47e88c15116329fa15f50bc4498829159a661",
+        "dimensions": {
+          "width": 1032,
+          "height": 2374
+        },
+        "game": "One Piece: Treasure Cruise",
+        "gameUrl": "https://www.spriters-resource.com/mobile/onepiecetreasurecruise/",
+        "sheetUrl": "https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/475609/",
+        "fileId": 475609,
+        "sourceCharacterName": "#3632 Heat & Wire",
+        "contributor": "Original rip contributor unconfirmed",
+        "contributorBasis": "Owner supplied the exact PNG from the linked source page. No rip credit is printed on the sheet and the source page metadata was unavailable.",
+        "frameMap": "art/production/b14-pirate-crews/wire-frame-map.json",
+        "frameMapSha256": "40e6da878deadf277eee6de285c8468318227a110dac37cb90683ecc786ccf5b",
+        "derivedFrameMap": "public/assets/animations/wire-v2/wire-v2.json#frames"
+      },
+      "pivot": {
+        "x": 64,
+        "y": 116
+      },
+      "processing": [
+        "Source alpha retained",
+        "29% nearest-neighbour reduction",
+        "Selected solo combat poses with short holds where necessary",
+        "Integer-pivot placement"
+      ],
+      "permission": {
+        "status": "confirmed",
+        "note": "Project-owner attestation covers the One Piece game sources used by this project. The owner supplied this exact Treasure Cruise sheet for B14. No downstream asset license is granted."
+      }
+    },
+    {
+      "id": "shachi",
+      "kind": "crew",
+      "outputAssetKey": "shachi-v2",
+      "editableSource": "licensed-reference-png",
+      "source": {
+        "strategy": "licensed-frame-map",
+        "localPath": "art/licensed-reference/b14-pirate-crews/shachi-penguin.png",
+        "sha256": "6e11d4f6d89c3d87e1cc82fe228d99a9ef932a8e456d338fc6ac07c5b5d0d34b",
+        "dimensions": {
+          "width": 1032,
+          "height": 2154
+        },
+        "game": "One Piece: Treasure Cruise",
+        "gameUrl": "https://www.spriters-resource.com/mobile/onepiecetreasurecruise/",
+        "sheetUrl": "https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/476645/",
+        "fileId": 476645,
+        "sourceCharacterName": "#1004 Shachi & Penguin - Heart Pirates",
+        "contributor": "Redtarp",
+        "contributorBasis": "The source page lists Redtarp as the uploader.",
+        "frameMap": "art/production/b14-pirate-crews/shachi-frame-map.json",
+        "frameMapSha256": "f4e64c5c9670ee74187c99ffc2f7d2f0ce2de9328ced94cbcdd900ef6c5c1fc8",
+        "derivedFrameMap": "public/assets/animations/shachi-v2/shachi-v2.json#frames"
+      },
+      "pivot": {
+        "x": 64,
+        "y": 116
+      },
+      "processing": [
+        "Source alpha retained",
+        "28% nearest-neighbour reduction",
+        "Selected solo combat poses with short holds where necessary",
+        "Integer-pivot placement"
+      ],
+      "permission": {
+        "status": "confirmed",
+        "note": "Project-owner attestation covers the One Piece game sources used by this project. The owner supplied this exact Treasure Cruise sheet for B14. No downstream asset license is granted."
+      }
+    },
+    {
+      "id": "penguin",
+      "kind": "crew",
+      "outputAssetKey": "penguin-v2",
+      "editableSource": "licensed-reference-png",
+      "source": {
+        "strategy": "licensed-frame-map",
+        "localPath": "art/licensed-reference/b14-pirate-crews/shachi-penguin.png",
+        "sha256": "6e11d4f6d89c3d87e1cc82fe228d99a9ef932a8e456d338fc6ac07c5b5d0d34b",
+        "dimensions": {
+          "width": 1032,
+          "height": 2154
+        },
+        "game": "One Piece: Treasure Cruise",
+        "gameUrl": "https://www.spriters-resource.com/mobile/onepiecetreasurecruise/",
+        "sheetUrl": "https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/476645/",
+        "fileId": 476645,
+        "sourceCharacterName": "#1004 Shachi & Penguin - Heart Pirates",
+        "contributor": "Redtarp",
+        "contributorBasis": "The source page lists Redtarp as the uploader.",
+        "frameMap": "art/production/b14-pirate-crews/penguin-frame-map.json",
+        "frameMapSha256": "dbfdb9792ccb0558a2de35cacc4230e609c811cb2ba6766e9bd3a3fe67ce7390",
+        "derivedFrameMap": "public/assets/animations/penguin-v2/penguin-v2.json#frames"
+      },
+      "pivot": {
+        "x": 64,
+        "y": 116
+      },
+      "processing": [
+        "Source alpha retained",
+        "28% nearest-neighbour reduction",
+        "Selected solo combat poses with short holds where necessary",
+        "Integer-pivot placement"
+      ],
+      "permission": {
+        "status": "confirmed",
+        "note": "Project-owner attestation covers the One Piece game sources used by this project. The owner supplied this exact Treasure Cruise sheet for B14. No downstream asset license is granted."
+      }
+    },
+    {
+      "id": "jean-bart",
+      "kind": "crew",
+      "outputAssetKey": "jean-bart-v2",
+      "editableSource": "licensed-reference-png",
+      "source": {
+        "strategy": "licensed-frame-map",
+        "localPath": "art/licensed-reference/b14-pirate-crews/jean-bart.png",
+        "sha256": "066e6039c6828243406a43d9b8c2eca56865917940b06488b35c8c55a00a2a0a",
+        "dimensions": {
+          "width": 1032,
+          "height": 2154
+        },
+        "game": "One Piece: Treasure Cruise",
+        "gameUrl": "https://www.spriters-resource.com/mobile/onepiecetreasurecruise/",
+        "sheetUrl": "https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/267422/",
+        "fileId": 267422,
+        "sourceCharacterName": "#1006 Jean Bart - Heart Pirates",
+        "contributor": "Original rip contributor unconfirmed",
+        "contributorBasis": "Owner supplied the exact PNG from the linked source page. No rip credit is printed on the sheet and the source page metadata was unavailable.",
+        "frameMap": "art/production/b14-pirate-crews/jean-bart-frame-map.json",
+        "frameMapSha256": "7eb490e5046a66861a9cde1b34153cee033568b4f0c8e053ca05b984c2eebb13",
+        "derivedFrameMap": "public/assets/animations/jean-bart-v2/jean-bart-v2.json#frames"
+      },
+      "pivot": {
+        "x": 64,
+        "y": 116
+      },
+      "processing": [
+        "Source alpha retained",
+        "33% nearest-neighbour reduction",
+        "Selected solo combat poses with short holds where necessary",
+        "Integer-pivot placement"
+      ],
+      "permission": {
+        "status": "confirmed",
+        "note": "Project-owner attestation covers the One Piece game sources used by this project. The owner supplied this exact Treasure Cruise sheet for B14. No downstream asset license is granted."
+      }
     }
   ]
 }

@@ -6,6 +6,26 @@ This non-commercial, localhost-only fan prototype has both original generated pr
 
 On `2026-08-14`, the project owner explicitly attested in the project conversation that the initial 17 listed source sheets may be used, adapted, and distributed in this public collaboration repository. Later source additions record their own permission basis in `art/animation-v2/source-matrix.json`. An owner attestation is not independent verification of chain of title; a Sprite Database URL is not treated as permission, and this repository grants no downstream asset license. The MIT license applies to code only. Reuse, redistribution, or commercialization of franchise or imported art requires its own appropriate rights clearance.
 
+## B14 Kid Pirates and Heart Pirates — 2026-11-23
+
+The project owner supplied all three original One Piece: Treasure Cruise PNGs under the established project permission. The #1004 page lists Redtarp as uploader. The #3632 and #1006 contributor credits are unconfirmed. The frame maps select individual poses from the sheets, including both duo sheets.
+
+| Atlas | Source page | Archived source | Source SHA-256 | Atlas SHA-256 |
+| --- | --- | --- | --- | --- |
+| `heat-v2` | [#3632 Heat & Wire](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/475609/) | `art/licensed-reference/b14-pirate-crews/heat-wire.png` | `a447892c3cee63c0001b0bb77df47e88c15116329fa15f50bc4498829159a661` | `12341aa49bee5c218c6c9fd4ca9646b718bb4a613484bd914dead1cd6288f34b` |
+| `wire-v2` | [#3632 Heat & Wire](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/475609/) | `art/licensed-reference/b14-pirate-crews/heat-wire.png` | `a447892c3cee63c0001b0bb77df47e88c15116329fa15f50bc4498829159a661` | `758defb16b73fcb8d52fca5ebbf9515d8a8cb2fc694ea9432a115c92c905cb1e` |
+| `shachi-v2` | [#1004 Shachi & Penguin - Heart Pirates](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/476645/) | `art/licensed-reference/b14-pirate-crews/shachi-penguin.png` | `6e11d4f6d89c3d87e1cc82fe228d99a9ef932a8e456d338fc6ac07c5b5d0d34b` | `4e042635156a8497958387073251c5b88d81386ebb63304008540f2c721d02c9` |
+| `penguin-v2` | [#1004 Shachi & Penguin - Heart Pirates](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/476645/) | `art/licensed-reference/b14-pirate-crews/shachi-penguin.png` | `6e11d4f6d89c3d87e1cc82fe228d99a9ef932a8e456d338fc6ac07c5b5d0d34b` | `4bc9e1f1149fb617079661e859c0b98f664fb92ebe045fe716ee9c2c3c7809df` |
+| `jean-bart-v2` | [#1006 Jean Bart - Heart Pirates](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/267422/) | `art/licensed-reference/b14-pirate-crews/jean-bart.png` | `066e6039c6828243406a43d9b8c2eca56865917940b06488b35c8c55a00a2a0a` | `aea9ed1ce6f45bdf64873bc47a941021fa93ccc63d25f1b1c951c0c6e193c81e` |
+
+The frame-map pins and source dimensions are recorded in `art/animation-v2/source-matrix.json`. The two crew icons are project-authored. All runtime paths and hashes are in `art/production/b14-pirate-crews/outputs.json`. Rebuild the exports offline with `npm run assets:b14`.
+
+- Final asset: `public/assets/characters/heat.png`
+- Final asset: `public/assets/characters/wire.png`
+- Final asset: `public/assets/characters/shachi.png`
+- Final asset: `public/assets/characters/penguin.png`
+- Final asset: `public/assets/characters/jean-bart.png`
+
 ## B13 Minks crew — 2026-11-19
 
 The project owner attested to permission covering the One Piece game sources and supplied the three Treasure Cruise sheets from The Spriters Resource. Bepo's Gigant Battle 2 sheet credits Grim. The three Treasure Cruise PNGs contain no printed rip credit. The exact source pages, dimensions and frame-map pins are in `art/animation-v2/source-matrix.json`.

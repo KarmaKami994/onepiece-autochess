@@ -4,6 +4,7 @@ import {
   DEFAULT_CONTENT,
   getActiveTraitEffectGrants,
   getActiveTraitsForUnits,
+  getEffectiveUnitTraits,
   simulateBattle,
   type AbilityDefinition,
   type BattleEvent,
@@ -227,6 +228,14 @@ const expectedTraits: Record<
     behaviors: TraitBehavior[];
   }> }
 > = {
+  "kid-pirates": { category: "origin", tiers: [
+    { required: 2, scope: "holders", effects: [{ kind: "attack-percent", value: 6 }], behaviors: [] },
+    { required: 4, scope: "holders", effects: [{ kind: "attack-percent", value: 12 }, { kind: "attack-speed-percent", value: 8 }], behaviors: [] },
+  ] },
+  "heart-pirates": { category: "origin", tiers: [
+    { required: 2, scope: "holders", effects: [{ kind: "shield-flat", value: 55 }], behaviors: [] },
+    { required: 4, scope: "holders", effects: [{ kind: "shield-flat", value: 115 }, { kind: "defense-flat", value: 12 }], behaviors: [] },
+  ] },
   minks: { category: "origin", tiers: [
     { required: 2, scope: "holders", effects: [], behaviors: [{ kind: "first-ability-hit-electro", power: 35 }] },
     { required: 4, scope: "holders", effects: [], behaviors: [{ kind: "first-ability-hit-electro", power: 70 }] },
@@ -252,6 +261,7 @@ const expectedTraits: Record<
   supernova: { category: "origin", tiers: [
     { required: 2, scope: "holders", effects: [{ kind: "attack-percent", value: 8 }, { kind: "stacking-attack-percent", value: 3 }, { kind: "stacking-ability-power-percent", value: 3 }], behaviors: [] },
     { required: 4, scope: "holders", effects: [{ kind: "attack-percent", value: 18 }, { kind: "stacking-attack-percent", value: 7 }, { kind: "stacking-ability-power-percent", value: 7 }], behaviors: [] },
+    { required: 5, scope: "holders", effects: [{ kind: "attack-percent", value: 24 }, { kind: "stacking-attack-percent", value: 9 }, { kind: "stacking-ability-power-percent", value: 9 }], behaviors: [] },
   ] },
   brotherhood: { category: "origin", tiers: [
     { required: 2, scope: "holders", effects: [{ kind: "emergency-shield-percent", value: 22 }], behaviors: [{ kind: "on-brotherhood-holder-death-rally", healMaxHealthPercent: 6, attackSpeedPercent: 8 }] },
@@ -282,6 +292,7 @@ const expectedTraits: Record<
   marksman: { category: "role", tiers: [
     { required: 2, scope: "holders", effects: [{ kind: "range-flat", value: 1 }, { kind: "critical-chance-percent", value: 10 }], behaviors: [{ kind: "every-n-successful-basic-volley", every: 4, shots: 2, attackDamagePercent: 50 }] },
     { required: 3, scope: "holders", effects: [{ kind: "range-flat", value: 2 }, { kind: "critical-chance-percent", value: 20 }], behaviors: [{ kind: "every-n-successful-basic-volley", every: 3, shots: 2, attackDamagePercent: 50 }] },
+    { required: 5, scope: "holders", effects: [{ kind: "range-flat", value: 2 }, { kind: "critical-chance-percent", value: 25 }], behaviors: [{ kind: "every-n-successful-basic-volley", every: 3, shots: 2, attackDamagePercent: 70 }] },
   ] },
   specialist: { category: "role", tiers: [
     { required: 2, scope: "holders", effects: [{ kind: "ability-power-percent", value: 20 }], behaviors: [{ kind: "post-specialist-cast-energy", energy: 5 }] },
@@ -290,6 +301,7 @@ const expectedTraits: Record<
   guardian: { category: "role", tiers: [
     { required: 2, scope: "holders", effects: [{ kind: "defense-flat", value: 15 }, { kind: "shield-flat", value: 90 }], behaviors: [{ kind: "first-direct-hit-guard-point", shield: 60, runeProtectMs: 2_000 }] },
     { required: 3, scope: "holders", effects: [{ kind: "defense-flat", value: 32 }, { kind: "shield-flat", value: 220 }], behaviors: [{ kind: "first-direct-hit-guard-point", shield: 120, runeProtectMs: 3_000 }] },
+    { required: 5, scope: "holders", effects: [{ kind: "defense-flat", value: 42 }, { kind: "shield-flat", value: 340 }], behaviors: [{ kind: "first-direct-hit-guard-point", shield: 165, runeProtectMs: 3_000 }] },
   ] },
 };
 
@@ -306,7 +318,7 @@ describe("P6 trait content and scope", () => {
         behaviors: tier.behaviors ?? [],
       }))).toEqual(expected.tiers);
     }
-    expect(DEFAULT_CONTENT.version).toBe("1.39.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.40.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 
@@ -354,7 +366,7 @@ describe("P6 trait content and scope", () => {
       tier: trait.tiers[0],
     }));
     const views = createTraitViews(active, DEFAULT_CONTENT);
-    expect(views).toHaveLength(15);
+    expect(views).toHaveLength(17);
     expect(views.every((view) => view.semanticDescription.includes(view.scopeLabel))).toBe(true);
     expect(views.filter(view => view.staticEffects.length === 0).map(view => view.id).sort())
       .toEqual(["fish-man", "minks"]);
@@ -481,7 +493,7 @@ describe("B13 Minks and expanded thresholds", () => {
 
   it.each([
     ["straw-hat", 6, 8, 14],
-    ["brawler", 4, 6, 10],
+    ["brawler", 4, 6, 9],
     ["swordsman", 3, 5, 9],
   ] as const)("reaches the new %s tier with native crew and retains the previous tier below it", (id, previous, highest, gold) => {
     const holders = DEFAULT_CONTENT.units.filter(unit => unit.traits.includes(id)).sort((a, b) => a.cost - b.cost);
@@ -492,6 +504,55 @@ describe("B13 Minks and expanded thresholds", () => {
     expect(active(lineup)?.tier?.required).toBe(highest);
     const below = lineup.slice(0, -1);
     expect(active([...below, below[0]])).toMatchObject({ count: highest - 1, tier: { required: previous } });
+  });
+});
+
+describe("B14 pirate crews", () => {
+  it("activates all crew bonds together and preserves Kid's effective traits in Punk Rotten", () => {
+    const ids = ["kid", "killer", "heat", "wire", "law", "bepo", "shachi", "penguin", "carrot"];
+    const active = getActiveTraitsForUnits(ids.map(definitionId => ({ definitionId })));
+    for (const [id, count] of [["kid-pirates", 4], ["heart-pirates", 4], ["minks", 2], ["supernova", 3]] as const) {
+      expect(active.find(trait => trait.traitId === id)).toMatchObject({
+        count, tier: { required: count === 3 ? 2 : count },
+      });
+    }
+    expect(getEffectiveUnitTraits({ definitionId: "kid", formId: "kid-punk-rotten" }))
+      .toEqual(["supernova", "captain", "kid-pirates"]);
+  });
+
+  it.each([
+    [2, 106, 55, 0],
+    [4, 112, 115, 12],
+  ])("applies tier %i Attack and Shield only to their respective crew", (required, attack, shield, defense) => {
+    const crews: FixtureUnit[] = [];
+    for (let index = 0; index < required; index += 1) {
+      crews.push(
+        { id: `kid-${index}`, teamId: "a", x: index, y: 0, traits: ["kid-pirates"] },
+        { id: `heart-${index}`, teamId: "a", x: index, y: 1, traits: ["heart-pirates"] },
+      );
+    }
+    const result = run([
+      ...crews,
+      { id: "ally", teamId: "a", x: 7, y: 0 },
+      { id: "enemy", teamId: "b", x: 7, y: 5 },
+    ], { maxTicks: 0 });
+    expect(unit(result, "kid-0", true)).toMatchObject({ attack, shield: 0, defense: 0 });
+    expect(unit(result, "heart-0", true)).toMatchObject({ attack: 100, shield, defense });
+    expect(unit(result, "ally", true)).toMatchObject({ attack: 100, shield: 0, defense: 0 });
+  });
+
+  it.each([
+    ["supernova", 4, 15],
+    ["marksman", 3, 14],
+    ["guardian", 3, 7],
+  ] as const)("reaches %s 5 with native recruits and keeps the previous tier with four", (id, previous, gold) => {
+    const holders = DEFAULT_CONTENT.units.filter(unit => unit.traits.includes(id)).sort((a, b) => a.cost - b.cost);
+    const lineup = holders.slice(0, 5).map(unit => ({ definitionId: unit.id }));
+    const active = (units: typeof lineup) => getActiveTraitsForUnits(units).find(trait => trait.traitId === id);
+    expect(holders.length).toBeGreaterThan(5);
+    expect(holders.slice(0, 5).reduce((sum, unit) => sum + unit.cost, 0)).toBe(gold);
+    expect(active(lineup)?.tier?.required).toBe(5);
+    expect(active([...lineup.slice(0, 4), lineup[0]])).toMatchObject({ count: 4, tier: { required: previous } });
   });
 });
 

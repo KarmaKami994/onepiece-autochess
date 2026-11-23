@@ -99,6 +99,11 @@ const V2_IDLE_VISUAL_TOP_PX: Record<string, number> = {
   carrot: 62,
   pedro: 63,
   pekoms: 60,
+  heat: 62,
+  wire: 53,
+  shachi: 63,
+  penguin: 60,
+  "jean-bart": 48,
   "marine-recruit": 8,
   "rifle-marine": 9,
   "pirate-raider": 8,
@@ -274,6 +279,11 @@ export const CREW_V2_ANIMATIONS = {
   carrot: crewV2Definition("carrot"),
   pedro: crewV2Definition("pedro"),
   pekoms: crewV2Definition("pekoms"),
+  heat: crewV2Definition("heat"),
+  wire: crewV2Definition("wire"),
+  shachi: crewV2Definition("shachi"),
+  penguin: crewV2Definition("penguin"),
+  "jean-bart": crewV2Definition("jean-bart"),
 } as const satisfies Record<string, CrewAnimationDefinition>;
 
 function pveV2Definition(
@@ -452,6 +462,11 @@ const CREW_VARIANT_OVERRIDES: Partial<Record<string, CrewAnimationDefinition[]>>
   carrot: [CREW_V2_ANIMATIONS.carrot],
   pedro: [CREW_V2_ANIMATIONS.pedro],
   pekoms: [CREW_V2_ANIMATIONS.pekoms],
+  heat: [CREW_V2_ANIMATIONS.heat],
+  wire: [CREW_V2_ANIMATIONS.wire],
+  shachi: [CREW_V2_ANIMATIONS.shachi],
+  penguin: [CREW_V2_ANIMATIONS.penguin],
+  "jean-bart": [CREW_V2_ANIMATIONS["jean-bart"]],
 };
 
 export function resolveAnimationCandidates(

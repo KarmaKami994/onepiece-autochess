@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" shape-rendering="crispEdges">
+  <title>Kid Pirates</title>
+  <path fill="#311f2b" d="M10 4h28v4h7v32h-7v4H10v-4H3V8h7z"/>
+  <path fill="#9f5046" d="M10 4h28v4h7v4h-4V8H7v4H3V8h7zm31 32h4v4h-7v4H10v-4H3v-4h4v4h34z"/>
+  <path fill="#743f46" d="M19 11h10v4h6v5h4v8h-4v5h-6v4H19v-4h-6v-5H9v-8h4v-5h6z"/>
+  <path fill="#e28062" d="M10 15h9v7h10v-7h9v10h-4v5H14v-5h-4z"/>
+  <path fill="#ffc293" d="M10 15h9v4h-6v6h-3zm19 0h9v4h-6v6h-3zM19 26h10v4H19z"/>
+</svg>

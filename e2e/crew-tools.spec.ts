@@ -25,7 +25,7 @@ function examplePlan() {
 
 test("codex covers searchable crew, all recipes, forms, PvE and exact recruitment rounds", async ({ page }, testInfo) => {
   await openTools(page);
-  await expect(page.locator(".reference-card")).toHaveCount(41);
+  await expect(page.locator(".reference-card")).toHaveCount(46);
   await page.getByLabel("Search codex").fill("nami thunder");
   await expect(page.locator(".reference-card")).toHaveCount(1);
   await page.getByRole("combobox", { name: "Cost", exact: true }).selectOption("1");

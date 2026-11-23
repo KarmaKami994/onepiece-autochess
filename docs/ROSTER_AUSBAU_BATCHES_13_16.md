@@ -43,6 +43,8 @@ Umgesetzt auf der B13-Branch. Werte, reguläre Mindestkosten und Sprite-Quellen 
 
 ## B14 · Kid Pirates und Heart Pirates
 
+Umgesetzt auf der lokalen B14-Branch, die auf B13 aufbaut. Werte, Mindestkosten und Sprite-Quellen stehen in der [B14-Übergabe](B14_KID_AND_HEART_PIRATES.md).
+
 - Bei den **Kid Pirates** bringt Heat als **Marksman** Flächendruck und Wire Nahkampfkontrolle. Kid und Killer erhalten den Crew-Bond zusätzlich zu ihren bestehenden Traits. Vier Mitglieder erlauben die Stufen 2 / 4. Die Crew setzt auf physischen Druck mit bestehenden Trait-Effekten.
 - Bei den **Heart Pirates** ergänzen Shachi und Penguin die Unterstützung und Jean Bart übernimmt als **Guardian** die Front. Law und Bepo erhalten den Crew-Bond zusätzlich zu ihren bestehenden Traits. Fünf Mitglieder geben bei Stufe 4 eine freie Wahl. Die Synergie setzt auf Schutz mit bestehenden Trait-Effekten.
 - Supernova bleibt die gemeinsame Verbindung der bisherigen Figuren aus der Worst Generation. Kid, Killer und Law behalten ihre Kosten, Fähigkeiten, Klassen und Formen.

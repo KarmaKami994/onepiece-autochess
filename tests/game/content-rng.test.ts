@@ -12,6 +12,20 @@ import {
 } from "../../game";
 
 describe("canonical game content", () => {
+  it("adds the five B14 pool keys to a B13 save without changing the existing shop or RNG", () => {
+    const newIds = new Set(["heat", "wire", "shachi", "penguin", "jean-bart"]);
+    const saved = createMatch("b14-crews-pool-backfill", {
+      ...DEFAULT_CONTENT,
+      version: "1.39.0",
+      units: DEFAULT_CONTENT.units.filter(unit => !newIds.has(unit.id)),
+      traits: DEFAULT_CONTENT.traits.filter(trait => !["kid-pirates", "heart-pirates"].includes(trait.id)),
+    });
+    const restored = migrateMatchState(saved, DEFAULT_CONTENT);
+    expect(restored).toMatchObject({ schemaVersion: 6, contentVersion: "1.40.0", rngState: saved.rngState });
+    expect(restored.players.map(player => player.shop)).toEqual(saved.players.map(player => player.shop));
+    expect(restored.pool).toEqual({ ...saved.pool, heat: 22, wire: 27, shachi: 22, penguin: 27, "jean-bart": 18 });
+  });
+
   it("backfills only the four B13 pool entries when resuming a 1.38 voyage", () => {
     const newIds = new Set(["bepo", "carrot", "pedro", "pekoms"]);
     const saved = createMatch("minks-pool-backfill", {
@@ -21,7 +35,7 @@ describe("canonical game content", () => {
       traits: DEFAULT_CONTENT.traits.filter(trait => trait.id !== "minks"),
     });
     const restored = migrateMatchState(saved, DEFAULT_CONTENT);
-    expect(restored).toMatchObject({ schemaVersion: 6, contentVersion: "1.39.0", rngState: saved.rngState });
+    expect(restored).toMatchObject({ schemaVersion: 6, contentVersion: "1.40.0", rngState: saved.rngState });
     expect(restored.players.map(player => player.shop)).toEqual(saved.players.map(player => player.shop));
     expect(restored.pool).toEqual({ ...saved.pool, bepo: 22, carrot: 22, pedro: 18, pekoms: 27 });
   });
@@ -88,6 +102,11 @@ describe("canonical game content", () => {
       "carrot",
       "pedro",
       "pekoms",
+      "heat",
+      "wire",
+      "shachi",
+      "penguin",
+      "jean-bart",
     ]);
     expect(DEFAULT_CONTENT.units.map((unit) => unit.cost)).toEqual([
       1, 1, 1, 1, 1, 1,
@@ -97,8 +116,9 @@ describe("canonical game content", () => {
       5, 5, 5, 5, 5,
       1, 2, 3,
       2, 2, 3, 1,
+      2, 1, 2, 1, 3,
     ]);
-    expect(DEFAULT_CONTENT.traits).toHaveLength(15);
+    expect(DEFAULT_CONTENT.traits).toHaveLength(17);
     expect(DEFAULT_CONTENT.items).toHaveLength(65);
     expect(DEFAULT_CONTENT.enemies).toHaveLength(29);
     expect(
@@ -166,8 +186,15 @@ describe("canonical game content", () => {
       "Electro Claw",
       "Jaguar Lightning Blade",
       "Shell Charge",
+      "Flame Breath",
+      "Trident Hook",
+      "Emergency Rescue",
+      "Covering Guard",
+      "Iron Bodyguard",
     ]);
     expect(DEFAULT_CONTENT.traits.map((trait) => trait.name)).toEqual([
+      "Kid Pirates",
+      "Heart Pirates",
       "Minks",
       "Fish-Man",
       "Straw Hat",

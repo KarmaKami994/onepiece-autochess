@@ -23,10 +23,13 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
+B14 is implemented locally on `codex/b14-kid-and-heart-pirates`, based on the B13 PR head `0db153d`. GameContent `1.40.0`, save schema 6, 46 playable recruits, 17 traits and 10 forms. The local handoff is in [B14](docs/B14_KID_AND_HEART_PIRATES.md).
+
 B13 is implemented on `codex/b13-minks-crew-and-trait-tiers` from `b417bb2` and under review in [PR #79](https://github.com/KarmaKami994/onepiece-autochess/pull/79). GameContent `1.39.0`, save schema 6, 41 playable recruits, 15 traits and 10 forms. The remaining B14–B16 roadmap targets 55 recruits and 18 traits. See [B13](docs/B13_MINKS_AND_TRAIT_TIERS.md) and [the batch plan](docs/ROSTER_AUSBAU_BATCHES_13_16.md).
 
 ## Last Completed Work
 
+- 2026-11-23 — B14 adds Heat, Wire, Shachi, Penguin and Jean Bart from three owner-supplied Treasure Cruise sheets. Kid Pirates and Heart Pirates have 2/4 tiers. Supernova, Marksman and Guardian gain their 5-member tiers. Material changes cover content, five sprite packages, two trait icons, visual manifests, the crew exporter, content/trait/save/asset/browser test fixtures, and B14 documentation.
 - 2026-11-20 — PR #79 CI coverage follow-up splits the two existing three-seed simulations in `tests/production-audit.test.ts` into separately timed fixtures and assertions. The test retains both three-seed runs, exact report equality and the existing 30-second per-case limit.
 - 2026-11-20 — PR #79 second CI follow-up updates two Browser E2E fixtures for 41 crew, 15 traits and 10 existing forms. The four affected browser cases passed locally at both desktop sizes.
 - 2026-11-20 — PR #79 CI fixture follow-up for the current crew catalogue, v2 anchors, static sprites, Jinbe's Fish-Man trait and Koby's ghost pairing. Updated five test files and provenance entries. The ghost regression now produces its pairing through normal match progression. Gameplay and asset bytes are unaffected.
@@ -134,6 +137,8 @@ B13 is implemented on `codex/b13-minks-crew-and-trait-tiers` from `b417bb2` and 
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+B14 — The offline asset exporter generated all five runtime sprite packages and the output hash manifest. The owner deferred verification. NOT RUN for tests, typecheck, lint, build, asset validation, browser checks, CI and production runs. Publication is pending so automatic PR checks do not run before approval.
 
 B13 coverage follow-up — CI #203 unit suite passed 1144/1144 on both attempts. Coverage failed at the existing 30-second limit around two sequential three-seed simulations. Scratch-excluding local typecheck passed after the test-only split. The corrected-head suite and Coverage run through standard PR CI.
 
@@ -875,6 +880,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- B14 adds five recruits and holder-scoped Kid Pirates and Heart Pirates bonuses using the existing trait engine. Kid, Killer, Law and Bepo gain crew membership. Supernova, Marksman and Guardian have new 5-member bonuses. Existing saves fill missing pool entries through schema 6.
 - B13 adds four shared-pool definitions and three later tiers with the existing entry bonuses retained. Minks deals 35/70 base Special damage once per fighter after their first damaging ability hit when the target survives. The replay records the bonus as trait damage. Loading an older schema-6 save fills only missing pool keys.
 - Sabo changes after a surviving direct hit below 30% HP. Kid starts as Punk Rotten when deployed orthogonally next to allied Killer. Kuzan starts in Ice Form during Snow. Blackbeard alternates Darkness and Quake after resolved casts. Koby unlocks Honesty Impact after four deployed battles and retains the highest training count at star merge. Details and sources are in `docs/SABO_KID_FORMS.md`, `docs/KUZAN_BLACKBEARD_FORMS.md` and `docs/KOBY_HONESTY_IMPACT.md`.
 - Fish-Man adds three shop definitions, 2/4 distinct deployed Fish-Man thresholds and the Tidal Guard shield trigger. Jinbe keeps his existing ability and gains the trait. Schema remains 6 and the existing load path fills new pool keys. The existing Chronicle version/hash gate applies to old recordings.
@@ -952,6 +958,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- B14 is stacked on the B13 PR head. The owner deferred checks, so the handoff is local.
 - The four previously isolated batches share one squash handoff at the highest reserved content version, `1.38.0`. Punk Rotten uses the new three-piece sprite because the surveyed original sheets lacked the complete form.
 - ImageGen drafts missed character likeness and were excluded. Production uses the owner-supplied original sprites for all three recruits.
 - Regatta report initially suggested a camera offset. Browser hit-coordinate tracing confirmed overlapping sprite hit rectangles and release ownership; late image completion also interrupted drags. Corrected those renderer input paths without camera offsets or gameplay changes. Existing viewport tests now await/sample the actual preferred animation, including B11 sheets, rather than assuming legacy artwork. All original assertions and limits remain.
@@ -1028,6 +1035,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- B14 Treasure Cruise #3632 and #1006 contributor credits are unconfirmed. The two duo sheets use individual recoil or braced holds where separate defeat poses are unavailable.
 - B13 Treasure Cruise PNGs have no printed contributor credit. Source links, owner-supplied bytes and hashes are recorded. The three affected cost bands have greater roster variety at existing shop odds.
 - The combined runtime has not been tested locally. Source and output hashes are documented for the imported and generated art.
 - The supplied sheets have uneven pose coverage. Holds and available poses cover missing transitions. More recruits in the first three cost bands lower individual recruit availability at unchanged shop odds.
@@ -1148,7 +1156,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-Review B13, then take B14 Kid Pirates and Heart Pirates when approved.
+Review the B14 local handoff. Verification and publication are deferred.
 
 ## Codex Update Contract
 

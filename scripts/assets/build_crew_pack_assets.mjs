@@ -7,13 +7,17 @@ import sharp from "sharp";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const packs = {
-  "fish-man-crew": { ids: ["hatchan", "kuroobi", "fisher-tiger"], trait: "fish-man" },
-  "b13-minks": { ids: ["bepo", "carrot", "pedro", "pekoms"], trait: "minks" },
+  "fish-man-crew": { ids: ["hatchan", "kuroobi", "fisher-tiger"], traits: ["fish-man"] },
+  "b13-minks": { ids: ["bepo", "carrot", "pedro", "pekoms"], traits: ["minks"] },
+  "b14-pirate-crews": {
+    ids: ["heat", "wire", "shachi", "penguin", "jean-bart"],
+    traits: ["kid-pirates", "heart-pirates"],
+  },
 };
 const packId = process.argv[2];
 if (!Object.hasOwn(packs, packId)) throw new Error(`Unknown crew asset pack: ${packId}`);
-const { ids, trait } = packs[packId];
-const outputPaths = [`public/assets/traits/${trait}.svg`];
+const { ids, traits } = packs[packId];
+const outputPaths = traits.map(trait => `public/assets/traits/${trait}.svg`);
 const presentationOnly = process.argv.includes("--presentation-only");
 
 async function writeStaticSprite(id, directory, idle, width, height, maxWidth, maxHeight) {

@@ -366,7 +366,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     id: "killer",
     name: "Killer",
     cost: 2,
-    traits: ["supernova", "swordsman"],
+    traits: ["supernova", "swordsman", "kid-pirates"],
     stats: {
       health: 720,
       attack: 72,
@@ -454,7 +454,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     id: "kid",
     name: "Kid",
     cost: 3,
-    traits: ["supernova", "captain"],
+    traits: ["supernova", "captain", "kid-pirates"],
     stats: {
       health: 920,
       attack: 78,
@@ -581,7 +581,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     id: "law",
     name: "Law",
     cost: 4,
-    traits: ["supernova", "warlord", "captain"],
+    traits: ["supernova", "warlord", "captain", "heart-pirates"],
     stats: {
       health: 900,
       attack: 86,
@@ -949,7 +949,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     id: "bepo",
     name: "Bepo",
     cost: 2,
-    traits: ["minks", "brawler"],
+    traits: ["minks", "brawler", "heart-pirates"],
     stats: { health: 850, attack: 64, defense: 25, range: 1, attackIntervalMs: 1_050, moveIntervalMs: 450 },
     ability: ability(
       "polar-roundhouse", "Polar Roundhouse",
@@ -997,6 +997,72 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
       { damageType: "physical", signatureMechanics: [{ kind: "knockback" }] },
     ),
     assetPath: "/assets/characters/pekoms.png",
+  },
+  {
+    id: "heat",
+    name: "Heat",
+    cost: 2,
+    traits: ["kid-pirates", "marksman"],
+    stats: { health: 660, attack: 67, defense: 16, range: 3, attackIntervalMs: 1_100, moveIntervalMs: 450 },
+    ability: ability(
+      "flame-breath", "Flame Breath",
+      "Breathes fire through the nearest enemy and foes in line behind them, dealing Special damage and applying Burn for 2 seconds.",
+      175, "nearest-enemy", "line", { damageType: "special", burnPower: 18, burnDurationMs: 2_000 },
+    ),
+    assetPath: "/assets/characters/heat.png",
+  },
+  {
+    id: "wire",
+    name: "Wire",
+    cost: 1,
+    traits: ["kid-pirates", "brawler"],
+    stats: { health: 700, attack: 53, defense: 20, range: 2, attackIntervalMs: 1_150, moveIntervalMs: 500 },
+    ability: ability(
+      "trident-hook", "Trident Hook",
+      "Hooks the nearest enemy for Physical damage and pulls them one cell closer if they survive.",
+      150, "nearest-enemy", "single",
+      { damageType: "physical", signatureMechanics: [{ kind: "pull" }] },
+    ),
+    assetPath: "/assets/characters/wire.png",
+  },
+  {
+    id: "shachi",
+    name: "Shachi",
+    cost: 2,
+    traits: ["heart-pirates", "specialist"],
+    stats: { health: 715, attack: 55, defense: 19, range: 2, attackIntervalMs: 1_050, moveIntervalMs: 450 },
+    ability: ability(
+      "emergency-rescue", "Emergency Rescue",
+      "Heals the ally in reach with the lowest remaining health percentage.",
+      200, "lowest-health-ally", "single", { effect: "heal" },
+    ),
+    assetPath: "/assets/characters/shachi.png",
+  },
+  {
+    id: "penguin",
+    name: "Penguin",
+    cost: 1,
+    traits: ["heart-pirates", "guardian"],
+    stats: { health: 640, attack: 48, defense: 20, range: 2, attackIntervalMs: 1_150, moveIntervalMs: 450 },
+    ability: ability(
+      "covering-guard", "Covering Guard",
+      "Shields the ally in reach with the lowest remaining health percentage.",
+      145, "lowest-health-ally", "single", { effect: "shield" },
+    ),
+    assetPath: "/assets/characters/penguin.png",
+  },
+  {
+    id: "jean-bart",
+    name: "Jean Bart",
+    cost: 3,
+    traits: ["heart-pirates", "guardian"],
+    stats: { health: 1_050, attack: 71, defense: 33, specialDefense: 30, range: 1, attackIntervalMs: 1_200, moveIntervalMs: 500 },
+    ability: ability(
+      "iron-bodyguard", "Iron Bodyguard",
+      "Shields the ally in reach with the lowest remaining health percentage and their adjacent allies.",
+      210, "lowest-health-ally", "adjacent", { effect: "shield" },
+    ),
+    assetPath: "/assets/characters/jean-bart.png",
   },
 ];
 
@@ -1212,6 +1278,46 @@ export const FORM_DEFINITIONS: UnitFormDefinition[] = [
 
 export const TRAIT_DEFINITIONS: TraitDefinition[] = [
   {
+    id: "kid-pirates",
+    name: "Kid Pirates",
+    category: "origin",
+    description: "Kid Pirates increase the Attack of their own crew members.",
+    tiers: [
+      {
+        required: 2,
+        effects: [{ kind: "attack-percent", value: 6 }],
+        effectScope: "holders",
+        label: "Kid Pirates: +6% Attack",
+      },
+      {
+        required: 4,
+        effects: [{ kind: "attack-percent", value: 12 }, { kind: "attack-speed-percent", value: 8 }],
+        effectScope: "holders",
+        label: "Kid Pirates: +12% Attack and +8% Attack Speed",
+      },
+    ],
+  },
+  {
+    id: "heart-pirates",
+    name: "Heart Pirates",
+    category: "origin",
+    description: "Heart Pirates start combat protected by their crew's defenses.",
+    tiers: [
+      {
+        required: 2,
+        effects: [{ kind: "shield-flat", value: 55 }],
+        effectScope: "holders",
+        label: "Heart Pirates: 55 starting Shield",
+      },
+      {
+        required: 4,
+        effects: [{ kind: "shield-flat", value: 115 }, { kind: "defense-flat", value: 12 }],
+        effectScope: "holders",
+        label: "Heart Pirates: 115 starting Shield, +12 Defense and Special Defense",
+      },
+    ],
+  },
+  {
     id: "minks",
     name: "Minks",
     category: "origin",
@@ -1378,6 +1484,16 @@ export const TRAIT_DEFINITIONS: TraitDefinition[] = [
         ],
         effectScope: "holders",
         label: "Trait holders: +18% Attack; +7% Attack and Ability Power per takedown",
+      },
+      {
+        required: 5,
+        effects: [
+          { kind: "attack-percent", value: 24 },
+          { kind: "stacking-attack-percent", value: 9 },
+          { kind: "stacking-ability-power-percent", value: 9 },
+        ],
+        effectScope: "holders",
+        label: "Trait holders: +24% Attack; +9% Attack and Ability Power per takedown",
       },
     ],
   },
@@ -1575,6 +1691,16 @@ export const TRAIT_DEFINITIONS: TraitDefinition[] = [
         behaviors: [{ kind: "every-n-successful-basic-volley", every: 3, shots: 2, attackDamagePercent: 50 }],
         label: "Trait holders: +2 Range, +20% Critical Chance; every 3rd hit fires two 50% shots",
       },
+      {
+        required: 5,
+        effects: [
+          { kind: "range-flat", value: 2 },
+          { kind: "critical-chance-percent", value: 25 },
+        ],
+        effectScope: "holders",
+        behaviors: [{ kind: "every-n-successful-basic-volley", every: 3, shots: 2, attackDamagePercent: 70 }],
+        label: "Trait holders: +2 Range, +25% Critical Chance; every 3rd hit fires two 70% shots",
+      },
     ],
   },
   {
@@ -1627,6 +1753,16 @@ export const TRAIT_DEFINITIONS: TraitDefinition[] = [
         effectScope: "holders",
         behaviors: [{ kind: "first-direct-hit-guard-point", shield: 120, runeProtectMs: 3_000 }],
         label: "Trait holders: +32 Defense, 220 Shield; first direct hit grants 120 Shield and 3s Rune Protect",
+      },
+      {
+        required: 5,
+        effects: [
+          { kind: "defense-flat", value: 42 },
+          { kind: "shield-flat", value: 340 },
+        ],
+        effectScope: "holders",
+        behaviors: [{ kind: "first-direct-hit-guard-point", shield: 165, runeProtectMs: 3_000 }],
+        label: "Trait holders: +42 Defense, 340 Shield; first direct hit grants 165 Shield and 3s Rune Protect",
       },
     ],
   },
@@ -2928,7 +3064,7 @@ export const FOOD_DEFINITIONS: NonNullable<GameContent["foods"]> = [
 ];
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.39.0",
+  version: "1.40.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,
