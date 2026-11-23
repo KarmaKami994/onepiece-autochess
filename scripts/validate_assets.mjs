@@ -87,7 +87,7 @@ const itemSpecs = JSON.parse(await readFile(path.join(root, "art", "ui-icons", "
 const traitSpecs = JSON.parse(await readFile(path.join(root, "art", "ui-icons", "trait-icons.json"), "utf8"));
 const statusSpecs = JSON.parse(await readFile(path.join(root, "art", "ui-icons", "status-icons.json"), "utf8"));
 
-if (DEFAULT_CONTENT.units.length !== 46) throw new Error(`Expected 46 units, found ${DEFAULT_CONTENT.units.length}`);
+if (DEFAULT_CONTENT.units.length !== 50) throw new Error(`Expected 50 units, found ${DEFAULT_CONTENT.units.length}`);
 for (const unit of DEFAULT_CONTENT.units) {
   if (unit.assetPath.endsWith("/placeholder.svg")) throw new Error(`${unit.id} still uses the production placeholder`);
   await requireFile(path.join(publicRoot, unit.assetPath.replace(/^\//, "")));
@@ -117,7 +117,7 @@ for (const itemId of itemIds) await validateSvg(path.join(publicRoot, "assets", 
 
 const traitIds = DEFAULT_CONTENT.traits.map((trait) => trait.id).sort();
 const specTraitIds = traitSpecs.traits.map((trait) => trait.id).sort();
-if (JSON.stringify(traitIds) !== JSON.stringify([...specTraitIds, "fish-man", "minks", "kid-pirates", "heart-pirates"].sort())) throw new Error("Trait visuals must exactly cover the catalogue");
+if (JSON.stringify(traitIds) !== JSON.stringify([...specTraitIds, "fish-man", "minks", "kid-pirates", "heart-pirates", "big-mom-pirates"].sort())) throw new Error("Trait visuals must exactly cover the catalogue");
 for (const traitId of traitIds) await validateSvg(path.join(publicRoot, "assets", "traits", `${traitId}.svg`));
 
 if (DEFAULT_CONTENT.forms.length !== 10) throw new Error(`Expected ten forms, found ${DEFAULT_CONTENT.forms.length}`);
@@ -166,7 +166,7 @@ for (const entry of sourceMatrix.entries) {
   if (entry.source.sheetUrl && (!entry.source.contributor || !entry.source.dimensions)) throw new Error(`${entry.id} lacks source-page provenance`);
 }
 
-for (const pack of ["fish-man-crew", "b13-minks", "b14-pirate-crews"]) {
+for (const pack of ["fish-man-crew", "b13-minks", "b14-pirate-crews", "b15-big-mom-pirates"]) {
   const outputs = JSON.parse(await readFile(path.join(root, `art/production/${pack}/outputs.json`), "utf8"));
   for (const output of outputs) {
     if (await sha256(path.join(root, output.path)) !== output.sha256) throw new Error(`${pack} asset provenance mismatch: ${output.path}`);

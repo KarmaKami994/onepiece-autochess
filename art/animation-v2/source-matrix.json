@@ -5157,6 +5157,162 @@
         "status": "confirmed",
         "note": "Project-owner attestation covers the One Piece game sources used by this project. The owner supplied this exact Treasure Cruise sheet for B14. No downstream asset license is granted."
       }
+    },
+    {
+      "id": "pudding",
+      "kind": "crew",
+      "outputAssetKey": "pudding-v2",
+      "editableSource": "licensed-reference-png",
+      "source": {
+        "strategy": "licensed-frame-map",
+        "localPath": "art/licensed-reference/b15-big-mom-pirates/pudding.png",
+        "sha256": "63720b2ea3618e9e03021f6e82e241447b7163db63a206764b883ea286436030",
+        "dimensions": {
+          "width": 1024,
+          "height": 1024
+        },
+        "game": "One Piece: Treasure Cruise",
+        "gameUrl": "https://www.spriters-resource.com/mobile/onepiecetreasurecruise/",
+        "sheetUrl": "https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/262142/",
+        "fileId": 262142,
+        "sourceCharacterName": "#2065 Charlotte Pudding",
+        "contributor": "Original rip contributor unconfirmed",
+        "contributorBasis": "The owner supplied this exact PNG from the linked playable-character asset page. The sheet shows no printed rip credit.",
+        "frameMap": "art/production/b15-big-mom-pirates/pudding-frame-map.json",
+        "frameMapSha256": "b4407f7388946230ace3d8b85426e11f05a4b031bdf2184f28151480b9188afc",
+        "derivedFrameMap": "public/assets/animations/pudding-v2/pudding-v2.json#frames"
+      },
+      "pivot": {
+        "x": 64,
+        "y": 116
+      },
+      "processing": [
+        "Exact sheet background color removed",
+        "29% nearest-neighbour reduction",
+        "Original combat poses selected with holds where necessary",
+        "Integer-pivot placement"
+      ],
+      "permission": {
+        "status": "confirmed",
+        "note": "Project-owner attestation covers the One Piece game sources used by this project. The owner supplied this exact Treasure Cruise sheet for B15. No downstream asset license is granted."
+      }
+    },
+    {
+      "id": "cracker",
+      "kind": "crew",
+      "outputAssetKey": "cracker-v2",
+      "editableSource": "licensed-reference-png",
+      "source": {
+        "strategy": "licensed-frame-map",
+        "localPath": "art/licensed-reference/b15-big-mom-pirates/cracker.png",
+        "sha256": "1095e1ad973c38f726c674307ce57e4ff9eac291e1120dbf118c96b43907f645",
+        "dimensions": {
+          "width": 1032,
+          "height": 3088
+        },
+        "game": "One Piece: Treasure Cruise",
+        "gameUrl": "https://www.spriters-resource.com/mobile/onepiecetreasurecruise/",
+        "sheetUrl": "https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/280534/",
+        "fileId": 280534,
+        "sourceCharacterName": "#3477 Charlotte Cracker - Unexpected Strike",
+        "contributor": "Original rip contributor unconfirmed",
+        "contributorBasis": "The owner supplied this exact PNG from the linked playable-character asset page. The sheet shows no printed rip credit.",
+        "frameMap": "art/production/b15-big-mom-pirates/cracker-frame-map.json",
+        "frameMapSha256": "6ca6a810fdce42af188212ea0e4c57b41822334c204001bbbaeae088f53063cc",
+        "derivedFrameMap": "public/assets/animations/cracker-v2/cracker-v2.json#frames"
+      },
+      "pivot": {
+        "x": 64,
+        "y": 116
+      },
+      "processing": [
+        "Source alpha retained",
+        "29% nearest-neighbour reduction",
+        "Original combat poses selected with holds where necessary",
+        "Integer-pivot placement"
+      ],
+      "permission": {
+        "status": "confirmed",
+        "note": "Project-owner attestation covers the One Piece game sources used by this project. The owner supplied this exact Treasure Cruise sheet for B15. No downstream asset license is granted."
+      }
+    },
+    {
+      "id": "katakuri",
+      "kind": "crew",
+      "outputAssetKey": "katakuri-v2",
+      "editableSource": "licensed-reference-png",
+      "source": {
+        "strategy": "licensed-frame-map",
+        "localPath": "art/licensed-reference/b15-big-mom-pirates/katakuri.png",
+        "sha256": "d9dd3593da1ab8f4d94adadef18da05043beb2657426c7d32f24579efec6d969",
+        "dimensions": {
+          "width": 1548,
+          "height": 1032
+        },
+        "game": "One Piece: Treasure Cruise",
+        "gameUrl": "https://www.spriters-resource.com/mobile/onepiecetreasurecruise/",
+        "sheetUrl": "https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/225431/",
+        "fileId": 225431,
+        "sourceCharacterName": "#2471 Charlotte Katakuri - Mochi-Mochi Fruit User",
+        "contributor": "Original rip contributor unconfirmed",
+        "contributorBasis": "The owner supplied this exact PNG from the linked playable-character asset page. The sheet shows no printed rip credit.",
+        "frameMap": "art/production/b15-big-mom-pirates/katakuri-frame-map.json",
+        "frameMapSha256": "1d9525e6ae19d389a279df415f81cc4b8a69d80f9d818109a9897b7b2c76e04b",
+        "derivedFrameMap": "public/assets/animations/katakuri-v2/katakuri-v2.json#frames"
+      },
+      "pivot": {
+        "x": 64,
+        "y": 116
+      },
+      "processing": [
+        "Source alpha retained",
+        "31% nearest-neighbour reduction",
+        "Original combat poses selected with holds where necessary",
+        "Integer-pivot placement"
+      ],
+      "permission": {
+        "status": "confirmed",
+        "note": "Project-owner attestation covers the One Piece game sources used by this project. The owner supplied this exact Treasure Cruise sheet for B15. No downstream asset license is granted."
+      }
+    },
+    {
+      "id": "big-mom",
+      "kind": "crew",
+      "outputAssetKey": "big-mom-v2",
+      "editableSource": "licensed-reference-png",
+      "source": {
+        "strategy": "licensed-frame-map",
+        "localPath": "art/licensed-reference/b15-big-mom-pirates/big-mom.png",
+        "sha256": "b8c4bd696eb081fdce3737415c640fa55c5ce3c80836e87ef338378f3d4dbe39",
+        "dimensions": {
+          "width": 1032,
+          "height": 2060
+        },
+        "game": "One Piece: Treasure Cruise",
+        "gameUrl": "https://www.spriters-resource.com/mobile/onepiecetreasurecruise/",
+        "sheetUrl": "https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/262280/",
+        "fileId": 262280,
+        "sourceCharacterName": "#2109 Charlotte Linlin - Great Pirate Big Mom",
+        "contributor": "Original rip contributor unconfirmed",
+        "contributorBasis": "The owner supplied this exact PNG from the linked playable-character asset page. The sheet shows no printed rip credit.",
+        "frameMap": "art/production/b15-big-mom-pirates/big-mom-frame-map.json",
+        "frameMapSha256": "967e81d33f8a9e00368a18e879212f7f0c794624f8c68a061f1c6ca6c1e9fc6a",
+        "derivedFrameMap": "public/assets/animations/big-mom-v2/big-mom-v2.json#frames"
+      },
+      "pivot": {
+        "x": 64,
+        "y": 116
+      },
+      "processing": [
+        "Source alpha retained",
+        "37% nearest-neighbour reduction",
+        "Original combat poses selected with holds where necessary",
+        "Integer-pivot placement"
+      ],
+      "permission": {
+        "status": "confirmed",
+        "note": "Project-owner attestation covers the One Piece game sources used by this project. The owner supplied this exact Treasure Cruise sheet for B15. No downstream asset license is granted."
+      }
     }
   ]
 }

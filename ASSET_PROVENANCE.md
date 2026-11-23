@@ -6,6 +6,24 @@ This non-commercial, localhost-only fan prototype has both original generated pr
 
 On `2026-08-14`, the project owner explicitly attested in the project conversation that the initial 17 listed source sheets may be used, adapted, and distributed in this public collaboration repository. Later source additions record their own permission basis in `art/animation-v2/source-matrix.json`. An owner attestation is not independent verification of chain of title; a Sprite Database URL is not treated as permission, and this repository grants no downstream asset license. The MIT license applies to code only. Reuse, redistribution, or commercialization of franchise or imported art requires its own appropriate rights clearance.
 
+## B15 Big Mom Pirates — 2026-11-23
+
+The project owner supplied four original One Piece: Treasure Cruise PNGs under the established project permission. The sheets carry no printed rip credits. Contributor attribution remains unconfirmed. The frame maps use the original combat poses and hold available poses where the sheet has no separate transition.
+
+| Atlas | Source page | Archived source | Source SHA-256 | Atlas SHA-256 |
+| --- | --- | --- | --- | --- |
+| `pudding-v2` | [#2065 Charlotte Pudding](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/262142/) | `art/licensed-reference/b15-big-mom-pirates/pudding.png` | `63720b2ea3618e9e03021f6e82e241447b7163db63a206764b883ea286436030` | `ef72e02bf46791bed82f87932df8835e9e4a761dd96fcca13e722b76eef97847` |
+| `cracker-v2` | [#3477 Charlotte Cracker - Unexpected Strike](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/280534/) | `art/licensed-reference/b15-big-mom-pirates/cracker.png` | `1095e1ad973c38f726c674307ce57e4ff9eac291e1120dbf118c96b43907f645` | `ae42c8b95a4d835a2c4f0515db4b478f57ee57bbfebe9227bfa6eebe36db209e` |
+| `katakuri-v2` | [#2471 Charlotte Katakuri - Mochi-Mochi Fruit User](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/225431/) | `art/licensed-reference/b15-big-mom-pirates/katakuri.png` | `d9dd3593da1ab8f4d94adadef18da05043beb2657426c7d32f24579efec6d969` | `f085f339e42f46008ca15b78ec300c863ab76d5e339b69871f842d7d4fd1f64a` |
+| `big-mom-v2` | [#2109 Charlotte Linlin - Great Pirate Big Mom](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/262280/) | `art/licensed-reference/b15-big-mom-pirates/big-mom.png` | `b8c4bd696eb081fdce3737415c640fa55c5ce3c80836e87ef338378f3d4dbe39` | `a5376869546116cca86b40b17d440d8989e20181864124490d242cdfedd2c1bc` |
+
+Source dimensions and frame-map hashes are recorded in `art/animation-v2/source-matrix.json`. The Big Mom Pirates icon is project-authored. All sprite output hashes are in `art/production/b15-big-mom-pirates/outputs.json`. Rebuild offline with `npm run assets:b15`.
+
+- Final asset: `public/assets/characters/pudding.png`
+- Final asset: `public/assets/characters/cracker.png`
+- Final asset: `public/assets/characters/katakuri.png`
+- Final asset: `public/assets/characters/big-mom.png`
+
 ## B14 Kid Pirates and Heart Pirates — 2026-11-23
 
 The project owner supplied all three original One Piece: Treasure Cruise PNGs under the established project permission. The #1004 page lists Redtarp as uploader. The #3632 and #1006 contributor credits are unconfirmed. The frame maps select individual poses from the sheets, including both duo sheets.

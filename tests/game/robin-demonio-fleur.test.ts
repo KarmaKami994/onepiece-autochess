@@ -129,12 +129,12 @@ describe("Robin Demonio Fleur production content", () => {
     const robin = DEFAULT_CONTENT.units.find((unit) => unit.id === "robin");
     const form = getUnitFormDefinition(DEMONIO_FORM_ID);
 
-    expect(DEFAULT_CONTENT.version).toBe("1.40.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.41.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
-    expect(DEFAULT_CONTENT.units).toHaveLength(46);
+    expect(DEFAULT_CONTENT.units).toHaveLength(50);
     expect([1, 2, 3, 4, 5].map((cost) =>
       DEFAULT_CONTENT.units.filter((unit) => unit.cost === cost).length
-    )).toEqual([10, 13, 10, 8, 5]);
+    )).toEqual([11, 13, 11, 9, 6]);
     expect(DEFAULT_CONTENT.forms).toHaveLength(10);
     expect(form).toEqual({
       id: DEMONIO_FORM_ID,
@@ -526,7 +526,7 @@ describe("Robin Demonio Fleur schema-6 persistence", () => {
     const restoredPlayer = human(restored);
 
     expect(restored.schemaVersion).toBe(6);
-    expect(restored.contentVersion).toBe("1.40.0");
+    expect(restored.contentVersion).toBe("1.41.0");
     expect(restoredPlayer.units[legacy.id]).toMatchObject({
       definitionId: "robin",
       star: 3,

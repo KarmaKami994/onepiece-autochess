@@ -8,8 +8,9 @@ export function b07ReferenceContent(): GameContent {
   const laterCrew = new Set([
     "hatchan", "kuroobi", "fisher-tiger", "bepo", "carrot", "pedro", "pekoms",
     "heat", "wire", "shachi", "penguin", "jean-bart",
+    "pudding", "cracker", "katakuri", "big-mom",
   ]);
-  const laterTraits = new Set(["fish-man", "minks", "kid-pirates", "heart-pirates"]);
+  const laterTraits = new Set(["fish-man", "minks", "kid-pirates", "heart-pirates", "big-mom-pirates"]);
   const laterForms = new Set([
     "sabo-flame-emperor", "kid-punk-rotten", "kuzan-ice-form",
     "blackbeard-darkness", "blackbeard-quake", "koby-honesty-impact",
@@ -20,6 +21,7 @@ export function b07ReferenceContent(): GameContent {
   content.traits = content.traits.filter(trait => !laterTraits.has(trait.id));
   const tierLimits: Record<string, number> = {
     "straw-hat": 6, brawler: 4, swordsman: 3, supernova: 4, marksman: 3, guardian: 3,
+    navy: 3, captain: 3, specialist: 4,
   };
   for (const trait of content.traits) {
     if (Object.hasOwn(tierLimits, trait.id)) {

@@ -52,8 +52,10 @@ Umgesetzt auf der lokalen B14-Branch, die auf B13 aufbaut. Werte, Mindestkosten 
 
 ## B15 · Big Moms Kerncrew und 50er-Kader
 
+Umgesetzt auf der lokalen B15-Branch, die auf B14 aufbaut. Die konkreten Werte und Sprite-Quellen stehen in der [B15-Übergabe](B15_BIG_MOM_PIRATES.md).
+
 - Pudding eröffnet als früher **Specialist**, Cracker besetzt als **Guardian** die Front, Katakuri übernimmt die Rolle des späten Angreifers und Big Mom die teure **Captain**-Rolle. Pekoms erhält Big Mom Pirates zusätzlich zu Minks.
-- Die Stufen 2 / 4 erhalten bereits einen eigenständigen Nutzen. Als Richtung ist Schutz für Crew-Mitglieder vorgesehen. Werte und konkrete Trait-Effekte werden für B15 festgelegt. Die Synergie zeigt zu diesem Zeitpunkt die erreichbaren Stufen an.
+- Die Stufen 2 / 4 geben Crew-Mitgliedern einen Notschild nach überlebtem Schaden bei höchstens 30 % HP. Stufe 4 erhöht zusätzlich Defense und Special Defense.
 - Ergänzt **Captain 5 und 7**, **Navy 5** und **Specialist 6**. Die Wahlmöglichkeiten für die Captain-Stufen schließen Aufstellungen ohne Big Mom ein.
 - Abnahme umfasst die neuen Schwellen, eine Big-Mom-Pirates-Vierer-Aufstellung ohne Big Mom, den Doppel-Bond von Pekoms und die Integration in Shop, Rekrutierung und Crew-Übersicht. Dieser Stand erreicht das Mindestziel von 50 und ist separat veröffentlichbar.
 

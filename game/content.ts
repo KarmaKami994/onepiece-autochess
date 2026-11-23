@@ -988,7 +988,7 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     id: "pekoms",
     name: "Pekoms",
     cost: 1,
-    traits: ["minks", "guardian"],
+    traits: ["minks", "guardian", "big-mom-pirates"],
     stats: { health: 740, attack: 49, defense: 29, specialDefense: 25, range: 1, attackIntervalMs: 1_200, moveIntervalMs: 500 },
     ability: ability(
       "shell-charge", "Shell Charge",
@@ -1063,6 +1063,58 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
       210, "lowest-health-ally", "adjacent", { effect: "shield" },
     ),
     assetPath: "/assets/characters/jean-bart.png",
+  },
+  {
+    id: "pudding",
+    name: "Pudding",
+    cost: 1,
+    traits: ["big-mom-pirates", "specialist"],
+    stats: { health: 560, attack: 45, defense: 12, specialDefense: 22, range: 3, attackIntervalMs: 1_150, moveIntervalMs: 450 },
+    ability: ability(
+      "memory-edit", "Memory Edit",
+      "Unsettles the nearest enemy's memories for Special damage and puts them to Sleep for 1.2 seconds.",
+      105, "nearest-enemy", "single", { damageType: "special", sleepMs: 1_200 },
+    ),
+    assetPath: "/assets/characters/pudding.png",
+  },
+  {
+    id: "cracker",
+    name: "Cracker",
+    cost: 3,
+    traits: ["big-mom-pirates", "guardian"],
+    stats: { health: 1_030, attack: 72, defense: 34, specialDefense: 26, range: 1, attackIntervalMs: 1_150, moveIntervalMs: 500 },
+    ability: ability(
+      "biscuit-guard", "Biscuit Guard",
+      "Raises a protective biscuit shell around himself to gain a Shield.",
+      290, "self", "single", { effect: "shield" },
+    ),
+    assetPath: "/assets/characters/cracker.png",
+  },
+  {
+    id: "katakuri",
+    name: "Katakuri",
+    cost: 4,
+    traits: ["big-mom-pirates", "brawler"],
+    stats: { health: 1_060, attack: 86, defense: 32, specialDefense: 30, range: 2, attackIntervalMs: 1_000, moveIntervalMs: 400 },
+    ability: ability(
+      "mochi-barrage", "Mochi Barrage",
+      "Strikes the nearest enemy and foes in line behind them for Physical damage, then Locks survivors for 1.25 seconds.",
+      305, "nearest-enemy", "line", { damageType: "physical", lockMs: 1_250 },
+    ),
+    assetPath: "/assets/characters/katakuri.png",
+  },
+  {
+    id: "big-mom",
+    name: "Big Mom",
+    cost: 5,
+    traits: ["big-mom-pirates", "emperor", "captain"],
+    stats: { health: 1_250, attack: 93, defense: 40, specialDefense: 38, range: 2, attackIntervalMs: 1_150, moveIntervalMs: 500 },
+    ability: ability(
+      "ikoku-sovereignty", "Ikoku Sovereignty",
+      "Sends a shockwave through the nearest enemy and foes in line behind them, dealing Special damage and knocking back survivors.",
+      375, "nearest-enemy", "line", { damageType: "special", signatureMechanics: [{ kind: "knockback" }] },
+    ),
+    assetPath: "/assets/characters/big-mom.png",
   },
 ];
 
@@ -1278,6 +1330,26 @@ export const FORM_DEFINITIONS: UnitFormDefinition[] = [
 
 export const TRAIT_DEFINITIONS: TraitDefinition[] = [
   {
+    id: "big-mom-pirates",
+    name: "Big Mom Pirates",
+    category: "origin",
+    description: "Sweet Resolve protects crew members who survive a hit at 30% Health or below.",
+    tiers: [
+      {
+        required: 2,
+        effects: [{ kind: "emergency-shield-percent", value: 14 }],
+        effectScope: "holders",
+        label: "Big Mom Pirates: 14% Max HP emergency Shield",
+      },
+      {
+        required: 4,
+        effects: [{ kind: "emergency-shield-percent", value: 25 }, { kind: "defense-flat", value: 12 }],
+        effectScope: "holders",
+        label: "Big Mom Pirates: 25% Max HP emergency Shield, +12 Defense and Special Defense",
+      },
+    ],
+  },
+  {
     id: "kid-pirates",
     name: "Kid Pirates",
     category: "origin",
@@ -1428,6 +1500,16 @@ export const TRAIT_DEFINITIONS: TraitDefinition[] = [
         effectScope: "holders",
         behaviors: [{ kind: "start-navy-formation-shield", shieldPerAdjacentHolder: 70, adjacentHolderCap: 2 }],
         label: "Trait holders: +28 Defense, 100 Shield; +70 Shield per adjacent Navy holder",
+      },
+      {
+        required: 5,
+        effects: [
+          { kind: "defense-flat", value: 38 },
+          { kind: "shield-flat", value: 145 },
+        ],
+        effectScope: "holders",
+        behaviors: [{ kind: "start-navy-formation-shield", shieldPerAdjacentHolder: 90, adjacentHolderCap: 2 }],
+        label: "Trait holders: +38 Defense, 145 Shield; +90 Shield per adjacent Navy holder",
       },
     ],
   },
@@ -1590,6 +1672,20 @@ export const TRAIT_DEFINITIONS: TraitDefinition[] = [
         behaviors: [{ kind: "first-captain-cast-command", energy: 10 }],
         label: "Crew-wide: 225 starting Shield; first Captain cast grants all allies 10 Energy",
       },
+      {
+        required: 5,
+        effects: [{ kind: "shield-flat", value: 300 }],
+        effectScope: "team",
+        behaviors: [{ kind: "first-captain-cast-command", energy: 13 }],
+        label: "Crew-wide: 300 starting Shield; first Captain cast grants all allies 13 Energy",
+      },
+      {
+        required: 7,
+        effects: [{ kind: "shield-flat", value: 390 }],
+        effectScope: "team",
+        behaviors: [{ kind: "first-captain-cast-command", energy: 16 }],
+        label: "Crew-wide: 390 starting Shield; first Captain cast grants all allies 16 Energy",
+      },
     ],
   },
   {
@@ -1725,6 +1821,16 @@ export const TRAIT_DEFINITIONS: TraitDefinition[] = [
         effectScope: "holders",
         behaviors: [{ kind: "post-specialist-cast-energy", energy: 10 }],
         label: "Trait holders: +45% Ability Power, +15 starting Energy; casts refund 10 Energy",
+      },
+      {
+        required: 6,
+        effects: [
+          { kind: "ability-power-percent", value: 55 },
+          { kind: "starting-energy", value: 20 },
+        ],
+        effectScope: "holders",
+        behaviors: [{ kind: "post-specialist-cast-energy", energy: 12 }],
+        label: "Trait holders: +55% Ability Power, +20 starting Energy; casts refund 12 Energy",
       },
     ],
   },
@@ -3064,7 +3170,7 @@ export const FOOD_DEFINITIONS: NonNullable<GameContent["foods"]> = [
 ];
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.40.0",
+  version: "1.41.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,

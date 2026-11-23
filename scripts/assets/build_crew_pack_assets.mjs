@@ -13,6 +13,10 @@ const packs = {
     ids: ["heat", "wire", "shachi", "penguin", "jean-bart"],
     traits: ["kid-pirates", "heart-pirates"],
   },
+  "b15-big-mom-pirates": {
+    ids: ["pudding", "cracker", "katakuri", "big-mom"],
+    traits: ["big-mom-pirates"],
+  },
 };
 const packId = process.argv[2];
 if (!Object.hasOwn(packs, packId)) throw new Error(`Unknown crew asset pack: ${packId}`);

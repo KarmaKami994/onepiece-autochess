@@ -19,18 +19,20 @@ const matrixPath = path.join(
 );
 const fishManCrewIds = new Set(["hatchan", "kuroobi", "fisher-tiger"]);
 const minkCrewIds = new Set(["bepo", "carrot", "pedro", "pekoms"]);
-const pirateCrewIds = new Set(["heat", "wire", "shachi", "penguin", "jean-bart"]);
+const pirateCrewIds = new Set(["heat", "wire", "shachi", "penguin", "jean-bart", "pudding", "cracker", "katakuri", "big-mom"]);
 const curatedCrewIds = new Set([...fishManCrewIds, ...minkCrewIds, ...pirateCrewIds]);
 const crewIds = [
   "ace",
   "akainu",
   "bepo",
+  "big-mom",
   "blackbeard",
   "brook",
   "buggy",
   "capone-bege",
   "carrot",
   "chopper",
+  "cracker",
   "crocodile",
   "doflamingo",
   "fisher-tiger",
@@ -42,6 +44,7 @@ const crewIds = [
   "ivankov",
   "jean-bart",
   "jinbe",
+  "katakuri",
   "kid",
   "killer",
   "kizaru",
@@ -56,6 +59,7 @@ const crewIds = [
   "pedro",
   "pekoms",
   "penguin",
+  "pudding",
   "robin",
   "sabo",
   "sanji",

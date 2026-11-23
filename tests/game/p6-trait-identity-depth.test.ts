@@ -228,6 +228,10 @@ const expectedTraits: Record<
     behaviors: TraitBehavior[];
   }> }
 > = {
+  "big-mom-pirates": { category: "origin", tiers: [
+    { required: 2, scope: "holders", effects: [{ kind: "emergency-shield-percent", value: 14 }], behaviors: [] },
+    { required: 4, scope: "holders", effects: [{ kind: "emergency-shield-percent", value: 25 }, { kind: "defense-flat", value: 12 }], behaviors: [] },
+  ] },
   "kid-pirates": { category: "origin", tiers: [
     { required: 2, scope: "holders", effects: [{ kind: "attack-percent", value: 6 }], behaviors: [] },
     { required: 4, scope: "holders", effects: [{ kind: "attack-percent", value: 12 }, { kind: "attack-speed-percent", value: 8 }], behaviors: [] },
@@ -253,6 +257,7 @@ const expectedTraits: Record<
   navy: { category: "origin", tiers: [
     { required: 2, scope: "holders", effects: [{ kind: "defense-flat", value: 14 }], behaviors: [{ kind: "start-navy-formation-shield", shieldPerAdjacentHolder: 40, adjacentHolderCap: 2 }] },
     { required: 3, scope: "holders", effects: [{ kind: "defense-flat", value: 28 }, { kind: "shield-flat", value: 100 }], behaviors: [{ kind: "start-navy-formation-shield", shieldPerAdjacentHolder: 70, adjacentHolderCap: 2 }] },
+    { required: 5, scope: "holders", effects: [{ kind: "defense-flat", value: 38 }, { kind: "shield-flat", value: 145 }], behaviors: [{ kind: "start-navy-formation-shield", shieldPerAdjacentHolder: 90, adjacentHolderCap: 2 }] },
   ] },
   warlord: { category: "origin", tiers: [
     { required: 2, scope: "holders", effects: [{ kind: "omnivamp-percent", value: 8 }, { kind: "starting-energy", value: 10 }], behaviors: [{ kind: "on-warlord-kill-sustain", healMaxHealthPercent: 6, energy: 10 }] },
@@ -278,6 +283,8 @@ const expectedTraits: Record<
   captain: { category: "role", tiers: [
     { required: 2, scope: "team", effects: [{ kind: "shield-flat", value: 100 }], behaviors: [{ kind: "first-captain-cast-command", energy: 5 }] },
     { required: 3, scope: "team", effects: [{ kind: "shield-flat", value: 225 }], behaviors: [{ kind: "first-captain-cast-command", energy: 10 }] },
+    { required: 5, scope: "team", effects: [{ kind: "shield-flat", value: 300 }], behaviors: [{ kind: "first-captain-cast-command", energy: 13 }] },
+    { required: 7, scope: "team", effects: [{ kind: "shield-flat", value: 390 }], behaviors: [{ kind: "first-captain-cast-command", energy: 16 }] },
   ] },
   brawler: { category: "role", tiers: [
     { required: 2, scope: "holders", effects: [{ kind: "max-health-percent", value: 6 }, { kind: "attack-speed-percent", value: 4 }], behaviors: [{ kind: "every-n-direct-damage-counter", every: 10, attackDamagePercent: 50 }] },
@@ -297,6 +304,7 @@ const expectedTraits: Record<
   specialist: { category: "role", tiers: [
     { required: 2, scope: "holders", effects: [{ kind: "ability-power-percent", value: 20 }], behaviors: [{ kind: "post-specialist-cast-energy", energy: 5 }] },
     { required: 4, scope: "holders", effects: [{ kind: "ability-power-percent", value: 45 }, { kind: "starting-energy", value: 15 }], behaviors: [{ kind: "post-specialist-cast-energy", energy: 10 }] },
+    { required: 6, scope: "holders", effects: [{ kind: "ability-power-percent", value: 55 }, { kind: "starting-energy", value: 20 }], behaviors: [{ kind: "post-specialist-cast-energy", energy: 12 }] },
   ] },
   guardian: { category: "role", tiers: [
     { required: 2, scope: "holders", effects: [{ kind: "defense-flat", value: 15 }, { kind: "shield-flat", value: 90 }], behaviors: [{ kind: "first-direct-hit-guard-point", shield: 60, runeProtectMs: 2_000 }] },
@@ -318,7 +326,7 @@ describe("P6 trait content and scope", () => {
         behaviors: tier.behaviors ?? [],
       }))).toEqual(expected.tiers);
     }
-    expect(DEFAULT_CONTENT.version).toBe("1.40.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.41.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 
@@ -329,6 +337,28 @@ describe("P6 trait content and scope", () => {
     ]);
     expect(getActiveTraitEffectGrants(active).filter((grant) => grant.traitId === "straw-hat"))
       .toEqual([{ traitId: "straw-hat", scope: "team", effect: { kind: "max-health-percent", value: 10 } }]);
+  });
+
+  it("reaches Big Mom Pirates 4 without Big Mom and counts Pekoms for Minks", () => {
+    const active = getActiveTraitsForUnits(
+      ["pekoms", "pudding", "cracker", "katakuri", "carrot"].map(definitionId => ({ definitionId })),
+    );
+    expect(active.find(trait => trait.traitId === "big-mom-pirates")).toMatchObject({ count: 4, tier: { required: 4 } });
+    expect(active.find(trait => trait.traitId === "minks")).toMatchObject({ count: 2, tier: { required: 2 } });
+  });
+
+  it.each([
+    { traitId: "captain", required: 5 },
+    { traitId: "captain", required: 7 },
+    { traitId: "navy", required: 5 },
+    { traitId: "specialist", required: 6 },
+  ])("reaches $traitId $required with natural holders and without Big Mom", ({ traitId, required }) => {
+    const crew = DEFAULT_CONTENT.units
+      .filter(unit => unit.id !== "big-mom" && unit.traits.includes(traitId))
+      .slice(0, required)
+      .map(unit => ({ definitionId: unit.id }));
+    const active = getActiveTraitsForUnits(crew).find(trait => trait.traitId === traitId);
+    expect(active).toMatchObject({ count: required, tier: { required } });
   });
 
   it("applies crew-wide effects to allies and representative holder effects only to holders", () => {
@@ -366,7 +396,7 @@ describe("P6 trait content and scope", () => {
       tier: trait.tiers[0],
     }));
     const views = createTraitViews(active, DEFAULT_CONTENT);
-    expect(views).toHaveLength(17);
+    expect(views).toHaveLength(18);
     expect(views.every((view) => view.semanticDescription.includes(view.scopeLabel))).toBe(true);
     expect(views.filter(view => view.staticEffects.length === 0).map(view => view.id).sort())
       .toEqual(["fish-man", "minks"]);

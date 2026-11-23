@@ -40,6 +40,7 @@ export function itemVisual(itemId: string, fallbackGlyph = "◆"): VisualDefinit
 }
 
 export const TRAIT_VISUALS = {
+  "big-mom-pirates": { imagePath: "/assets/traits/big-mom-pirates.svg", fallbackGlyph: "♛", color: "#f499b7" },
   "kid-pirates": { imagePath: "/assets/traits/kid-pirates.svg", fallbackGlyph: "⚒", color: "#e28062" },
   "heart-pirates": { imagePath: "/assets/traits/heart-pirates.svg", fallbackGlyph: "♥", color: "#efd66e" },
   "fish-man": { imagePath: "/assets/traits/fish-man.svg", fallbackGlyph: "≈", color: "#58cdc0" },

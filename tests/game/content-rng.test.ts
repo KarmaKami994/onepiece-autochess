@@ -12,6 +12,22 @@ import {
 } from "../../game";
 
 describe("canonical game content", () => {
+  it("adds the four B15 pool keys when resuming a B14 voyage without advancing the shop RNG", () => {
+    const recruits = { pudding: 27, cracker: 18, katakuri: 14, "big-mom": 10 };
+    const saved = createMatch("b15-big-mom-pool-backfill", {
+      ...DEFAULT_CONTENT,
+      version: "1.40.0",
+      units: DEFAULT_CONTENT.units.filter(unit => !Object.hasOwn(recruits, unit.id)).map(unit =>
+        unit.id === "pekoms" ? { ...unit, traits: ["minks", "guardian"] } : unit,
+      ),
+      traits: DEFAULT_CONTENT.traits.filter(trait => trait.id !== "big-mom-pirates"),
+    });
+    const restored = migrateMatchState(saved, DEFAULT_CONTENT);
+    expect(restored).toMatchObject({ schemaVersion: 6, contentVersion: "1.41.0", rngState: saved.rngState });
+    expect(restored.players.map(player => player.shop)).toEqual(saved.players.map(player => player.shop));
+    expect(restored.pool).toEqual({ ...saved.pool, ...recruits });
+  });
+
   it("adds the five B14 pool keys to a B13 save without changing the existing shop or RNG", () => {
     const newIds = new Set(["heat", "wire", "shachi", "penguin", "jean-bart"]);
     const saved = createMatch("b14-crews-pool-backfill", {
@@ -21,7 +37,7 @@ describe("canonical game content", () => {
       traits: DEFAULT_CONTENT.traits.filter(trait => !["kid-pirates", "heart-pirates"].includes(trait.id)),
     });
     const restored = migrateMatchState(saved, DEFAULT_CONTENT);
-    expect(restored).toMatchObject({ schemaVersion: 6, contentVersion: "1.40.0", rngState: saved.rngState });
+    expect(restored).toMatchObject({ schemaVersion: 6, contentVersion: "1.41.0", rngState: saved.rngState });
     expect(restored.players.map(player => player.shop)).toEqual(saved.players.map(player => player.shop));
     expect(restored.pool).toEqual({ ...saved.pool, heat: 22, wire: 27, shachi: 22, penguin: 27, "jean-bart": 18 });
   });
@@ -35,7 +51,7 @@ describe("canonical game content", () => {
       traits: DEFAULT_CONTENT.traits.filter(trait => trait.id !== "minks"),
     });
     const restored = migrateMatchState(saved, DEFAULT_CONTENT);
-    expect(restored).toMatchObject({ schemaVersion: 6, contentVersion: "1.40.0", rngState: saved.rngState });
+    expect(restored).toMatchObject({ schemaVersion: 6, contentVersion: "1.41.0", rngState: saved.rngState });
     expect(restored.players.map(player => player.shop)).toEqual(saved.players.map(player => player.shop));
     expect(restored.pool).toEqual({ ...saved.pool, bepo: 22, carrot: 22, pedro: 18, pekoms: 27 });
   });
@@ -107,6 +123,10 @@ describe("canonical game content", () => {
       "shachi",
       "penguin",
       "jean-bart",
+      "pudding",
+      "cracker",
+      "katakuri",
+      "big-mom",
     ]);
     expect(DEFAULT_CONTENT.units.map((unit) => unit.cost)).toEqual([
       1, 1, 1, 1, 1, 1,
@@ -117,8 +137,9 @@ describe("canonical game content", () => {
       1, 2, 3,
       2, 2, 3, 1,
       2, 1, 2, 1, 3,
+      1, 3, 4, 5,
     ]);
-    expect(DEFAULT_CONTENT.traits).toHaveLength(17);
+    expect(DEFAULT_CONTENT.traits).toHaveLength(18);
     expect(DEFAULT_CONTENT.items).toHaveLength(65);
     expect(DEFAULT_CONTENT.enemies).toHaveLength(29);
     expect(
@@ -191,8 +212,13 @@ describe("canonical game content", () => {
       "Emergency Rescue",
       "Covering Guard",
       "Iron Bodyguard",
+      "Memory Edit",
+      "Biscuit Guard",
+      "Mochi Barrage",
+      "Ikoku Sovereignty",
     ]);
     expect(DEFAULT_CONTENT.traits.map((trait) => trait.name)).toEqual([
+      "Big Mom Pirates",
       "Kid Pirates",
       "Heart Pirates",
       "Minks",
