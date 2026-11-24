@@ -889,13 +889,15 @@ kbd {
 }
 
 .phase-clock {
-  position: relative;
-  display: flex;
+  --clock-track: #311b1f;
+  --clock-fill: #f2cd65;
+  display: grid;
+  grid-template: "label number" 1fr "track track" 4px / minmax(0, 1fr) auto;
+  min-width: 110px;
   height: 48px;
-  padding: 5px 17px;
+  padding: 5px 10px;
   align-items: center;
-  justify-content: center;
-  gap: 13px;
+  gap: 3px 9px;
   border: 2px solid #a67a3a;
   background: #081e27;
   box-shadow: inset 0 0 0 2px #172e33;
@@ -915,39 +917,38 @@ kbd {
 .harbor-screen .reward-card:disabled, .starter-recruitment-screen .reward-card:disabled { opacity: .5; cursor: not-allowed; filter: grayscale(.8); }
 .harbor-screen .reward-rays, .starter-recruitment-screen .reward-rays { pointer-events: none; }
 
-.phase-clock span {
-  max-width: 110px;
+.phase-clock-label {
+  grid-area: label;
   color: #d4bc88;
   font: 900 11px/1.2 "Courier New", monospace;
   letter-spacing: 0.1em;
 }
 
 .phase-clock strong {
+  grid-area: number;
   color: #f2cd65;
   font: 900 25px/1 "Courier New", monospace;
   font-variant-numeric: tabular-nums;
 }
 
-.phase-clock i {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: 3px;
-  background: linear-gradient(
-    90deg,
-    var(--gold) calc(var(--timer) * 100%),
-    #311b1f calc(var(--timer) * 100%)
-  );
+.phase-clock-track {
+  grid-area: track;
+  align-self: stretch;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--clock-track);
+}
+
+.phase-clock-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--clock-fill);
 }
 
 .phase-clock.is-warning {
+  --clock-fill: #ec766a;
   border-color: #db5b56;
-  animation: clock-warning 650ms steps(2, end) infinite;
-}
-
-@keyframes clock-warning {
-  50% { background: #3b2024; }
 }
 
 .topbar-tools {

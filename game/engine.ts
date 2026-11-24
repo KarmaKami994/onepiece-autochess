@@ -22,6 +22,7 @@ import {
   KOBY_TRAINING_BATTLES_REQUIRED,
   reconcileProductionFormProgression,
   resolvePersistentFormId,
+  resolveUnitDefinition,
 } from "./forms";
 import { hashSeed, randomInt, shuffleDeterministic } from "./rng";
 import { getActiveTraits, getEffectiveUnitTraits } from "./traits";
@@ -611,6 +612,32 @@ function recordKobyTraining(state: MatchState, content: GameContent): void {
   }
 }
 
+function fillOpenDeploymentSlots(player: PlayerState, content: GameContent): void {
+  let openSlots = player.level - boardUnitCount(player);
+  if (openSlots <= 0) return;
+  const { boardHeight, boardWidth, deployRows } = content.config;
+  const front = boardHeight - deployRows;
+  const columns = Array.from({ length: boardWidth }, (_, index) => index);
+  const frontToBack = Array.from({ length: deployRows }, (_, index) => front + index);
+  const backToFront = [...frontToBack].reverse();
+  const middle = frontToBack[Math.floor(deployRows / 2)];
+  const middleFirst = [middle, ...backToFront.filter(row => row !== middle)];
+
+  for (const id of player.bench) {
+    if (openSlots <= 0) break;
+    const unit = id ? player.units[id] : undefined;
+    if (!unit) continue;
+    const definition = resolveUnitDefinition(unit.definitionId, resolvePersistentFormId(unit, content), content);
+    if (!definition) continue;
+    // As in PAC, reach chooses front, middle, or back first. Within a row use left to right.
+    const rows = definition.stats.range <= 1 ? frontToBack : definition.stats.range === 2 ? middleFirst : backToFront;
+    const row = rows.find(y => columns.some(x => !player.board[cellKey(x, y)]));
+    if (row === undefined) break;
+    const x = columns.find(column => !player.board[cellKey(column, row)]);
+    if (x !== undefined && !moveUnit(player, unit.id, { zone: "board", x, y: row }, content)) openSlots -= 1;
+  }
+}
+
 function beginBattle(
   state: MatchState,
   content: GameContent,
@@ -621,6 +648,9 @@ function beginBattle(
     prepareVoyageRecruitOffers(next, content);
     autoChooseBotVoyageRecruits(next, content);
     return next;
+  }
+  for (const player of next.players) {
+    if (player.alive && !player.isBot) fillOpenDeploymentSlots(player, content);
   }
   freezeBattleMeals(next, content);
   if (stage.kind === "pve") {

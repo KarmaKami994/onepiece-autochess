@@ -45,6 +45,33 @@ function resolveEliminationBatch(
   return advanceMatchPhase(state);
 }
 
+describe("automatic preparation deployment", () => {
+  it.each(["END_PREPARATION", "TIMER_EXPIRED"] as const)("fills human slots in bench order on %s before freezing combat", (type) => {
+    const state = createMatch("auto-deploy-bench-order");
+    const player = state.players[0];
+    player.level = 4;
+    for (const bot of state.players.slice(1)) bot.alive = false;
+    for (const [index, definitionId] of ["koby", "zoro", "katakuri", "nami", "chopper"].entries()) {
+      player.units[definitionId] = { id: definitionId, definitionId, star: 1, items: [], acquiredOrder: index + 1 };
+      state.pool[definitionId] -= 1;
+    }
+    player.board = { "0,3": "koby" };
+    player.bench.splice(1, 4, "zoro", "katakuri", "nami", "chopper");
+    const result = applyCommand(state, { type }, PLAYER_CONTEXT);
+    if (!result.ok) throw new Error(result.error.message);
+
+    expect(result.state.phase).toBe("battle");
+    expect(result.state.players[0].board).toEqual({ "0,3": "koby", "1,3": "zoro", "0,4": "katakuri", "0,5": "nami" });
+    expect(result.state.players[0].bench.filter(Boolean)).toEqual(["chopper"]);
+    expect(result.state.lastResults[0].initialUnits.filter(unit => unit.teamId === player.id).map(unit => unit.definitionId).sort())
+      .toEqual(["katakuri", "koby", "nami", "zoro"]);
+    expect(result.state.players[0].gold).toBe(player.gold);
+    expect(result.state.pool).toEqual(state.pool);
+    expect(result.state.rngState).toBe(state.rngState);
+    expect(player.board).toEqual({ "0,3": "koby" });
+  });
+});
+
 describe("pairing and bots", () => {
   it("pairs deterministically and creates one harmless ghost when odd", () => {
     const state = createMatch("odd-pairing");

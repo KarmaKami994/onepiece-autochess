@@ -23,6 +23,11 @@ function preparation(state: MatchState, round: number): MatchState {
 describe("Koby — Honesty Impact", () => {
   it("counts four deployments, freezes the fourth battle as base Koby and starts the next battle in form", () => {
     const { state, playerId, kobyId, reserveId } = fixture();
+    const player = state.players[0];
+    const ally = addUnitToPlayer(state, player, "nami", DEFAULT_CONTENT);
+    if (!ally) throw new Error("Could not fill the deployed crew.");
+    player.bench[player.bench.indexOf(ally.id)] = null;
+    player.board["2,4"] = ally.id;
     const opponent = state.players[1];
     const roundFour = { playerAId: playerId, playerBId: opponent.id, ghostOfPlayerId: null };
     let active = state;

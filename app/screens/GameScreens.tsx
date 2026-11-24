@@ -8,6 +8,7 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
 import { KOBY_TRAINING_BATTLES_REQUIRED } from "@/game";
+import { copiesForStar } from "@/game/state";
 import {
   type BoardMove,
   type BoardInteractionMode,
@@ -593,6 +594,7 @@ export function SettingsScreen({
           <span><kbd>R</kbd> Reroll</span>
           <span><kbd>L</kbd> Lock</span>
           <span><kbd>X</kbd> Buy XP</span>
+          <span><kbd>S</kbd> Sell selected crew</span>
           <span><kbd>Enter</kbd> Start / skip battle</span>
           <span><kbd>Esc</kbd> Menu</span>
         </div>
@@ -678,7 +680,7 @@ export function MatchScreen({
   onReroll,
   onToggleLock,
   onBuyXp,
-  onSellSelected,
+  onSellUnit,
   onEquipItem,
   onServeFood,
   onChangeSettings,
@@ -709,7 +711,7 @@ export function MatchScreen({
   onReroll: () => void;
   onToggleLock: () => void;
   onBuyXp: () => void;
-  onSellSelected: () => void;
+  onSellUnit: (unitId: string) => boolean;
   onEquipItem: (itemId: string) => void;
   onServeFood: (foodId: string) => void;
   onChangeSettings: (settings: Settings) => void;
@@ -875,6 +877,14 @@ export function MatchScreen({
           reducedMotion={settings.reducedMotion}
           onMoveUnit={onMoveUnit}
           onSelectUnit={observing ? () => undefined : onSelectUnit}
+          sell={hidden || observing || !economyPhase || tutorialStep !== null ? undefined : {
+            priceFor(unit) {
+              const definition = tacticalDefinitions.get(unit.id);
+              const star = unit.star === 2 || unit.star === 3 ? unit.star : 1;
+              return definition ? definition.cost * copiesForStar(star) : undefined;
+            },
+            submit: onSellUnit,
+          }}
         />
         <div className="left-rail">
           <PacTraits traits={tacticalTraits} units={tacticalUnits} definitions={tacticalDefinitions} itemsById={view.itemsById} onHighlight={(id, units) => setTraitHighlight(current => units ? { id, units } : current?.id === id ? null : current)} />
@@ -997,7 +1007,7 @@ export function MatchScreen({
               allowSell={tutorialStep === null}
               quickMove={planning && !scouting ? quickMove : null}
               onClose={() => { setHoveredUnitId(null); onSelectUnit(null); }}
-              onSell={onSellSelected}
+              onSell={() => { if (selectedUnit) onSellUnit(selectedUnit.id); }}
               onMove={() => quickMove && onMoveUnit(quickMove)}
             />
           </div>)}
@@ -1862,9 +1872,10 @@ function UnitInspector({
                 className="sell-button"
                 onClick={onSell}
                 disabled={!allowSell}
+                aria-keyshortcuts="S"
                 title={
                   allowSell
-                    ? "Sell this unit and return its equipped treasure"
+                    ? "Sell this unit and return its equipped treasure (S)"
                     : "Selling unlocks after the first-voyage guide"
                 }
               >
