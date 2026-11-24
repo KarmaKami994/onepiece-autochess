@@ -23,14 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-B15 is implemented locally on `codex/b15-big-mom-pirates`, based on B14 commit `8fe7e86`. GameContent `1.41.0`, save schema 6, 50 playable recruits, 18 traits and 10 forms. See [B15](docs/B15_BIG_MOM_PIRATES.md).
-
-B14 is implemented locally on `codex/b14-kid-and-heart-pirates`, based on the B13 PR head `0db153d`. GameContent `1.40.0`, save schema 6, 46 playable recruits, 17 traits and 10 forms. The local handoff is in [B14](docs/B14_KID_AND_HEART_PIRATES.md).
-
-B13 is implemented on `codex/b13-minks-crew-and-trait-tiers` from `b417bb2` and under review in [PR #79](https://github.com/KarmaKami994/onepiece-autochess/pull/79). GameContent `1.39.0`, save schema 6, 41 playable recruits, 15 traits and 10 forms. The remaining B14–B16 roadmap targets 55 recruits and 18 traits. See [B13](docs/B13_MINKS_AND_TRAIT_TIERS.md) and [the batch plan](docs/ROSTER_AUSBAU_BATCHES_13_16.md).
+B16 completes the roster expansion from B13 through B16. GameContent `1.42.0`, save schema 6, 55 playable recruits, 18 traits and 10 forms. The batches are delivered together through [PR #79](https://github.com/KarmaKami994/onepiece-autochess/pull/79). See the [batch plan](docs/ROSTER_AUSBAU_BATCHES_13_16.md) and the [B16 handoff](docs/B16_WHOLE_CAKE_PIRATES.md).
 
 ## Last Completed Work
 
+- 2026-11-23 — B16 adds Perospero, Smoothie, Oven, Brûlée and Daifuku, plus Big Mom Pirates 6/9, Brawler 8, Specialist 8 and Swordsman 7. The Homie strike is authoritative and presented in live combat and Chronicle. Material files cover content and combat, replay validation and visual selectors, runtime sprite packages, source provenance and focused tests.
 - 2026-11-23 — B15 adds Pudding, Cracker, Katakuri and Big Mom with four supplied Treasure Cruise sprite packages. Pekoms gains Big Mom Pirates 2/4 alongside Minks, and Captain 5/7, Navy 5 and Specialist 6 extend existing trait effects. Material files cover `game/content.ts`, the visual manifests, four asset packages and provenance, the crew asset exporter, content/trait/save/asset/browser fixtures, and the B15 handoff.
 - 2026-11-23 — B14 adds Heat, Wire, Shachi, Penguin and Jean Bart from three owner-supplied Treasure Cruise sheets. Kid Pirates and Heart Pirates have 2/4 tiers. Supernova, Marksman and Guardian gain their 5-member tiers. Material changes cover content, five sprite packages, two trait icons, visual manifests, the crew exporter, content/trait/save/asset/browser test fixtures, and B14 documentation.
 - 2026-11-20 — PR #79 CI coverage follow-up splits the two existing three-seed simulations in `tests/production-audit.test.ts` into separately timed fixtures and assertions. The test retains both three-seed runs, exact report equality and the existing 30-second per-case limit.
@@ -140,6 +137,8 @@ B13 is implemented on `codex/b13-minks-crew-and-trait-tiers` from `b417bb2` and 
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+B16 — Sprite export PASS. Focused trait, save and replay tests PASS, 89/89. Focused browser verification and normal PR CI are reported as they finish. No separate local production run or new baseline.
 
 B15 — `npm run assets:b15` generated all four runtime sprite packages and the output hash manifest. NOT RUN for tests, typecheck, lint, build, asset validation, browser checks, CI and production runs. Checks and publication remain deferred.
 
@@ -885,6 +884,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- B16 counts nine deployed Big Mom Pirates without requiring Big Mom. Tier 9 triggers one Homie Special strike per team on the fourth distinct completed cast. Five recruits join the shared pool, and the existing schema-6 loader backfills their keys.
 - B15 adds four shared-pool recruits and a holder-scoped emergency Shield at Big Mom Pirates 2/4. The four-member tier is reachable without Big Mom. Captain, Navy and Specialist gain additional tiers. The schema-6 load path fills missing pool keys for the new recruits.
 - B14 adds five recruits and holder-scoped Kid Pirates and Heart Pirates bonuses using the existing trait engine. Kid, Killer, Law and Bepo gain crew membership. Supernova, Marksman and Guardian have new 5-member bonuses. Existing saves fill missing pool entries through schema 6.
 - B13 adds four shared-pool definitions and three later tiers with the existing entry bonuses retained. Minks deals 35/70 base Special damage once per fighter after their first damaging ability hit when the target survives. The replay records the bonus as trait damage. Loading an older schema-6 save fills only missing pool keys.
@@ -964,6 +964,8 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- The four batches were implemented on separate branches and use the existing PR #79 for a single squash delivery, as requested.
+- B16 uses a generated Daifuku pose board because the surveyed sprite catalogues lacked a suitable combat sheet. The other four recruits use original Treasure Cruise sheets.
 - B15 is stacked on the local B14 commit. The handoff stays local while checks and publication are deferred.
 - B14 is stacked on the B13 PR head. The owner deferred checks, so the handoff is local.
 - The four previously isolated batches share one squash handoff at the highest reserved content version, `1.38.0`. Punk Rotten uses the new three-piece sprite because the surveyed original sheets lacked the complete form.
@@ -1042,6 +1044,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- B16 expands the number of recruits competing for shop draws in bands 1–4. The authored combat values are covered by focused regressions and have no separate balance baseline.
 - B15 Treasure Cruise contributor credits are unconfirmed. Frame maps use pose holds where the sources lack separate transitions. More recruits in four cost bands change individual availability at existing shop odds.
 - B14 Treasure Cruise #3632 and #1006 contributor credits are unconfirmed. The two duo sheets use individual recoil or braced holds where separate defeat poses are unavailable.
 - B13 Treasure Cruise PNGs have no printed contributor credit. Source links, owner-supplied bytes and hashes are recorded. The three affected cost bands have greater roster variety at existing shop odds.
@@ -1164,7 +1167,7 @@ Final current-roster high-cost identity pack:
 
 ## Next Recommended Task
 
-Review the stacked B14 and B15 handoffs once checks are approved. B16 remains a separate task.
+Finish the squash handoff for the roster expansion once B16's focused and GitHub checks are green.
 
 ## Codex Update Contract
 

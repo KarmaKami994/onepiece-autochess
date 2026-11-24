@@ -6,6 +6,26 @@ This non-commercial, localhost-only fan prototype has both original generated pr
 
 On `2026-08-14`, the project owner explicitly attested in the project conversation that the initial 17 listed source sheets may be used, adapted, and distributed in this public collaboration repository. Later source additions record their own permission basis in `art/animation-v2/source-matrix.json`. An owner attestation is not independent verification of chain of title; a Sprite Database URL is not treated as permission, and this repository grants no downstream asset license. The MIT license applies to code only. Reuse, redistribution, or commercialization of franchise or imported art requires its own appropriate rights clearance.
 
+## B16 Whole Cake Pirates — 2026-11-23
+
+The four Treasure Cruise sheets use the established project-owner attestation. Their asset pages credit Redtarp as uploader. Daifuku uses a new ImageGen pose board based on the character reference, with the six poses cropped into the usual offline clips. The optional movement and defeat holds use the available source poses.
+
+| Atlas | Source or design reference | Project input | Input SHA-256 | Atlas SHA-256 |
+| --- | --- | --- | --- | --- |
+| `perospero-v2` | [#2240 - Perospero - Eldest Son of the Charlotte Family](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/275583/) | `art/licensed-reference/b16-whole-cake-pirates/perospero.png` | `1cabe7ad7a54a050b6902e84ef818461837a0f0b084ae2474bbefd7ad4cc5df8` | `22f3e2a3177d44a4776fc4b6ac3547ca443209e7674e3caa445657f4acff43e1` |
+| `smoothie-v2` | [#2238 - General Smoothie - Big Mom Pirates](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/269158/) | `art/licensed-reference/b16-whole-cake-pirates/smoothie.png` | `1fa9b18e10d002235a4ff45ff8056cd06025f8a55ffa923efd48e5b6d28e89e9` | `b7884820a20051e35160e282187d3cf3e1b2e77e16126c43e5b9a48f3503166e` |
+| `oven-v2` | [#2121 - Charlotte Oven - Big Mom Pirates](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/269153/) | `art/licensed-reference/b16-whole-cake-pirates/oven.png` | `2e5ffcbfe7c160284e89e9cd87e854190ddce078b06c3a06e63255c8a6c17656` | `9296bee09d605133756d43e407e9c3da5052d7f4444ba67f579d61354c407159` |
+| `brulee-v2` | [#2800 - Charlotte Brulee - Little Sister Taking Care of Her Brother](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/232759/) | `art/licensed-reference/b16-whole-cake-pirates/brulee.png` | `4ac614bb6a273526eb5369d07e42fce9d4d6b4b9351456c1e26ec5de5cac0782` | `73cf1e71a2c9cd37fb2b3a4c2a52e13ddd86cc39bf4383b46319b397f1c08d5e` |
+| `daifuku-v2` | [Daifuku design reference](https://one-piece.com/character/Charlotte_Daifuku/index.html) | `art/production/b16-whole-cake-pirates/daifuku-master.png` | `051e1ac8ecde1d156c770db9613e985d1aa2525a80ef4fead67a36d8b451567b` | `a0afdbd4a809e8cf2ae469ddb0e75f0c693686b8b9ed90ccc81cd399ee86d1a4` |
+
+The Homie strike uses a single ImageGen illustration of [Zeus](https://one-piece.com/character/Zeus/index.html), [Prometheus](https://one-piece.com/character/Prometheus/index.html) and [Napoleon](https://one-piece.com/character/Napoleon/index.html). The runtime texture is `public/assets/effects/homie-attack.png` with SHA-256 `76e432703138122198c2d4c3e2c90178afb9557f527aca3e3d5fb93ec8fda64a`. The source image, runtime sprites and effect hashes are listed in `art/production/b16-whole-cake-pirates/outputs.json`. The source matrix records exact dimensions and frame-map hashes. Rebuild offline with `npm run assets:b16`.
+
+- Final asset: `public/assets/characters/perospero.png`
+- Final asset: `public/assets/characters/smoothie.png`
+- Final asset: `public/assets/characters/oven.png`
+- Final asset: `public/assets/characters/brulee.png`
+- Final asset: `public/assets/characters/daifuku.png`
+
 ## B15 Big Mom Pirates — 2026-11-23
 
 The project owner supplied four original One Piece: Treasure Cruise PNGs under the established project permission. The sheets carry no printed rip credits. Contributor attribution remains unconfirmed. The frame maps use the original combat poses and hold available poses where the sheet has no separate transition.

@@ -32,6 +32,11 @@ const v1CharacterSlugs = [
 ];
 const characterSlugs = [
   ...v1CharacterSlugs,
+  "brulee",
+  "daifuku",
+  "oven",
+  "perospero",
+  "smoothie",
   "akainu",
   "bepo",
   "big-mom",

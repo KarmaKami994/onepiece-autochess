@@ -1433,7 +1433,7 @@ export function simulateBattle(
   const teamTraitRuntime = new Map(
     [teamA.id, teamB.id].map((teamId) => [
       teamId,
-      { strawHatRallyUsed: false, captainCommandUsed: false },
+      { strawHatRallyUsed: false, captainCommandUsed: false, homieCasters: new Set<string>(), homieAttackUsed: false },
     ]),
   );
   const tidalGuardUsed = new Set<MutableBattleUnit>();
@@ -2722,6 +2722,31 @@ export function simulateBattle(
     }
   };
 
+  const applyHomieAttack = (tick: number, source: MutableBattleUnit): void => {
+    const runtime = teamTraitRuntime.get(source.teamId);
+    if (!runtime || runtime.homieAttackUsed || !hasEffectiveTrait(source, "big-mom-pirates")) return;
+    const behavior = traitBehavior(source.teamId, "big-mom-pirates", "fourth-distinct-cast-homie-attack");
+    if (behavior?.kind !== "fourth-distinct-cast-homie-attack") return;
+    runtime.homieCasters.add(source.definitionId);
+    if (runtime.homieCasters.size !== 4) return;
+    runtime.homieAttackUsed = true;
+
+    const enemies = units.filter(unit => unit.teamId !== source.teamId && alive(unit));
+    const center = chooseTarget(source, enemies);
+    if (!center) return;
+    const targets = enemies.filter(unit => distance(center, unit) <= 1)
+      .sort((left, right) => left.id.localeCompare(right.id));
+    emit({
+      type: "homie-attack",
+      tick,
+      sourceId: source.id,
+      targetId: center.id,
+      targetIds: targets.map(unit => unit.id),
+      center: { x: center.x, y: center.y },
+    });
+    for (const target of targets) applyDamage(tick, source, target, behavior.power, "trait", "special");
+  };
+
   const applyPostCastTraitBehaviors = (
     tick: number,
     source: MutableBattleUnit,
@@ -3698,6 +3723,7 @@ export function simulateBattle(
         }
       }
       applyPostCastTraitBehaviors(tick, source);
+      applyHomieAttack(tick, source);
       const previousForm = source.formId;
       const nextForm = previousForm === DARKNESS_FORM_ID && abilityDefinition.id === "black-hole"
         ? QUAKE_FORM_ID

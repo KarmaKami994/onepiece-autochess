@@ -108,6 +108,11 @@ const V2_IDLE_VISUAL_TOP_PX: Record<string, number> = {
   cracker: 46,
   katakuri: 54,
   "big-mom": 34,
+  perospero: 43,
+  smoothie: 43,
+  oven: 42,
+  brulee: 40,
+  daifuku: 38,
   "marine-recruit": 8,
   "rifle-marine": 9,
   "pirate-raider": 8,
@@ -292,6 +297,11 @@ export const CREW_V2_ANIMATIONS = {
   cracker: crewV2Definition("cracker"),
   katakuri: crewV2Definition("katakuri"),
   "big-mom": crewV2Definition("big-mom"),
+  perospero: crewV2Definition("perospero"),
+  smoothie: crewV2Definition("smoothie"),
+  oven: crewV2Definition("oven"),
+  brulee: crewV2Definition("brulee"),
+  daifuku: crewV2Definition("daifuku"),
 } as const satisfies Record<string, CrewAnimationDefinition>;
 
 function pveV2Definition(
@@ -479,6 +489,11 @@ const CREW_VARIANT_OVERRIDES: Partial<Record<string, CrewAnimationDefinition[]>>
   cracker: [CREW_V2_ANIMATIONS.cracker],
   katakuri: [CREW_V2_ANIMATIONS.katakuri],
   "big-mom": [CREW_V2_ANIMATIONS["big-mom"]],
+  perospero: [CREW_V2_ANIMATIONS.perospero],
+  smoothie: [CREW_V2_ANIMATIONS.smoothie],
+  oven: [CREW_V2_ANIMATIONS.oven],
+  brulee: [CREW_V2_ANIMATIONS.brulee],
+  daifuku: [CREW_V2_ANIMATIONS.daifuku],
 };
 
 export function resolveAnimationCandidates(

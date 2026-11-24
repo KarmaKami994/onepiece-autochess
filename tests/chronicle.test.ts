@@ -50,7 +50,7 @@ describe("B04 bounded non-authoritative recording", () => {
     steps[0].players[0].gold = 999;
     expect(replay.frames[0].players[0].gold).not.toBe(999);
     expect(observeVoyage(replay, steps[2], 999)).toBe(replay);
-    expect(DEFAULT_CONTENT.version).toBe("1.41.0"); expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
+    expect(DEFAULT_CONTENT.version).toBe("1.42.0"); expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 
   it("replaces same-phase snapshots but preserves original battle fighters through live economy", () => {
@@ -93,6 +93,27 @@ describe("B04 bounded non-authoritative recording", () => {
 });
 
 describe("B04 untrusted replay boundaries and retention", () => {
+  it("round-trips a Homie strike and projects its center correctly for either captain", () => {
+    const replay = completed();
+    const frame = replay.frames[1];
+    const battle = frame.battles[0];
+    const source = battle.initialUnits[0];
+    const target = battle.initialUnits[1];
+    const center = { x: target.x, y: target.y };
+    battle.events.splice(1, 0, { type: "homie-attack", tick: 0, sourceId: source.id, targetId: target.id, targetIds: [target.id], center });
+    const parsed = parseReplay(JSON.stringify(replay), DEFAULT_CONTENT);
+    expect(parsed).toEqual(replay);
+    const state = replayFrameState(parsed, parsed.frames[1], DEFAULT_CONTENT);
+    expect(selectBattlePresentation(state, battle.playerAId)?.events).toContainEqual(expect.objectContaining({ kind: "homie-attack", to: center }));
+    expect(selectBattlePresentation(state, frame.players[1].id)?.events).toContainEqual(expect.objectContaining({
+      kind: "homie-attack", to: { x: DEFAULT_CONTENT.config.boardWidth - 1 - center.x, y: DEFAULT_CONTENT.config.boardHeight - 1 - center.y },
+    }));
+    const homies = battle.events.find(event => event.type === "homie-attack");
+    if (!homies) throw new Error("Missing Homie attack fixture.");
+    homies.targetIds.push("missing-fighter");
+    expect(() => validateReplay(replay, DEFAULT_CONTENT)).toThrow("Unknown battle event target");
+  });
+
   it("round-trips the Electro trait damage event alongside existing combat events", () => {
     const replay = completed();
     const battle = replay.frames[1].battles[0];

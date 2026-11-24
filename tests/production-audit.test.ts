@@ -201,7 +201,7 @@ describe("three-seed normalized production report", () => {
       "36",
       "40",
     ]);
-    expect(Object.keys(report.characterPresence)).toHaveLength(50);
+    expect(Object.keys(report.characterPresence)).toHaveLength(55);
     expect(Object.keys(report.costBands)).toEqual(["1", "2", "3", "4", "5"]);
     expect(Object.keys(report.shopPoolAvailability.byCost)).toEqual([
       "1",
@@ -210,7 +210,7 @@ describe("three-seed normalized production report", () => {
       "4",
       "5",
     ]);
-    expect(Object.keys(report.characterCombatExpression)).toHaveLength(50);
+    expect(Object.keys(report.characterCombatExpression)).toHaveLength(55);
     expect(report.characterPresence["robin-demonio-fleur"]).toBeUndefined();
     expect(
       report.characterCombatExpression["chopper-monster-point"],

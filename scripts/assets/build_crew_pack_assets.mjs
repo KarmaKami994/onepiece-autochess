@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
@@ -16,6 +16,10 @@ const packs = {
   "b15-big-mom-pirates": {
     ids: ["pudding", "cracker", "katakuri", "big-mom"],
     traits: ["big-mom-pirates"],
+  },
+  "b16-whole-cake-pirates": {
+    ids: ["perospero", "smoothie", "oven", "brulee", "daifuku"],
+    traits: [],
   },
 };
 const packId = process.argv[2];
@@ -47,6 +51,17 @@ for (const id of ids) {
   await writeStaticSprite(id, "characters", idle, 512, 768, 448, 704);
   await writeStaticSprite(id, "portraits", idle, 320, 320, 270, 300);
   await writeStaticSprite(id, "tokens", idle, 160, 160, 128, 146);
+}
+
+if (packId === "b16-whole-cake-pirates") {
+  const filename = "public/assets/effects/homie-attack.png";
+  const master = `art/production/${packId}/homie-attack-master.png`;
+  await mkdir(path.join(root, "public/assets/effects"), { recursive: true });
+  await sharp(path.join(root, master))
+    .trim({ background: "#00000000" })
+    .resize(106, 59, { fit: "contain", background: "#00000000", kernel: "nearest" })
+    .png({ palette: true, colours: 256, dither: 0 }).toFile(path.join(root, filename));
+  outputPaths.push(master, filename);
 }
 
 const outputs = await Promise.all(outputPaths.sort().map(async filename => ({

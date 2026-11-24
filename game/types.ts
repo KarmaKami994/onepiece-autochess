@@ -138,6 +138,7 @@ export type TraitBehavior =
   | { kind: "first-straw-hat-cast-rally"; energy: number }
   | { kind: "first-ability-knockback-tidal-guard"; shield: number; shareWithAdjacentAllies: boolean }
   | { kind: "first-ability-hit-electro"; power: number }
+  | { kind: "fourth-distinct-cast-homie-attack"; power: number }
   | {
       kind: "start-navy-formation-shield";
       shieldPerAdjacentHolder: number;
@@ -847,6 +848,14 @@ export type BattleEvent =
       hitCount: number;
       /** True only when the conditional final-hit damage bonus was applied. */
       finisher: boolean;
+    }
+  | {
+      type: "homie-attack";
+      tick: number;
+      sourceId: string;
+      targetId: string;
+      targetIds: string[];
+      center: Position;
     }
   | {
       type: "damage";

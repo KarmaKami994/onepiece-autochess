@@ -1156,6 +1156,17 @@ function combatEvents(
         finisher: event.finisher,
       }];
     }
+    if (event.type === "homie-attack") {
+      return [{
+        id,
+        tick: event.tick,
+        kind: "homie-attack",
+        sourceId: event.sourceId,
+        targetId: event.targetId,
+        targetIds: event.targetIds,
+        to: point(event.center),
+      }];
+    }
     if (event.type === "damage") {
       return [{
         id,

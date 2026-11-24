@@ -20,7 +20,8 @@ const matrixPath = path.join(
 const fishManCrewIds = new Set(["hatchan", "kuroobi", "fisher-tiger"]);
 const minkCrewIds = new Set(["bepo", "carrot", "pedro", "pekoms"]);
 const pirateCrewIds = new Set(["heat", "wire", "shachi", "penguin", "jean-bart", "pudding", "cracker", "katakuri", "big-mom"]);
-const curatedCrewIds = new Set([...fishManCrewIds, ...minkCrewIds, ...pirateCrewIds]);
+const wholeCakeCrewIds = ["brulee", "daifuku", "oven", "perospero", "smoothie"];
+const curatedCrewIds = new Set([...fishManCrewIds, ...minkCrewIds, ...pirateCrewIds, ...wholeCakeCrewIds]);
 const crewIds = [
   "ace",
   "akainu",
@@ -28,12 +29,14 @@ const crewIds = [
   "big-mom",
   "blackbeard",
   "brook",
+  "brulee",
   "buggy",
   "capone-bege",
   "carrot",
   "chopper",
   "cracker",
   "crocodile",
+  "daifuku",
   "doflamingo",
   "fisher-tiger",
   "franky",
@@ -56,9 +59,11 @@ const crewIds = [
   "law",
   "mihawk",
   "nami",
+  "oven",
   "pedro",
   "pekoms",
   "penguin",
+  "perospero",
   "pudding",
   "robin",
   "sabo",
@@ -66,6 +71,7 @@ const crewIds = [
   "shachi",
   "shanks",
   "smoker",
+  "smoothie",
   "tashigi",
   "usopp",
   "whitebeard",
@@ -313,9 +319,14 @@ describe("animation v2 asset pipeline", () => {
     }
 
     for (const entry of crew) {
-      expect(entry.permission.status).toBe("confirmed");
-      expect(entry.source.contributor).toBeTruthy();
-      if (curatedCrewIds.has(entry.id)) {
+      const authored = entry.id === "daifuku";
+      expect(entry.permission.status).toBe(authored ? "project-owned" : "confirmed");
+      if (!authored) expect(entry.source.contributor).toBeTruthy();
+      if (authored) {
+        expect(entry.source.strategy).toBe("authored-frame-map");
+        const map = await readFile(path.join(projectRoot, entry.source.frameMap!));
+        expect(sha256(map)).toBe(entry.source.frameMapSha256);
+      } else if (curatedCrewIds.has(entry.id)) {
         expect(entry.permission.note).toContain(fishManCrewIds.has(entry.id) ? "2026-11-18" : "Project-owner attestation");
         expect(entry.source.strategy).toBe("licensed-frame-map");
         const map = await readFile(path.join(projectRoot, entry.source.frameMap!));
@@ -326,7 +337,7 @@ describe("animation v2 asset pipeline", () => {
         expect(entry.source.frameMap).toBe("auto:connected-components-v1");
         expect(entry.source.contributorBasis).toContain("file page read");
       }
-      expect(entry.source.derivedFrameMap).toBe(
+      if (!authored) expect(entry.source.derivedFrameMap).toBe(
         `public/assets/animations/${entry.outputAssetKey}/${entry.outputAssetKey}.json#frames`,
       );
       const source = await readFile(path.join(projectRoot, entry.source.localPath));
@@ -346,12 +357,13 @@ describe("animation v2 asset pipeline", () => {
     )) {
       const metadata = await expectRuntimeBundle(entry);
       const curated = curatedCrewIds.has(entry.id);
+      const authored = entry.id === "daifuku";
       expect(metadata).toMatchObject({
         schemaVersion: 2,
-        pipeline: curated ? "licensed-frame-map-v1" : "auto-connected-components-v1",
+        pipeline: authored ? "authored-frame-map-v1" : curated ? "licensed-frame-map-v1" : "auto-connected-components-v1",
         sourceSha256: entry.source.sha256,
         ...(curated ? {} : { sourcePage: entry.source.sheetUrl, contributor: entry.source.contributor }),
-        permission: { status: "confirmed" },
+        permission: { status: authored ? "project-owned" : "confirmed" },
         frameCount: 46,
         frame: { destinationPivot: { x: 64, y: 116 } },
       });

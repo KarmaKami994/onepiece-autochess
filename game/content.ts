@@ -1116,6 +1116,71 @@ export const UNIT_DEFINITIONS: UnitDefinition[] = [
     ),
     assetPath: "/assets/characters/big-mom.png",
   },
+  {
+    id: "perospero",
+    name: "Perospero",
+    cost: 2,
+    traits: ["big-mom-pirates", "specialist"],
+    stats: { health: 685, attack: 56, defense: 18, specialDefense: 25, range: 3, attackIntervalMs: 1_200, moveIntervalMs: 500 },
+    ability: ability(
+      "candy-lock", "Candy Lock",
+      "Hardens candy around the nearest enemy, dealing Special damage and Locking them for 2 seconds.",
+      165, "nearest-enemy", "single", { damageType: "special", lockMs: 2_000 },
+    ),
+    assetPath: "/assets/characters/perospero.png",
+  },
+  {
+    id: "smoothie",
+    name: "Smoothie",
+    cost: 4,
+    traits: ["big-mom-pirates", "swordsman"],
+    stats: { health: 1_000, attack: 90, defense: 28, specialDefense: 31, range: 2, attackIntervalMs: 1_100, moveIntervalMs: 450 },
+    ability: ability(
+      "juice-blade", "Juice Blade",
+      "Slashes the nearest enemy and foes behind them for Physical damage, bypassing 15% of their Defense.",
+      350, "nearest-enemy", "line", { damageType: "physical", defensePiercePercent: 15 },
+    ),
+    assetPath: "/assets/characters/smoothie.png",
+  },
+  {
+    id: "oven",
+    name: "Oven",
+    cost: 3,
+    traits: ["big-mom-pirates", "brawler"],
+    stats: { health: 980, attack: 76, defense: 28, specialDefense: 32, range: 1, attackIntervalMs: 1_150, moveIntervalMs: 500 },
+    ability: ability(
+      "heat-wave", "Heat Wave",
+      "Scorches the nearest enemy and adjacent foes with Special damage and Burns survivors for 2 seconds.",
+      220, "nearest-enemy", "adjacent", { damageType: "special", burnPower: 24, burnDurationMs: 2_000 },
+    ),
+    assetPath: "/assets/characters/oven.png",
+  },
+  {
+    id: "brulee",
+    name: "Brûlée",
+    cost: 1,
+    traits: ["big-mom-pirates", "specialist"],
+    stats: { health: 580, attack: 44, defense: 12, specialDefense: 22, range: 3, attackIntervalMs: 1_250, moveIntervalMs: 500 },
+    ability: ability(
+      "mirror-shelter", "Mirror Shelter",
+      "Shields the ally in reach with the lowest remaining health percentage.",
+      155, "lowest-health-ally", "single", { effect: "shield" },
+    ),
+    assetPath: "/assets/characters/brulee.png",
+  },
+  {
+    id: "daifuku",
+    name: "Daifuku",
+    cost: 3,
+    traits: ["big-mom-pirates", "brawler"],
+    stats: { health: 890, attack: 74, defense: 24, specialDefense: 25, range: 2, attackIntervalMs: 1_100, moveIntervalMs: 450 },
+    ability: ability(
+      "genie-sweep", "Genie Sweep",
+      "Calls on his genie to sweep through the nearest enemy and adjacent foes for Physical damage.",
+      245, "nearest-enemy", "adjacent", { damageType: "physical" },
+    ),
+    assetPath: "/assets/characters/daifuku.png",
+  },
 ];
 
 export const FORM_DEFINITIONS: UnitFormDefinition[] = [
@@ -1346,6 +1411,19 @@ export const TRAIT_DEFINITIONS: TraitDefinition[] = [
         effects: [{ kind: "emergency-shield-percent", value: 25 }, { kind: "defense-flat", value: 12 }],
         effectScope: "holders",
         label: "Big Mom Pirates: 25% Max HP emergency Shield, +12 Defense and Special Defense",
+      },
+      {
+        required: 6,
+        effects: [{ kind: "emergency-shield-percent", value: 33 }, { kind: "defense-flat", value: 20 }],
+        effectScope: "holders",
+        label: "Big Mom Pirates: 33% Max HP emergency Shield, +20 Defense and Special Defense",
+      },
+      {
+        required: 9,
+        effects: [{ kind: "emergency-shield-percent", value: 42 }, { kind: "defense-flat", value: 28 }],
+        effectScope: "holders",
+        behaviors: [{ kind: "fourth-distinct-cast-homie-attack", power: 220 }],
+        label: "Big Mom Pirates: 42% Max HP emergency Shield, +28 Defense and Special Defense; Homie attack",
       },
     ],
   },
@@ -1724,6 +1802,16 @@ export const TRAIT_DEFINITIONS: TraitDefinition[] = [
         behaviors: [{ kind: "every-n-direct-damage-counter", every: 10, attackDamagePercent: 90 }],
         label: "Trait holders: +30% Max HP, +22% Attack Speed; every 10th direct hit counters for 90% Attack",
       },
+      {
+        required: 8,
+        effects: [
+          { kind: "max-health-percent", value: 36 },
+          { kind: "attack-speed-percent", value: 26 },
+        ],
+        effectScope: "holders",
+        behaviors: [{ kind: "every-n-direct-damage-counter", every: 10, attackDamagePercent: 105 }],
+        label: "Trait holders: +36% Max HP, +26% Attack Speed; every 10th direct hit counters for 105% Attack",
+      },
     ],
   },
   {
@@ -1758,6 +1846,15 @@ export const TRAIT_DEFINITIONS: TraitDefinition[] = [
         ],
         effectScope: "holders",
         label: "Trait holders: +48% Critical Chance and +65% Critical Power",
+      },
+      {
+        required: 7,
+        effects: [
+          { kind: "critical-chance-percent", value: 58 },
+          { kind: "critical-power-percent", value: 85 },
+        ],
+        effectScope: "holders",
+        label: "Trait holders: +58% Critical Chance and +85% Critical Power",
       },
     ],
   },
@@ -1831,6 +1928,16 @@ export const TRAIT_DEFINITIONS: TraitDefinition[] = [
         effectScope: "holders",
         behaviors: [{ kind: "post-specialist-cast-energy", energy: 12 }],
         label: "Trait holders: +55% Ability Power, +20 starting Energy; casts refund 12 Energy",
+      },
+      {
+        required: 8,
+        effects: [
+          { kind: "ability-power-percent", value: 65 },
+          { kind: "starting-energy", value: 25 },
+        ],
+        effectScope: "holders",
+        behaviors: [{ kind: "post-specialist-cast-energy", energy: 15 }],
+        label: "Trait holders: +65% Ability Power, +25 starting Energy; casts refund 15 Energy",
       },
     ],
   },
@@ -3170,7 +3277,7 @@ export const FOOD_DEFINITIONS: NonNullable<GameContent["foods"]> = [
 ];
 
 export const DEFAULT_CONTENT: GameContent = {
-  version: "1.41.0",
+  version: "1.42.0",
   units: UNIT_DEFINITIONS,
   forms: FORM_DEFINITIONS,
   traits: TRAIT_DEFINITIONS,

@@ -10,7 +10,7 @@ import {
   type CrewAnimationDefinition,
   type CrewAnimationState,
 } from "./crewAnimationManifest";
-import { battleVfx } from "./battleVfx";
+import { battleVfx, HOMIE_ATTACK_TEXTURE } from "./battleVfx";
 import {
   getBoardMapDefinition,
   type BoardSkin,
@@ -119,6 +119,7 @@ export type CombatFxEvent = {
     | "attack"
     | "cast"
     | "ability-hit"
+    | "homie-attack"
     | "damage"
     | "heal"
     | "shield"
@@ -494,6 +495,7 @@ export default function PhaserBoard({
           }
 
           preload() {
+            this.load.image(HOMIE_ATTACK_TEXTURE, "/assets/effects/homie-attack.png");
             this.load.image(
               initialAssets.map.textureKey,
               initialAssets.map.assetPath,
@@ -2134,6 +2136,14 @@ export default function PhaserBoard({
                   );
 
                 this.payload.units.forEach((unit) => refreshStatuses(unit.id, event.tick));
+
+                if (event.kind === "homie-attack" && event.to) {
+                  const at = boardCellCenter(event.to.x, event.to.y);
+                  showCastName(target ?? source, "Zeus · Prometheus · Napoleon");
+                  battleVfx.homieAttack(this, { at, speed, reducedMotion: reduceMotion });
+                  battleVfx.telegraph(this, { from: at, targets: targets.length ? targets : [at], shape: "area", color: 0xf2b759, speed, reducedMotion: reduceMotion });
+                  return;
+                }
 
                 if (event.kind === "transform" && source) {
                   this.presentedForms.set(event.unitId ?? event.sourceId ?? "", event.toFormId);

@@ -158,7 +158,7 @@ describe("combat resource bars", () => {
     const definitions = ALL_UNIT_ANIMATION_DEFINITIONS.filter(
       (definition) => definition.version === "v2",
     );
-    expect(definitions).toHaveLength(147);
+    expect(definitions).toHaveLength(152);
     for (const assetKey of ["koala-b10-v2", "kaido-b10-v2", "robin-demonio-fleur-b10-v2", "luffy-gear-4-boundman-b11-v2", "luffy-gear-4-snakeman-b11-v2", "chopper-monster-point-b11-v2"]) {
       expect(definitions.some((definition) => definition.assetKey === assetKey)).toBe(true);
     }

@@ -1,0 +1,110 @@
+[
+  {
+    "path": "art/production/b16-whole-cake-pirates/homie-attack-master.png",
+    "sha256": "a8f6409058e5d7ce5bfb0b08ef853bab9da605d3b25660967b5a87c8961e4218"
+  },
+  {
+    "path": "public/assets/animations/brulee-v2/brulee-v2.json",
+    "sha256": "80aa257f8db3e897b3c6b883636ac6f275ca7da081d66b9ed394beb67f503bb0"
+  },
+  {
+    "path": "public/assets/animations/brulee-v2/brulee-v2.png",
+    "sha256": "73cf1e71a2c9cd37fb2b3a4c2a52e13ddd86cc39bf4383b46319b397f1c08d5e"
+  },
+  {
+    "path": "public/assets/animations/daifuku-v2/daifuku-v2.json",
+    "sha256": "aee8849a0461c315ccb598b8d789cd610e1c5bc1d215096a05c29a8b8217de81"
+  },
+  {
+    "path": "public/assets/animations/daifuku-v2/daifuku-v2.png",
+    "sha256": "a0afdbd4a809e8cf2ae469ddb0e75f0c693686b8b9ed90ccc81cd399ee86d1a4"
+  },
+  {
+    "path": "public/assets/animations/oven-v2/oven-v2.json",
+    "sha256": "861d1d4f52b3c906470a0414ea70324786c3a28bb2aadf23f15a1b2f61a22c8a"
+  },
+  {
+    "path": "public/assets/animations/oven-v2/oven-v2.png",
+    "sha256": "9296bee09d605133756d43e407e9c3da5052d7f4444ba67f579d61354c407159"
+  },
+  {
+    "path": "public/assets/animations/perospero-v2/perospero-v2.json",
+    "sha256": "13c5d7695358e8e9a2a7d6bfc788143ee2c012b900dcde2a404bdc69eb11b49d"
+  },
+  {
+    "path": "public/assets/animations/perospero-v2/perospero-v2.png",
+    "sha256": "22f3e2a3177d44a4776fc4b6ac3547ca443209e7674e3caa445657f4acff43e1"
+  },
+  {
+    "path": "public/assets/animations/smoothie-v2/smoothie-v2.json",
+    "sha256": "a541f5173c5356ee3cd0ff3c74983a73ba794cbe6ba6682f2dec1c8c90a6f355"
+  },
+  {
+    "path": "public/assets/animations/smoothie-v2/smoothie-v2.png",
+    "sha256": "b7884820a20051e35160e282187d3cf3e1b2e77e16126c43e5b9a48f3503166e"
+  },
+  {
+    "path": "public/assets/characters/brulee.png",
+    "sha256": "36baffe2c46f425265b5229f7d345c5b8bba6ecbc439de4fe2a3a1aabf8918fa"
+  },
+  {
+    "path": "public/assets/characters/daifuku.png",
+    "sha256": "b5c6a445c84679b56d48933829904ccbe528bde7c309b6fd516b702c0191a8ee"
+  },
+  {
+    "path": "public/assets/characters/oven.png",
+    "sha256": "b7304c02953ec57a89cbd758cde2f50da5c972a5f02998d98d23532280248c7d"
+  },
+  {
+    "path": "public/assets/characters/perospero.png",
+    "sha256": "cb6573be1cd53c2e63f9949e6f7154da8704baea20b4fecb319f7a92662249fd"
+  },
+  {
+    "path": "public/assets/characters/smoothie.png",
+    "sha256": "2f805c3e3eefad05755998c27234f9b218e5e6c10830fa9df0d2f3052637fdd8"
+  },
+  {
+    "path": "public/assets/effects/homie-attack.png",
+    "sha256": "76e432703138122198c2d4c3e2c90178afb9557f527aca3e3d5fb93ec8fda64a"
+  },
+  {
+    "path": "public/assets/portraits/brulee.png",
+    "sha256": "af15d348dd6e72825d5347ee88256fa8d8dbab5cf040eccea6d357e59ff85f58"
+  },
+  {
+    "path": "public/assets/portraits/daifuku.png",
+    "sha256": "918521f27314f3a277a3d3d1d7ca7ed1a63a0c05ebbd65899ac538186c448c4f"
+  },
+  {
+    "path": "public/assets/portraits/oven.png",
+    "sha256": "919b34a3027f1b845af1bafcd1df14fc145eaf04490308317f484ed18cd5fb2f"
+  },
+  {
+    "path": "public/assets/portraits/perospero.png",
+    "sha256": "910cc68540859dab74454c2eb52e8bde044ca02df2028666a067e1a12a33199e"
+  },
+  {
+    "path": "public/assets/portraits/smoothie.png",
+    "sha256": "6e44c4d5a85a7d00cf8b619282df6e793f05441dcc61b7da210e18c53db9a1bc"
+  },
+  {
+    "path": "public/assets/tokens/brulee.png",
+    "sha256": "784fc8bc11d779dd8f30d7e896917702544c694ac06c63a367c709e05eb2ea98"
+  },
+  {
+    "path": "public/assets/tokens/daifuku.png",
+    "sha256": "d165774e94b7a1b5924c6a76e27c96a1daba9f32c58902643424ac0748420f71"
+  },
+  {
+    "path": "public/assets/tokens/oven.png",
+    "sha256": "b910ea327651cc7f1b53c68237ab71489b899ab3e2568a1da681474c410b04e0"
+  },
+  {
+    "path": "public/assets/tokens/perospero.png",
+    "sha256": "bd9f1614526798fc0b66a677c36afb87b1d495e31a2276572a12a2dbf69f0921"
+  },
+  {
+    "path": "public/assets/tokens/smoothie.png",
+    "sha256": "adafcb5a40464d60b9a8d54bec7c217bfdbe41404a62ca1eff44e7b0e1388d0d"
+  }
+]

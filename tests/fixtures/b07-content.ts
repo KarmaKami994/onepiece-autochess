@@ -9,6 +9,7 @@ export function b07ReferenceContent(): GameContent {
     "hatchan", "kuroobi", "fisher-tiger", "bepo", "carrot", "pedro", "pekoms",
     "heat", "wire", "shachi", "penguin", "jean-bart",
     "pudding", "cracker", "katakuri", "big-mom",
+    "perospero", "smoothie", "oven", "brulee", "daifuku",
   ]);
   const laterTraits = new Set(["fish-man", "minks", "kid-pirates", "heart-pirates", "big-mom-pirates"]);
   const laterForms = new Set([
