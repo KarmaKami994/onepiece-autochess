@@ -1,0 +1,86 @@
+[
+  {
+    "path": "public/assets/animations/big-mom-v2/big-mom-v2.json",
+    "sha256": "ca3fe8dc5eb8fe0e2aa1d4d47b12201f76afa658ad45fe09968d1b5250bc0e71"
+  },
+  {
+    "path": "public/assets/animations/big-mom-v2/big-mom-v2.png",
+    "sha256": "a5376869546116cca86b40b17d440d8989e20181864124490d242cdfedd2c1bc"
+  },
+  {
+    "path": "public/assets/animations/cracker-v2/cracker-v2.json",
+    "sha256": "34fa660209f1e3b47e4b1b64af32a42530bb283c6a261465873cd84cdf3321da"
+  },
+  {
+    "path": "public/assets/animations/cracker-v2/cracker-v2.png",
+    "sha256": "ae42c8b95a4d835a2c4f0515db4b478f57ee57bbfebe9227bfa6eebe36db209e"
+  },
+  {
+    "path": "public/assets/animations/katakuri-v2/katakuri-v2.json",
+    "sha256": "a4fdd2d9d652306fd9edde17bad2788b23318480b4aa24777b339b98d3030aae"
+  },
+  {
+    "path": "public/assets/animations/katakuri-v2/katakuri-v2.png",
+    "sha256": "f085f339e42f46008ca15b78ec300c863ab76d5e339b69871f842d7d4fd1f64a"
+  },
+  {
+    "path": "public/assets/animations/pudding-v2/pudding-v2.json",
+    "sha256": "108b117e49b1ad90b7996e4479c343c8407672d1f03e21d5ccfb4fa4a6ba1690"
+  },
+  {
+    "path": "public/assets/animations/pudding-v2/pudding-v2.png",
+    "sha256": "ef72e02bf46791bed82f87932df8835e9e4a761dd96fcca13e722b76eef97847"
+  },
+  {
+    "path": "public/assets/characters/big-mom.png",
+    "sha256": "910e27e1add1132e6c5dd9635b75c768cbaf8d5e60e04bbf83bc184b37db4a84"
+  },
+  {
+    "path": "public/assets/characters/cracker.png",
+    "sha256": "90a889d0b7f2f80eadf63802260fbc1c726d08eb36e7a0818fc16282ba6636dc"
+  },
+  {
+    "path": "public/assets/characters/katakuri.png",
+    "sha256": "e23705804371c4892450e717b28af283a6ecc46eb82355f1abd19b262c47d69f"
+  },
+  {
+    "path": "public/assets/characters/pudding.png",
+    "sha256": "c806feee35c2a0a26c93fca323fe7900ed6561bbb163f14ce30ef59c4242ddbb"
+  },
+  {
+    "path": "public/assets/portraits/big-mom.png",
+    "sha256": "cf569043a99a3ca7f6e83094887b6a52f2aa2c2b529b04f38a0f30cd5b8c0804"
+  },
+  {
+    "path": "public/assets/portraits/cracker.png",
+    "sha256": "e875cc8b70f24b2c744ec140397232c3ab0c3b834573a3620591534226d7ca0c"
+  },
+  {
+    "path": "public/assets/portraits/katakuri.png",
+    "sha256": "2bc7cecdf91563fd54e8a4222fad4abda23a4b0d7f814ff07b96644dcc6725fa"
+  },
+  {
+    "path": "public/assets/portraits/pudding.png",
+    "sha256": "05f350cdf13d70585c0288c152675d31dd381fe05dcdfa0282f8c346c04aa71b"
+  },
+  {
+    "path": "public/assets/tokens/big-mom.png",
+    "sha256": "7f9d7c3bd98e04829cf74997d223b850a6fa5f1297e333370686f23c073db38b"
+  },
+  {
+    "path": "public/assets/tokens/cracker.png",
+    "sha256": "85508398f5a9294a05c3d6eb0c8fe10003a6d2289ae72bda3ac5cd823b987e88"
+  },
+  {
+    "path": "public/assets/tokens/katakuri.png",
+    "sha256": "f814c54482756d73b99da8ade6dd60975bf32bc43e5db0b7e8b90de2ddb5cc6b"
+  },
+  {
+    "path": "public/assets/tokens/pudding.png",
+    "sha256": "c3a5f421986e8e5fae0c12900df35b5289fe85c9fc0c64f6e6a7ce0f1360d3fd"
+  },
+  {
+    "path": "public/assets/traits/big-mom-pirates.svg",
+    "sha256": "7828081253f087e477661cb478d78aefff93e79b180e9477f9684617e605876e"
+  }
+]

@@ -31,6 +31,7 @@ export function combatEventCue(event: CombatFxEvent, units: readonly CombatContr
   }
   if (event.kind === "transform") return `${name(event.unitId)}: ${event.label ?? "Transformation"}`;
   if (event.kind === "resurrect") return `${name(event.unitId)}: Phoenix resurrection`;
+  if (event.kind === "homie-attack") return `Zeus · Prometheus · Napoleon → ${(event.targetIds ?? []).map(name).join(", ")}`;
   if (event.kind === "status-end") return `${name(event.targetId)}: ${event.status} ended`;
   if (event.kind === "status" && ["poison", "freeze", "sleep", "locked"].includes(event.status ?? "")) return `${event.sourceId?.startsWith("environment:") ? "Board field" : name(event.sourceId)} → ${name(event.targetId)}: ${event.status}`;
   if (event.kind === "energy" && event.reason === "environment" && (event.energyDelta ?? 0) > 0) return `${name(event.targetId)}: +${event.energyDelta} Energy from ${event.sourceId?.split(":")[1] ?? "environment"}`;

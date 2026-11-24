@@ -1,13 +1,31 @@
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
-const ids = ["hatchan", "kuroobi", "fisher-tiger"];
-const outputPaths = ["public/assets/traits/fish-man.svg"];
+const packs = {
+  "fish-man-crew": { ids: ["hatchan", "kuroobi", "fisher-tiger"], traits: ["fish-man"] },
+  "b13-minks": { ids: ["bepo", "carrot", "pedro", "pekoms"], traits: ["minks"] },
+  "b14-pirate-crews": {
+    ids: ["heat", "wire", "shachi", "penguin", "jean-bart"],
+    traits: ["kid-pirates", "heart-pirates"],
+  },
+  "b15-big-mom-pirates": {
+    ids: ["pudding", "cracker", "katakuri", "big-mom"],
+    traits: ["big-mom-pirates"],
+  },
+  "b16-whole-cake-pirates": {
+    ids: ["perospero", "smoothie", "oven", "brulee", "daifuku"],
+    traits: [],
+  },
+};
+const packId = process.argv[2];
+if (!Object.hasOwn(packs, packId)) throw new Error(`Unknown crew asset pack: ${packId}`);
+const { ids, traits } = packs[packId];
+const outputPaths = traits.map(trait => `public/assets/traits/${trait}.svg`);
 const presentationOnly = process.argv.includes("--presentation-only");
 
 async function writeStaticSprite(id, directory, idle, width, height, maxWidth, maxHeight) {
@@ -35,8 +53,19 @@ for (const id of ids) {
   await writeStaticSprite(id, "tokens", idle, 160, 160, 128, 146);
 }
 
+if (packId === "b16-whole-cake-pirates") {
+  const filename = "public/assets/effects/homie-attack.png";
+  const master = `art/production/${packId}/homie-attack-master.png`;
+  await mkdir(path.join(root, "public/assets/effects"), { recursive: true });
+  await sharp(path.join(root, master))
+    .trim({ background: "#00000000" })
+    .resize(106, 59, { fit: "contain", background: "#00000000", kernel: "nearest" })
+    .png({ palette: true, colours: 256, dither: 0 }).toFile(path.join(root, filename));
+  outputPaths.push(master, filename);
+}
+
 const outputs = await Promise.all(outputPaths.sort().map(async filename => ({
   path: filename,
   sha256: createHash("sha256").update(await readFile(path.join(root, filename))).digest("hex"),
 })));
-await writeFile(path.join(root, "art/production/fish-man-crew/outputs.json"), `${JSON.stringify(outputs, null, 2)}\n`);
+await writeFile(path.join(root, `art/production/${packId}/outputs.json`), `${JSON.stringify(outputs, null, 2)}\n`);

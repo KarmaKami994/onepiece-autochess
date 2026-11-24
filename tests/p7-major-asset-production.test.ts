@@ -91,9 +91,9 @@ async function expectFile(relativePath: string): Promise<void> {
 
 describe("P7 major asset production", () => {
   it("completes real static and preferred v2 presentation for all crew", async () => {
-    expect(DEFAULT_CONTENT.version).toBe("1.38.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.42.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
-    expect(DEFAULT_CONTENT.units).toHaveLength(37);
+    expect(DEFAULT_CONTENT.units).toHaveLength(55);
     expect(DEFAULT_CONTENT.units.some((unit) =>
       unit.assetPath.endsWith("/placeholder.svg"),
     )).toBe(false);
@@ -165,7 +165,7 @@ describe("P7 major asset production", () => {
         : value,
     );
     expect(createHash("sha256").update(normalized).digest("hex"))
-      .toBe("b78bab5149aa9cad7f61fff9933126b1dabe53444693081dc33d065d5c69b923");
+      .toBe("d3ca838d0e687f1074c6e868a92a325bb51d90a8a6246c23a1bb133ca419468f");
   });
 
   it("maps all 65 item identities and preserves recipes and glyph fallback", async () => {
@@ -197,7 +197,7 @@ describe("P7 major asset production", () => {
   });
 
   it("maps all traits, statuses, and forms with explicit safe fallbacks", async () => {
-    expect(DEFAULT_CONTENT.traits).toHaveLength(14);
+    expect(DEFAULT_CONTENT.traits).toHaveLength(18);
     expect(Object.keys(TRAIT_VISUALS).sort()).toEqual(
       DEFAULT_CONTENT.traits.map((trait) => trait.id).sort(),
     );
@@ -236,7 +236,7 @@ describe("P7 major asset production", () => {
       `public/assets/forms/${id}/overlay.svg`,
     ]));
 
-    expect(files).toHaveLength(65 + 14 + 12 + 30);
+    expect(files).toHaveLength(65 + 18 + 12 + 30);
     for (const file of files) {
       const source = await readFile(path.join(projectRoot, file), "utf8");
       const lower = source.toLowerCase();

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" shape-rendering="crispEdges">
+  <title>Heart Pirates</title>
+  <path fill="#302637" d="M10 4h28v4h7v32h-7v4H10v-4H3V8h7z"/>
+  <path fill="#866941" d="M10 4h28v4h7v4h-4V8H7v4H3V8h7zm31 32h4v4h-7v4H10v-4H3v-4h4v4h34z"/>
+  <path fill="#ed9c56" d="M10 14h4v-3h6v3h8v-3h6v3h4v12h-4v4h-4v4h-4v4h-4v-4h-4v-4h-4v-4h-4z"/>
+  <path fill="#efd66e" d="M10 14h4v-3h6v3h8v-3h6v3h4v8h-4v4h-4v4H18v-4h-4v-4h-4z"/>
+  <path fill="#654448" d="M22 16h4v4h4v4h-4v4h-4v-4h-4v-4h4z"/>
+</svg>

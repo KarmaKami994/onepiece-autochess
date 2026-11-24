@@ -203,7 +203,7 @@ describe("Combat Identity Pack B content", () => {
     });
     expect(definition(DEFAULT_CONTENT, "kid")).toMatchObject({
       cost: 3,
-      traits: ["supernova", "captain"],
+      traits: ["supernova", "captain", "kid-pirates"],
       stats: {
         health: 920,
         attack: 78,
@@ -240,7 +240,7 @@ describe("Combat Identity Pack B content", () => {
         energyDrain: 15,
       },
     });
-    expect(DEFAULT_CONTENT.version).toBe("1.38.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.42.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 });

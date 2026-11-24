@@ -157,7 +157,7 @@ describe("Combat Identity Pack C content", () => {
   it("declares the four locked identities without changing base values", () => {
     expect(definition(DEFAULT_CONTENT, "law")).toMatchObject({
       cost: 4,
-      traits: ["supernova", "warlord", "captain"],
+      traits: ["supernova", "warlord", "captain", "heart-pirates"],
       stats: {
         health: 900,
         attack: 86,
@@ -235,7 +235,7 @@ describe("Combat Identity Pack C content", () => {
         signatureMechanics: [{ kind: "pull" }],
       },
     });
-    expect(DEFAULT_CONTENT.version).toBe("1.38.0");
+    expect(DEFAULT_CONTENT.version).toBe("1.42.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
   });
 });

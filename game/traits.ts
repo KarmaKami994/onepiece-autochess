@@ -179,6 +179,10 @@ export function describeTraitBehavior(behavior: TraitBehavior): string {
       return `First Straw Hat cast: living Straw Hat holders gain ${behavior.energy} Energy once per battle.`;
     case "first-ability-knockback-tidal-guard":
       return `First successful ability Knockback by each holder: gain ${behavior.shield} Shield.${behavior.shareWithAdjacentAllies ? ` Adjacent allies each gain ${behavior.shield} Shield.` : ""}`;
+    case "first-ability-hit-electro":
+      return `Each Mink's first damaging ability hit adds ${behavior.power} base Special damage if the target survives.`;
+    case "fourth-distinct-cast-homie-attack":
+      return `Once per battle, after four different Big Mom Pirates resolve a cast, Zeus, Prometheus and Napoleon deal ${behavior.power} base Special damage to the nearest enemy and adjacent foes.`;
     case "start-navy-formation-shield":
       return `Battle start: each Navy holder gains ${behavior.shieldPerAdjacentHolder} Shield per adjacent Navy holder, up to ${behavior.adjacentHolderCap}.`;
     case "on-warlord-kill-sustain":

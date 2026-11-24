@@ -30,7 +30,7 @@ function preparation() {
 
 test("all four icon families load in the real codex with unchanged names, recipes and no external requests", async ({ page }, info) => {
   await menu(page); await page.getByRole("button", { name: /CREW TOOLS/ }).click();
-  for (const [tab, family, count] of [["Items & recipes", "items", 65], ["Food & galley", "food", 3], ["Bonds", "traits", 14], ["Status", "status", 12]] as const) {
+  for (const [tab, family, count] of [["Items & recipes", "items", 65], ["Food & galley", "food", 3], ["Bonds", "traits", 18], ["Status", "status", 12]] as const) {
     await page.getByRole("button", { name: tab, exact: true }).click();
     const cards = page.locator(".reference-card"); await expect(cards).toHaveCount(count);
     for (let i = 0; i < count; i += 1) {

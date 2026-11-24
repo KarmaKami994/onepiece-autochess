@@ -1,0 +1,110 @@
+[
+  {
+    "path": "public/assets/animations/heat-v2/heat-v2.json",
+    "sha256": "621336772731b4a6654f570a859756cab9361c2965215848fec06b6eb037a6d1"
+  },
+  {
+    "path": "public/assets/animations/heat-v2/heat-v2.png",
+    "sha256": "12341aa49bee5c218c6c9fd4ca9646b718bb4a613484bd914dead1cd6288f34b"
+  },
+  {
+    "path": "public/assets/animations/jean-bart-v2/jean-bart-v2.json",
+    "sha256": "cabfea4972dd04bfaedf0f9dc7f431379bcc7d9b71823b02c0f685662998b106"
+  },
+  {
+    "path": "public/assets/animations/jean-bart-v2/jean-bart-v2.png",
+    "sha256": "aea9ed1ce6f45bdf64873bc47a941021fa93ccc63d25f1b1c951c0c6e193c81e"
+  },
+  {
+    "path": "public/assets/animations/penguin-v2/penguin-v2.json",
+    "sha256": "129a8b0da07c0797d5fc9ac5da0ad7b1e6e101d4de92c651a20e54239eb6a3c4"
+  },
+  {
+    "path": "public/assets/animations/penguin-v2/penguin-v2.png",
+    "sha256": "4bc9e1f1149fb617079661e859c0b98f664fb92ebe045fe716ee9c2c3c7809df"
+  },
+  {
+    "path": "public/assets/animations/shachi-v2/shachi-v2.json",
+    "sha256": "36977fe6c2109264f0be2fa748e06b50a774f242f7df0bfeb1aeac36b16536af"
+  },
+  {
+    "path": "public/assets/animations/shachi-v2/shachi-v2.png",
+    "sha256": "4e042635156a8497958387073251c5b88d81386ebb63304008540f2c721d02c9"
+  },
+  {
+    "path": "public/assets/animations/wire-v2/wire-v2.json",
+    "sha256": "b528b36cd190950c36c5f47f9f1d90b7a1c7295d24bdd8c7ee5b5d6431c8b927"
+  },
+  {
+    "path": "public/assets/animations/wire-v2/wire-v2.png",
+    "sha256": "758defb16b73fcb8d52fca5ebbf9515d8a8cb2fc694ea9432a115c92c905cb1e"
+  },
+  {
+    "path": "public/assets/characters/heat.png",
+    "sha256": "ad8844ae3e33dc7023ccc87966e0f60ad8782bed39f155a9e85c076caf5edc6d"
+  },
+  {
+    "path": "public/assets/characters/jean-bart.png",
+    "sha256": "30482e081b29f6bf4b0091949bfd33b40b93a1824da3a38cbed97d900750edec"
+  },
+  {
+    "path": "public/assets/characters/penguin.png",
+    "sha256": "6e02ef4edbf20f3dba07a407569298f8495db55ea67f7b779b9f4bcc17e3150b"
+  },
+  {
+    "path": "public/assets/characters/shachi.png",
+    "sha256": "78929a6e5f79a4b2dc63cef3ac07fd45a4be09be2acad77c0591205149db9c3f"
+  },
+  {
+    "path": "public/assets/characters/wire.png",
+    "sha256": "8497ac987d7de6f51c2197cbd8523f41a0c4af8526c4d9ad0b44ee62d8d0ceb6"
+  },
+  {
+    "path": "public/assets/portraits/heat.png",
+    "sha256": "2d160ea347c520c13867e7101910c794e5c9ea4a7f83d7a8ee39a9bee474dd35"
+  },
+  {
+    "path": "public/assets/portraits/jean-bart.png",
+    "sha256": "7b0a154c32f5b56050332df0b5d8fda2aaada4f83e0cc2c3ce5f404299b03972"
+  },
+  {
+    "path": "public/assets/portraits/penguin.png",
+    "sha256": "7a04929d382efa13b649389367b0b9555b574a8a1885f84fc3690814223b3c30"
+  },
+  {
+    "path": "public/assets/portraits/shachi.png",
+    "sha256": "393664571dec5aefcbe39420058a62334c4e3e7441bbac4cecb220fa6da192d9"
+  },
+  {
+    "path": "public/assets/portraits/wire.png",
+    "sha256": "ccb7ae1419978cbce023a3033dc80885de0322735185715e1c02a310d7b24d54"
+  },
+  {
+    "path": "public/assets/tokens/heat.png",
+    "sha256": "8755d4b537a84ffb145ea98abfde5362a3bc5d4b8935ebab5df7382e6f2b9395"
+  },
+  {
+    "path": "public/assets/tokens/jean-bart.png",
+    "sha256": "f653b1403714fee19e1711aa83d4fe1a4d6722a8d44c6dbc6070ccacbf0ab6f2"
+  },
+  {
+    "path": "public/assets/tokens/penguin.png",
+    "sha256": "c887f21127c3b5583d9020e34e86aa9b6a07338a4d0493b2f8da24198fc010c3"
+  },
+  {
+    "path": "public/assets/tokens/shachi.png",
+    "sha256": "0eea9f4729c1695c72402a638064f69d21de6736e35fbb9ff66e68f5836f09b8"
+  },
+  {
+    "path": "public/assets/tokens/wire.png",
+    "sha256": "b83f66738381203d7a71d1c76666672d7c30e288d498c2cb7c013ea9649ac960"
+  },
+  {
+    "path": "public/assets/traits/heart-pirates.svg",
+    "sha256": "2c50e56ec3af90367e501f040cb9b1f00932d78df42c5e4ff29f659b98c980aa"
+  },
+  {
+    "path": "public/assets/traits/kid-pirates.svg",
+    "sha256": "36511adfe96df25d2a2e5c768b3692f778966e1d77bde08c6788739c6fd505c3"
+  }
+]

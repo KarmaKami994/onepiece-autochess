@@ -325,14 +325,14 @@ describe("Roster Expansion Pack F content", () => {
   });
 
   it("completes the generic roster and pool at the locked distribution", () => {
-    expect(DEFAULT_CONTENT.units).toHaveLength(37);
+    expect(DEFAULT_CONTENT.units).toHaveLength(55);
     expect(
       [1, 2, 3, 4, 5].map(
         (cost) => DEFAULT_CONTENT.units.filter((unit) => unit.cost === cost).length,
       ),
-    ).toEqual([7, 9, 8, 8, 5]);
-    expect(DEFAULT_CONTENT.traits).toHaveLength(14);
-    expect(DEFAULT_CONTENT.version).toBe("1.38.0");
+    ).toEqual([12, 14, 13, 10, 6]);
+    expect(DEFAULT_CONTENT.traits).toHaveLength(18);
+    expect(DEFAULT_CONTENT.version).toBe("1.42.0");
     expect(CURRENT_SAVE_SCHEMA_VERSION).toBe(6);
 
     const state = createMatch("pack-f-pool", DEFAULT_CONTENT);
@@ -455,6 +455,22 @@ describe("Emperor origin", () => {
           behaviors: [{ kind: "first-captain-cast-command", energy: 10 }],
           label:
             "Crew-wide: 225 starting Shield; first Captain cast grants all allies 10 Energy",
+        },
+        {
+          required: 5,
+          effects: [{ kind: "shield-flat", value: 300 }],
+          effectScope: "team",
+          behaviors: [{ kind: "first-captain-cast-command", energy: 13 }],
+          label:
+            "Crew-wide: 300 starting Shield; first Captain cast grants all allies 13 Energy",
+        },
+        {
+          required: 7,
+          effects: [{ kind: "shield-flat", value: 390 }],
+          effectScope: "team",
+          behaviors: [{ kind: "first-captain-cast-command", energy: 16 }],
+          label:
+            "Crew-wide: 390 starting Shield; first Captain cast grants all allies 16 Energy",
         },
       ]);
   });

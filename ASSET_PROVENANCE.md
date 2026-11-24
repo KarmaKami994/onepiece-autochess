@@ -6,6 +6,82 @@ This non-commercial, localhost-only fan prototype has both original generated pr
 
 On `2026-08-14`, the project owner explicitly attested in the project conversation that the initial 17 listed source sheets may be used, adapted, and distributed in this public collaboration repository. Later source additions record their own permission basis in `art/animation-v2/source-matrix.json`. An owner attestation is not independent verification of chain of title; a Sprite Database URL is not treated as permission, and this repository grants no downstream asset license. The MIT license applies to code only. Reuse, redistribution, or commercialization of franchise or imported art requires its own appropriate rights clearance.
 
+## B16 Whole Cake Pirates — 2026-11-23
+
+The four Treasure Cruise sheets use the established project-owner attestation. Their asset pages credit Redtarp as uploader. Daifuku uses a new ImageGen pose board based on the character reference, with the six poses cropped into the usual offline clips. The optional movement and defeat holds use the available source poses.
+
+| Atlas | Source or design reference | Project input | Input SHA-256 | Atlas SHA-256 |
+| --- | --- | --- | --- | --- |
+| `perospero-v2` | [#2240 - Perospero - Eldest Son of the Charlotte Family](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/275583/) | `art/licensed-reference/b16-whole-cake-pirates/perospero.png` | `1cabe7ad7a54a050b6902e84ef818461837a0f0b084ae2474bbefd7ad4cc5df8` | `22f3e2a3177d44a4776fc4b6ac3547ca443209e7674e3caa445657f4acff43e1` |
+| `smoothie-v2` | [#2238 - General Smoothie - Big Mom Pirates](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/269158/) | `art/licensed-reference/b16-whole-cake-pirates/smoothie.png` | `1fa9b18e10d002235a4ff45ff8056cd06025f8a55ffa923efd48e5b6d28e89e9` | `b7884820a20051e35160e282187d3cf3e1b2e77e16126c43e5b9a48f3503166e` |
+| `oven-v2` | [#2121 - Charlotte Oven - Big Mom Pirates](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/269153/) | `art/licensed-reference/b16-whole-cake-pirates/oven.png` | `2e5ffcbfe7c160284e89e9cd87e854190ddce078b06c3a06e63255c8a6c17656` | `9296bee09d605133756d43e407e9c3da5052d7f4444ba67f579d61354c407159` |
+| `brulee-v2` | [#2800 - Charlotte Brulee - Little Sister Taking Care of Her Brother](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/232759/) | `art/licensed-reference/b16-whole-cake-pirates/brulee.png` | `4ac614bb6a273526eb5369d07e42fce9d4d6b4b9351456c1e26ec5de5cac0782` | `73cf1e71a2c9cd37fb2b3a4c2a52e13ddd86cc39bf4383b46319b397f1c08d5e` |
+| `daifuku-v2` | [Daifuku design reference](https://one-piece.com/character/Charlotte_Daifuku/index.html) | `art/production/b16-whole-cake-pirates/daifuku-master.png` | `051e1ac8ecde1d156c770db9613e985d1aa2525a80ef4fead67a36d8b451567b` | `a0afdbd4a809e8cf2ae469ddb0e75f0c693686b8b9ed90ccc81cd399ee86d1a4` |
+
+The Homie strike uses a single ImageGen illustration of [Zeus](https://one-piece.com/character/Zeus/index.html), [Prometheus](https://one-piece.com/character/Prometheus/index.html) and [Napoleon](https://one-piece.com/character/Napoleon/index.html). The runtime texture is `public/assets/effects/homie-attack.png` with SHA-256 `76e432703138122198c2d4c3e2c90178afb9557f527aca3e3d5fb93ec8fda64a`. The source image, runtime sprites and effect hashes are listed in `art/production/b16-whole-cake-pirates/outputs.json`. The source matrix records exact dimensions and frame-map hashes. Rebuild offline with `npm run assets:b16`.
+
+- Final asset: `public/assets/characters/perospero.png`
+- Final asset: `public/assets/characters/smoothie.png`
+- Final asset: `public/assets/characters/oven.png`
+- Final asset: `public/assets/characters/brulee.png`
+- Final asset: `public/assets/characters/daifuku.png`
+
+## B15 Big Mom Pirates — 2026-11-23
+
+The project owner supplied four original One Piece: Treasure Cruise PNGs under the established project permission. The sheets carry no printed rip credits. Contributor attribution remains unconfirmed. The frame maps use the original combat poses and hold available poses where the sheet has no separate transition.
+
+| Atlas | Source page | Archived source | Source SHA-256 | Atlas SHA-256 |
+| --- | --- | --- | --- | --- |
+| `pudding-v2` | [#2065 Charlotte Pudding](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/262142/) | `art/licensed-reference/b15-big-mom-pirates/pudding.png` | `63720b2ea3618e9e03021f6e82e241447b7163db63a206764b883ea286436030` | `ef72e02bf46791bed82f87932df8835e9e4a761dd96fcca13e722b76eef97847` |
+| `cracker-v2` | [#3477 Charlotte Cracker - Unexpected Strike](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/280534/) | `art/licensed-reference/b15-big-mom-pirates/cracker.png` | `1095e1ad973c38f726c674307ce57e4ff9eac291e1120dbf118c96b43907f645` | `ae42c8b95a4d835a2c4f0515db4b478f57ee57bbfebe9227bfa6eebe36db209e` |
+| `katakuri-v2` | [#2471 Charlotte Katakuri - Mochi-Mochi Fruit User](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/225431/) | `art/licensed-reference/b15-big-mom-pirates/katakuri.png` | `d9dd3593da1ab8f4d94adadef18da05043beb2657426c7d32f24579efec6d969` | `f085f339e42f46008ca15b78ec300c863ab76d5e339b69871f842d7d4fd1f64a` |
+| `big-mom-v2` | [#2109 Charlotte Linlin - Great Pirate Big Mom](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/262280/) | `art/licensed-reference/b15-big-mom-pirates/big-mom.png` | `b8c4bd696eb081fdce3737415c640fa55c5ce3c80836e87ef338378f3d4dbe39` | `a5376869546116cca86b40b17d440d8989e20181864124490d242cdfedd2c1bc` |
+
+Source dimensions and frame-map hashes are recorded in `art/animation-v2/source-matrix.json`. The Big Mom Pirates icon is project-authored. All sprite output hashes are in `art/production/b15-big-mom-pirates/outputs.json`. Rebuild offline with `npm run assets:b15`.
+
+- Final asset: `public/assets/characters/pudding.png`
+- Final asset: `public/assets/characters/cracker.png`
+- Final asset: `public/assets/characters/katakuri.png`
+- Final asset: `public/assets/characters/big-mom.png`
+
+## B14 Kid Pirates and Heart Pirates — 2026-11-23
+
+The project owner supplied all three original One Piece: Treasure Cruise PNGs under the established project permission. The #1004 page lists Redtarp as uploader. The #3632 and #1006 contributor credits are unconfirmed. The frame maps select individual poses from the sheets, including both duo sheets.
+
+| Atlas | Source page | Archived source | Source SHA-256 | Atlas SHA-256 |
+| --- | --- | --- | --- | --- |
+| `heat-v2` | [#3632 Heat & Wire](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/475609/) | `art/licensed-reference/b14-pirate-crews/heat-wire.png` | `a447892c3cee63c0001b0bb77df47e88c15116329fa15f50bc4498829159a661` | `12341aa49bee5c218c6c9fd4ca9646b718bb4a613484bd914dead1cd6288f34b` |
+| `wire-v2` | [#3632 Heat & Wire](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/475609/) | `art/licensed-reference/b14-pirate-crews/heat-wire.png` | `a447892c3cee63c0001b0bb77df47e88c15116329fa15f50bc4498829159a661` | `758defb16b73fcb8d52fca5ebbf9515d8a8cb2fc694ea9432a115c92c905cb1e` |
+| `shachi-v2` | [#1004 Shachi & Penguin - Heart Pirates](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/476645/) | `art/licensed-reference/b14-pirate-crews/shachi-penguin.png` | `6e11d4f6d89c3d87e1cc82fe228d99a9ef932a8e456d338fc6ac07c5b5d0d34b` | `4e042635156a8497958387073251c5b88d81386ebb63304008540f2c721d02c9` |
+| `penguin-v2` | [#1004 Shachi & Penguin - Heart Pirates](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/476645/) | `art/licensed-reference/b14-pirate-crews/shachi-penguin.png` | `6e11d4f6d89c3d87e1cc82fe228d99a9ef932a8e456d338fc6ac07c5b5d0d34b` | `4bc9e1f1149fb617079661e859c0b98f664fb92ebe045fe716ee9c2c3c7809df` |
+| `jean-bart-v2` | [#1006 Jean Bart - Heart Pirates](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/267422/) | `art/licensed-reference/b14-pirate-crews/jean-bart.png` | `066e6039c6828243406a43d9b8c2eca56865917940b06488b35c8c55a00a2a0a` | `aea9ed1ce6f45bdf64873bc47a941021fa93ccc63d25f1b1c951c0c6e193c81e` |
+
+The frame-map pins and source dimensions are recorded in `art/animation-v2/source-matrix.json`. The two crew icons are project-authored. All runtime paths and hashes are in `art/production/b14-pirate-crews/outputs.json`. Rebuild the exports offline with `npm run assets:b14`.
+
+- Final asset: `public/assets/characters/heat.png`
+- Final asset: `public/assets/characters/wire.png`
+- Final asset: `public/assets/characters/shachi.png`
+- Final asset: `public/assets/characters/penguin.png`
+- Final asset: `public/assets/characters/jean-bart.png`
+
+## B13 Minks crew — 2026-11-19
+
+The project owner attested to permission covering the One Piece game sources and supplied the three Treasure Cruise sheets from The Spriters Resource. Bepo's Gigant Battle 2 sheet credits Grim. The three Treasure Cruise PNGs contain no printed rip credit. The exact source pages, dimensions and frame-map pins are in `art/animation-v2/source-matrix.json`.
+
+| Atlas | Source page | Archived source | Source SHA-256 | Atlas SHA-256 |
+| --- | --- | --- | --- | --- |
+| `bepo-v2` | [Gigant Battle! 2 file 14453](https://spritedatabase.net/file/14453) | `art/licensed-reference/b13-minks/bepo.png` | `46ea2db608a8213e902a1902db8b77f4bee715de614496d4f06de42e5c3e5e86` | `a11bcea536511c2da5dccb15fc0e70ab22ec3e33a962db85083d32cd7aea5fac` |
+| `carrot-v2` | [Treasure Cruise #1656](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/552786/) | `art/licensed-reference/b13-minks/carrot.png` | `511c3a75ab283582246545a25a5f944eaa050a117464be921221ab6924c53ab4` | `59a07c3e6f98243697e002d6b13a8c17b32c29ef76523e3eb28273f21e5ba901` |
+| `pedro-v2` | [Treasure Cruise #1654](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/552772/) | `art/licensed-reference/b13-minks/pedro.png` | `67f72c0c97aee4d65791126ed53d364c7f5d447bcc9ea89612a1f034c9e161ce` | `c857b70ba92f6d58c7ca19c2e4f4aa1189477d9d1d28675c219960e118fa65a0` |
+| `pekoms-v2` | [Treasure Cruise #1357](https://www.spriters-resource.com/mobile/onepiecetreasurecruise/asset/533347/) | `art/licensed-reference/b13-minks/pekoms.png` | `df22bd566180b2994f882abb66321eb9b93a11f5233956de0703abbfdd60184e` | `6893c06d5862b7e3aa827418c7dccf9a6f3041b4a01e4f413160b255f920432e` |
+
+The exact inputs are archived at `art/licensed-reference/b13-minks/`. The frame maps choose source combat poses and hold the final crouch or fall where the sheet has limited dedicated defeat poses. The shared v2 pipeline exports six clips, and the crew pack exporter derives static sprites, portraits and tokens. The Minks icon is project-authored. All runtime hashes are in `art/production/b13-minks/outputs.json`. Rebuild offline with `npm run assets:b13`.
+
+- Final asset: `public/assets/characters/bepo.png`
+- Final asset: `public/assets/characters/carrot.png`
+- Final asset: `public/assets/characters/pedro.png`
+- Final asset: `public/assets/characters/pekoms.png`
+
 ## Fish-Man crew pack — 2026-11-18
 
 The project owner confirmed the applicable game-source permission and supplied the exact source PNGs. Paddy is credited on the two Game Boy Advance sheets. Fisher Tiger is Treasure Cruise unit #4203. The supplied Fisher Tiger PNG is byte-identical to the OPTC Team Builder mirror, and the original rip contributor is unconfirmed. The finished figures use existing source poses. The discarded generated drafts are not part of the repository.
@@ -17,6 +93,10 @@ The project owner confirmed the applicable game-source permission and supplied t
 | `fisher-tiger-v2` | `art/licensed-reference/fish-man-crew/fisher-tiger.png` | `956a25f7c21578919dc07cbda5734d46b3d8a404ca49ab165166ac7612863c70` | `935d61a82e8e9a9aeb1f501d3f32c16e165e6fb790bf073c07609c537c1a6d4a` |
 
 `art/animation-v2/source-matrix.json` records pages, contributors, dimensions and frame-map pins. `art/production/fish-man-crew/outputs.json` pins the local runtime exports and the project-authored Fish-Man trait SVG. Run `npm run assets:fish-man-crew` to repack the selected original poses and generate portraits and tokens offline. Kuroobi is mirrored to the project's canonical facing. Fisher Tiger is scaled with nearest-neighbour at 40% to fit the v2 frame. Original pose holds fill transitions where a sheet has fewer usable frames than the game requests.
+
+- Final asset: `public/assets/characters/hatchan.png`
+- Final asset: `public/assets/characters/kuroobi.png`
+- Final asset: `public/assets/characters/fisher-tiger.png`
 
 ## Kid — Punk Rotten
 

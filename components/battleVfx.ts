@@ -18,6 +18,8 @@ export const BATTLE_VFX_DEPTH = {
   overlay: 150,
 } as const;
 
+export const HOMIE_ATTACK_TEXTURE = "homie-attack";
+
 type CommonVfxOptions = Readonly<{
   team?: BattleVfxTeam;
   color?: number;
@@ -641,6 +643,28 @@ export function playDirectedCueVfx(scene: Phaser.Scene, options: CommonVfxOption
   return scope.handle;
 }
 
+function playHomieAttackVfx(scene: Phaser.Scene, options: {
+  at: BattleVfxPoint;
+  speed: number;
+  reducedMotion: boolean;
+}): void {
+  const durationMs = scaledDuration(850, options.speed);
+  const scope = createEffectScope(scene, durationMs);
+  const homies = scope.add(scene.add.image(options.at.x, options.at.y - 12, HOMIE_ATTACK_TEXTURE))
+    .setOrigin(0.5, 1)
+    .setDisplaySize(106, 59)
+    .setDepth(BATTLE_VFX_DEPTH.overlay);
+  if (!options.reducedMotion) {
+    scene.tweens.add({
+      targets: homies,
+      alpha: 0,
+      y: homies.y - 12,
+      delay: scaledDuration(420, options.speed),
+      duration: scaledDuration(430, options.speed),
+    });
+  }
+}
+
 export const battleVfx = {
   directedCue: playDirectedCueVfx,
   slash: playSlashVfx,
@@ -650,5 +674,6 @@ export const battleVfx = {
   impact: playImpactVfx,
   shield: playShieldVfx,
   heal: playHealVfx,
+  homieAttack: playHomieAttackVfx,
   telegraph: playTelegraphVfx,
 } as const;

@@ -47,7 +47,8 @@ function event(value: unknown): value is BattleEvent {
     case "attack": return ids("sourceId", "targetId") && typeof value.critical === "boolean";
     case "cast": return ids("sourceId", "abilityId") && strings(value.targetIds);
     case "ability-hit": return ids("sourceId", "targetId", "abilityId") && integer(value.hitIndex) && integer(value.hitCount) && value.hitIndex >= 1 && value.hitIndex <= value.hitCount && typeof value.finisher === "boolean";
-    case "damage": return ids("sourceId", "targetId") && nums("amount", "healthDamage", "shieldDamage") && ["attack", "ability", "burn", "poison", "item"].includes(String(value.damageKind));
+    case "homie-attack": return ids("sourceId", "targetId") && position(value.center) && array(value.targetIds, text, 5) && unique(value.targetIds as string[]) && value.targetIds.includes(value.targetId);
+    case "damage": return ids("sourceId", "targetId") && nums("amount", "healthDamage", "shieldDamage") && ["attack", "ability", "burn", "poison", "item", "trait"].includes(String(value.damageKind));
     case "energy": return ids("unitId") && (value.sourceId === undefined || text(value.sourceId)) && typeof value.amount === "number" && Number.isFinite(value.amount) && nums("value") && ["attack", "damaged", "cast-reset", "ability-drain", "item", "trait", "environment"].includes(String(value.reason));
     case "dodge": return ids("sourceId", "targetId");
     case "buff": return ids("sourceId", "targetId") && nums("amount", "value") && value.stat === "attack" && value.reason === "stacking-attack";
@@ -107,7 +108,7 @@ export function validateReplay(raw: unknown, content: GameContent): VoyageReplay
             ((entry.sourceId === "environment:rain" && battle.environment?.weather === "rain") ||
               (entry.sourceId === "environment:charged-deck" && battle.environment?.fields.some(field => field.kind === "charged-deck"))));
         for (const key of ["sourceId", "targetId", "unitId"] as const) if (!(key === "sourceId" && environmentSource) && key in entry && entry[key as keyof typeof entry] !== null && entry[key as keyof typeof entry] !== undefined && !fighterIds.includes(String(entry[key as keyof typeof entry]))) throw new Error("Battle event references an unknown fighter.");
-        if (entry.type === "cast" && entry.targetIds.some((id) => !fighterIds.includes(id))) throw new Error("Unknown cast target.");
+        if ((entry.type === "cast" || entry.type === "homie-attack") && entry.targetIds.some((id) => !fighterIds.includes(id))) throw new Error("Unknown battle event target.");
       }
     }
   }

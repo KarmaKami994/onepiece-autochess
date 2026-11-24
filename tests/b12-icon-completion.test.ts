@@ -18,7 +18,7 @@ describe("B12 fixed local icon production", () => {
     const ids = (family: string) => provenance.outputs.filter(r => r.family === family).map(r => r.id).sort();
     expect(ids("items")).toEqual(DEFAULT_CONTENT.items.map(i => i.id).sort());
     expect(ids("food")).toEqual(DEFAULT_CONTENT.foods!.map(f => f.id).sort());
-    expect([...ids("traits"), "fish-man"].sort()).toEqual(Object.keys(TRAIT_VISUALS).sort());
+    expect([...ids("traits"), "fish-man", "minks", "kid-pirates", "heart-pirates", "big-mom-pirates"].sort()).toEqual(Object.keys(TRAIT_VISUALS).sort());
     expect(ids("status")).toEqual(Object.keys(STATUS_VISUALS).sort());
     expect(crewReference(DEFAULT_CONTENT).filter(entry => entry.category === "traits").map(entry => entry.imagePath).sort()).toEqual(Object.values(TRAIT_VISUALS).map(visual => visual.imagePath).sort());
     expect(provenance.outputs).toHaveLength(93);

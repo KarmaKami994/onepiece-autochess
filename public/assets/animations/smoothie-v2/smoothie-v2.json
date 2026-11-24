@@ -1,0 +1,941 @@
+{
+  "schemaVersion": 2,
+  "pipeline": "licensed-frame-map-v1",
+  "assetId": "smoothie",
+  "assetKey": "smoothie-v2",
+  "source": "art/licensed-reference/b16-whole-cake-pirates/smoothie.png",
+  "sourceSha256": "1fa9b18e10d002235a4ff45ff8056cd06025f8a55ffa923efd48e5b6d28e89e9",
+  "sourceDimensions": {
+    "width": 1548,
+    "height": 1032
+  },
+  "permission": {
+    "status": "confirmed",
+    "note": "Project-owner attestation covers the One Piece game sources used by this project. These exact Treasure Cruise sheets are upstream originals. No downstream asset license is granted."
+  },
+  "frame": {
+    "width": 128,
+    "height": 128,
+    "columns": 8,
+    "destinationPivot": {
+      "x": 64,
+      "y": 116
+    },
+    "idleVisualTopPx": 43
+  },
+  "frameCount": 46,
+  "clips": {
+    "idle": {
+      "start": 0,
+      "end": 5,
+      "frameRate": 8,
+      "repeat": -1
+    },
+    "move": {
+      "start": 6,
+      "end": 13,
+      "frameRate": 16,
+      "repeat": 0
+    },
+    "attack": {
+      "start": 14,
+      "end": 21,
+      "frameRate": 14,
+      "repeat": 0
+    },
+    "cast": {
+      "start": 22,
+      "end": 33,
+      "frameRate": 12,
+      "repeat": 0
+    },
+    "hit": {
+      "start": 34,
+      "end": 37,
+      "frameRate": 12,
+      "repeat": 0
+    },
+    "defeat": {
+      "start": 38,
+      "end": 45,
+      "frameRate": 10,
+      "repeat": 0
+    }
+  },
+  "frames": [
+    {
+      "index": 0,
+      "state": "idle",
+      "durationMs": 125,
+      "sourceRect": {
+        "x": 8,
+        "y": 5,
+        "width": 105,
+        "height": 198
+      },
+      "sourcePivot": {
+        "x": 64,
+        "y": 203
+      },
+      "destination": {
+        "x": 43,
+        "y": 43
+      }
+    },
+    {
+      "index": 1,
+      "state": "idle",
+      "durationMs": 125,
+      "sourceRect": {
+        "x": 120,
+        "y": 5,
+        "width": 105,
+        "height": 198
+      },
+      "sourcePivot": {
+        "x": 164,
+        "y": 203
+      },
+      "destination": {
+        "x": 48,
+        "y": 43
+      }
+    },
+    {
+      "index": 2,
+      "state": "idle",
+      "durationMs": 125,
+      "sourceRect": {
+        "x": 232,
+        "y": 5,
+        "width": 105,
+        "height": 198
+      },
+      "sourcePivot": {
+        "x": 278,
+        "y": 203
+      },
+      "destination": {
+        "x": 47,
+        "y": 43
+      }
+    },
+    {
+      "index": 3,
+      "state": "idle",
+      "durationMs": 125,
+      "sourceRect": {
+        "x": 345,
+        "y": 6,
+        "width": 103,
+        "height": 197
+      },
+      "sourcePivot": {
+        "x": 388,
+        "y": 203
+      },
+      "destination": {
+        "x": 48,
+        "y": 43
+      }
+    },
+    {
+      "index": 4,
+      "state": "idle",
+      "durationMs": 125,
+      "sourceRect": {
+        "x": 232,
+        "y": 5,
+        "width": 105,
+        "height": 198
+      },
+      "sourcePivot": {
+        "x": 278,
+        "y": 203
+      },
+      "destination": {
+        "x": 47,
+        "y": 43
+      }
+    },
+    {
+      "index": 5,
+      "state": "idle",
+      "durationMs": 125,
+      "sourceRect": {
+        "x": 120,
+        "y": 5,
+        "width": 105,
+        "height": 198
+      },
+      "sourcePivot": {
+        "x": 164,
+        "y": 203
+      },
+      "destination": {
+        "x": 48,
+        "y": 43
+      }
+    },
+    {
+      "index": 6,
+      "state": "move",
+      "durationMs": 63,
+      "sourceRect": {
+        "x": 10,
+        "y": 838,
+        "width": 112,
+        "height": 187
+      },
+      "sourcePivot": {
+        "x": 64,
+        "y": 1025
+      },
+      "destination": {
+        "x": 44,
+        "y": 47
+      }
+    },
+    {
+      "index": 7,
+      "state": "move",
+      "durationMs": 63,
+      "sourceRect": {
+        "x": 10,
+        "y": 838,
+        "width": 112,
+        "height": 187
+      },
+      "sourcePivot": {
+        "x": 64,
+        "y": 1025
+      },
+      "destination": {
+        "x": 44,
+        "y": 47
+      }
+    },
+    {
+      "index": 8,
+      "state": "move",
+      "durationMs": 63,
+      "sourceRect": {
+        "x": 137,
+        "y": 844,
+        "width": 113,
+        "height": 181
+      },
+      "sourcePivot": {
+        "x": 202,
+        "y": 1025
+      },
+      "destination": {
+        "x": 40,
+        "y": 49
+      }
+    },
+    {
+      "index": 9,
+      "state": "move",
+      "durationMs": 63,
+      "sourceRect": {
+        "x": 137,
+        "y": 844,
+        "width": 113,
+        "height": 181
+      },
+      "sourcePivot": {
+        "x": 202,
+        "y": 1025
+      },
+      "destination": {
+        "x": 40,
+        "y": 49
+      }
+    },
+    {
+      "index": 10,
+      "state": "move",
+      "durationMs": 63,
+      "sourceRect": {
+        "x": 266,
+        "y": 846,
+        "width": 115,
+        "height": 179
+      },
+      "sourcePivot": {
+        "x": 330,
+        "y": 1025
+      },
+      "destination": {
+        "x": 40,
+        "y": 50
+      }
+    },
+    {
+      "index": 11,
+      "state": "move",
+      "durationMs": 63,
+      "sourceRect": {
+        "x": 266,
+        "y": 846,
+        "width": 115,
+        "height": 179
+      },
+      "sourcePivot": {
+        "x": 330,
+        "y": 1025
+      },
+      "destination": {
+        "x": 40,
+        "y": 50
+      }
+    },
+    {
+      "index": 12,
+      "state": "move",
+      "durationMs": 63,
+      "sourceRect": {
+        "x": 137,
+        "y": 844,
+        "width": 113,
+        "height": 181
+      },
+      "sourcePivot": {
+        "x": 202,
+        "y": 1025
+      },
+      "destination": {
+        "x": 40,
+        "y": 49
+      }
+    },
+    {
+      "index": 13,
+      "state": "move",
+      "durationMs": 63,
+      "sourceRect": {
+        "x": 137,
+        "y": 844,
+        "width": 113,
+        "height": 181
+      },
+      "sourcePivot": {
+        "x": 202,
+        "y": 1025
+      },
+      "destination": {
+        "x": 40,
+        "y": 49
+      }
+    },
+    {
+      "index": 14,
+      "state": "attack",
+      "durationMs": 71,
+      "sourceRect": {
+        "x": 1034,
+        "y": 166,
+        "width": 121,
+        "height": 194
+      },
+      "sourcePivot": {
+        "x": 1098,
+        "y": 360
+      },
+      "destination": {
+        "x": 40,
+        "y": 44
+      }
+    },
+    {
+      "index": 15,
+      "state": "attack",
+      "durationMs": 71,
+      "sourceRect": {
+        "x": 1034,
+        "y": 166,
+        "width": 121,
+        "height": 194
+      },
+      "sourcePivot": {
+        "x": 1098,
+        "y": 360
+      },
+      "destination": {
+        "x": 40,
+        "y": 44
+      }
+    },
+    {
+      "index": 16,
+      "state": "attack",
+      "durationMs": 71,
+      "sourceRect": {
+        "x": 1034,
+        "y": 166,
+        "width": 121,
+        "height": 194
+      },
+      "sourcePivot": {
+        "x": 1098,
+        "y": 360
+      },
+      "destination": {
+        "x": 40,
+        "y": 44
+      }
+    },
+    {
+      "index": 17,
+      "state": "attack",
+      "durationMs": 71,
+      "sourceRect": {
+        "x": 1034,
+        "y": 166,
+        "width": 121,
+        "height": 194
+      },
+      "sourcePivot": {
+        "x": 1098,
+        "y": 360
+      },
+      "destination": {
+        "x": 40,
+        "y": 44
+      }
+    },
+    {
+      "index": 18,
+      "state": "attack",
+      "durationMs": 71,
+      "sourceRect": {
+        "x": 1167,
+        "y": 171,
+        "width": 240,
+        "height": 167
+      },
+      "sourcePivot": {
+        "x": 1268,
+        "y": 338
+      },
+      "destination": {
+        "x": 27,
+        "y": 54
+      }
+    },
+    {
+      "index": 19,
+      "state": "attack",
+      "durationMs": 71,
+      "sourceRect": {
+        "x": 1167,
+        "y": 171,
+        "width": 240,
+        "height": 167
+      },
+      "sourcePivot": {
+        "x": 1268,
+        "y": 338
+      },
+      "destination": {
+        "x": 27,
+        "y": 54
+      }
+    },
+    {
+      "index": 20,
+      "state": "attack",
+      "durationMs": 71,
+      "sourceRect": {
+        "x": 1167,
+        "y": 171,
+        "width": 240,
+        "height": 167
+      },
+      "sourcePivot": {
+        "x": 1268,
+        "y": 338
+      },
+      "destination": {
+        "x": 27,
+        "y": 54
+      }
+    },
+    {
+      "index": 21,
+      "state": "attack",
+      "durationMs": 71,
+      "sourceRect": {
+        "x": 120,
+        "y": 5,
+        "width": 105,
+        "height": 198
+      },
+      "sourcePivot": {
+        "x": 164,
+        "y": 203
+      },
+      "destination": {
+        "x": 48,
+        "y": 43
+      }
+    },
+    {
+      "index": 22,
+      "state": "cast",
+      "durationMs": 83,
+      "sourceRect": {
+        "x": 1034,
+        "y": 166,
+        "width": 121,
+        "height": 194
+      },
+      "sourcePivot": {
+        "x": 1098,
+        "y": 360
+      },
+      "destination": {
+        "x": 40,
+        "y": 44
+      }
+    },
+    {
+      "index": 23,
+      "state": "cast",
+      "durationMs": 83,
+      "sourceRect": {
+        "x": 1034,
+        "y": 166,
+        "width": 121,
+        "height": 194
+      },
+      "sourcePivot": {
+        "x": 1098,
+        "y": 360
+      },
+      "destination": {
+        "x": 40,
+        "y": 44
+      }
+    },
+    {
+      "index": 24,
+      "state": "cast",
+      "durationMs": 83,
+      "sourceRect": {
+        "x": 401,
+        "y": 654,
+        "width": 145,
+        "height": 180
+      },
+      "sourcePivot": {
+        "x": 476,
+        "y": 834
+      },
+      "destination": {
+        "x": 36,
+        "y": 49
+      }
+    },
+    {
+      "index": 25,
+      "state": "cast",
+      "durationMs": 83,
+      "sourceRect": {
+        "x": 401,
+        "y": 654,
+        "width": 145,
+        "height": 180
+      },
+      "sourcePivot": {
+        "x": 476,
+        "y": 834
+      },
+      "destination": {
+        "x": 36,
+        "y": 49
+      }
+    },
+    {
+      "index": 26,
+      "state": "cast",
+      "durationMs": 83,
+      "sourceRect": {
+        "x": 550,
+        "y": 654,
+        "width": 156,
+        "height": 180
+      },
+      "sourcePivot": {
+        "x": 632,
+        "y": 834
+      },
+      "destination": {
+        "x": 34,
+        "y": 49
+      }
+    },
+    {
+      "index": 27,
+      "state": "cast",
+      "durationMs": 83,
+      "sourceRect": {
+        "x": 550,
+        "y": 654,
+        "width": 156,
+        "height": 180
+      },
+      "sourcePivot": {
+        "x": 632,
+        "y": 834
+      },
+      "destination": {
+        "x": 34,
+        "y": 49
+      }
+    },
+    {
+      "index": 28,
+      "state": "cast",
+      "durationMs": 83,
+      "sourceRect": {
+        "x": 1167,
+        "y": 171,
+        "width": 240,
+        "height": 167
+      },
+      "sourcePivot": {
+        "x": 1268,
+        "y": 338
+      },
+      "destination": {
+        "x": 27,
+        "y": 54
+      }
+    },
+    {
+      "index": 29,
+      "state": "cast",
+      "durationMs": 83,
+      "sourceRect": {
+        "x": 1167,
+        "y": 171,
+        "width": 240,
+        "height": 167
+      },
+      "sourcePivot": {
+        "x": 1268,
+        "y": 338
+      },
+      "destination": {
+        "x": 27,
+        "y": 54
+      }
+    },
+    {
+      "index": 30,
+      "state": "cast",
+      "durationMs": 83,
+      "sourceRect": {
+        "x": 1167,
+        "y": 171,
+        "width": 240,
+        "height": 167
+      },
+      "sourcePivot": {
+        "x": 1268,
+        "y": 338
+      },
+      "destination": {
+        "x": 27,
+        "y": 54
+      }
+    },
+    {
+      "index": 31,
+      "state": "cast",
+      "durationMs": 83,
+      "sourceRect": {
+        "x": 1167,
+        "y": 171,
+        "width": 240,
+        "height": 167
+      },
+      "sourcePivot": {
+        "x": 1268,
+        "y": 338
+      },
+      "destination": {
+        "x": 27,
+        "y": 54
+      }
+    },
+    {
+      "index": 32,
+      "state": "cast",
+      "durationMs": 83,
+      "sourceRect": {
+        "x": 8,
+        "y": 5,
+        "width": 105,
+        "height": 198
+      },
+      "sourcePivot": {
+        "x": 64,
+        "y": 203
+      },
+      "destination": {
+        "x": 43,
+        "y": 43
+      }
+    },
+    {
+      "index": 33,
+      "state": "cast",
+      "durationMs": 83,
+      "sourceRect": {
+        "x": 8,
+        "y": 5,
+        "width": 105,
+        "height": 198
+      },
+      "sourcePivot": {
+        "x": 64,
+        "y": 203
+      },
+      "destination": {
+        "x": 43,
+        "y": 43
+      }
+    },
+    {
+      "index": 34,
+      "state": "hit",
+      "durationMs": 83,
+      "sourceRect": {
+        "x": 1038,
+        "y": 5,
+        "width": 178,
+        "height": 156
+      },
+      "sourcePivot": {
+        "x": 1116,
+        "y": 161
+      },
+      "destination": {
+        "x": 35,
+        "y": 58
+      }
+    },
+    {
+      "index": 35,
+      "state": "hit",
+      "durationMs": 83,
+      "sourceRect": {
+        "x": 1038,
+        "y": 5,
+        "width": 178,
+        "height": 156
+      },
+      "sourcePivot": {
+        "x": 1116,
+        "y": 161
+      },
+      "destination": {
+        "x": 35,
+        "y": 58
+      }
+    },
+    {
+      "index": 36,
+      "state": "hit",
+      "durationMs": 83,
+      "sourceRect": {
+        "x": 1038,
+        "y": 5,
+        "width": 178,
+        "height": 156
+      },
+      "sourcePivot": {
+        "x": 1116,
+        "y": 161
+      },
+      "destination": {
+        "x": 35,
+        "y": 58
+      }
+    },
+    {
+      "index": 37,
+      "state": "hit",
+      "durationMs": 83,
+      "sourceRect": {
+        "x": 8,
+        "y": 5,
+        "width": 105,
+        "height": 198
+      },
+      "sourcePivot": {
+        "x": 64,
+        "y": 203
+      },
+      "destination": {
+        "x": 43,
+        "y": 43
+      }
+    },
+    {
+      "index": 38,
+      "state": "defeat",
+      "durationMs": 100,
+      "sourceRect": {
+        "x": 1038,
+        "y": 5,
+        "width": 178,
+        "height": 156
+      },
+      "sourcePivot": {
+        "x": 1116,
+        "y": 161
+      },
+      "destination": {
+        "x": 35,
+        "y": 58
+      }
+    },
+    {
+      "index": 39,
+      "state": "defeat",
+      "durationMs": 100,
+      "sourceRect": {
+        "x": 1038,
+        "y": 5,
+        "width": 178,
+        "height": 156
+      },
+      "sourcePivot": {
+        "x": 1116,
+        "y": 161
+      },
+      "destination": {
+        "x": 35,
+        "y": 58
+      }
+    },
+    {
+      "index": 40,
+      "state": "defeat",
+      "durationMs": 100,
+      "sourceRect": {
+        "x": 1038,
+        "y": 5,
+        "width": 178,
+        "height": 156
+      },
+      "sourcePivot": {
+        "x": 1116,
+        "y": 161
+      },
+      "destination": {
+        "x": 35,
+        "y": 58
+      }
+    },
+    {
+      "index": 41,
+      "state": "defeat",
+      "durationMs": 100,
+      "sourceRect": {
+        "x": 1230,
+        "y": 7,
+        "width": 178,
+        "height": 154
+      },
+      "sourcePivot": {
+        "x": 1302,
+        "y": 161
+      },
+      "destination": {
+        "x": 37,
+        "y": 59
+      }
+    },
+    {
+      "index": 42,
+      "state": "defeat",
+      "durationMs": 100,
+      "sourceRect": {
+        "x": 1230,
+        "y": 7,
+        "width": 178,
+        "height": 154
+      },
+      "sourcePivot": {
+        "x": 1302,
+        "y": 161
+      },
+      "destination": {
+        "x": 37,
+        "y": 59
+      }
+    },
+    {
+      "index": 43,
+      "state": "defeat",
+      "durationMs": 100,
+      "sourceRect": {
+        "x": 1230,
+        "y": 7,
+        "width": 178,
+        "height": 154
+      },
+      "sourcePivot": {
+        "x": 1302,
+        "y": 161
+      },
+      "destination": {
+        "x": 37,
+        "y": 59
+      }
+    },
+    {
+      "index": 44,
+      "state": "defeat",
+      "durationMs": 100,
+      "sourceRect": {
+        "x": 1230,
+        "y": 7,
+        "width": 178,
+        "height": 154
+      },
+      "sourcePivot": {
+        "x": 1302,
+        "y": 161
+      },
+      "destination": {
+        "x": 37,
+        "y": 59
+      }
+    },
+    {
+      "index": 45,
+      "state": "defeat",
+      "durationMs": 100,
+      "sourceRect": {
+        "x": 1230,
+        "y": 7,
+        "width": 178,
+        "height": 154
+      },
+      "sourcePivot": {
+        "x": 1302,
+        "y": 161
+      },
+      "destination": {
+        "x": 37,
+        "y": 59
+      }
+    }
+  ]
+}

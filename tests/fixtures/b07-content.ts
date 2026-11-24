@@ -5,6 +5,30 @@ import { DEFAULT_CONTENT, type GameContent } from "../../game";
 export function b07ReferenceContent(): GameContent {
   const content = structuredClone(DEFAULT_CONTENT);
   content.version = "1.32.0";
+  const laterCrew = new Set([
+    "hatchan", "kuroobi", "fisher-tiger", "bepo", "carrot", "pedro", "pekoms",
+    "heat", "wire", "shachi", "penguin", "jean-bart",
+    "pudding", "cracker", "katakuri", "big-mom",
+    "perospero", "smoothie", "oven", "brulee", "daifuku",
+  ]);
+  const laterTraits = new Set(["fish-man", "minks", "kid-pirates", "heart-pirates", "big-mom-pirates"]);
+  const laterForms = new Set([
+    "sabo-flame-emperor", "kid-punk-rotten", "kuzan-ice-form",
+    "blackbeard-darkness", "blackbeard-quake", "koby-honesty-impact",
+  ]);
+  content.units = content.units.filter(unit => !laterCrew.has(unit.id));
+  for (const unit of content.units) unit.traits = unit.traits.filter(trait => !laterTraits.has(trait));
+  content.forms = content.forms?.filter(form => !laterForms.has(form.id));
+  content.traits = content.traits.filter(trait => !laterTraits.has(trait.id));
+  const tierLimits: Record<string, number> = {
+    "straw-hat": 6, brawler: 4, swordsman: 3, supernova: 4, marksman: 3, guardian: 3,
+    navy: 3, captain: 3, specialist: 4,
+  };
+  for (const trait of content.traits) {
+    if (Object.hasOwn(tierLimits, trait.id)) {
+      trait.tiers = trait.tiers.filter(tier => tier.required <= tierLimits[trait.id]);
+    }
+  }
   // Explicit undefined also clears the field when the control is assigned to DEFAULT_CONTENT.
   content.foods = undefined;
   for (const encounter of content.harborEncounters) delete encounter.foodOffer;
