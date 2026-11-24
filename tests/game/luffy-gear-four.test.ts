@@ -754,6 +754,10 @@ describe("Luffy Gear 4 battle-economy freeze", () => {
     for (let copy = 4; copy <= 8; copy += 1) state = buy(state, "luffy");
     expect(human(state).units[anchor.id]).toMatchObject({ star: 2 });
     expect(human(state).units[anchor.id]).not.toHaveProperty("formId");
+    state = buy(state, "nami");
+    const ally = Object.values(human(state).units).find(unit => unit.definitionId === "nami");
+    if (!ally) throw new Error("Expected an ally to occupy the final deployment slot.");
+    placeOnBoard(human(state), ally, "1,5");
     forceOffer(state, "luffy");
     state = run(state, { type: "END_PREPARATION" });
 

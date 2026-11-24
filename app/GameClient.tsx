@@ -801,38 +801,18 @@ export default function GameClient() {
     [issueCommand, scoutedPlayerId, tutorialStep, view],
   );
 
-  const sellSelected = useCallback(() => {
-    if (scoutedPlayerId) return;
-    if (!view || !selectedUnitId) return;
-    const selected = view.boardUnits.find(
-      (unit) => unit.id === selectedUnitId,
+  const sellUnit = useCallback((unitId: string) => {
+    if (!view || scoutedPlayerId || tutorialStep !== null) return false;
+    const unit = view.boardUnits.find(candidate => candidate.id === unitId && candidate.team === "player");
+    if (!unit || (view.phase !== "preparation" && !(view.phase === "battle" && unit.zone === "bench"))) return false;
+    const sold = issueCommand(
+      { type: "SELL_UNIT", unitId: persistentUnitId(view, unitId) },
+      "coin",
+      `Sold ${unit.name}; equipped treasure was returned.`,
     );
-    const canSell =
-      view.phase === "preparation" ||
-      (view.phase === "battle" &&
-        tutorialStep === null &&
-        selected?.zone === "bench");
-    if (!canSell) return;
-    const selectedName = selected?.name ?? "the selected crew member";
-    if (
-      issueCommand(
-        {
-          type: "SELL_UNIT",
-          unitId: persistentUnitId(view, selectedUnitId),
-        },
-        "coin",
-        `Sold ${selectedName}; equipped treasure was returned.`,
-      )
-    ) {
-      setSelectedUnitId(null);
-    }
-  }, [
-    issueCommand,
-    scoutedPlayerId,
-    selectedUnitId,
-    tutorialStep,
-    view,
-  ]);
+    if (sold) setSelectedUnitId(current => current === unitId ? null : current);
+    return sold;
+  }, [issueCommand, scoutedPlayerId, tutorialStep, view]);
 
   const chooseReward = useCallback(
     (choiceId: string) => {
@@ -1040,7 +1020,8 @@ export default function GameClient() {
       if (
         target?.tagName === "INPUT" ||
         target?.tagName === "SELECT" ||
-        target?.tagName === "TEXTAREA"
+        target?.tagName === "TEXTAREA" ||
+        target?.isContentEditable
       ) {
         return;
       }
@@ -1104,6 +1085,12 @@ export default function GameClient() {
         return;
       }
       if (view.phase !== "preparation" && view.phase !== "battle") return;
+      if (key === "s") {
+        if (!event.repeat && !event.ctrlKey && !event.metaKey && !event.altKey && selectedUnitId && sellUnit(selectedUnitId)) {
+          event.preventDefault();
+        }
+        return;
+      }
       if (tutorialStep && ["r", "l", "x"].includes(key)) {
         event.preventDefault();
         showToast(
@@ -1159,6 +1146,8 @@ export default function GameClient() {
     returnFromScouting,
     scoutedPlayerId,
     screen,
+    selectedUnitId,
+    sellUnit,
     showToast,
     tutorialStep,
     view,
@@ -1369,7 +1358,7 @@ export default function GameClient() {
               "Bought 4 XP.",
             )
           }
-          onSellSelected={sellSelected}
+          onSellUnit={sellUnit}
           onServeFood={(foodId) => {
             if (scoutedPlayerId || !selectedUnitId) return;
             issueCommand({ type: "USE_FOOD", unitId: selectedUnitId, foodId }, "reward", "Meal served for the next battle.");

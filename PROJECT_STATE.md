@@ -23,10 +23,12 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-B16 completes the roster expansion from B13 through B16. GameContent `1.42.0`, save schema 6, 55 playable recruits, 18 traits and 10 forms. The batches are delivered together through [PR #79](https://github.com/KarmaKami994/onepiece-autochess/pull/79). See the [batch plan](docs/ROSTER_AUSBAU_BATCHES_13_16.md) and the [B16 handoff](docs/B16_WHOLE_CAKE_PIRATES.md).
+Deck cleanup follows the roster expansion merged in [PR #79](https://github.com/KarmaKami994/onepiece-autochess/pull/79) at `a2fd62e`. GameContent `1.42.0`, save schema 6, 55 playable recruits, 18 traits and 10 forms.
 
 ## Last Completed Work
 
+- 2026-11-24 — Deck cleanup adds pre-battle bench deployment, selected-crew sale with S, a temporary sale target and a readable timer with separate track and fill. Material files cover `game/engine.ts`, `app/GameClient.tsx`, `app/screens/GameScreens.tsx`, `components/PhaserBoard.tsx`, the phase clock and HUD styles, and focused domain and browser fixtures.
+- 2026-11-24 — PR #80 CI follow-up fills board slots in the existing food and combat economy fixtures so their reserve units remain benched. The new meal regression covers a served recipient auto-deployed before combat.
 - 2026-11-24 — PR #79 combines the completed B13–B16 branches for one squash. The first combined CI exposed a stale Captain tier expectation in `tests/game/roster-expansion-pack-f.test.ts`. The fixture now pins Captain 5 and 7 alongside the original tiers.
 - 2026-11-23 — B16 adds Perospero, Smoothie, Oven, Brûlée and Daifuku, plus Big Mom Pirates 6/9, Brawler 8, Specialist 8 and Swordsman 7. The Homie strike is authoritative and presented in live combat and Chronicle. Material files cover content and combat, replay validation and visual selectors, runtime sprite packages, source provenance and focused tests.
 - 2026-11-23 — B15 adds Pudding, Cracker, Katakuri and Big Mom with four supplied Treasure Cruise sprite packages. Pekoms gains Big Mom Pirates 2/4 alongside Minks, and Captain 5/7, Navy 5 and Specialist 6 extend existing trait effects. Material files cover `game/content.ts`, the visual manifests, four asset packages and provenance, the crew asset exporter, content/trait/save/asset/browser fixtures, and the B15 handoff.
@@ -138,6 +140,8 @@ B16 completes the roster expansion from B13 through B16. GameContent `1.42.0`, s
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+Deck cleanup — Focused unit tests PASS, 94/94 across initial and CI follow-up runs. Eight focused browser cases PASS at 1280×720 and 1920×1080 for selling, automatic deployment, timer fill, battle economy and Regatta drag. CI #208 passed typecheck, lint and dependency review and found four fixtures that needed to keep a reserve out of combat with a full board. Final CI is recorded on [PR #80](https://github.com/KarmaKami994/onepiece-autochess/pull/80/checks). No separate local production run.
 
 B16 — Sprite export PASS. Focused trait, save and replay tests PASS, 89/89. Browser tests PASS, 8/8 at 1280×720 and 1920×1080. Combined CI #205 passed typecheck, lint and dependency review and failed the unit step at 1164/1165 on a stale Captain fixture. The focused correction passed 11/11. Final CI is recorded on [PR #79](https://github.com/KarmaKami994/onepiece-autochess/pull/79/checks). NOT RUN for a separate local production run, a new baseline or the 1,000-seed soak.
 
@@ -885,6 +889,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- At actual battle start, open slots for living human captains fill in left-to-right bench order. Melee prefers the front, range 2 the middle and longer range the back. Existing deployments stay in place, and this runs for both Start Battle and timeout. The selected shortcut, drag target and inspector all use `SELL_UNIT`. Sale remains available in preparation and for bench units during combat after the tutorial. The timer's display now separates phase, seconds and progress while retaining existing phase timing.
 - B16 counts nine deployed Big Mom Pirates without requiring Big Mom. Tier 9 triggers one Homie Special strike per team on the fourth distinct completed cast. Five recruits join the shared pool, and the existing schema-6 loader backfills their keys.
 - B15 adds four shared-pool recruits and a holder-scoped emergency Shield at Big Mom Pirates 2/4. The four-member tier is reachable without Big Mom. Captain, Navy and Specialist gain additional tiers. The schema-6 load path fills missing pool keys for the new recruits.
 - B14 adds five recruits and holder-scoped Kid Pirates and Heart Pirates bonuses using the existing trait engine. Kid, Killer, Law and Bepo gain crew membership. Supernova, Marksman and Guardian have new 5-member bonuses. Existing saves fill missing pool entries through schema 6.
@@ -965,6 +970,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- The PAC reference supplies the bench order, range-aware placement and drag target. The local S shortcut uses explicit selection and existing sale permissions. PAC-specific unit exceptions and server infrastructure stay reference-only. [PAC deployment](https://github.com/keldaanCommunity/pokemonAutoChess/blob/a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee/app/rooms/commands/game-commands.ts#L1820) · [PAC sale target](https://github.com/keldaanCommunity/pokemonAutoChess/blob/a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee/app/public/src/game/components/sell-zone.ts)
 - The four batches were implemented on separate branches and use the existing PR #79 for a single squash delivery, as requested.
 - B16 uses a generated Daifuku pose board because the surveyed sprite catalogues lacked a suitable combat sheet. The other four recruits use original Treasure Cruise sheets.
 - B15 is stacked on the local B14 commit. The handoff stays local while checks and publication are deferred.
@@ -1165,10 +1171,6 @@ Final current-roster high-cost identity pack:
 - Character forms remain separate from stars and shop/pool identity. Robin and Luffy are persistent production pilots; Chopper is the first battle-temporary production pilot.
 - All future Codex work must be bounded and branch/PR based.
 - ChatGPT decides architecture and prioritization; Codex executes requested tasks.
-
-## Next Recommended Task
-
-Finish the squash handoff for the roster expansion once B16's focused and GitHub checks are green.
 
 ## Codex Update Contract
 

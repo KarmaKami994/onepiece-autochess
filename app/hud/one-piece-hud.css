@@ -63,13 +63,36 @@
 }
 .pac-hud .pac-stage-path .current { background: #a14431 !important; border-color: #edc37e !important; }
 .pac-hud .phase-clock {
-  color: #6b472c; background: linear-gradient(#fff0ce, #dec295); box-shadow: inset 0 0 0 1px #a77b44;
+  --clock-track: #9c764d;
+  --clock-fill: #175d59;
+  background: linear-gradient(#fff0ce, #dec295); box-shadow: inset 0 0 0 1px #a77b44;
 }
 .pac-hud .phase-clock strong { color: var(--hud-ink); }
-.pac-hud .phase-clock span { color: #6b472c; }
-.pac-hud .phase-clock i { background: #af4d37; }
-.pac-hud .phase-clock.is-warning { outline: 2px solid #f29d73; }
+.pac-hud .phase-clock-label { color: #6b472c; }
+.pac-hud .phase-clock.is-warning { --clock-fill: #aa3b29; outline: 2px solid #f29d73; }
 .pac-hud .phase-clock.is-warning strong { color: #9e3726; }
+
+.board-sell-drop {
+  position: absolute;
+  z-index: 24;
+  top: clamp(100px, 18%, 190px);
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px dashed #f4ca7d;
+  border-radius: 8px;
+  background: #4b2b20;
+  color: #fff0ce;
+  box-shadow: 0 2px 10px #1c100ad9;
+  font: 600 14px/1.2 Jost, sans-serif;
+  white-space: nowrap;
+}
+.board-sell-drop strong { color: #ffdb8d; }
+.board-sell-drop[data-hovered="true"] { border-style: solid; background: #813b2a; }
 
 /* Captain medallions retain their health arc and readable numeric receipts. */
 .pac-hud .standings-list button {

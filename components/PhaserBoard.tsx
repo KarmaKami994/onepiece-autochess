@@ -231,6 +231,10 @@ export type PhaserBoardProps = BoardPayload & {
   onPlaybackUnavailable?: () => void;
   onMoveUnit: (move: BoardMove) => boolean;
   onSelectUnit: (unitId: string | null) => void;
+  sell?: {
+    priceFor: (unit: BoardUnit) => number | undefined;
+    submit: (unitId: string) => boolean;
+  };
 };
 
 type SceneBridge = {
@@ -293,6 +297,7 @@ export default function PhaserBoard({
   onPlaybackUnavailable,
   onMoveUnit,
   onSelectUnit,
+  sell,
 }: PhaserBoardProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<import("phaser").Game | null>(null);
@@ -309,6 +314,9 @@ export default function PhaserBoard({
   });
   const moveRef = useRef(onMoveUnit);
   const selectRef = useRef(onSelectUnit);
+  const sellRef = useRef(sell);
+  const sellDropRef = useRef<HTMLDivElement>(null);
+  const [sellDrop, setSellDrop] = useState<{ gold: number; hovered: boolean } | null>(null);
   const hoverRef = useRef(onHoverUnit);
   useEffect(() => { hoverRef.current = onHoverUnit; }, [onHoverUnit]);
   const eventsRef = useRef(combatEvents);
@@ -329,6 +337,7 @@ export default function PhaserBoard({
   };
   moveRef.current = onMoveUnit;
   selectRef.current = onSelectUnit;
+  sellRef.current = sell;
 
   useEffect(() => {
     let cancelled = false;
@@ -1150,9 +1159,26 @@ export default function PhaserBoard({
             }
           }
 
+          private clearUnitDrag() {
+            if (this.draggingUnitId) setSellDrop(null);
+            this.draggingUnitId = null;
+            this.hoverDestinationKey = null;
+          }
+
+          private overSellDrop(pointer: Phaser.Input.Pointer): boolean {
+            if (!sellRef.current || !sellDropRef.current || pointer.wasCanceled) return false;
+            const event = pointer.event;
+            const position = "changedTouches" in event
+              ? Array.from(event.changedTouches).find(touch => touch.identifier === pointer.identifier)
+              : event;
+            if (!position) return false;
+            const { left, right, top, bottom } = sellDropRef.current.getBoundingClientRect();
+            return position.clientX >= left && position.clientX < right && position.clientY >= top && position.clientY < bottom;
+          }
+
           sync(payload: BoardPayload, forceRebuild = false) {
-            // Keep ordinary formation clicks out of drag/tween selection.
-            this.input.dragDistanceThreshold = payload.interactionMode === "formation" ? 4 : 0;
+            // Keep ordinary clicks out of drag/tween selection.
+            this.input.dragDistanceThreshold = 4;
             if (
               !forceRebuild &&
               this.tokenObjects.size > 0 &&
@@ -1165,9 +1191,8 @@ export default function PhaserBoard({
             }
             if (payload.phase !== this.payload.phase) {
               this.animationGeneration += 1;
-              this.draggingUnitId = null;
-              this.hoverDestinationKey = null;
             }
+            this.clearUnitDrag();
             if (payload.boardSkin !== this.currentBoardSkin) {
               const map = getBoardMapDefinition(payload.boardSkin);
               if (this.textures.exists(map.textureKey)) {
@@ -1185,7 +1210,6 @@ export default function PhaserBoard({
             this.resourceBars.forEach((bar) => {
               this.tweens.killTweensOf(bar.display);
             });
-            this.draggingUnitId = null;
             this.textureRefreshPending = false;
             this.tokenLayer.removeAll(true);
             this.tokenObjects.clear();
@@ -1234,6 +1258,7 @@ export default function PhaserBoard({
             previous: BoardPayload,
             next: BoardPayload,
           ) {
+            this.clearUnitDrag();
             for (const unit of previous.units) {
               if (unit.zone === "bench") this.removeToken(unit.id);
             }
@@ -1826,6 +1851,8 @@ export default function PhaserBoard({
               container.on("dragstart", () => {
                 wasDragged = true;
                 this.draggingUnitId = unit.id;
+                const gold = sellRef.current?.priceFor(unit);
+                if (gold !== undefined) setSellDrop({ gold, hovered: false });
                 this.hoverDestinationKey = destinationKey(
                   unitDestination(unit),
                 );
@@ -1841,7 +1868,9 @@ export default function PhaserBoard({
                 "drag",
                 (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
                   container.setPosition(dragX, dragY);
-                  const destination = boardDestinationAtPoint(
+                  const hovered = this.overSellDrop(pointer);
+                  setSellDrop(previous => previous && previous.hovered !== hovered ? { ...previous, hovered } : previous);
+                  const destination = hovered ? null : boardDestinationAtPoint(
                     pointer.worldX,
                     pointer.worldY,
                   );
@@ -1865,8 +1894,17 @@ export default function PhaserBoard({
                   pointer.worldY,
                 );
                 const origin = boardDestinationCenter(unitDestination(unit));
-                this.draggingUnitId = null;
-                this.hoverDestinationKey = null;
+                const droppedOnSell = this.overSellDrop(pointer);
+                this.clearUnitDrag();
+                if (droppedOnSell || pointer.wasCanceled) {
+                  if (droppedOnSell && sellRef.current?.submit(unit.id)) {
+                    container.setVisible(false);
+                  } else {
+                    container.setPosition(origin.x, origin.y);
+                  }
+                  this.refreshDestinationCues();
+                  return;
+                }
 
                 if (
                   destination &&
@@ -2648,6 +2686,11 @@ export default function PhaserBoard({
         role="application"
         aria-label={`${activeMap.ariaLabel}. Drag your crew to arrange them.`}
       />
+      {sell && sellDrop && (
+        <div ref={sellDropRef} className="board-sell-drop" data-hovered={sellDrop.hovered} role="status">
+          Drop to sell <strong>{sellDrop.gold} gold</strong>
+        </div>
+      )}
       <ul className="sr-only" aria-label="Units on the tactical board">
         {units.map((unit) => (
           <li key={unit.id}>

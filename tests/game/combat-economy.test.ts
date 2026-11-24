@@ -39,22 +39,22 @@ function buy(state: MatchState, definitionId: string): MatchState {
   return run(state, { type: "BUY_UNIT", shopIndex: 0 });
 }
 
+function deployReserve(state: MatchState, definitionId: string, x: number): MatchState {
+  const captain = player(state);
+  const id = captain.bench.find(unitId => unitId && captain.units[unitId].definitionId === definitionId);
+  if (!id) throw new Error(`Missing reserve ${definitionId}`);
+  return run(state, { type: "MOVE_UNIT", unitId: id, to: { zone: "board", x, y: 5 } });
+}
+
 function createBattleState(seed = "combat-economy"): MatchState {
   let state = createMatch(seed);
   player(state).gold = 99;
   state = buy(state, "luffy");
-  const luffyId = player(state).bench.find(
-    (unitId): unitId is string => Boolean(unitId),
-  );
-  if (!luffyId) throw new Error("Missing deployed test unit");
-  state = run(state, {
-    type: "MOVE_UNIT",
-    unitId: luffyId,
-    to: { zone: "board", x: 0, y: 5 },
-  });
+  state = deployReserve(state, "luffy", 0);
   state = buy(state, "nami");
   state = buy(state, "usopp");
   state = buy(state, "robin");
+  state = deployReserve(state, "robin", 1);
   forceOffer(state, "chopper");
   state = run(state, { type: "END_PREPARATION" });
   expect(state.phase).toBe("battle");
@@ -194,6 +194,8 @@ describe("combat economy command policy", () => {
       to: { zone: "board", x: 0, y: 5 },
     });
     state = buy(state, "luffy");
+    state = buy(state, "nami");
+    state = deployReserve(state, "nami", 1);
     forceOffer(state, "luffy");
     state = run(state, { type: "END_PREPARATION" });
 
