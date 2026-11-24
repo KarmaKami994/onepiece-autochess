@@ -123,7 +123,11 @@ describe("B09 one-battle lifecycle", () => {
       player.units[older.id] = older; player.board["1,5"] = older.id; state.pool.zoro -= 1;
     }
     state = command(state, { type: "USE_FOOD", foodId: "sea-king-bento", unitId: id });
-    if (mode === "bench") state = command(state, { type: "MOVE_UNIT", unitId: id, to: { zone: "bench", slot: 1 } });
+    if (mode === "bench") {
+      state = command(state, { type: "MOVE_UNIT", unitId: id, to: { zone: "bench", slot: 1 } });
+      put(state, 0, "nami");
+      put(state, 0, "koby");
+    }
     if (mode === "sell") state = command(state, { type: "SELL_UNIT", unitId: id });
     if (mode === "merge") {
       const next = addUnitToPlayer(state, state.players[0], "zoro", content);
@@ -133,6 +137,16 @@ describe("B09 one-battle lifecycle", () => {
     expect(battle.battleMeals?.["player-1"]).toBeUndefined(); expect(battle.players[0].foodInventory).toEqual([]);
     expect(battle.foodHistory?.map(receipt => receipt.kind)).toEqual(["served", "expired"]);
     expect(battle.lastResults.flatMap(result => result.initialUnits).every(unit => !unit.foodId)).toBe(true);
+  });
+
+  it("keeps a served meal when its recipient automatically redeploys before combat", () => {
+    const state = preparation();
+    const id = Object.values(state.players[0].board)[0];
+    const served = command(state, { type: "USE_FOOD", foodId: "sea-king-bento", unitId: id });
+    const reserve = command(served, { type: "MOVE_UNIT", unitId: id, to: { zone: "bench", slot: 1 } });
+    const battle = command(reserve, { type: "END_PREPARATION" });
+    expect(battle.battleMeals?.["player-1"]?.unitId).toBe(id);
+    expect(battle.foodHistory?.map(receipt => receipt.kind)).toEqual(["served", "applied"]);
   });
 
   it("does not stack a meal again on Phoenix resurrection", () => {

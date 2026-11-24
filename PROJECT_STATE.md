@@ -28,6 +28,7 @@ Deck cleanup follows the roster expansion merged in [PR #79](https://github.com/
 ## Last Completed Work
 
 - 2026-11-24 — Deck cleanup adds pre-battle bench deployment, selected-crew sale with S, a temporary sale target and a readable timer with separate track and fill. Material files cover `game/engine.ts`, `app/GameClient.tsx`, `app/screens/GameScreens.tsx`, `components/PhaserBoard.tsx`, the phase clock and HUD styles, and focused domain and browser fixtures.
+- 2026-11-24 — PR #80 CI follow-up fills board slots in the existing food and combat economy fixtures so their reserve units remain benched. The new meal regression covers a served recipient auto-deployed before combat.
 - 2026-11-24 — PR #79 combines the completed B13–B16 branches for one squash. The first combined CI exposed a stale Captain tier expectation in `tests/game/roster-expansion-pack-f.test.ts`. The fixture now pins Captain 5 and 7 alongside the original tiers.
 - 2026-11-23 — B16 adds Perospero, Smoothie, Oven, Brûlée and Daifuku, plus Big Mom Pirates 6/9, Brawler 8, Specialist 8 and Swordsman 7. The Homie strike is authoritative and presented in live combat and Chronicle. Material files cover content and combat, replay validation and visual selectors, runtime sprite packages, source provenance and focused tests.
 - 2026-11-23 — B15 adds Pudding, Cracker, Katakuri and Big Mom with four supplied Treasure Cruise sprite packages. Pekoms gains Big Mom Pirates 2/4 alongside Minks, and Captain 5/7, Navy 5 and Specialist 6 extend existing trait effects. Material files cover `game/content.ts`, the visual manifests, four asset packages and provenance, the crew asset exporter, content/trait/save/asset/browser fixtures, and the B15 handoff.
@@ -140,7 +141,7 @@ Deck cleanup follows the roster expansion merged in [PR #79](https://github.com/
 
 ## Verification
 
-Deck cleanup — Focused unit tests PASS, 57/57. Focused browser cases PASS at 1280×720 and 1920×1080 for selling, automatic deployment, timer fill, battle economy and Regatta drag. The first timer run exposed overflow and the corrected cases passed. GitHub PR CI is the integration gate. No separate local production run.
+Deck cleanup — Focused unit tests PASS, 94/94 across initial and CI follow-up runs. Eight focused browser cases PASS at 1280×720 and 1920×1080 for selling, automatic deployment, timer fill, battle economy and Regatta drag. CI #208 passed typecheck, lint and dependency review and found four fixtures that needed to keep a reserve out of combat with a full board. Final CI is recorded on [PR #80](https://github.com/KarmaKami994/onepiece-autochess/pull/80/checks). No separate local production run.
 
 B16 — Sprite export PASS. Focused trait, save and replay tests PASS, 89/89. Browser tests PASS, 8/8 at 1280×720 and 1920×1080. Combined CI #205 passed typecheck, lint and dependency review and failed the unit step at 1164/1165 on a stale Captain fixture. The focused correction passed 11/11. Final CI is recorded on [PR #79](https://github.com/KarmaKami994/onepiece-autochess/pull/79/checks). NOT RUN for a separate local production run, a new baseline or the 1,000-seed soak.
 
