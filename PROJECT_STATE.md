@@ -27,6 +27,7 @@ B16 completes the roster expansion from B13 through B16. GameContent `1.42.0`, s
 
 ## Last Completed Work
 
+- 2026-11-24 — PR #79 combines the completed B13–B16 branches for one squash. The first combined CI exposed a stale Captain tier expectation in `tests/game/roster-expansion-pack-f.test.ts`. The fixture now pins Captain 5 and 7 alongside the original tiers.
 - 2026-11-23 — B16 adds Perospero, Smoothie, Oven, Brûlée and Daifuku, plus Big Mom Pirates 6/9, Brawler 8, Specialist 8 and Swordsman 7. The Homie strike is authoritative and presented in live combat and Chronicle. Material files cover content and combat, replay validation and visual selectors, runtime sprite packages, source provenance and focused tests.
 - 2026-11-23 — B15 adds Pudding, Cracker, Katakuri and Big Mom with four supplied Treasure Cruise sprite packages. Pekoms gains Big Mom Pirates 2/4 alongside Minks, and Captain 5/7, Navy 5 and Specialist 6 extend existing trait effects. Material files cover `game/content.ts`, the visual manifests, four asset packages and provenance, the crew asset exporter, content/trait/save/asset/browser fixtures, and the B15 handoff.
 - 2026-11-23 — B14 adds Heat, Wire, Shachi, Penguin and Jean Bart from three owner-supplied Treasure Cruise sheets. Kid Pirates and Heart Pirates have 2/4 tiers. Supernova, Marksman and Guardian gain their 5-member tiers. Material changes cover content, five sprite packages, two trait icons, visual manifests, the crew exporter, content/trait/save/asset/browser test fixtures, and B14 documentation.
@@ -138,11 +139,11 @@ B16 completes the roster expansion from B13 through B16. GameContent `1.42.0`, s
 
 ## Verification
 
-B16 — Sprite export PASS. Focused trait, save and replay tests PASS, 89/89. Focused browser verification and normal PR CI are reported as they finish. No separate local production run or new baseline.
+B16 — Sprite export PASS. Focused trait, save and replay tests PASS, 89/89. Browser tests PASS, 8/8 at 1280×720 and 1920×1080. Combined CI #205 passed typecheck, lint and dependency review and failed the unit step at 1164/1165 on a stale Captain fixture. The focused correction passed 11/11. Final CI is recorded on [PR #79](https://github.com/KarmaKami994/onepiece-autochess/pull/79/checks). NOT RUN for a separate local production run, a new baseline or the 1,000-seed soak.
 
 B15 — `npm run assets:b15` generated all four runtime sprite packages and the output hash manifest. NOT RUN for tests, typecheck, lint, build, asset validation, browser checks, CI and production runs. Checks and publication remain deferred.
 
-B14 — The offline asset exporter generated all five runtime sprite packages and the output hash manifest. The owner deferred verification. NOT RUN for tests, typecheck, lint, build, asset validation, browser checks, CI and production runs. Publication is pending so automatic PR checks do not run before approval.
+B14 — The offline asset exporter generated all five runtime sprite packages and the output hash manifest. The owner initially deferred standalone verification. The final B14 browser fixture passed at both desktop sizes in the combined B16 verification.
 
 B13 coverage follow-up — CI #203 unit suite passed 1144/1144 on both attempts. Coverage failed at the existing 30-second limit around two sequential three-seed simulations. Scratch-excluding local typecheck passed after the test-only split. The corrected-head suite and Coverage run through standard PR CI.
 

@@ -456,6 +456,22 @@ describe("Emperor origin", () => {
           label:
             "Crew-wide: 225 starting Shield; first Captain cast grants all allies 10 Energy",
         },
+        {
+          required: 5,
+          effects: [{ kind: "shield-flat", value: 300 }],
+          effectScope: "team",
+          behaviors: [{ kind: "first-captain-cast-command", energy: 13 }],
+          label:
+            "Crew-wide: 300 starting Shield; first Captain cast grants all allies 13 Energy",
+        },
+        {
+          required: 7,
+          effects: [{ kind: "shield-flat", value: 390 }],
+          effectScope: "team",
+          behaviors: [{ kind: "first-captain-cast-command", energy: 16 }],
+          label:
+            "Crew-wide: 390 starting Shield; first Captain cast grants all allies 16 Energy",
+        },
       ]);
   });
 
