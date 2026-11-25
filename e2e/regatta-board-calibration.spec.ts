@@ -53,6 +53,16 @@ test("Regatta return picks the correct stacked crew and preserves bench/field dr
   await storeVoyageFixture(page, createVoyageSaveEnvelope(state, state.seed, Date.now()));
   await page.reload(); await page.getByRole("button", { name: /CONTINUE/i }).click();
   await expect(page.locator("[data-carousel-ready=true]")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "BOUNTY REGATTA" })).toHaveCSS("font-family", /Pirata One/);
+  await expect(page.locator(".regatta-hud .carousel-timer strong")).toHaveCSS("font-family", /Atkinson Hyperlegible Next/);
+  const localFontsLoaded = await page.evaluate(async () => {
+    const fonts = await Promise.all([
+      document.fonts.load('32px "Pirata One"'),
+      document.fonts.load('800 24px "Atkinson Hyperlegible Next"'),
+    ]);
+    return fonts.every((faces) => faces.length > 0 && faces.every((face) => face.status === "loaded"));
+  });
+  expect(localFontsLoaded).toBe(true);
   await advanceVisiblePhase(page);
   await expect(page.locator(".phaser-stage-frame")).toHaveAttribute("data-phase", "preparation");
   await expect(page.locator(".board-loading")).toBeHidden();

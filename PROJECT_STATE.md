@@ -23,10 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-Deck cleanup follows the roster expansion merged in [PR #79](https://github.com/KarmaKami994/onepiece-autochess/pull/79) at `a2fd62e`. GameContent `1.42.0`, save schema 6, 55 playable recruits, 18 traits and 10 forms.
+Regatta presentation polish follows deck cleanup in [PR #80](https://github.com/KarmaKami994/onepiece-autochess/pull/80) at `a301304`. GameContent `1.42.0`, save schema 6, 55 playable recruits, 18 traits and 10 forms.
 
 ## Last Completed Work
 
+- 2026-11-25 — Bounty Regatta uses a pixel-art Grand Line harbor, eight boat silhouettes, a gold player pennant, heading-relative wakes, buoy crates, pickup effects, tow ropes and offline Pirata One / Atkinson Hyperlegible Next typography. Material files cover `components/PhaserCarousel.tsx`, `app/game.css`, the carousel asset generator and assets, font provenance and `e2e/regatta-board-calibration.spec.ts`.
 - 2026-11-24 — Deck cleanup adds pre-battle bench deployment, selected-crew sale with S, a temporary sale target and a readable timer with separate track and fill. Material files cover `game/engine.ts`, `app/GameClient.tsx`, `app/screens/GameScreens.tsx`, `components/PhaserBoard.tsx`, the phase clock and HUD styles, and focused domain and browser fixtures.
 - 2026-11-24 — PR #80 CI follow-up fills board slots in the existing food and combat economy fixtures so their reserve units remain benched. The new meal regression covers a served recipient auto-deployed before combat.
 - 2026-11-24 — PR #79 combines the completed B13–B16 branches for one squash. The first combined CI exposed a stale Captain tier expectation in `tests/game/roster-expansion-pack-f.test.ts`. The fixture now pins Captain 5 and 7 alongside the original tiers.
@@ -140,6 +141,8 @@ Deck cleanup follows the roster expansion merged in [PR #79](https://github.com/
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+Regatta presentation — `npm run assets:carousel` PASS. Local tests and asset validation NOT RUN pending verification scope. The Regatta return browser regression covers the local title and timer fonts and the existing bench/field calibration.
 
 Deck cleanup — Focused unit tests PASS, 94/94 across initial and CI follow-up runs. Eight focused browser cases PASS at 1280×720 and 1920×1080 for selling, automatic deployment, timer fill, battle economy and Regatta drag. CI #208 passed typecheck, lint and dependency review and found four fixtures that needed to keep a reserve out of combat with a full board. Final CI is recorded on [PR #80](https://github.com/KarmaKami994/onepiece-autochess/pull/80/checks). No separate local production run.
 
@@ -889,6 +892,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- The Regatta retains its fixed overhead Phaser Canvas view. Available buoys display the existing 64-unit claim radius, claims show a splash at the buoy, and claimed bounties tow visibly behind the boat. The existing reduced-motion setting suppresses extra wakes and splashes. Controls, timing, rewards and gameplay state are unaffected.
 - At actual battle start, open slots for living human captains fill in left-to-right bench order. Melee prefers the front, range 2 the middle and longer range the back. Existing deployments stay in place, and this runs for both Start Battle and timeout. The selected shortcut, drag target and inspector all use `SELL_UNIT`. Sale remains available in preparation and for bench units during combat after the tutorial. The timer's display now separates phase, seconds and progress while retaining existing phase timing.
 - B16 counts nine deployed Big Mom Pirates without requiring Big Mom. Tier 9 triggers one Homie Special strike per team on the fourth distinct completed cast. Five recruits join the shared pool, and the existing schema-6 loader backfills their keys.
 - B15 adds four shared-pool recruits and a holder-scoped emergency Shield at Big Mom Pirates 2/4. The four-member tier is reachable without Big Mom. Captain, Navy and Specialist gain additional tiers. The schema-6 load path fills missing pool keys for the new recruits.

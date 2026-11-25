@@ -14,6 +14,9 @@ import {
   type CarouselPoint,
 } from "./carouselGeometry";
 
+const REGATTA_LABEL_FONT = '"Atkinson Hyperlegible Next", system-ui, sans-serif';
+const BOUNTY_CLAIM_RADIUS = CAROUSEL_GEOMETRY.boatRadius + CAROUSEL_GEOMETRY.bountyRadius;
+
 export type CarouselParticipantView = Readonly<{
   playerId: string;
   name: string;
@@ -278,7 +281,13 @@ export default function PhaserCarousel({
       if (!hostRef.current || gameRef.current) return;
 
       try {
-        const PhaserModule = await import("phaser");
+        const [PhaserModule] = await Promise.all([
+          import("phaser"),
+          Promise.allSettled([
+            document.fonts.load('13px "Atkinson Hyperlegible Next"'),
+            document.fonts.load('bold 18px "Atkinson Hyperlegible Next"'),
+          ]),
+        ]);
         if (cancelled || !hostRef.current) return;
         const Phaser = PhaserModule.default;
 
@@ -287,10 +296,12 @@ export default function PhaserCarousel({
           container: Phaser.GameObjects.Container;
           body: Phaser.GameObjects.Sprite | Phaser.GameObjects.Graphics;
           wake: Phaser.GameObjects.Graphics;
+          turnSpread: number;
           contrastOutline: Phaser.GameObjects.Graphics;
           label: Phaser.GameObjects.Text;
-          arrow: Phaser.GameObjects.Text;
+          pennant: Phaser.GameObjects.Graphics;
           status: Phaser.GameObjects.Text;
+          towLine: Phaser.GameObjects.Graphics;
           tow?: Phaser.GameObjects.Sprite | Phaser.GameObjects.Graphics;
           towChoiceId?: string;
           direction: CarouselDirection;
@@ -430,30 +441,7 @@ export default function PhaserCarousel({
                 CAROUSEL_GEOMETRY.centerY,
                 CAROUSEL_GEOMETRY.orbitRadiusX * 2,
                 CAROUSEL_GEOMETRY.orbitRadiusY * 2,
-              )
-              .lineStyle(2, 0xdcb85a, 0.38)
-              .strokeCircle(
-                CAROUSEL_GEOMETRY.centerX,
-                CAROUSEL_GEOMETRY.centerY,
-                104,
               );
-            this.add
-              .text(
-                CAROUSEL_GEOMETRY.centerX,
-                CAROUSEL_GEOMETRY.centerY,
-                "BOUNTY\nREGATTA",
-                {
-                  align: "center",
-                  color: this.payload.highContrast ? "#fff2a8" : "#d8bd76",
-                  fontFamily: "monospace",
-                  fontSize: "24px",
-                  fontStyle: "bold",
-                  stroke: "#031820",
-                  strokeThickness: 7,
-                },
-              )
-              .setOrigin(0.5)
-              .setDepth(-18);
           }
 
           private createTargetMarker() {
@@ -486,14 +474,14 @@ export default function PhaserCarousel({
               .strokeRoundedRect(-145, -44, 290, 88, 8);
             this.tooltipTitle = this.add.text(0, -27, "", {
               color: "#ffe08a",
-              fontFamily: "monospace",
+              fontFamily: REGATTA_LABEL_FONT,
               fontSize: "18px",
               fontStyle: "bold",
             }).setOrigin(0.5, 0);
             this.tooltipDescription = this.add.text(0, -1, "", {
               align: "center",
               color: "#d5edf1",
-              fontFamily: "monospace",
+              fontFamily: REGATTA_LABEL_FONT,
               fontSize: "13px",
               wordWrap: { width: 262 },
             }).setOrigin(0.5, 0);
@@ -561,13 +549,7 @@ export default function PhaserCarousel({
               .lineStyle(5, this.boatColor(participant), 1)
               .strokeEllipse(0, 4, 82, 70);
             const wake = this.add.graphics();
-            wake
-              .lineStyle(5, 0xbdeaf1, 0.38)
-              .beginPath()
-              .moveTo(-22, 31)
-              .lineTo(0, 49)
-              .lineTo(22, 31)
-              .strokePath();
+            const towLine = this.add.graphics();
             const body = this.textureAvailable(BOAT_SHEET_KEY)
               ? this.add
                   .sprite(0, 0, BOAT_SHEET_KEY, 0)
@@ -576,23 +558,23 @@ export default function PhaserCarousel({
             const label = this.add.text(0, 53, participant.name, {
               align: "center",
               color: "#f4f1dc",
-              fontFamily: "monospace",
+              fontFamily: REGATTA_LABEL_FONT,
               fontSize: "15px",
               fontStyle: "bold",
               stroke: "#031820",
               strokeThickness: this.payload.highContrast ? 6 : 4,
             }).setOrigin(0.5, 0);
-            const arrow = this.add.text(0, -66, "▼", {
-              color: "#ffd45f",
-              fontFamily: "monospace",
-              fontSize: "28px",
-              fontStyle: "bold",
-              stroke: "#031820",
-              strokeThickness: 5,
-            }).setOrigin(0.5);
+            const pennant = this.add.graphics();
+            pennant
+              .fillStyle(0x061b24, 1)
+              .fillTriangle(-16, -77, 18, -70, -16, -56)
+              .fillRect(-17, -79, 6, 34)
+              .fillStyle(0xffd45f, 1)
+              .fillTriangle(-12, -73, 11, -69, -12, -61)
+              .fillRect(-15, -77, 3, 28);
             const status = this.add.text(0, -91, "", {
               color: "#ffffff",
-              fontFamily: "monospace",
+              fontFamily: REGATTA_LABEL_FONT,
               fontSize: "13px",
               fontStyle: "bold",
               stroke: "#031820",
@@ -602,9 +584,10 @@ export default function PhaserCarousel({
               .container(participant.position.x, participant.position.y, [
                 contrastOutline,
                 wake,
+                towLine,
                 body,
                 label,
-                arrow,
+                pennant,
                 status,
               ])
               .setDepth(30 + participant.rank);
@@ -613,10 +596,12 @@ export default function PhaserCarousel({
               container,
               body,
               wake,
+              turnSpread: 0,
               contrastOutline,
               label,
-              arrow,
+              pennant,
               status,
+              towLine,
               direction: "n",
               hasSynced: false,
             };
@@ -631,20 +616,28 @@ export default function PhaserCarousel({
             const column = carouselBountyColumn(choice);
             const accent = colorNumber(choice.color, colors[column ?? 0]);
             body
+              .fillStyle(0xa44f38, 1)
+              .fillEllipse(0, 11, 51, 42)
               .fillStyle(0x4a2a19, 1)
-              .fillRoundedRect(-28, -23, 56, 49, 7)
+              .fillRoundedRect(-26, -25, 52, 46, 7)
               .fillStyle(accent, 1)
-              .fillRoundedRect(-23, -18, 46, 38, 5)
+              .fillRoundedRect(-22, -21, 44, 38, 5)
               .lineStyle(this.payload.highContrast ? 5 : 3, 0xffdf82, 1)
-              .strokeRoundedRect(-28, -23, 56, 49, 7);
+              .strokeRoundedRect(-26, -25, 52, 46, 7);
             return body;
           }
 
           private createBounty(choice: CarouselTokenView): BountyDisplay {
+            const claimRing = this.add.graphics();
+            claimRing
+              .lineStyle(5, 0x08262e, 0.82)
+              .strokeCircle(0, 0, BOUNTY_CLAIM_RADIUS)
+              .lineStyle(2, 0x83d2c0, 0.63)
+              .strokeCircle(0, 0, BOUNTY_CLAIM_RADIUS);
             const contrastOutline = this.add.graphics();
             contrastOutline
-              .lineStyle(5, 0xffffff, 0.95)
-              .strokeCircle(0, 0, 34);
+              .lineStyle(4, 0xffffff, 0.95)
+              .strokeCircle(0, 0, BOUNTY_CLAIM_RADIUS);
             const recommendation = this.add.graphics();
             recommendation
               .lineStyle(5, 0xffd85c, 0.96)
@@ -677,6 +670,7 @@ export default function PhaserCarousel({
               .setInteractive({ useHandCursor: true });
             const container = this.add
               .container(0, 0, [
+                claimRing,
                 contrastOutline,
                 recommendation,
                 body,
@@ -733,13 +727,14 @@ export default function PhaserCarousel({
                 ).setScale(0.72)
               : this.fallbackBounty(choice).setScale(0.72);
             display.towChoiceId = choice.id;
-            display.container.addAt(display.tow, 1);
+            display.container.addAt(display.tow, 3);
           }
 
           private removeTow(display: BoatDisplay) {
             display.tow?.destroy();
             display.tow = undefined;
             display.towChoiceId = undefined;
+            display.towLine.clear();
           }
 
           private syncBoat(participant: CarouselParticipantView) {
@@ -750,7 +745,7 @@ export default function PhaserCarousel({
             }
             display.participant = participant;
             display.label.setText(participant.name);
-            display.arrow.setVisible(
+            display.pennant.setVisible(
               participant.playerId === this.payload.playerId,
             );
 
@@ -767,6 +762,9 @@ export default function PhaserCarousel({
                   position,
                   previousDirection,
                 );
+            if (participant.moving && display.direction !== previousDirection) {
+              display.turnSpread = 1;
+            }
 
             const duration = carouselInterpolationDuration(
               this.payload.tickMs,
@@ -820,10 +818,14 @@ export default function PhaserCarousel({
             if (claimed) {
               this.ensureTow(display, claimed);
               const vector = carouselDirectionVector(display.direction);
-              display.tow?.setPosition(
-                -vector.x * CAROUSEL_GEOMETRY.towDistance,
-                -vector.y * CAROUSEL_GEOMETRY.towDistance,
-              );
+              const x = -vector.x * CAROUSEL_GEOMETRY.towDistance;
+              const y = -vector.y * CAROUSEL_GEOMETRY.towDistance;
+              display.tow?.setPosition(x, y);
+              display.towLine.clear()
+                .lineStyle(5, 0x17272b, 0.9)
+                .lineBetween(0, 0, x, y)
+                .lineStyle(2, 0xe1bc78, 0.9)
+                .lineBetween(0, 0, x, y);
             } else {
               this.removeTow(display);
             }
@@ -933,18 +935,33 @@ export default function PhaserCarousel({
                 }
               }
               if (event.type === "claim" && !this.payload.reducedMotion) {
+                const choice = this.payload.snapshot.choices.find(
+                  (candidate) => candidate.id === event.choiceId,
+                );
                 const participant = event.playerId
                   ? this.boats.get(event.playerId)
                   : undefined;
-                if (participant) {
-                  this.spawnBurst(
-                    {
-                      x: participant.container.x,
-                      y: participant.container.y,
-                    },
-                    0xffd45f,
-                    58,
-                  );
+                const position = choice
+                  ? choice.position ?? carouselOrbitPoint(
+                      choice.orbitIndex,
+                      this.payload.snapshot.choices.length,
+                      event.tick,
+                      this.payload.snapshot.orbitDirection ?? 1,
+                    )
+                  : participant?.participant.position;
+                if (position) {
+                  const point = finitePoint(position);
+                  const ripple = this.add.graphics().setDepth(19).setPosition(point.x, point.y);
+                  ripple.lineStyle(4, 0xa8f3e1, 0.85).strokeCircle(0, 0, 28);
+                  this.tweens.add({
+                    targets: ripple,
+                    scale: 2.4,
+                    alpha: 0,
+                    duration: 365,
+                    ease: "Quad.easeOut",
+                    onComplete: () => ripple.destroy(),
+                  });
+                  this.spawnBurst(point, 0xf9e3a2, 58);
                 }
               }
             });
@@ -1003,7 +1020,28 @@ export default function PhaserCarousel({
             this.emitNewEvents(payload.snapshot.events ?? []);
           }
 
-          update(time: number) {
+          private drawWake(display: BoatDisplay, time: number, delta: number) {
+            display.turnSpread = Math.max(0, display.turnSpread - delta / 340);
+            const vector = carouselDirectionVector(display.direction);
+            const flare = 28 + display.turnSpread * 24;
+            const fade = 0.55 + Math.sin(time / 110) * 0.12;
+            display.wake
+              .clear()
+              .setRotation(Math.atan2(vector.y, vector.x) + Math.PI / 2);
+            for (const side of [-1, 1]) {
+              display.wake
+                .lineStyle(3, 0xb3e6df, fade)
+                .beginPath()
+                .moveTo(side * 10, 28)
+                .lineTo(side * flare * 0.72, 45)
+                .lineTo(side * flare, 63)
+                .strokePath()
+                .lineStyle(2, 0x6bb7c0, fade * 0.64)
+                .lineBetween(side * flare * 0.7, 59, side * (flare + 6), 76);
+            }
+          }
+
+          update(time: number, delta: number) {
             const reducedMotion = this.payload.reducedMotion;
             for (const display of this.boats.values()) {
               const animationFrame =
@@ -1023,9 +1061,7 @@ export default function PhaserCarousel({
                 const vector = carouselDirectionVector(display.direction);
                 display.body.rotation = Math.atan2(vector.y, vector.x) - Math.PI / 2;
               }
-              display.wake.alpha = reducedMotion
-                ? 0
-                : 0.28 + (Math.sin(time / 105) + 1) * 0.12;
+              if (display.wake.visible) this.drawWake(display, time, delta);
               if (display.tow instanceof Phaser.GameObjects.Sprite) {
                 const choice = this.payload.snapshot.choices.find(
                   (candidate) => candidate.id === display.towChoiceId,
@@ -1053,9 +1089,6 @@ export default function PhaserCarousel({
                   ),
                 );
               }
-              display.container.setScale(
-                reducedMotion ? 1 : 1 + Math.sin(time / 320 + display.choice.orbitIndex) * 0.025,
-              );
             }
             if (this.targetMarker?.visible && !reducedMotion) {
               this.targetMarker.rotation = time / 1_100;

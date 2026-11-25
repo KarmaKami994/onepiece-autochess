@@ -34,6 +34,17 @@ const palettes = [
   { id: "obsidian", name: "Obsidian Squall", sail: "#34475c", shade: "#182735", trim: "#f1b84a" },
 ];
 
+const rigging = [
+  { beam: 8, length: 16, sail: [[0, 10], [8, -3], [0, -9], [-2, 1]] },
+  { beam: 7, length: 18, sail: [[0, 11], [6, 4], [5, -5], [-4, -9], [-3, 5]] },
+  { beam: 10, length: 15, sail: [[0, 10], [9, 4], [7, -4], [-7, -4], [-8, 4]] },
+  { beam: 9, length: 17, sail: [[-2, 10], [8, 5], [6, -5], [1, -10], [-5, -1]] },
+  { beam: 10, length: 16, sail: [[-6, 8], [7, 8], [9, 0], [5, -6], [-5, -6], [-8, 0]] },
+  { beam: 7, length: 17, sail: [[1, 11], [7, -6], [-5, -10], [-3, 3]] },
+  { beam: 9, length: 18, sail: [[-4, 10], [5, 10], [8, 0], [4, -10], [-4, -7], [-7, 2]] },
+  { beam: 10, length: 18, sail: [[0, 11], [9, 5], [4, 1], [8, -7], [-7, -9], [-5, 4]] },
+];
+
 const items = [
   { id: "black-blade", name: "Black Blade", color: "#34475c", accent: "#efc15c", motif: "blade" },
   { id: "meat-platter", name: "Meat Platter", color: "#d45d55", accent: "#f5dfb0", motif: "meat" },
@@ -203,12 +214,61 @@ function randomFactory(seed) {
   };
 }
 
+function drawHarborPier(target, originX, originY, facing, random) {
+  const x = (distance) => originX + facing * distance;
+  const plank = (start, top, width, height, color) => {
+    rect(target, Math.min(x(start), x(start + width - 1)), originY + top, width, height, color);
+  };
+  for (const distance of [13, 46, 83]) {
+    rect(target, x(distance) - 5, originY + 22, 11, 10, "#04222b");
+    ellipseRing(target, x(distance), originY + 34, 14, 5, 1, "#438e88");
+  }
+  plank(0, -10, 97, 37, "#081a20");
+  plank(0, -14, 94, 36, "#482a21");
+  for (let distance = 0; distance < 94; distance += 6) {
+    const width = Math.min(5, 94 - distance);
+    plank(distance, -12, width, 30, distance % 18 === 0 ? "#ad7849" : "#886042");
+    plank(distance, -11, 1, 27, "#c68e55");
+    plank(distance + 2, Math.floor(random() * 15) - 4, 2, 10, "#71513b");
+  }
+  plank(0, -13, 95, 2, "#d0965a");
+  plank(0, 18, 95, 3, "#c48a55");
+  for (const distance of [13, 46, 83]) {
+    for (const y of [-11, 19]) {
+      circle(target, x(distance), originY + y, 5, "#34231b");
+      circle(target, x(distance) - 1, originY + y - 2, 3, "#c18b54");
+    }
+  }
+  plank(32, -6, 13, 13, "#37261e");
+  plank(32, -6, 11, 10, "#b3814e");
+  plank(51, 3, 10, 11, "#37261e");
+  plank(51, 3, 8, 8, "#95734e");
+}
+
+function drawHarborRock(target, x, y, size) {
+  const facet = (points, color) => polygon(target, points.map(([dx, dy]) => [x + dx * size, y + dy * size]), color);
+  ellipseRing(target, x, y + 5 * size, 32 * size, 21 * size, 1, "#40827e");
+  ellipseRing(target, x, y + 4 * size, 28 * size, 18 * size, 2, "#85c5b5", 9);
+  facet([[-28, 2], [-15, -18], [3, -22], [19, -13], [25, 7], [9, 17], [-15, 18]], "#142e33");
+  facet([[-24, 0], [-13, -16], [3, -22], [15, -12], [6, 0], [-9, 8]], "#596759");
+  facet([[3, -22], [19, -13], [25, 7], [9, 17], [6, 0], [15, -12]], "#31484a");
+  facet([[-24, 0], [-9, 8], [6, 0], [9, 17], [-15, 18]], "#3e5350");
+  facet([[-13, -16], [3, -22], [10, -17], [3, -16], [-6, -10], [-18, -8]], "#7e886f");
+}
+
 function createArena() {
   const target = canvas(arena.logicalWidth, arena.logicalHeight, "#061c29");
-  const bands = ["#082735", "#09313e", "#0a3945", "#0b414b", "#0d4851"];
-  for (let y = 0; y < target.height; y += 6) {
-    const band = bands[Math.floor(y / 18) % bands.length];
-    rect(target, 0, y, target.width, 6, band);
+  for (let y = 0; y < target.height; y += 3) {
+    for (let x = 0; x < target.width; x += 3) {
+      const edge = Math.hypot((x - 380) / 425, (y - 210) / 252);
+      const shoal = Math.min(1, Math.max(0, (edge - 0.56) / 0.59));
+      const swell = Math.sin(y / 23 + x / 83) * 1.6;
+      rect(target, x, y, 3, 3, [
+        Math.round(9 + shoal * 6),
+        Math.round(46 + shoal * 27 + swell),
+        Math.round(57 + shoal * 22 + swell), 255,
+      ]);
+    }
   }
 
   const random = randomFactory(0x4752414e);
@@ -217,8 +277,9 @@ function createArena() {
     const y = Math.floor(random() * target.height);
     const length = 5 + Math.floor(random() * 22);
     const bend = Math.floor(random() * 5) - 2;
-    const color = index % 5 === 0 ? "#26717a" : index % 3 === 0 ? "#155663" : "#0e4a57";
-    line(target, x, y, Math.min(target.width - 1, x + length), y + bend, color, index % 7 === 0 ? 2 : 1);
+    const edge = Math.hypot((x - 380) / 390, (y - 210) / 214);
+    const color = edge > 0.76 ? "#286971" : "#134550";
+    line(target, x, y, Math.min(target.width - 1, x + length), y + bend, color);
     if (index % 4 === 0) {
       line(target, x + 3, y + 2, Math.min(target.width - 1, x + Math.floor(length * 0.7)), y + bend + 2, "#0a3441");
     }
@@ -230,25 +291,19 @@ function createArena() {
     let previousY = baseY;
     for (let x = 0; x < target.width; x += 6) {
       const y = baseY + Math.round(Math.sin((x + lane * 31) / 37) * 4);
-      line(target, Math.max(0, x - 6), previousY, x, y, lane % 2 === 0 ? "#155a66" : "#104b59");
+      line(target, Math.max(0, x - 6), previousY, x, y, "#154854");
       previousY = y;
     }
   }
 
   // Central regatta current and brass compass rose.
-  ellipseRing(target, 380, 210, 184, 126, 5, "#06212d");
-  ellipseRing(target, 380, 210, 181, 123, 2, "#2f7e81", 14);
-  ellipseRing(target, 380, 210, 151, 99, 1, "#58a7a0", 10);
-  ellipseRing(target, 380, 210, 105, 67, 2, "#0a303b");
-  ellipseRing(target, 380, 210, 72, 45, 1, "#398188", 8);
-  circle(target, 380, 210, 29, "#082a36");
-  circle(target, 380, 210, 24, "#0e4650");
-  polygon(target, [[380, 178], [387, 207], [380, 202], [373, 207]], "#e6b34b");
-  polygon(target, [[380, 242], [373, 213], [380, 218], [387, 213]], "#7b4d2d");
-  polygon(target, [[348, 210], [377, 203], [372, 210], [377, 217]], "#d8d0a4");
-  polygon(target, [[412, 210], [383, 217], [388, 210], [383, 203]], "#b14a4d");
-  circle(target, 380, 210, 5, "#f4d37a");
-  circle(target, 380, 210, 2, "#382619");
+  ellipseRing(target, 380, 210, 40, 40, 1, "#30585b", 4);
+  ellipseRing(target, 380, 210, 33, 33, 1, "#2a5259");
+  polygon(target, [[380, 172], [387, 203], [380, 210], [373, 203]], "#5a6960");
+  polygon(target, [[380, 248], [373, 217], [380, 210], [387, 217]], "#324f53");
+  polygon(target, [[342, 210], [373, 203], [380, 210], [373, 217]], "#476267");
+  polygon(target, [[418, 210], [387, 217], [380, 210], [387, 203]], "#3b5558");
+  circle(target, 380, 210, 4, "#687366");
 
   // Outer rope-and-buoy course boundary.
   ellipseRing(target, 380, 210, 333, 181, 3, "#071822");
@@ -262,13 +317,12 @@ function createArena() {
     rect(target, x - 2, y - 4, 4, 3, "#f3dda0");
   }
 
-  // Rocky shoals stay beyond the navigable oval and frame the scene.
-  for (const [x, y, flip] of [[25, 25, 1], [735, 28, -1], [30, 390, -1], [731, 386, 1]]) {
-    polygon(target, [[x - 25 * flip, y + 8], [x - 12 * flip, y - 13], [x + 8 * flip, y - 18], [x + 27 * flip, y + 2], [x + 13 * flip, y + 18], [x - 16 * flip, y + 19]], "#071720");
-    polygon(target, [[x - 18 * flip, y + 5], [x - 8 * flip, y - 10], [x + 7 * flip, y - 13], [x + 20 * flip, y + 2], [x + 9 * flip, y + 12], [x - 11 * flip, y + 13]], "#36505a");
-    line(target, x - 15 * flip, y - 2, x + 5 * flip, y - 9, "#758078", 2);
-    line(target, x - 22 * flip, y + 24, x + 24 * flip, y + 23, "#8bd0cc", 2);
-  }
+  for (const [x, y, size] of [
+    [19, 11, 1.25], [53, 12, 0.68], [28, 34, 0.66], [710, 28, 0.96], [746, 14, 1.3],
+    [63, 382, 0.6], [35, 404, 1.18], [6, 385, 1.05], [733, 397, 1.22], [695, 405, 0.58],
+  ]) drawHarborRock(target, x, y, size);
+  drawHarborPier(target, 0, 91, 1, random);
+  drawHarborPier(target, 759, 322, -1, random);
 
   // Sparse foam flecks around the edge add motion without hiding boats.
   for (let index = 0; index < 34; index += 1) {
@@ -292,7 +346,7 @@ function transformedPolygon(cx, cy, forward, right, points) {
   return points.map(([side, ahead]) => localPoint(cx, cy, forward, right, side, ahead));
 }
 
-function createBoatFrame(palette, direction, animationFrame) {
+function createBoatFrame(palette, rig, direction, animationFrame) {
   const target = canvas(boatFrame.logicalWidth, boatFrame.logicalHeight);
   const forward = [Math.cos(direction.angle), Math.sin(direction.angle)];
   const right = [-forward[1], forward[0]];
@@ -301,32 +355,33 @@ function createBoatFrame(palette, direction, animationFrame) {
   const wakeShift = animationFrame % 2;
 
   // Wake trails animate independently while the vessel pivot remains fixed.
-  for (let trail = 0; trail < 3; trail += 1) {
+  for (let trail = 0; trail < 2; trail += 1) {
     const behind = -12 - trail * 4 - wakeShift;
     const spread = 5 + trail * 2;
     const leftA = localPoint(cx, cy, forward, right, -3, behind + 3);
     const leftB = localPoint(cx, cy, forward, right, -spread, behind);
     const rightA = localPoint(cx, cy, forward, right, 3, behind + 3);
     const rightB = localPoint(cx, cy, forward, right, spread, behind);
-    const wakeColor = trail === 0 ? colors.foamLight : trail === 1 ? colors.foam : "#438e91";
+    const wakeColor = trail === 0 ? colors.foam : "#438e91";
     line(target, leftA[0], leftA[1], leftB[0], leftB[1], wakeColor, trail === 0 ? 2 : 1);
     line(target, rightA[0], rightA[1], rightB[0], rightB[1], wakeColor, trail === 0 ? 2 : 1);
   }
   const fleck = localPoint(cx, cy, forward, right, animationFrame % 2 === 0 ? -10 : 10, -9 - animationFrame);
   pixel(target, fleck[0], fleck[1], colors.foamLight);
 
-  const hull = [[0, 16], [7, 8], [8, -7], [5, -14], [0, -17], [-5, -14], [-8, -7], [-7, 8]];
-  const hullInner = [[0, 13], [5, 6], [6, -7], [3, -12], [0, -14], [-3, -12], [-6, -7], [-5, 6]];
+  const { beam, length, sail } = rig;
+  const hull = [[0, length], [beam - 1, 8], [beam, -6], [beam - 3, -13], [0, -length], [3 - beam, -13], [-beam, -6], [1 - beam, 8]];
+  const hullInner = hull.map(([side, ahead]) => [side * 0.79, ahead * 0.83]);
   polygon(target, transformedPolygon(cx, cy, forward, right, hull), colors.ink);
   polygon(target, transformedPolygon(cx, cy, forward, right, hullInner), colors.hullDark);
   polygon(target, transformedPolygon(cx, cy, forward, right, [[0, 11], [4, 5], [4, -7], [0, -11], [-4, -7], [-4, 5]]), colors.deck);
   line(target, ...localPoint(cx, cy, forward, right, -3, -4), ...localPoint(cx, cy, forward, right, 3, -4), colors.deckLight);
   line(target, ...localPoint(cx, cy, forward, right, -3, 5), ...localPoint(cx, cy, forward, right, 3, 5), colors.hullDark);
 
-  // Top-down mast and split lateen sail, outlined for readability on any sea tile.
-  const sailOutline = transformedPolygon(cx, cy, forward, right, [[-1, 10], [8, 1], [-1, -10], [-4, 0]]);
-  const sailMain = transformedPolygon(cx, cy, forward, right, [[0, 8], [6, 1], [0, -8], [-2, 0]]);
-  const sailShade = transformedPolygon(cx, cy, forward, right, [[0, 8], [-2, 0], [0, -8], [1, 0]]);
+  // Each fleet entry has its own sail silhouette as well as its own color.
+  const sailOutline = transformedPolygon(cx, cy, forward, right, sail);
+  const sailMain = transformedPolygon(cx, cy, forward, right, sail.map(([side, ahead]) => [side * 0.8, ahead * 0.86]));
+  const sailShade = transformedPolygon(cx, cy, forward, right, [[0, 8], [-2, 0], [0, -7], [1, 0]]);
   polygon(target, sailOutline, colors.ink);
   polygon(target, sailMain, palette.sail);
   polygon(target, sailShade, palette.shade);
@@ -401,14 +456,15 @@ function createBountyFrame(item, animationFrame) {
   const cx = 16;
   const cy = 16 + bob;
 
-  circle(target, cx, cy + 2, 14, "#07141d");
-  circle(target, cx, cy + 1, 12, "#9b6033");
-  circle(target, cx, cy, 10, "#e0ad4e");
-  circle(target, cx, cy, 8, "#f3dda0");
-  rect(target, cx - 7, cy - 6, 14, 12, "#ead49b");
-  pixel(target, cx - 7, cy - 6, "#b78042");
-  pixel(target, cx + 7, cy + 6, "#b78042");
-  drawBountyMotif(target, item, cx, cy);
+  ellipseRing(target, cx, 26, 14, 4, 1, "#7fc9c0");
+  circle(target, cx, cy + 6, 12, "#092631");
+  circle(target, cx, cy + 4, 11, "#a44f38");
+  circle(target, cx, cy + 3, 9, "#d77d4c");
+  rect(target, cx - 11, cy - 8, 22, 16, "#38281e");
+  rect(target, cx - 10, cy - 7, 20, 14, "#f0d093");
+  rect(target, cx - 10, cy - 7, 2, 14, "#ac6d37");
+  rect(target, cx + 8, cy - 7, 2, 14, "#ac6d37");
+  drawBountyMotif(target, item, cx, cy - 1);
 
   const sparklePositions = [[5, 5], [26, 7], [25, 26], [6, 24]];
   const [sx, sy] = sparklePositions[animationFrame];
@@ -450,7 +506,7 @@ for (let paletteIndex = 0; paletteIndex < palettes.length; paletteIndex += 1) {
       const column = index % boatColumns;
       const row = Math.floor(index / boatColumns);
       blit(
-        createBoatFrame(palettes[paletteIndex], directions[directionIndex], animationFrame),
+        createBoatFrame(palettes[paletteIndex], rigging[paletteIndex], directions[directionIndex], animationFrame),
         boatLogicalAtlas,
         column * boatFrame.logicalWidth,
         row * boatFrame.logicalHeight,

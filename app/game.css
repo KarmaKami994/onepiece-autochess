@@ -4092,13 +4092,30 @@ details.trait-building {
 
 /* Phase 7C: player-controlled Bounty Regatta */
 
+@font-face {
+  font-family: "Pirata One";
+  src: url("/assets/carousel/fonts/PirataOne-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("/assets/carousel/fonts/AtkinsonHyperlegibleNext.ttf") format("truetype");
+  font-weight: 200 800;
+  font-display: swap;
+}
+
 .bounty-regatta-screen {
+  --regatta-body-font: "Atkinson Hyperlegible Next", system-ui, sans-serif;
+  --regatta-title-font: "Pirata One", Georgia, serif;
   display: block;
   height: 100vh;
   min-height: 0;
   padding: 0;
   overflow: hidden;
   background: #03141c;
+  font-family: var(--regatta-body-font);
 }
 
 .regatta-stage {
@@ -4137,11 +4154,11 @@ details.trait-building {
   grid-template-columns: minmax(290px, 1fr) 190px 92px 92px;
   align-items: center;
   gap: 12px;
-  border: 2px solid #b78c43;
-  color: #e8d4a6;
+  border: 3px double #ba8e50;
+  color: #ead8b1;
   background:
-    repeating-linear-gradient(0deg, #ffffff04 0 1px, transparent 1px 7px),
-    #071e28ed;
+    repeating-linear-gradient(0deg, #fbe2b508 0 1px, transparent 1px 7px),
+    linear-gradient(115deg, #513523f5, #251c18f5 55%, #10252af5);
   box-shadow: inset 0 0 0 2px #031017, 7px 8px 0 #020b11a3;
   pointer-events: none;
 }
@@ -4150,19 +4167,25 @@ details.trait-building {
   min-width: 0;
 }
 
+.regatta-title .eyebrow {
+  color: #f3d296;
+  font: 800 11px/1.2 var(--regatta-body-font);
+  letter-spacing: 0.11em;
+}
+
 .regatta-title h2 {
   margin: 5px 0 2px;
   color: #f6dda0;
-  font: 900 clamp(25px, 2.6vw, 39px)/0.9 Impact, "Arial Black", sans-serif;
-  letter-spacing: 0.08em;
+  font: 400 clamp(30px, 3.1vw, 48px)/0.95 var(--regatta-title-font);
+  letter-spacing: 0.045em;
   text-shadow: 3px 4px 0 #031016;
 }
 
 .regatta-title p {
   margin: 6px 0 0;
   overflow: hidden;
-  color: #a9c4c0;
-  font: 700 10px/1.1 "Courier New", monospace;
+  color: #e4d3b1;
+  font: 500 13px/1.15 var(--regatta-body-font);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -4179,15 +4202,15 @@ details.trait-building {
 
 .regatta-status span,
 .regatta-status small {
-  color: #8da9a7;
-  font: 800 8px/1.2 "Courier New", monospace;
+  color: #b3ceca;
+  font: 700 11px/1.15 var(--regatta-body-font);
   letter-spacing: 0.07em;
 }
 
 .regatta-status strong {
   margin: 4px 0;
   color: #80ddb2;
-  font: 900 11px/1 "Courier New", monospace;
+  font: 800 14px/1 var(--regatta-body-font);
 }
 
 .regatta-status strong.is-locked {
@@ -4199,6 +4222,15 @@ details.trait-building {
   width: 92px;
   height: 58px;
   box-shadow: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.regatta-hud .carousel-timer span {
+  font: 700 10px/1 var(--regatta-body-font);
+}
+
+.regatta-hud .carousel-timer strong {
+  font: 800 24px/1 var(--regatta-body-font);
 }
 
 .regatta-settings {
@@ -4207,7 +4239,7 @@ details.trait-building {
   color: #ead39b;
   background: #103440;
   cursor: pointer;
-  font: 900 9px/1 "Courier New", monospace;
+  font: 800 11px/1 var(--regatta-body-font);
   pointer-events: auto;
 }
 
@@ -4237,13 +4269,13 @@ details.trait-building {
 .regatta-preview > strong {
   margin: 4px 0;
   color: #f3dda4;
-  font: 900 12px/1 "Courier New", monospace;
+  font: 800 16px/1.1 var(--regatta-body-font);
 }
 
 .regatta-preview small,
 .regatta-preview em {
   color: #a9c1bd;
-  font: 700 8px/1.25 "Courier New", monospace;
+  font: 500 12px/1.25 var(--regatta-body-font);
 }
 
 .regatta-preview em {
@@ -4259,7 +4291,7 @@ details.trait-building {
 .regatta-claimed {
   margin-top: 7px;
   color: #ef8d80;
-  font: 900 8px/1 "Courier New", monospace;
+  font: 800 12px/1.2 var(--regatta-body-font);
 }
 
 .regatta-help {
@@ -4276,7 +4308,7 @@ details.trait-building {
   border: 1px solid #537278;
   color: #9eb9b5;
   background: #041821df;
-  font: 800 8px/1 "Courier New", monospace;
+  font: 700 11px/1.1 var(--regatta-body-font);
   letter-spacing: 0.05em;
   pointer-events: none;
 }
@@ -4309,13 +4341,13 @@ details.trait-building {
 
 .regatta-fallback strong {
   margin-top: 8px;
-  font: 900 17px/1.1 Impact, "Arial Black", sans-serif;
+  font: 400 24px/1.1 var(--regatta-title-font);
   letter-spacing: 0.05em;
 }
 
 .regatta-fallback p {
   color: #abc1be;
-  font: 700 10px/1.4 "Courier New", monospace;
+  font: 500 13px/1.4 var(--regatta-body-font);
 }
 
 .regatta-fallback button {
@@ -4324,14 +4356,14 @@ details.trait-building {
   border: 2px solid #d2a44d;
   background: #87343a;
   cursor: pointer;
-  font: 900 10px/1 "Courier New", monospace;
+  font: 800 12px/1 var(--regatta-body-font);
 }
 
 .high-contrast .regatta-hud,
 .high-contrast .regatta-preview,
 .high-contrast .regatta-help {
   border-color: #ffe078;
-  background-color: #03141cf5;
+  background: #03141cf5;
 }
 
 @media (max-height: 760px) {
@@ -4342,7 +4374,7 @@ details.trait-building {
   }
 
   .regatta-title h2 {
-    font-size: 27px;
+    font-size: 33px;
   }
 
   .regatta-title p {

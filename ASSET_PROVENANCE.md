@@ -1057,15 +1057,22 @@ Constraints: one character only; opaque hard-edged sprite silhouette; all feathe
 - Visual QA sheet: `public/assets/carousel/contact-sheet.png`
 - Processing contract: integer-coordinate clean-room geometry at half resolution, hard alpha edges, nearest-neighbor 2× enlargement, fixed palettes and fixed PRNG seed; no interpolation, GUI step, runtime generation, copied sprite, or external art input
 
-The set contains an original deep-navy ocean regatta arena with a central current and buoy course, an original top-down sailing boat animated in eight directions and four wake phases across eight sail palettes, and original animated bounty tokens for the eight finished items. Item symbols are locally drawn, simplified gameplay motifs rather than imported icons. The boat atlas is palette-major, direction-major, then animation-frame-minor; the bounty atlas is animation-frame-major then item-column-minor. Exact rectangles, pivots, frame formulas, palette colors, item IDs, dimensions, and timings are stored in the runtime manifest.
+The 2026-11-25 presentation pass adds two wooden harbor piers, rocky islets with surf, a quieter compass rose and race water, eight distinct hull/sail silhouettes, and floating bounty crates on buoys. The generator still uses only project-authored pixel geometry. The boat atlas is palette-major, direction-major, then animation-frame-minor. The bounty atlas is animation-frame-major then item-column-minor. The runtime manifest pins frame rectangles, pivots, formulas, colors, item IDs, dimensions and timings.
 
 | Asset | Runtime dimensions | SHA-256 |
 |---|---:|---|
-| `public/assets/carousel/ocean-arena.png` | `1520×840` | `41097c8919c5dd308bcef01dbf4981ff46eb2973c0c5fbf34a0109b6638fe381` |
-| `public/assets/carousel/boats.png` | `1536×1536` (256 frames at `96×96`) | `1c60ff65240917cca043d85eee7f2b857b481e3868f6b1eb4793199cfa32a9de` |
-| `public/assets/carousel/bounties.png` | `512×256` (32 frames at `64×64`) | `82618d906775375b810cab9b4234cefb65eff98d590de4d078dd3599dff7741d` |
+| `public/assets/carousel/ocean-arena.png` | `1520×840` | `a7e8e1f881eeb6ce537fe06c0c9132ed68908029ab8c60bc0ca62add32486bdd` |
+| `public/assets/carousel/boats.png` | `1536×1536` (256 frames at `96×96`) | `85fb8f5c1c50a89cbc5c11492dacd6e94974cbc9bc2f35722344aa248a29b788` |
+| `public/assets/carousel/bounties.png` | `512×256` (32 frames at `64×64`) | `a77dd52a5c6e12db4cd60c28dc5362c938e61d8e447576b524d3edb592fcf37f` |
 | `public/assets/carousel/carousel-manifest.json` | schema v1 | `a70007a69d809b7c7f57bcebf3a3f254b78f7f648dc28f294237938f09c3c511` |
-| `public/assets/carousel/contact-sheet.png` | `1400×800` | `5632adc7c3d26831bb3025d592fff5fbd00cabf8771b2b7d05504be931e2e4d3` |
+| `public/assets/carousel/contact-sheet.png` | `1400×800` | `2b41b8725d3b76809ab4e7bee590fe15f5dd9450d813215980b33c48c8fb8307` |
+
+The Regatta fonts are bundled unchanged under the SIL Open Font License 1.1 in `public/assets/carousel/fonts/`, with the matching upstream `*-OFL.txt` notices. Both are pinned to Google Fonts commit `83c62e30d87daa70216dab6b984d00d20d96d585`.
+
+| Font file | SHA-256 | Source |
+|---|---|---|
+| `PirataOne-Regular.ttf` | `5347a2e155589ecf667d4b766613c8ee003edde9f83717fd24c09599a4b1ecc0` | [Pirata One](https://github.com/google/fonts/tree/83c62e30d87daa70216dab6b984d00d20d96d585/ofl/pirataone) |
+| `AtkinsonHyperlegibleNext.ttf` | `5a455d1cfa099b601ab70751bb9673e8fe1854dc4500c80e1a220d0d75e31745` | [Atkinson Hyperlegible Next](https://github.com/google/fonts/tree/83c62e30d87daa70216dab6b984d00d20d96d585/ofl/atkinsonhyperlegiblenext) |
 
 Visual QA on `2026-08-24` confirmed that all eight palette/direction combinations remain distinguishable on the arena, all 32 item frames stay inside their cells, all sprite edges are hard pixels, all atlas backgrounds are transparent, and the generated contact sheet contains no text, logo, watermark, recognizable external character, or copied interface.
 

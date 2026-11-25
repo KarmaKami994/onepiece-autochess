@@ -1,11 +1,11 @@
 {
   "algorithm": "sha256",
   "files": {
-    "scripts/build_carousel_assets.mjs": "f9a07ce29874039534ac5e8c699675e3a309c2c9b2789a53eda933cdcb45a96d",
-    "public/assets/carousel/ocean-arena.png": "41097c8919c5dd308bcef01dbf4981ff46eb2973c0c5fbf34a0109b6638fe381",
-    "public/assets/carousel/boats.png": "1c60ff65240917cca043d85eee7f2b857b481e3868f6b1eb4793199cfa32a9de",
-    "public/assets/carousel/bounties.png": "82618d906775375b810cab9b4234cefb65eff98d590de4d078dd3599dff7741d",
+    "scripts/build_carousel_assets.mjs": "805731e5caba14543b53f46f37c277ae17024c6866315feec4defd4f8cdebe15",
+    "public/assets/carousel/ocean-arena.png": "a7e8e1f881eeb6ce537fe06c0c9132ed68908029ab8c60bc0ca62add32486bdd",
+    "public/assets/carousel/boats.png": "85fb8f5c1c50a89cbc5c11492dacd6e94974cbc9bc2f35722344aa248a29b788",
+    "public/assets/carousel/bounties.png": "a77dd52a5c6e12db4cd60c28dc5362c938e61d8e447576b524d3edb592fcf37f",
     "public/assets/carousel/carousel-manifest.json": "a70007a69d809b7c7f57bcebf3a3f254b78f7f648dc28f294237938f09c3c511",
-    "public/assets/carousel/contact-sheet.png": "5632adc7c3d26831bb3025d592fff5fbd00cabf8771b2b7d05504be931e2e4d3"
+    "public/assets/carousel/contact-sheet.png": "2b41b8725d3b76809ab4e7bee590fe15f5dd9450d813215980b33c48c8fb8307"
   }
 }
