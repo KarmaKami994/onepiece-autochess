@@ -64,6 +64,9 @@ export async function openFriendAccess(origin: string) {
   mkdirSync(dirname(databasePath), { recursive: true });
   const db = new DatabaseSync(databasePath);
   try {
+    if (typeof db.prepare("SELECT 1").columns !== "function") {
+      throw new Error("Google sign-in requires Node.js 22.16 or later for the SQLite adapter.");
+    }
     const allowlist = createFriendAllowlist(db, () => JSON.parse(readFileSync(allowlistPath, "utf8").replace(/^\uFEFF/, "")) as unknown);
     const auth = betterAuth({
       baseURL: origin,

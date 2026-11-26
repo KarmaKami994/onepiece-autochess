@@ -2,7 +2,9 @@
 
 ## MP2 Google sign-in and private lobby
 
-Run `npm run dev:friends` for the authenticated localhost mode. Create a
+Run `npm run dev:friends` with Node.js 22.16 or later for the authenticated
+localhost mode. The Better Auth SQLite adapter and the focused auth tests
+use the statement metadata API available from that version. Create a
 Google OAuth **Web application** client with the redirect URI
 `http://localhost:3000/api/auth/callback/google`. A different local port
 requires the same port in the redirect URI and `npm run dev:friends -- <port>`.

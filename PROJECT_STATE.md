@@ -143,7 +143,7 @@ MP2 friends-only localhost lobby is based on the reviewed MP1 head `e79b262` in 
 
 ## Verification
 
-MP2 — Focused MP1/MP2 tests PASS, 7/7. The localhost Chromium lobby check PASS with two Better Auth test sessions, host start and reload. Local Typecheck PASS with ignored temporary snapshot files excluded. Lint and Build PASS. Live Google login NOT RUN pending a real localhost OAuth client.
+MP2 — Focused MP1/MP2 tests PASS, 7/7, including the Node 22.23.5 CI runtime. The localhost Chromium lobby check PASS with two Better Auth test sessions, host start and reload. Local Typecheck PASS with ignored temporary snapshot files excluded. Lint and Build PASS. Live Google login NOT RUN pending a real localhost OAuth client. [PR #82](https://github.com/KarmaKami994/onepiece-autochess/pull/82/checks) tracks standard CI.
 
 MP1 — Focused unit tests PASS, 49/49. Settings and MP1 CI follow-up tests PASS, 11/11. Local typecheck PASS with a temporary config that excludes pre-existing ignored `tmp/` source snapshots. Lint and build PASS. The two-browser regression at 1280×720 PASS covers separate shops, deployment, reload and the shared fight. [PR #81](https://github.com/KarmaKami994/onepiece-autochess/pull/81/checks) tracks standard CI.
 
@@ -1059,6 +1059,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- MP2 CI #213 exposed the Better Auth SQLite driver's requirement for Node 22.16+ metadata APIs and flagged PostCSS 8.5.14. The CI runtime is pinned to Node 22.23.5 and the lockfile updates PostCSS to 8.5.33.
 - MP2 requires the owner's Google OAuth client before the real provider callback can be accepted. CI and local tests use simulated provider profiles and actual local sessions.
 - MP1 CI #211 flagged Zod 4.4.3 when Colyseus promoted the existing dependency to runtime. The lockfile now uses 4.6.7. CI also identified a source-path assertion tied to the former locations of the shared HUD defaults. The regression now checks the exported default values.
 - B16 expands the number of recruits competing for shop draws in bands 1–4. The authored combat values are covered by focused regressions and have no separate balance baseline.
