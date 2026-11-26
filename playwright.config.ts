@@ -27,7 +27,7 @@ export default defineConfig({
   ],
   webServer: {
     command:
-      "node node_modules/vinext/dist/cli.js dev --host localhost --port 3100",
+      "node --import tsx scripts/run_local_multiplayer.ts 3100",
     url: "http://localhost:3100",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

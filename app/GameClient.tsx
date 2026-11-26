@@ -17,10 +17,6 @@ import ChronicleScreen from "./screens/ChronicleScreen";
 import { useChronicleRecorder } from "./useChronicleRecorder";
 import type { ReferenceCategory } from "./crewReference";
 import {
-  DEFAULT_BOARD_SKIN,
-  isBoardSkin,
-} from "@/components/boardMapManifest";
-import {
   resolvePurchaseSelection,
   retainValidBoardSelection,
 } from "@/components/boardSelection";
@@ -36,7 +32,7 @@ import {
   writeVoyage,
 } from "./voyagePersistence";
 import { useGameAudio, type SoundName } from "./useGameAudio";
-import { DEFAULT_AUDIO_SETTINGS, normalizeAudioSettings } from "./audioSettings";
+import { DEFAULT_SETTINGS, SETTINGS_KEY, loadStoredSettings } from "./gameSettings";
 import { useLocalGameSession } from "./useLocalGameSession";
 import { useMatchClock } from "./useMatchClock";
 import { isTimedPhase, readPhaseClockCheckpoint, type PhaseClockCheckpoint } from "./phaseClock";
@@ -90,18 +86,6 @@ type Screen =
 
 const engine = GameEngine;
 const content = engine.CONTENT;
-const SETTINGS_KEY = "grand-line-auto-chess.settings.v1";
-const COMBAT_SPEEDS = [0.5, 1, 2, 4] as const;
-const DEFAULT_SETTINGS: Settings = {
-  ...DEFAULT_AUDIO_SETTINGS,
-  animationSpeed: 1,
-  autoContinueBattle: true,
-  particles: true,
-  combatNumbers: true,
-  reducedMotion: false,
-  highContrast: false,
-  boardSkin: DEFAULT_BOARD_SKIN,
-};
 
 function persistentUnitId(view: MatchView, presentationId: string): string {
   const battlePrefix = `${view.playerId}:`;
@@ -110,33 +94,7 @@ function persistentUnitId(view: MatchView, presentationId: string): string {
     : presentationId;
 }
 
-function loadStoredSettings(): Settings {
-  if (typeof window === "undefined") return DEFAULT_SETTINGS;
-  try {
-    const stored = window.localStorage.getItem(SETTINGS_KEY);
-    if (!stored) return DEFAULT_SETTINGS;
-    const parsed = JSON.parse(stored) as Partial<Settings> | null;
-    if (!parsed || typeof parsed !== "object") return DEFAULT_SETTINGS;
-    return {
-      ...DEFAULT_SETTINGS,
-      ...parsed,
-      ...normalizeAudioSettings(parsed),
-      autoContinueBattle: typeof parsed.autoContinueBattle === "boolean" ? parsed.autoContinueBattle : true,
-      animationSpeed: COMBAT_SPEEDS.includes(
-        parsed.animationSpeed as (typeof COMBAT_SPEEDS)[number],
-      )
-        ? parsed.animationSpeed!
-        : DEFAULT_SETTINGS.animationSpeed,
-      boardSkin: isBoardSkin(parsed.boardSkin)
-        ? parsed.boardSkin
-        : DEFAULT_BOARD_SKIN,
-    };
-  } catch {
-    return DEFAULT_SETTINGS;
-  }
-}
-
-export default function GameClient() {
+export default function GameClient({ localMultiplayer = false }: { localMultiplayer?: boolean }) {
   const [screen, setScreen] = useState<Screen>("menu");
   const [returnScreen, setReturnScreen] = useState<Screen>("menu");
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
@@ -1265,6 +1223,7 @@ export default function GameClient() {
       </div>
       {screen === "menu" && (
         <MainMenu
+          localMultiplayer={localMultiplayer}
           hasSave={hasSave}
           saveReady={saveReady}
           saveDate={saveDate}

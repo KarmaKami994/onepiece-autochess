@@ -1486,9 +1486,11 @@ export function selectCarouselView(
 export function selectMatchView(
   state: MatchState,
   content: GameContent = DEFAULT_CONTENT,
+  perspectivePlayerId?: string,
 ): MatchView {
-  const player =
-    state.players.find((candidate) => !candidate.isBot) ?? state.players[0];
+  const player = perspectivePlayerId === undefined
+    ? state.players.find((candidate) => !candidate.isBot) ?? state.players[0]
+    : state.players.find((candidate) => candidate.id === perspectivePlayerId);
   if (!player) throw new Error("Cannot build a match view without players.");
   const stage = getStageDefinition(state.round, content);
   const pairing = state.pairings.find(
@@ -1516,6 +1518,10 @@ export function selectMatchView(
         content,
         false,
       );
+      const privateScouting = perspectivePlayerId !== undefined && candidate.id !== player.id;
+      const scoutingUnits = privateScouting
+        ? scoutingBoard.units.filter((unit) => unit.zone === "board")
+        : scoutingBoard.units;
       const crewPreview = scoutingBoard.units
         .filter((unit) => unit.zone === "board")
         .sort(
@@ -1540,13 +1546,15 @@ export function selectMatchView(
         alive: candidate.alive,
         isHuman: candidate.id === player.id,
         traits: traitViews(candidate, content),
-        inventory: candidate.inventory.map((itemId) =>
+        inventory: (privateScouting ? [] : candidate.inventory).map((itemId) =>
           createItemView(itemId, content),
         ),
-        boardUnits: scoutingBoard.units,
+        boardUnits: scoutingUnits,
         crewPreview,
         recentBattles: recentBattleViews(candidate, names),
-        selectedDefinitionByUnit: scoutingBoard.views,
+        selectedDefinitionByUnit: privateScouting
+          ? new Map(scoutingUnits.map((unit) => [unit.id, definitionView(unit.contentId ?? "", content, unit.formId)]))
+          : scoutingBoard.views,
       };
     })
     .sort(

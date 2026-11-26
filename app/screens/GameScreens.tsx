@@ -7,6 +7,7 @@ import {
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
+import Link from "next/link";
 import { KOBY_TRAINING_BATTLES_REQUIRED } from "@/game";
 import { copiesForStar } from "@/game/state";
 import {
@@ -90,6 +91,7 @@ export function MainMenu({
   onAnimationLab,
   onCrewTools,
   onChronicle,
+  localMultiplayer,
 }: {
   hasSave: boolean;
   saveReady: boolean;
@@ -100,6 +102,7 @@ export function MainMenu({
   onAnimationLab: () => void;
   onCrewTools: () => void;
   onChronicle: () => void;
+  localMultiplayer?: boolean;
 }) {
   return (
     <section className="menu-screen">
@@ -162,6 +165,7 @@ export function MainMenu({
           <span className="button-icon">▤</span>
           VOYAGE CHRONICLE
         </button>
+        {localMultiplayer && <Link href="/multiplayer" className="pixel-button compact">LOCAL MULTIPLAYER</Link>}
       </nav>
       <footer className="menu-footer">
         <span>OFFLINE</span>
@@ -686,6 +690,7 @@ export function MatchScreen({
   onChangeSettings,
   onAdvance,
   onSettings,
+  online,
 }: {
   hidden: boolean;
   view: MatchView;
@@ -694,7 +699,7 @@ export function MatchScreen({
   clockLabel: string;
   clockPaused: boolean;
   manualPaused: boolean;
-  onTogglePause: () => void;
+  onTogglePause?: () => void;
   settings: Settings;
   selectedUnit?: BoardUnit;
   selectedDefinition?: ShopUnitView;
@@ -716,7 +721,8 @@ export function MatchScreen({
   onServeFood: (foodId: string) => void;
   onChangeSettings: (settings: Settings) => void;
   onAdvance: () => void;
-  onSettings: () => void;
+  onSettings?: () => void;
+  online?: { ready: boolean; connected: boolean; onLeave: () => void };
 }) {
   const [previewShopIndex, setPreviewShopIndex] = useState<number | null>(null);
   const [traitHighlight, setTraitHighlight] = useState<{ id: string; units: string[] } | null>(null);
@@ -731,8 +737,8 @@ export function MatchScreen({
   const scouting = planning && Boolean(scoutedStanding);
   const watching = view.phase === "battle" && Boolean(scoutedStanding);
   const observing = scouting || watching;
-  const battleEconomy = view.phase === "battle" && tutorialStep === null;
-  const economyPhase = planning || battleEconomy;
+  const battleEconomy = !online && view.phase === "battle" && tutorialStep === null;
+  const economyPhase = (planning && (online?.connected ?? true)) || battleEconomy;
   const tacticalUnits = scouting
     ? scoutedStanding?.boardUnits ?? []
     : battlePresentation?.boardUnits ?? view.boardUnits;
@@ -827,15 +833,17 @@ export function MatchScreen({
         </div>
         <PhaseClockDisplay timer={timer} duration={phaseDuration} label={clockLabel} />
         <div className="topbar-tools">
-          <button type="button" className="icon-button" onClick={onTogglePause}
+          {onTogglePause && <button type="button" className="icon-button" onClick={onTogglePause}
             aria-label={manualPaused ? "Resume voyage" : "Pause voyage"} aria-pressed={manualPaused}
             disabled={tutorialStep !== null} title={manualPaused ? "Resume voyage" : "Pause voyage"}>
             {manualPaused ? "▶" : "Ⅱ"}
-          </button>
+          </button>}
           <span className={`save-indicator ${saveStatus}`}>
-            {saveStatus === "saving" ? "WRITING LOG…" : saveStatus === "saved" ? "LOG SAVED" : "LOCAL"}
+            {online ? online.connected ? "LOCAL ROOM" : "RECONNECTING…" : saveStatus === "saving" ? "WRITING LOG…" : saveStatus === "saved" ? "LOG SAVED" : "LOCAL"}
           </span>
-          <button
+          {online && <button type="button" className="icon-button" onClick={online.onLeave}
+            aria-label="Leave local multiplayer" title="Leave local multiplayer">←</button>}
+          {onSettings && <button
             type="button"
             className="icon-button"
             onClick={onSettings}
@@ -843,7 +851,7 @@ export function MatchScreen({
             data-tooltip="Settings · Esc"
           >
             ⚙
-          </button>
+          </button>}
         </div>
       </header>
 
@@ -1140,15 +1148,18 @@ export function MatchScreen({
             }`}
             disabled={
               isAdvancing ||
+              Boolean(online && (!planning || online.ready || !online.connected)) ||
               (planning &&
                 (!tutorialAllowsSailing ||
                   (tutorialStep === "sail" && view.deployed < 2)))
             }
             onClick={onAdvance}
-            data-tooltip={planning ? "End preparation early" : "Resolve battle"}
+            data-tooltip={online ? "The round starts when both captains are ready or the timer expires" :
+              planning ? "End preparation early" : "Resolve battle"}
           >
-            <span>{planning ? "START BATTLE" : timer === 0 ? "CONTINUE" : "SKIP ANIMATION"}</span>
-            <small>{planning ? "READY!" : "RESOLVE NOW"}</small>
+            <span>{online ? planning ? online.ready ? "WAITING FOR CAPTAIN" : "READY FOR BATTLE" : "BATTLE IN PROGRESS" :
+              planning ? "START BATTLE" : timer === 0 ? "CONTINUE" : "SKIP ANIMATION"}</span>
+            {!online && <small>{planning ? "READY!" : "RESOLVE NOW"}</small>}
           </button>
         </div>
       </footer>

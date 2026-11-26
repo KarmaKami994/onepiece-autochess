@@ -697,6 +697,7 @@ export type GameCommand =
 
 export interface CommandContext {
   actorPlayerId: string;
+  waitForAllHumanPlayers?: boolean;
 }
 
 export type CommandErrorCode =
