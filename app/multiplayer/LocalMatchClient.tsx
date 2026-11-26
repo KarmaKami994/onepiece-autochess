@@ -1,6 +1,6 @@
 "use client";
 
-import { Client, type Room } from "@colyseus/sdk";
+import { Client, type Room, type SeatReservation } from "@colyseus/sdk";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ActionToast, MatchScreen } from "../screens/GameScreens";
@@ -15,8 +15,11 @@ import {
 import "../game.css";
 
 const seatKey = "grand-line-auto-chess.mp1-seat";
+const friendsLobbyKey = "grand-line-auto-chess.friends-lobby";
 
-export default function LocalMatchClient() {
+export type FriendsJoin = { code: string | null; name: string; create: boolean };
+
+export default function LocalMatchClient({ friends }: { friends?: FriendsJoin }) {
   const router = useRouter();
   const roomRef = useRef<Room | null>(null);
   const [attempt, setAttempt] = useState(0);
@@ -32,7 +35,7 @@ export default function LocalMatchClient() {
   useEffect(() => {
     let disposed = false;
     let joined: Room | null = null;
-    const token = sessionStorage.getItem(seatKey);
+    const token = friends ? null : sessionStorage.getItem(seatKey);
 
     async function connect() {
       const client = new Client(`${window.location.origin}${LOCAL_MATCH_PATH}`);
@@ -40,7 +43,17 @@ export default function LocalMatchClient() {
       setSettings(loadStoredSettings());
       try {
         let room: Room;
-        if (token) {
+        if (friends) {
+          const response = await fetch(`${LOCAL_MATCH_PATH}/friends/join`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(friends),
+          });
+          if (!response.ok) throw new Error(response.status === 401 ? "Friends-list access required." : "The friends lobby is unavailable.");
+          const reservation: SeatReservation = await response.json();
+          room = await client.consumeSeatReservation(reservation);
+          room.reconnection.enabled = false;
+        } else if (token) {
           try {
             room = await client.reconnect(token);
           } catch {
@@ -58,11 +71,18 @@ export default function LocalMatchClient() {
         joined = room;
         roomRef.current = room;
         const sync = () => {
-          sessionStorage.setItem(seatKey, room.reconnectionToken);
+          if (!friends) sessionStorage.setItem(seatKey, room.reconnectionToken);
           setConnection("connected");
           room.send("sync");
         };
         room.onMessage<LocalMatchSnapshot>("snapshot", (next) => {
+          if (next.status === "lobby") {
+            sessionStorage.setItem(friendsLobbyKey, next.code);
+            const link = new URL(window.location.href);
+            link.searchParams.delete("authError");
+            link.searchParams.set("lobby", next.code);
+            window.history.replaceState(window.history.state, "", link.href);
+          }
           const receivedAt = performance.now();
           setNow(receivedAt);
           if (next.status === "playing") setDeadline(receivedAt + next.remainingMs);
@@ -71,23 +91,28 @@ export default function LocalMatchClient() {
         room.onMessage<string>("command-error", setError);
         room.onDrop(() => { if (!disposed) setConnection("reconnecting"); });
         room.onReconnect(() => { if (!disposed) sync(); });
-        room.onLeave(() => {
+        room.onLeave((code) => {
           if (disposed) return;
           roomRef.current = null;
-          sessionStorage.removeItem(seatKey);
+          if (!friends) sessionStorage.removeItem(seatKey);
+          if (code === 4003) {
+            sessionStorage.removeItem(friendsLobbyKey);
+            setError("Your friends-list access or sign-in session has ended.");
+          }
           setConnection("closed");
         });
         sync();
-      } catch {
+      } catch (cause) {
         if (!disposed) {
           setConnection("closed");
-          setError("The local room is full or unavailable. Try again after both captains leave.");
+          setError(friends && cause instanceof Error ? cause.message :
+            "The local room is full or unavailable. Try again after both captains leave.");
         }
       }
     }
 
     const start = window.setTimeout(() => {
-      if (token || attempt > 0) void connect();
+      if (friends || token || attempt > 0) void connect();
       else setConnection("idle");
     }, 0);
     return () => {
@@ -98,7 +123,7 @@ export default function LocalMatchClient() {
         void joined.leave(false);
       }
     };
-  }, [attempt]);
+  }, [attempt, friends]);
 
   const playing = snapshot?.status === "playing" ? snapshot : null;
   const view = useMemo(() => playing ? readMatchView(playing.view) : null, [playing]);
@@ -135,7 +160,7 @@ export default function LocalMatchClient() {
   }, [playing, scoutedId, selectedId, send]);
 
   const leave = () => {
-    sessionStorage.removeItem(seatKey);
+    sessionStorage.removeItem(friends ? friendsLobbyKey : seatKey);
     const room = roomRef.current;
     roomRef.current = null;
     if (room) void room.leave();
@@ -150,6 +175,7 @@ export default function LocalMatchClient() {
   const selectedUnit = (scouted?.boardUnits ?? view?.boardUnits)?.find((unit) => unit.id === selectedId);
   const selectedDefinition = selectedUnit && (scouted?.selectedDefinitionByUnit ?? view?.selectedDefinitionByUnit)?.get(selectedUnit.id);
   const captain = view?.standings.find((standing) => standing.isHuman)?.name;
+  const lobby = snapshot?.status === "lobby" && connection === "connected" ? snapshot : null;
 
   return (
     <main className={`game-shell ${settings.highContrast ? "high-contrast" : ""} ${settings.reducedMotion ? "reduced-motion" : ""}`}
@@ -196,19 +222,34 @@ export default function LocalMatchClient() {
       ) : (
         <section className="overlay-screen">
           <div className="modal-panel">
-            <h1>{snapshot?.status === "complete" ? "LOCAL ROUND COMPLETE" : "LOCAL MULTIPLAYER"}</h1>
+            <h1>{snapshot?.status === "complete" ? "LOCAL ROUND COMPLETE" : lobby ? "PRIVATE LOBBY" : "LOCAL MULTIPLAYER"}</h1>
             <p role="status">
               {connection === "loading" ? "Preparing the local room…" :
                 connection === "closed" ? "Connection closed." :
                 snapshot?.status === "complete" ? "The round has finished. Return to the menu to leave your seat." :
                 connection === "connecting" || connection === "reconnecting" ? "Connecting to the local room…" :
                 snapshot?.status === "waiting" ? `Captain ${snapshot.captain} · Waiting for the other captain.` :
+                lobby ? `${lobby.captains.length} captains connected. The host starts the match.` :
                 "Two captains and six bots. Join from a separate browser window or profile."}
             </p>
+            {lobby && (
+              <>
+                <ul aria-label="Captains">
+                  {lobby.captains.map((name, index) => <li key={index}>{name}</li>)}
+                </ul>
+                {lobby.host && (
+                  <>
+                    <label>Lobby link <input readOnly value={`${window.location.origin}/multiplayer?lobby=${lobby.code}`} /></label>
+                    <button type="button" className="pixel-button primary" disabled={lobby.captains.length < 2}
+                      onClick={() => { setError(""); roomRef.current?.send("start"); }}>Start match</button>
+                  </>
+                )}
+              </>
+            )}
             {error && <p role="alert">{error}</p>}
             {(connection === "idle" || connection === "closed") &&
               <button type="button" className="pixel-button primary" onClick={() => { setError(""); setAttempt(attempt + 1); }}>
-                JOIN LOCAL MATCH
+                {friends ? "RETRY LOBBY" : "JOIN LOCAL MATCH"}
               </button>}
             <button type="button" className="pixel-button compact" disabled={connection === "loading"} onClick={leave}>BACK TO MENU</button>
           </div>

@@ -17,6 +17,9 @@ export default defineConfig(() => {
           ws: true,
           rewrite: (path) => path.slice(LOCAL_MATCH_PATH.length),
         },
+        ...(process.env.MP2_FRIENDS_ENABLED === "1" ? {
+          "^/api/auth(?:/|$)": { target: `http://127.0.0.1:${matchPort}` },
+        } : {}),
       } : undefined,
     },
     plugins: [vinext()],

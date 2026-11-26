@@ -1,14 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { matchMaker, Room, ServerError, type Client } from "@colyseus/core";
-import { CONTENT } from "../game";
-import { selectMatchView } from "../app/selectors";
 import {
   LOCAL_MATCH_ROOM,
   LOCAL_SEATS,
-  writeMatchView,
   type LocalMatchSnapshot,
 } from "../app/multiplayer/protocol";
-import { applyLocalMatchCommand, createLocalMatch, expireLocalMatch, readLocalMatchCommand, type LocalMatch } from "./localMatch";
+import { applyLocalMatchCommand, createLocalMatch, expireLocalMatch, localMatchSnapshot, readLocalMatchCommand, type LocalMatch } from "./localMatch";
 
 const roomCreationKey = randomUUID();
 const reconnectSeconds = 30;
@@ -84,18 +81,9 @@ export class LocalMatchRoom extends Room {
     const seat = this.seats.get(client.sessionId);
     if (!seat) return;
     const match = this.match;
-    const playerId = `player-${seat}`;
     const snapshot: LocalMatchSnapshot = !match
       ? { status: "waiting", captain: seat }
-      : match.completed
-        ? { status: "complete" }
-        : {
-            status: "playing",
-            ready: match.state.players.some((player) => player.id === playerId && player.ready),
-            durationMs: match.durationMs,
-            remainingMs: Math.max(0, match.endsAt - performance.now()),
-            view: writeMatchView(selectMatchView(match.state, CONTENT, playerId)),
-          };
+      : localMatchSnapshot(match, seat, performance.now());
     client.send("snapshot", snapshot);
   }
 }

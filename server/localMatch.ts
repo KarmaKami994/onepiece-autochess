@@ -1,7 +1,8 @@
 import { applyCommand, CONTENT, advanceMatchPhase, createMatch } from "../game";
 import type { MatchState } from "../game";
 import { phaseClockBudget } from "../app/phaseClock";
-import { LOCAL_SEATS, type LocalMatchCommand } from "../app/multiplayer/protocol";
+import { LOCAL_SEATS, writeMatchView, type LocalMatchCommand, type LocalMatchSnapshot } from "../app/multiplayer/protocol";
+import { selectMatchView } from "../app/selectors";
 
 export type LocalMatch = {
   state: MatchState;
@@ -17,8 +18,22 @@ function timePhase(state: MatchState, now: number): LocalMatch {
   return { state, durationMs, endsAt: now + durationMs, completed: false };
 }
 
-export function createLocalMatch(seed: string, now: number): LocalMatch {
-  return timePhase(createMatch(seed, CONTENT, LOCAL_SEATS), now);
+export function createLocalMatch(seed: string, now: number, captains?: readonly string[]): LocalMatch {
+  const state = createMatch(seed, CONTENT, captains?.length ?? LOCAL_SEATS);
+  captains?.forEach((name, index) => { state.players[index].name = name; });
+  return timePhase(state, now);
+}
+
+export function localMatchSnapshot(match: LocalMatch, seat: number, now: number): LocalMatchSnapshot {
+  if (match.completed) return { status: "complete" };
+  const playerId = `player-${seat}`;
+  return {
+    status: "playing",
+    ready: match.state.players.some((player) => player.id === playerId && player.ready),
+    durationMs: match.durationMs,
+    remainingMs: Math.max(0, match.endsAt - now),
+    view: writeMatchView(selectMatchView(match.state, CONTENT, playerId)),
+  };
 }
 
 export function expireLocalMatch(match: LocalMatch, now: number): LocalMatch {
