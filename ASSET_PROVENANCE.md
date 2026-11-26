@@ -6,6 +6,10 @@ This non-commercial, localhost-only fan prototype has both original generated pr
 
 On `2026-08-14`, the project owner explicitly attested in the project conversation that the initial 17 listed source sheets may be used, adapted, and distributed in this public collaboration repository. Later source additions record their own permission basis in `art/animation-v2/source-matrix.json`. An owner attestation is not independent verification of chain of title; a Sprite Database URL is not treated as permission, and this repository grants no downstream asset license. The MIT license applies to code only. Reuse, redistribution, or commercialization of franchise or imported art requires its own appropriate rights clearance.
 
+## MP2 private lobby — 2026-11-26
+
+`public/assets/friends-harbor.webp` is an original ImageGen illustration of a fictional sailing ship in port, exported at 900 × 1350. The image is served locally with the friends multiplayer UI.
+
 ## B16 Whole Cake Pirates — 2026-11-23
 
 The four Treasure Cruise sheets use the established project-owner attestation. Their asset pages credit Redtarp as uploader. Daifuku uses a new ImageGen pose board based on the character reference, with the six poses cropped into the usual offline clips. The optional movement and defeat holds use the available source poses.

@@ -23,10 +23,12 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-MP1 local multiplayer is based on deck cleanup in [PR #80](https://github.com/KarmaKami994/onepiece-autochess/pull/80) at `a301304`. GameContent `1.42.0`, save schema 6, 55 playable recruits, 18 traits and 10 forms.
+MP2 delivers the friends-only localhost lobby in [PR #82](https://github.com/KarmaKami994/onepiece-autochess/pull/82). MP1 landed on `main` as `f7a765a` in [PR #81](https://github.com/KarmaKami994/onepiece-autochess/pull/81). GameContent `1.42.0`, save schema 6, 55 playable recruits, 18 traits and 10 forms.
 
 ## Last Completed Work
 
+- 2026-11-26 — MP2 gives the friends sign-in and private lobby a dedicated responsive layout with original harbor artwork, a visible captain-name field, eight crew seats and a separate invite field with a copy button. Material files: `app/multiplayer/FriendsEntry.tsx`, `app/multiplayer/LocalMatchClient.tsx`, `app/multiplayer/FriendsLobbyScreen.tsx`, `app/multiplayer/friends.css`, `public/assets/friends-harbor.webp` and `ASSET_PROVENANCE.md`.
+- 2026-11-26 — MP2 adds Google sign-in with self-hosted Better Auth and SQLite, fixed Gmail/Workspace access with stable account binding and live revocation, and a host-started private lobby for two to eight approved captains. Material files cover auth, room and launch code under `server/` and `scripts/`, the multiplayer UI and protocol, focused auth/lobby tests, dependencies, and the multiplayer architecture notes.
 - 2026-11-26 — MP1 adds a loopback-only Colyseus room for two captains and six bots, with per-seat views, preparation actions, a shared server clock and short seat reconnection. Material files cover the engine and selectors, Colyseus room and local launcher, multiplayer route and shared HUD/settings, focused tests, dependencies, and the multiplayer architecture notes.
 - 2026-11-24 — Deck cleanup adds pre-battle bench deployment, selected-crew sale with S, a temporary sale target and a readable timer with separate track and fill. Material files cover `game/engine.ts`, `app/GameClient.tsx`, `app/screens/GameScreens.tsx`, `components/PhaserBoard.tsx`, the phase clock and HUD styles, and focused domain and browser fixtures.
 - 2026-11-24 — PR #80 CI follow-up fills board slots in the existing food and combat economy fixtures so their reserve units remain benched. The new meal regression covers a served recipient auto-deployed before combat.
@@ -141,6 +143,10 @@ MP1 local multiplayer is based on deck cleanup in [PR #80](https://github.com/Ka
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+MP2 visual update — Dedicated local browser check, typecheck and lint NOT RUN. [PR #82 checks](https://github.com/KarmaKami994/onepiece-autochess/pull/82/checks) track CI for the final head.
+
+MP2 — Focused MP1/MP2 tests PASS, 7/7, with Node 22.23.5 and Vitest 4.1.12. The localhost Chromium lobby check PASS with two Better Auth test sessions, host start and reload. The existing MP1 browser case PASS after the Vite update. Local Typecheck PASS with ignored temporary snapshot files excluded. Lint and Build PASS. The project owner confirmed a live Google login and lobby creation on localhost before the visual update. [PR #82](https://github.com/KarmaKami994/onepiece-autochess/pull/82/checks) tracks standard CI.
 
 MP1 — Focused unit tests PASS, 49/49. Settings and MP1 CI follow-up tests PASS, 11/11. Local typecheck PASS with a temporary config that excludes pre-existing ignored `tmp/` source snapshots. Lint and build PASS. The two-browser regression at 1280×720 PASS covers separate shops, deployment, reload and the shared fight. [PR #81](https://github.com/KarmaKami994/onepiece-autochess/pull/81/checks) tracks standard CI.
 
@@ -892,6 +898,8 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- The friends lobby shows connected captains and open seats separately. Hosts can copy the invite link or select it for manual copying. The start area explains the two-captain minimum and who can start the match.
+- `npm run dev:friends` enables a separate localhost mode for Google sign-in and the private lobby. Lobby membership uses the verified session and display names, and only the host can start. Account verification takes place during reservation, WebSocket admission and gameplay. The first round retains MP1's rules and in-memory lifetime.
 - `npm run dev:multiplayer` enables a separate Local Multiplayer menu and round-1 room. Both living captains' readiness or the server deadline starts combat. The first battle runs to completion, and each captain's shop, bench and loose inventory are private. Solo uses its local phase clock and saves.
 - At actual battle start, open slots for living human captains fill in left-to-right bench order. Melee prefers the front, range 2 the middle and longer range the back. Existing deployments stay in place, and this runs for both Start Battle and timeout. The selected shortcut, drag target and inspector all use `SELL_UNIT`. Sale remains available in preparation and for bench units during combat after the tutorial. The timer's display now separates phase, seconds and progress while retaining existing phase timing.
 - B16 counts nine deployed Big Mom Pirates without requiring Big Mom. Tier 9 triggers one Homie Special strike per team on the fourth distinct completed cast. Five recruits join the shared pool, and the existing schema-6 loader backfills their keys.
@@ -1055,6 +1063,9 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- MP2 CI #213 exposed the Better Auth SQLite driver's requirement for Node 22.16+ metadata APIs and flagged PostCSS 8.5.14. CI #214 passed the unit suite on Node 22.23.5 and flagged Vite 8.0.13 when Better Auth brought its optional Vitest peer into dependency review. The lockfile uses PostCSS 8.5.33 and Vite 8.1.7. The build passed on this dependency set on Node 22.23.5.
+- MP2 CI #215 flagged `@vitest/mocker` through the same optional peer. Vitest and its coverage provider now resolve together at 4.1.12.
+- MP2 requires the owner's Google OAuth client in local configuration. Automated checks use simulated provider profiles and actual local sessions.
 - MP1 CI #211 flagged Zod 4.4.3 when Colyseus promoted the existing dependency to runtime. The lockfile now uses 4.6.7. CI also identified a source-path assertion tied to the former locations of the shared HUD defaults. The regression now checks the exported default values.
 - B16 expands the number of recruits competing for shop draws in bands 1–4. The authored combat values are covered by focused regressions and have no separate balance baseline.
 - B15 Treasure Cruise contributor credits are unconfirmed. Frame maps use pose holds where the sources lack separate transitions. More recruits in four cost bands change individual availability at existing shop odds.
@@ -1118,6 +1129,7 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
+- MP2 uses the owner's selected fixed Gmail/Google Workspace allowlist. Better Auth uses a local SQLite database. The localhost OAuth client requests basic identity access. Hosting and domain selection remain in MP5.
 - 2026-11-12 — Preserve the accepted PAC arrangement/interactions; owner now requests a One Piece timber/parchment/brass finish. Keep compact synergy thresholds, tier/crew highlights and item/recipe hovers, existing React/Phaser ownership and gameplay. Direct PAC reuse remains authorized with its existing notices; the project-authored color/material layer is separate. Do not replace the accepted layout.
 - 2026-11-11 — Owner's explicit B10 squash/B11 instruction accepts the B10 pilot/style contract for series completion: keep Koala/Kaido/Demonio masters, source-first curation, frozen local exports and separate body/FX. No new style/provider experiment or automatic B12 work.
 - B09 separates consumable stock/meal facts from equipment, recipes and profile item collection. Freeze a meal once before pairings and reuse its immutable battle identity; no combat RNG draw or duplicate stock/reward mutation during replay/regeneration. One replaced harbor option and the existing price avoid adding reward stages or currency. Schema 6 uses additive empty defaults; saved legacy offers are never regenerated.

@@ -2,6 +2,7 @@ import type { GameCommand } from "../../game/types";
 import type { MatchView, StandingView } from "../selectors";
 
 export const LOCAL_MATCH_ROOM = "mp1";
+export const FRIENDS_MATCH_ROOM = "friends";
 export const LOCAL_MATCH_PATH = "/mp1-socket";
 export const LOCAL_SEATS = 2;
 
@@ -25,6 +26,7 @@ type MatchSnapshot = Omit<MatchView,
 
 export type LocalMatchSnapshot =
   | { status: "waiting"; captain: number }
+  | { status: "lobby"; code: string; host: boolean; captains: string[] }
   | { status: "complete" }
   | {
       status: "playing";
