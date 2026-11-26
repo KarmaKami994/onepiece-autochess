@@ -143,18 +143,22 @@ describe("bot progression diagnostics", () => {
       ).reduce((total, bucket) => total + bucket.preparations, 0),
     ).toBe(botProgressionDiagnostics?.preparationCount);
     expect(diagnosticGameplay).toEqual(normalGameplay);
+    expect(diagnostic.configHash).toBe(hashCanonicalValue(DEFAULT_CONTENT.config));
+  }, 20_000);
+
+  it("retains the exact historical B07 report as a neutral-content control", () => {
     // B08 intentionally changes authored combat. Retain the exact B07 trace as
     // a hash-verified neutral-content control, alongside current-content observer equality.
     const historical = JSON.parse(readFileSync("docs/analysis/p1b-bot-progression-diagnostic-50.json", "utf8")) as {
       contentHash: string; configHash: string;
-      botProgressionDiagnostics: { rawPreparations: NonNullable<typeof botProgressionDiagnostics>["rawPreparations"] };
+      botProgressionDiagnostics: { rawPreparations: NonNullable<ReturnType<typeof runProductionSoak>["botProgressionDiagnostics"]>["rawPreparations"] };
     };
     const reference = b07ReferenceContent();
     expect(hashGameContent(reference)).toBe("58e78178");
     const { recruitmentRoutes, harborEncounters, voyageTiming, ...legacyContent } = reference;
     expect(recruitmentRoutes.length + harborEncounters.length + voyageTiming.recruitmentSeconds).toBeGreaterThan(0);
     expect(hashCanonicalValue({ ...legacyContent, version: "1.31.0" })).toBe(historical.contentHash);
-    expect(diagnostic.configHash).toBe(historical.configHash);
+    expect(hashCanonicalValue(DEFAULT_CONTENT.config)).toBe(historical.configHash);
     const production = { ...DEFAULT_CONTENT };
     try {
       Object.assign(DEFAULT_CONTENT, reference);

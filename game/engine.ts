@@ -225,8 +225,8 @@ export function createMatch(
 }
 
 /** Product entry point; createMatch remains the compatible prepared-match constructor. */
-export function createVoyage(seed: string | number, content: GameContent = DEFAULT_CONTENT): MatchState {
-  const state = createMatch(seed, content);
+export function createVoyage(seed: string | number, content: GameContent = DEFAULT_CONTENT, humanPlayerCount = 1): MatchState {
+  const state = createMatch(seed, content, humanPlayerCount);
   prepareStarterOffers(state, content);
   return state;
 }

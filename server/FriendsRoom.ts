@@ -1,11 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { CloseCode, Room, ServerError, type AuthContext, type Client } from "@colyseus/core";
 import { CONTENT } from "../game";
+import { FRIENDS_ROOM_UPDATE_MS } from "../app/multiplayer/protocol";
 import type { AuthorizeFriend, FriendSession } from "./friendAccess";
 import {
-  applyLocalMatchCommand, createLocalMatch, expireLocalMatch, localMatchSnapshot,
-  readLocalMatchCommand, type LocalMatch,
-} from "./localMatch";
+  applyFriendsCommand, createFriendsVoyage, friendsRegattaFrame, friendsVoyageSnapshot,
+  readFriendsCommand, tickFriendsVoyage, type FriendsVoyage,
+} from "./friendsVoyage";
 
 type ConnectedFriend = {
   client: Client;
@@ -13,7 +14,7 @@ type ConnectedFriend = {
   session: FriendSession;
 };
 type Member = { name: string; connection?: ConnectedFriend; seat?: number; leftAt?: number };
-type Lobby = { code: string; host: string; members: Map<string, Member>; match?: LocalMatch };
+type Lobby = { code: string; host: string; members: Map<string, Member>; match?: FriendsVoyage };
 
 const reconnectWindow = 30_000;
 
@@ -24,6 +25,7 @@ export function createFriendsRoom(authorize: AuthorizeFriend, roomCreationKey: s
     autoDispose = false;
     private lobby?: Lobby;
     private readonly connections = new Map<string, ConnectedFriend>();
+    private commands = Promise.resolve();
 
     onCreate(options: { roomCreationKey?: string }) {
       if (options.roomCreationKey !== roomCreationKey) {
@@ -47,26 +49,16 @@ export function createFriendsRoom(authorize: AuthorizeFriend, roomCreationKey: s
         }
         const members = [...lobby.members.values()];
         members.forEach((member, index) => { member.seat = index + 1; });
-        lobby.match = createLocalMatch(randomUUID(), performance.now(), members.map((member) => member.name));
+        lobby.match = createFriendsVoyage(randomUUID(), performance.now(), members.map((member) => member.name));
         this.publish();
       });
-      this.onMessage<unknown>("command", async (client, payload) => {
-        const friend = await this.checkedConnection(client);
-        const lobby = this.lobby;
-        if (!friend || !lobby?.match) return;
-        const seat = lobby.members.get(friend.session.accountId)?.seat;
-        const command = readLocalMatchCommand(payload);
-        if (!seat || !command) {
-          client.send("command-error", "That action is unavailable.");
-          return;
-        }
-        const previous = lobby.match;
-        const result = applyLocalMatchCommand(previous, `player-${seat}`, command, performance.now());
-        lobby.match = result.match;
-        if (result.error) client.send("command-error", result.error);
-        if (previous !== lobby.match) this.publish();
+      this.onMessage<unknown>("command", (client, payload) => {
+        // Keep received order even if session validation resolves asynchronously.
+        this.commands = this.commands.then(() => this.handleCommand(client, payload)).catch(() => {
+          client.send("command-error", "The server could not complete that action.");
+        });
       });
-      this.clock.setInterval(() => this.tick(), 100);
+      this.clock.setInterval(() => this.tick(), FRIENDS_ROOM_UPDATE_MS);
       this.clock.setInterval(() => {
         for (const { client } of this.connections.values()) void this.checkedConnection(client);
       }, 1_000);
@@ -126,11 +118,28 @@ export function createFriendsRoom(authorize: AuthorizeFriend, roomCreationKey: s
       }
       member.connection = undefined;
       member.leftAt = performance.now();
-      if (this.lobby.match?.completed && [...this.lobby.members.values()].every((entry) => !entry.connection)) {
+      if (this.lobby.match?.state.phase === "game-over" && [...this.lobby.members.values()].every((entry) => !entry.connection)) {
         this.closeLobby();
         return;
       }
       this.publish();
+    }
+
+    private async handleCommand(client: Client, payload: unknown) {
+      const friend = await this.checkedConnection(client);
+      const lobby = this.lobby;
+      if (!friend || !lobby?.match) return;
+      const seat = lobby.members.get(friend.session.accountId)?.seat;
+      const command = readFriendsCommand(payload);
+      if (!seat || !command) {
+        client.send("command-error", "That action is unavailable.");
+        return;
+      }
+      const previous = lobby.match;
+      const result = applyFriendsCommand(previous, `player-${seat}`, command, performance.now());
+      lobby.match = result.voyage;
+      if (result.error) client.send("command-error", result.error);
+      if (previous !== lobby.match) this.publish(previous);
     }
 
     private async checkedConnection(client: Client): Promise<ConnectedFriend | null> {
@@ -154,7 +163,7 @@ export function createFriendsRoom(authorize: AuthorizeFriend, roomCreationKey: s
       const now = performance.now();
       const expired = (member: Member) => member.leftAt !== undefined && now - member.leftAt >= reconnectWindow;
       const host = lobby.members.get(lobby.host);
-      if ([...lobby.members.values()].every(expired) || (!lobby.match && host && expired(host))) {
+      if (!lobby.match && ([...lobby.members.values()].every(expired) || (host && expired(host)))) {
         this.closeLobby();
         return;
       }
@@ -166,10 +175,15 @@ export function createFriendsRoom(authorize: AuthorizeFriend, roomCreationKey: s
         if (changed) this.publish();
         return;
       }
-      const next = expireLocalMatch(lobby.match, now);
-      if (next === lobby.match) return;
+      const previous = lobby.match;
+      const next = tickFriendsVoyage(previous, now);
+      if (next === previous) return;
       lobby.match = next;
-      this.publish();
+      if (next.state.phase === "game-over" && [...lobby.members.values()].every((member) => !member.connection)) {
+        this.closeLobby();
+        return;
+      }
+      this.publish(previous);
     }
 
     private closeLobby() {
@@ -177,10 +191,14 @@ export function createFriendsRoom(authorize: AuthorizeFriend, roomCreationKey: s
       for (const { client } of this.connections.values()) void client.leave(4004);
     }
 
-    private publish() {
-      if (!this.lobby) return;
-      for (const member of this.lobby.members.values()) {
-        if (member.connection) this.sendSnapshot(member.connection);
+    private publish(previous?: FriendsVoyage) {
+      const lobby = this.lobby;
+      if (!lobby) return;
+      const frame = previous && lobby.match && friendsRegattaFrame(previous, lobby.match);
+      for (const member of lobby.members.values()) {
+        if (!member.connection) continue;
+        if (frame) member.connection.client.send("regatta", frame);
+        else this.sendSnapshot(member.connection);
       }
     }
 
@@ -189,7 +207,7 @@ export function createFriendsRoom(authorize: AuthorizeFriend, roomCreationKey: s
       const seat = lobby?.members.get(connection.session.accountId)?.seat;
       if (!lobby) return;
       connection.client.send("snapshot", lobby.match && seat
-        ? localMatchSnapshot(lobby.match, seat, performance.now())
+        ? friendsVoyageSnapshot(lobby.match, seat, performance.now())
         : {
             status: "lobby",
             code: lobby.code,

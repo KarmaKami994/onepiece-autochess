@@ -722,7 +722,7 @@ export function MatchScreen({
   onChangeSettings: (settings: Settings) => void;
   onAdvance: () => void;
   onSettings?: () => void;
-  online?: { ready: boolean; connected: boolean; onLeave: () => void };
+  online?: { ready: boolean; connected: boolean; battleEconomy?: boolean; onLeave: () => void };
 }) {
   const [previewShopIndex, setPreviewShopIndex] = useState<number | null>(null);
   const [traitHighlight, setTraitHighlight] = useState<{ id: string; units: string[] } | null>(null);
@@ -737,7 +737,7 @@ export function MatchScreen({
   const scouting = planning && Boolean(scoutedStanding);
   const watching = view.phase === "battle" && Boolean(scoutedStanding);
   const observing = scouting || watching;
-  const battleEconomy = !online && view.phase === "battle" && tutorialStep === null;
+  const battleEconomy = (!online || (online.battleEconomy === true && online.connected)) && view.phase === "battle" && tutorialStep === null;
   const economyPhase = (planning && (online?.connected ?? true)) || battleEconomy;
   const tacticalUnits = scouting
     ? scoutedStanding?.boardUnits ?? []
@@ -878,7 +878,7 @@ export function MatchScreen({
           boardSkin={settings.boardSkin}
           combatEvents={scouting ? [] : battlePresentation?.events ?? view.events}
           eventSequence={battlePresentation?.eventSequence ?? view.eventSequence}
-          speed={settings.animationSpeed}
+          speed={online?.battleEconomy ? 1 : settings.animationSpeed}
           paused={clockPaused || timer === 0}
           particles={settings.particles}
           combatNumbers={settings.combatNumbers}
@@ -1913,6 +1913,7 @@ export function CarouselScreen({
   playerId,
   round,
   settings,
+  frameIntervalMs,
   onSetTarget,
   onAutoPick,
   onSettings,
@@ -1922,9 +1923,10 @@ export function CarouselScreen({
   playerId: string;
   round: number;
   settings: Settings;
+  frameIntervalMs?: number;
   onSetTarget: (target: { x: number; y: number }) => void;
-  onAutoPick: () => void;
-  onSettings: () => void;
+  onAutoPick?: () => void;
+  onSettings?: () => void;
 }) {
   const [rendererFailed, setRendererFailed] = useState(false);
   const [previewChoiceId, setPreviewChoiceId] = useState(
@@ -1993,14 +1995,14 @@ export function CarouselScreen({
           <span>AUTO PICK IN</span>
           <strong>{remainingSeconds}</strong>
         </div>
-        <button
+        {onSettings && <button
           type="button"
           className="regatta-settings"
           onClick={onSettings}
           aria-label="Open settings and pause the Bounty Regatta"
         >
           SETTINGS
-        </button>
+        </button>}
       </header>
       <div className="regatta-stage" aria-label="Player-controlled boat arena">
         {snapshot && !rendererFailed ? (
@@ -2008,6 +2010,7 @@ export function CarouselScreen({
             snapshot={snapshot}
             playerId={playerId}
             tickMs={50}
+            frameIntervalMs={frameIntervalMs}
             reducedMotion={settings.reducedMotion}
             highContrast={settings.highContrast}
             recommendedChoiceId={recommendedChoiceId}
@@ -2020,8 +2023,8 @@ export function CarouselScreen({
           <div className="regatta-fallback" role="alert">
             <span aria-hidden="true">⚓</span>
             <strong>THE CURRENT CANNOT BE CHARTED</strong>
-            <p>Your Log Pose can still secure the best remaining bounty.</p>
-            <button type="button" onClick={onAutoPick}>AUTO-PICK BEST FIT</button>
+            <p>{onAutoPick ? "Your Log Pose can still secure the best remaining bounty." : "The server will assign your bounty when time runs out."}</p>
+            {onAutoPick && <button type="button" onClick={onAutoPick}>AUTO-PICK BEST FIT</button>}
           </div>
         )}
         <div
@@ -2084,8 +2087,8 @@ export function VoyageRecruitmentScreen({
   phaseDuration: number;
   clockLabel: string;
   manualPaused: boolean;
-  onTogglePause: () => void;
-  onSettings: () => void;
+  onTogglePause?: () => void;
+  onSettings?: () => void;
   onChoose: (id: string) => void;
 }) {
   return (
@@ -2098,10 +2101,10 @@ export function VoyageRecruitmentScreen({
         {!starter && <p>RECRUITMENT ROUTE · {route ?? "Saved open-sea offers"} · two focused seeds and an open-sea wildcard when available.</p>}
         <div className="recruitment-clock-controls">
           <PhaseClockDisplay timer={timer} duration={phaseDuration} label={clockLabel} />
-          <button type="button" className="text-button" aria-pressed={manualPaused} onClick={onTogglePause}>{manualPaused ? "Resume voyage" : "Pause voyage"}</button>
-          <button type="button" className="text-button" onClick={onSettings}>Open settings</button>
+          {onTogglePause && <button type="button" className="text-button" aria-pressed={manualPaused} onClick={onTogglePause}>{manualPaused ? "Resume voyage" : "Pause voyage"}</button>}
+          {onSettings && <button type="button" className="text-button" onClick={onSettings}>Open settings</button>}
         </div>
-        <p className="pacing-help">23 seconds to choose. At zero, the Log Pose auto-picks using your crew fit. Pausing keeps your offers reserved.</p>
+        <p className="pacing-help">23 seconds to choose. At zero, the Log Pose auto-picks using your crew fit.{onTogglePause && " Pausing keeps your offers reserved."}</p>
       </header>
       <div className="reward-cards">
         {recruits.map((recruit, index) => (
@@ -2132,7 +2135,7 @@ export function VoyageRecruitmentScreen({
 
 export function HarborScreen({ harbor, round, gold, timer, phaseDuration, clockLabel, manualPaused, onTogglePause, onSettings, onChoose }: {
   harbor: NonNullable<MatchView["harbor"]>; round: number; gold: number; timer: number; phaseDuration: number; clockLabel: string;
-  manualPaused: boolean; onTogglePause: () => void; onSettings: () => void; onChoose: (id: string) => void;
+  manualPaused: boolean; onTogglePause?: () => void; onSettings?: () => void; onChoose: (id: string) => void;
 }) {
   return <section className="choice-screen reward-screen harbor-screen">
     <div className="reward-rays" aria-hidden="true" />
@@ -2140,8 +2143,8 @@ export function HarborScreen({ harbor, round, gold, timer, phaseDuration, clockL
       <VisualIcon className="harbor-portrait" imagePath={harbor.portrait} fallback="⚓" />
       <h2>{harbor.name.toUpperCase()}</h2><p>Choose at most one supply. Sailing on is free. Your normal preparation and battle follow this stop.</p>
       <div className="recruitment-clock-controls"><PhaseClockDisplay timer={timer} duration={phaseDuration} label={clockLabel} />
-        <button type="button" className="text-button" onClick={onTogglePause} aria-pressed={manualPaused}>{manualPaused ? "Resume voyage" : "Pause voyage"}</button>
-        <button type="button" className="text-button" onClick={onSettings}>Open settings</button></div>
+        {onTogglePause && <button type="button" className="text-button" onClick={onTogglePause} aria-pressed={manualPaused}>{manualPaused ? "Resume voyage" : "Pause voyage"}</button>}
+        {onSettings && <button type="button" className="text-button" onClick={onSettings}>Open settings</button>}</div>
       <p className="pacing-help">At zero the Log Pose picks a legal crew-fit gift, or skips paid offers that would breach your reserve.</p>
     </header>
     <div className="reward-cards">{harbor.offers.map((offer, index) => <button type="button" className="reward-card" key={offer.id}
@@ -2158,10 +2161,12 @@ export function RewardScreen({
   choices,
   source,
   onChoose,
+  clock,
 }: {
   choices: ChoiceView[];
   source: "pve" | "supply";
   onChoose: (id: string) => void;
+  clock?: { timer: number; duration: number; label: string };
 }) {
   const completed = choices[0]?.kind === "completed";
   return (
@@ -2170,6 +2175,7 @@ export function RewardScreen({
       <header className="choice-heading">
         <span className="eyebrow">{source === "pve" ? "PVE ENCOUNTER CLEARED" : "ROUND SUPPLIES"}</span>
         <h2>{completed ? "CLAIM A COMPLETED ITEM" : "CLAIM A COMPONENT"}</h2>
+        {clock && <PhaseClockDisplay {...clock} />}
         <p>{completed
           ? "Choose one of three distinct completed items for your crew."
           : "Choose one of three distinct components. Pair it on a crewmate to craft a completed item."}</p>
@@ -2215,7 +2221,7 @@ export function ResultsScreen({
   onMenu,
 }: {
   view: MatchView;
-  onNew: () => void;
+  onNew?: () => void;
   onMenu: () => void;
 }) {
   const won = view.placement === 1;
@@ -2309,9 +2315,9 @@ export function ResultsScreen({
           </section>
         ))}
         <div className="results-actions">
-          <button type="button" className="pixel-button primary compact" onClick={onNew}>
+          {onNew && <button type="button" className="pixel-button primary compact" onClick={onNew}>
             NEW VOYAGE
-          </button>
+          </button>}
           <button type="button" className="pixel-button compact" onClick={onMenu}>
             TITLE SCREEN
           </button>

@@ -6,11 +6,15 @@ import { useRouter } from "next/navigation";
 import { ActionToast, MatchScreen } from "../screens/GameScreens";
 import { DEFAULT_SETTINGS, loadStoredSettings } from "../gameSettings";
 import { FriendsFrame, FriendsLobbyScreen } from "./FriendsLobbyScreen";
+import FriendsVoyageScreen from "./FriendsVoyageScreen";
 import {
+  applyRegattaFrame,
   LOCAL_MATCH_PATH,
   LOCAL_MATCH_ROOM,
   readMatchView,
-  type LocalMatchCommand,
+  type FriendsCommand,
+  type FriendsCommandMessage,
+  type FriendsRegattaFrame,
   type LocalMatchSnapshot,
 } from "./protocol";
 import "../game.css";
@@ -23,6 +27,7 @@ export type FriendsJoin = { code: string | null; name: string; create: boolean }
 export default function LocalMatchClient({ friends }: { friends?: FriendsJoin }) {
   const router = useRouter();
   const roomRef = useRef<Room | null>(null);
+  const lastPhase = useRef<string | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [connection, setConnection] = useState<"loading" | "idle" | "connecting" | "connected" | "reconnecting" | "closed">("loading");
   const [snapshot, setSnapshot] = useState<LocalMatchSnapshot | null>(null);
@@ -84,13 +89,25 @@ export default function LocalMatchClient({ friends }: { friends?: FriendsJoin })
             link.searchParams.set("lobby", next.code);
             window.history.replaceState(window.history.state, "", link.href);
           }
+          if (friends && next.status === "playing") {
+            if (friends.code) sessionStorage.setItem(friendsLobbyKey, friends.code);
+            const nextPhase = `${next.view.round}:${next.view.phase}`;
+            if (lastPhase.current !== nextPhase) {
+              lastPhase.current = nextPhase;
+              setSelectedId(null);
+              setScoutedId(null);
+            }
+          }
           const receivedAt = performance.now();
           setNow(receivedAt);
           if (next.status === "playing") setDeadline(receivedAt + next.remainingMs);
           setSnapshot(next);
         });
         room.onMessage<string>("command-error", setError);
-        room.onDrop(() => { if (!disposed) setConnection("reconnecting"); });
+        if (friends) room.onMessage<FriendsRegattaFrame>("regatta", (frame) => {
+          if (!disposed) setSnapshot((current) => applyRegattaFrame(current, frame));
+        });
+        room.onDrop(() => { if (!disposed) setConnection(friends ? "closed" : "reconnecting"); });
         room.onReconnect(() => { if (!disposed) sync(); });
         room.onLeave((code) => {
           if (disposed) return;
@@ -128,37 +145,43 @@ export default function LocalMatchClient({ friends }: { friends?: FriendsJoin })
 
   const playing = snapshot?.status === "playing" ? snapshot : null;
   const view = useMemo(() => playing ? readMatchView(playing.view) : null, [playing]);
-  const clockRunning = playing !== null;
+  const clockRunning = (playing?.durationMs ?? 0) > 0;
   useEffect(() => {
     if (!clockRunning) return;
     const interval = window.setInterval(() => setNow(performance.now()), 100);
     return () => window.clearInterval(interval);
   }, [clockRunning]);
 
-  const send = useCallback((command: LocalMatchCommand) => {
-    if (connection !== "connected" || view?.phase !== "preparation" || !roomRef.current) return false;
+  const phase = view?.phase;
+  const round = view?.round;
+  const alive = view?.alive;
+  const send = useCallback((command: FriendsCommand) => {
+    const room = roomRef.current;
+    if (connection !== "connected" || !room || !phase || round === undefined || !alive) return false;
+    if (!friends && phase !== "preparation") return false;
     setError("");
-    roomRef.current.send("command", command);
+    room.send("command", friends ? { round, phase, command } satisfies FriendsCommandMessage : command);
     return true;
-  }, [connection, view?.phase]);
+  }, [alive, connection, friends, phase, round]);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (event.repeat || event.ctrlKey || event.metaKey || event.altKey ||
         (event.target instanceof HTMLElement && event.target.closest("button, a, input, select, textarea, [contenteditable]"))) return;
+      if (phase !== "preparation" && !(friends && phase === "battle")) return;
       const key = event.key.toLowerCase();
-      let command: LocalMatchCommand | undefined;
+      let command: FriendsCommand | undefined;
       if (/^[1-6]$/.test(key)) command = { type: "BUY_UNIT", shopIndex: Number(key) - 1 };
       if (key === "r") command = { type: "REROLL_SHOP" };
       if (key === "x") command = { type: "BUY_XP" };
       if (key === "l") command = { type: "TOGGLE_SHOP_LOCK" };
       if (key === "s" && !scoutedId && selectedId) command = { type: "SELL_UNIT", unitId: selectedId };
-      if (key === "enter" && playing && !playing.ready) command = { type: "END_PREPARATION" };
+      if (key === "enter" && phase === "preparation" && playing && !playing.ready) command = { type: "END_PREPARATION" };
       if (command && send(command)) event.preventDefault();
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [playing, scoutedId, selectedId, send]);
+  }, [friends, phase, playing, scoutedId, selectedId, send]);
 
   const leave = () => {
     sessionStorage.removeItem(friends ? friendsLobbyKey : seatKey);
@@ -178,6 +201,8 @@ export default function LocalMatchClient({ friends }: { friends?: FriendsJoin })
   const captain = view?.standings.find((standing) => standing.isHuman)?.name;
   const lobby = snapshot?.status === "lobby" && connection === "connected" ? snapshot : null;
   const showMatch = view && playing && (connection === "connected" || connection === "reconnecting");
+  const timer = Math.ceil(Math.max(0, deadline - now) / 1_000);
+  const duration = Math.ceil((playing?.durationMs ?? 0) / 1_000);
   const retry = () => { setError(""); setAttempt((previous) => previous + 1); };
 
   if (friends && !showMatch) {
@@ -200,12 +225,14 @@ export default function LocalMatchClient({ friends }: { friends?: FriendsJoin })
   return (
     <main className={`game-shell ${settings.highContrast ? "high-contrast" : ""} ${settings.reducedMotion ? "reduced-motion" : ""}`}
       aria-label={captain ? `${captain}'s local match` : "Local multiplayer"}>
-      {showMatch ? (
+      {showMatch && friends && (!view.alive || (phase !== "preparation" && phase !== "battle")) ? (
+        <FriendsVoyageScreen view={view} timer={timer} duration={duration} settings={settings} onCommand={send} onLeave={leave} />
+      ) : showMatch ? (
         <MatchScreen
           hidden={false}
           view={view}
-          timer={Math.ceil(Math.max(0, deadline - now) / 1_000)}
-          phaseDuration={Math.ceil(playing.durationMs / 1_000)}
+          timer={timer}
+          phaseDuration={duration}
           clockLabel={view.phaseLabel}
           clockPaused={false}
           manualPaused={false}
@@ -217,7 +244,7 @@ export default function LocalMatchClient({ friends }: { friends?: FriendsJoin })
           tutorialStep={null}
           saveStatus="idle"
           isAdvancing={false}
-          online={{ ready: playing.ready, connected: connection === "connected", onLeave: leave }}
+          online={{ ready: playing.ready, connected: connection === "connected", battleEconomy: Boolean(friends), onLeave: leave }}
           onSelectUnit={setSelectedId}
           onScoutPlayer={scout}
           onReturnFromScout={() => scout(null)}

@@ -84,6 +84,7 @@ export type PhaserCarouselProps = Readonly<{
   snapshot: CarouselPresentationSnapshot;
   playerId: string;
   tickMs?: number;
+  frameIntervalMs?: number;
   reducedMotion: boolean;
   highContrast: boolean;
   recommendedChoiceId?: string | null;
@@ -102,6 +103,7 @@ type CarouselPayload = Readonly<{
   snapshot: CarouselPresentationSnapshot;
   playerId: string;
   tickMs: number;
+  frameIntervalMs: number;
   reducedMotion: boolean;
   highContrast: boolean;
   recommendedChoiceId: string | null;
@@ -224,6 +226,7 @@ export default function PhaserCarousel({
   snapshot,
   playerId,
   tickMs = 50,
+  frameIntervalMs = tickMs,
   reducedMotion,
   highContrast,
   recommendedChoiceId = null,
@@ -253,6 +256,7 @@ export default function PhaserCarousel({
     snapshot,
     playerId,
     tickMs,
+    frameIntervalMs,
     reducedMotion,
     highContrast,
     recommendedChoiceId,
@@ -769,7 +773,7 @@ export default function PhaserCarousel({
                 );
 
             const duration = carouselInterpolationDuration(
-              this.payload.tickMs,
+              this.payload.frameIntervalMs,
               this.payload.reducedMotion,
             );
             this.tweens.killTweensOf(display.container);
@@ -856,7 +860,7 @@ export default function PhaserCarousel({
                   this.payload.snapshot.orbitDirection ?? 1,
                 );
             const duration = carouselInterpolationDuration(
-              this.payload.tickMs,
+              this.payload.frameIntervalMs,
               this.payload.reducedMotion,
             );
             this.tweens.killTweensOf(display.container);
@@ -1111,11 +1115,12 @@ export default function PhaserCarousel({
       snapshot,
       playerId,
       tickMs,
+      frameIntervalMs,
       reducedMotion,
       highContrast,
       recommendedChoiceId,
     });
-  }, [snapshot, playerId, tickMs, reducedMotion, highContrast, recommendedChoiceId]);
+  }, [snapshot, playerId, tickMs, frameIntervalMs, reducedMotion, highContrast, recommendedChoiceId]);
 
   const playerParticipant = snapshot.participants.find(
     (participant) => participant.playerId === playerId,

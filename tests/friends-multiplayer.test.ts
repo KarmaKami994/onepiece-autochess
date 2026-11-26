@@ -133,11 +133,15 @@ describe("MP2 friends access", () => {
 
       host.send("start");
       await expect.poll(async () => (await snapshot(mate)).status).toBe("playing");
-      expect(await snapshot(host)).toMatchObject({ status: "playing", view: { playerId: "player-1" } });
-      expect(await snapshot(mate)).toMatchObject({ status: "playing", view: { playerId: "player-2" } });
+      expect(await snapshot(host)).toMatchObject({ status: "playing", view: { playerId: "player-1", phase: "starter-choice" } });
+      expect(await snapshot(mate)).toMatchObject({ status: "playing", view: { playerId: "player-2", phase: "starter-choice" } });
       await mate.leave(false);
       const rejoined = await joinRoom(mateCookie, { code: lobby.code, name: "Different display name" });
       expect(await snapshot(rejoined)).toMatchObject({ status: "playing", view: { playerId: "player-2" } });
+      const starter = { round: 1, phase: "starter-choice", command: { type: "CHOOSE_STARTER_RECRUIT", definitionId: null } };
+      host.send("command", starter);
+      rejoined.send("command", starter);
+      await expect.poll(async () => snapshot(host)).toMatchObject({ status: "playing", view: { phase: "preparation" } });
 
       const disconnected = new Promise<number>((resolve) => { rejoined.onLeave(resolve); });
       await writeFile(friendsFile, '["host@gmail.com"]');
