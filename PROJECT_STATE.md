@@ -146,7 +146,7 @@ MP3 full friends voyage is in [PR #83](https://github.com/KarmaKami994/onepiece-
 
 ## Verification
 
-MP3 — Local commands NOT RUN. The first CI head failed typecheck on the optional battle economy flag. The follow-up converts that flag to an explicit boolean. [PR #83 checks](https://github.com/KarmaKami994/onepiece-autochess/pull/83/checks) track verification of the corrected head. No separate soak.
+MP3 — Local commands NOT RUN. CI on `2cdd436` passed typecheck, lint and all 1,179 unit tests. Coverage timed out in the full-voyage regression and the existing bot diagnostic fixture. The follow-up gives the single-voyage regression a 15-second budget and separates the existing historical diagnostic control without changing its simulations or assertion coverage. [PR #83 checks](https://github.com/KarmaKami994/onepiece-autochess/pull/83/checks) track the corrected head. No separate soak.
 
 MP2 visual update — [CI PASS](https://github.com/KarmaKami994/onepiece-autochess/actions/runs/45834968221) on `926e5a2`, including 1,175 unit tests, coverage, production smoke and browser E2E. The first coverage attempt timed out in an unchanged bot diagnostic test. The existing failed job passed on retry. Dedicated local visual checks NOT RUN.
 

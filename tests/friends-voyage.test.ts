@@ -82,5 +82,5 @@ describe("MP3 friends voyage", () => {
     expect(friendsVoyageSnapshot(voyage, 2, voyage.startedAt)).toMatchObject({
       status: "playing", view: { phase: "game-over", playerId: "player-2", placement: expect.any(Number) },
     });
-  });
+  }, 15_000);
 });
