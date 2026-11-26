@@ -1,0 +1,300 @@
+html:has(.friends-shell),
+body:has(.friends-shell) {
+  min-width: 0;
+}
+
+.friends-shell {
+  --friends-gold: #efc77d;
+  --friends-cream: #fff1d6;
+  --friends-muted: #b8c9cb;
+  --friends-line: #3e5357;
+  --friends-surface: #132a32;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  justify-items: center;
+  gap: clamp(16px, 4vh, 42px);
+  min-height: 100svh;
+  padding: clamp(14px, 3.5vw, 52px);
+  color: var(--friends-cream);
+  background:
+    radial-gradient(ellipse at 12% 3%, #294345, transparent 55%),
+    radial-gradient(ellipse at 96% 100%, #142d37, transparent 58%),
+    #091721;
+  image-rendering: auto;
+}
+
+.friends-shell.friends-high-contrast {
+  --friends-gold: #ffdc91;
+  --friends-cream: #fff9ea;
+  --friends-muted: #e1eef1;
+  --friends-line: #879b9e;
+  --friends-surface: #10222a;
+}
+
+.friends-topbar,
+.friends-panel {
+  width: min(100%, 1120px);
+  min-width: 0;
+}
+
+.friends-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.friends-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--friends-cream);
+  font: 700 clamp(15px, 2vw, 21px)/1.2 Georgia, serif;
+}
+
+.friends-brand-mark {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #776345;
+  border-radius: 9px;
+  background: #071c2c url("/favicon.svg") center / 85% no-repeat;
+}
+
+.friends-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  color: var(--friends-muted);
+  background: transparent;
+  font-size: .9rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.friends-back::before { content: "←" / ""; }
+.friends-back:hover { background: #253d45; color: var(--friends-cream); }
+.friends-signout { justify-self: start; margin-top: 14px; }
+.friends-signout::before { content: none; }
+
+.friends-panel {
+  display: grid;
+  grid-template-columns: minmax(0, .78fr) minmax(0, 1fr);
+  align-self: center;
+  min-height: 540px;
+  overflow: hidden;
+  border: 1px solid #78684f;
+  border-radius: 18px;
+  background: var(--friends-surface);
+  box-shadow: 0 28px 72px #020b12a6;
+}
+
+.friends-harbor {
+  border-right: 1px solid #78684f;
+  background:
+    linear-gradient(165deg, #112d4122 55%, #0b1c2b7a),
+    #264b58 url("/assets/friends-harbor.webp") center 52% / cover no-repeat;
+}
+
+.friends-content {
+  align-self: center;
+  min-width: 0;
+  padding: clamp(22px, 3.6vw, 52px);
+}
+
+.friends-content h1 {
+  margin: 0 0 22px;
+  color: var(--friends-cream);
+  font: 700 clamp(2.05rem, 4.3vw, 3.35rem)/1.05 Georgia, serif;
+  letter-spacing: -.038em;
+  overflow-wrap: anywhere;
+}
+
+.friends-intro {
+  max-width: 34ch;
+  margin: 0 0 24px;
+  color: var(--friends-muted);
+  line-height: 1.55;
+}
+
+.friends-form {
+  display: grid;
+  justify-items: start;
+  gap: 9px;
+  max-width: 380px;
+}
+
+.friends-form .friends-button { justify-self: stretch; margin-top: 8px; }
+
+.friends-form label,
+.friends-invite label {
+  font-weight: 700;
+  color: var(--friends-cream);
+}
+
+.friends-shell input {
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  padding: 10px 13px;
+  border: 1px solid #687c80;
+  border-radius: 7px;
+  background: #0b1d26;
+  color: var(--friends-cream);
+}
+
+.friends-shell :is(button, a, input):focus-visible {
+  outline: 2px solid var(--friends-gold);
+  outline-offset: 3px;
+}
+
+.friends-button {
+  min-height: 46px;
+  padding: 10px 18px;
+  border: 1px solid #ffe3a6;
+  border-radius: 7px;
+  color: #261908;
+  background: linear-gradient(#f4d392, #e7af5f);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.friends-button:hover:not(:disabled) { background: #ffe0a0; }
+
+.friends-button:disabled {
+  border-color: var(--friends-line);
+  color: var(--friends-muted);
+  background: #213942;
+  cursor: not-allowed;
+}
+
+.friends-button-secondary {
+  border-color: #857457;
+  color: var(--friends-cream);
+  background: #354449;
+}
+
+.friends-button-secondary:hover:not(:disabled) { background: #475859; }
+
+.friends-section-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin-bottom: 10px;
+}
+
+.friends-section-heading h2 { font-size: 1.12rem; font-weight: 800; }
+.friends-section-heading p { color: var(--friends-gold); font-size: .85rem; font-weight: 700; }
+
+.friends-seats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.friends-seat {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  min-height: 42px;
+  padding: 5px 9px;
+  border: 1px solid #736347;
+  border-radius: 7px;
+  background: #2e3939;
+  font-size: .92rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.friends-seat-mark {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--friends-gold);
+  color: #2f2310;
+  font: 700 .8rem/1 Georgia, serif;
+}
+
+.friends-seat-open {
+  border-color: var(--friends-line);
+  border-style: dashed;
+  background: #0c232c;
+  color: var(--friends-muted);
+  font-weight: 400;
+}
+
+.friends-seat-open .friends-seat-mark { background: #233b42; color: var(--friends-muted); }
+
+.friends-invite {
+  display: grid;
+  gap: 7px;
+  margin-top: 20px;
+}
+
+.friends-invite-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.friends-copy-feedback,
+.friends-departure p {
+  color: var(--friends-muted);
+  font-size: .88rem;
+  line-height: 1.45;
+}
+
+.friends-departure {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  margin-top: 19px;
+  padding-top: 15px;
+  border-top: 1px solid var(--friends-line);
+}
+
+.friends-error {
+  margin-block: 14px;
+  padding: 10px 12px;
+  border: 1px solid #bb735f;
+  border-radius: 7px;
+  background: #4d2b2b;
+  color: #ffe0cf;
+  line-height: 1.4;
+}
+
+@media (max-width: 760px) {
+  .friends-panel {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+    align-self: start;
+  }
+
+  .friends-harbor {
+    height: clamp(145px, 33vw, 220px);
+    border-right: 0;
+    border-bottom: 1px solid #78684f;
+    background-position: center 48%;
+  }
+}
+
+@media (max-width: 420px) {
+  .friends-content { padding: 18px; }
+  .friends-invite-row, .friends-departure { grid-template-columns: minmax(0, 1fr); }
+}

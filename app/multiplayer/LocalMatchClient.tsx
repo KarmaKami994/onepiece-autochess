@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ActionToast, MatchScreen } from "../screens/GameScreens";
 import { DEFAULT_SETTINGS, loadStoredSettings } from "../gameSettings";
+import { FriendsFrame, FriendsLobbyScreen } from "./FriendsLobbyScreen";
 import {
   LOCAL_MATCH_PATH,
   LOCAL_MATCH_ROOM,
@@ -176,11 +177,30 @@ export default function LocalMatchClient({ friends }: { friends?: FriendsJoin })
   const selectedDefinition = selectedUnit && (scouted?.selectedDefinitionByUnit ?? view?.selectedDefinitionByUnit)?.get(selectedUnit.id);
   const captain = view?.standings.find((standing) => standing.isHuman)?.name;
   const lobby = snapshot?.status === "lobby" && connection === "connected" ? snapshot : null;
+  const showMatch = view && playing && (connection === "connected" || connection === "reconnecting");
+  const retry = () => { setError(""); setAttempt((previous) => previous + 1); };
+
+  if (friends && !showMatch) {
+    if (lobby) {
+      return <FriendsLobbyScreen lobby={lobby} error={error} onLeave={leave} highContrast={settings.highContrast}
+        onStart={() => { setError(""); roomRef.current?.send("start"); }} />;
+    }
+    const complete = snapshot?.status === "complete";
+    return (
+      <FriendsFrame title={complete ? "Round complete" : "Private lobby"} onBack={leave} highContrast={settings.highContrast}>
+        <p className="friends-intro" role="status">
+          {connection === "closed" ? "Connection closed." : complete ? "The round has finished." : "Connecting to the friends room…"}
+        </p>
+        {error && <p className="friends-error" role="alert">{error}</p>}
+        {connection === "closed" && <button type="button" className="friends-button" onClick={retry}>Retry lobby</button>}
+      </FriendsFrame>
+    );
+  }
 
   return (
     <main className={`game-shell ${settings.highContrast ? "high-contrast" : ""} ${settings.reducedMotion ? "reduced-motion" : ""}`}
       aria-label={captain ? `${captain}'s local match` : "Local multiplayer"}>
-      {view && playing && (connection === "connected" || connection === "reconnecting") ? (
+      {showMatch ? (
         <MatchScreen
           hidden={false}
           view={view}
@@ -222,34 +242,19 @@ export default function LocalMatchClient({ friends }: { friends?: FriendsJoin })
       ) : (
         <section className="overlay-screen">
           <div className="modal-panel">
-            <h1>{snapshot?.status === "complete" ? "LOCAL ROUND COMPLETE" : lobby ? "PRIVATE LOBBY" : "LOCAL MULTIPLAYER"}</h1>
+            <h1>{snapshot?.status === "complete" ? "LOCAL ROUND COMPLETE" : "LOCAL MULTIPLAYER"}</h1>
             <p role="status">
               {connection === "loading" ? "Preparing the local room…" :
                 connection === "closed" ? "Connection closed." :
                 snapshot?.status === "complete" ? "The round has finished. Return to the menu to leave your seat." :
                 connection === "connecting" || connection === "reconnecting" ? "Connecting to the local room…" :
                 snapshot?.status === "waiting" ? `Captain ${snapshot.captain} · Waiting for the other captain.` :
-                lobby ? `${lobby.captains.length} captains connected. The host starts the match.` :
                 "Two captains and six bots. Join from a separate browser window or profile."}
             </p>
-            {lobby && (
-              <>
-                <ul aria-label="Captains">
-                  {lobby.captains.map((name, index) => <li key={index}>{name}</li>)}
-                </ul>
-                {lobby.host && (
-                  <>
-                    <label>Lobby link <input readOnly value={`${window.location.origin}/multiplayer?lobby=${lobby.code}`} /></label>
-                    <button type="button" className="pixel-button primary" disabled={lobby.captains.length < 2}
-                      onClick={() => { setError(""); roomRef.current?.send("start"); }}>Start match</button>
-                  </>
-                )}
-              </>
-            )}
             {error && <p role="alert">{error}</p>}
             {(connection === "idle" || connection === "closed") &&
-              <button type="button" className="pixel-button primary" onClick={() => { setError(""); setAttempt(attempt + 1); }}>
-                {friends ? "RETRY LOBBY" : "JOIN LOCAL MATCH"}
+              <button type="button" className="pixel-button primary" onClick={retry}>
+                JOIN LOCAL MATCH
               </button>}
             <button type="button" className="pixel-button compact" disabled={connection === "loading"} onClick={leave}>BACK TO MENU</button>
           </div>

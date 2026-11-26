@@ -1,11 +1,10 @@
 "use client";
 
 import { createAuthClient } from "better-auth/react";
-import Link from "next/link";
 import { useEffect, useState } from "react";
+import { FriendsFrame } from "./FriendsLobbyScreen";
 import LocalMatchClient, { type FriendsJoin } from "./LocalMatchClient";
 import { LOCAL_MATCH_PATH } from "./protocol";
-import "../game.css";
 
 const authClient = createAuthClient();
 
@@ -63,44 +62,44 @@ export default function FriendsEntry() {
   };
 
   return (
-    <main className="game-shell" aria-label="Friends multiplayer">
-      <section className="overlay-screen">
-        <div className="modal-panel">
-          <h1>FRIENDS MULTIPLAYER</h1>
-          {status === "loading" && <p role="status">Checking access…</p>}
-          {status === "error" && <p role="alert">The friends room is unavailable.</p>}
-          {status === "guest" && (
-            <button type="button" className="pixel-button primary" disabled={signingIn} onClick={signIn}>
-              Sign in with Google
+    <FriendsFrame title={code ? "Join your crew" : "Friends multiplayer"}>
+      {status === "loading" && <p className="friends-intro" role="status">Checking access…</p>}
+      {status === "error" && <p className="friends-error" role="alert">The friends room is unavailable.</p>}
+      {status === "guest" && (
+        <>
+          <p className="friends-intro">Sign in with an approved Google account to host or join a private lobby.</p>
+          <button type="button" className="friends-button" disabled={signingIn} onClick={signIn}>
+            {signingIn ? "Opening Google sign-in…" : "Sign in with Google"}
+          </button>
+        </>
+      )}
+      {status === "approved" && (
+        <>
+          <p className="friends-intro">Choose the name your crew will see in the lobby and match.</p>
+          <form className="friends-form" onSubmit={(event) => {
+            event.preventDefault();
+            const nickname = name.trim();
+            if (!nickname) return;
+            sessionStorage.setItem("grand-line-auto-chess.friends-name", nickname);
+            setJoin({ code, name: nickname, create: !code });
+          }}>
+            <label htmlFor="friends-captain-name">Captain name</label>
+            <input id="friends-captain-name" autoComplete="nickname" value={name}
+              onChange={(event) => setName(event.target.value)} maxLength={24} required />
+            <button type="submit" className="friends-button" disabled={!name.trim()}>
+              {code ? "Join private lobby" : "Create private lobby"}
             </button>
-          )}
-          {status === "approved" && (
-            <form onSubmit={(event) => {
-              event.preventDefault();
-              const nickname = name.trim();
-              if (!nickname) return;
-              sessionStorage.setItem("grand-line-auto-chess.friends-name", nickname);
-              setJoin({ code, name: nickname, create: !code });
-            }}>
-              <label>
-                Captain name
-                <input value={name} onChange={(event) => setName(event.target.value)} maxLength={24} required />
-              </label>
-              <button type="submit" className="pixel-button primary" disabled={!name.trim()}>
-                {code ? "Join private lobby" : "Create private lobby"}
-              </button>
-            </form>
-          )}
-          {error && <p role="alert">{error}</p>}
-          {status === "approved" && <button type="button" className="pixel-button compact" onClick={async () => {
+          </form>
+          <button type="button" className="friends-back friends-signout" onClick={async () => {
             const result = await authClient.signOut().catch(() => null);
             if (!result || result.error) { setError("Sign-out failed. Please try again."); return; }
             sessionStorage.removeItem("grand-line-auto-chess.friends-lobby");
+            setError("");
             setStatus("guest");
-          }}>Sign out</button>}
-          <Link href="/" className="pixel-button compact">Back to menu</Link>
-        </div>
-      </section>
-    </main>
+          }}>Sign out</button>
+        </>
+      )}
+      {error && <p className="friends-error" role="alert">{error}</p>}
+    </FriendsFrame>
   );
 }
