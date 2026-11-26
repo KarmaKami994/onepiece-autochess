@@ -5,18 +5,31 @@ import { WebSocketTransport } from "@colyseus/ws-transport";
 import { toNodeHandler } from "better-auth/node";
 import { FRIENDS_MATCH_ROOM, LOCAL_MATCH_ROOM } from "../app/multiplayer/protocol";
 import { createFriendsRoom } from "./FriendsRoom";
+import { DEFAULT_FRIENDS_VOYAGE_DB, finishedVoyageExpired, openFriendsVoyageStore, type VoyageCheckpoint } from "./friendsVoyageStore";
 import type { openFriendAccess } from "./friendAccess";
 import { LocalMatchRoom, openLocalMatchRoom } from "./LocalMatchRoom";
 
 type FriendsAccess = Pick<Awaited<ReturnType<typeof openFriendAccess>>, "auth" | "authorize">;
 
-export async function startLocalMultiplayer(origin: string, access?: FriendsAccess) {
+export async function startLocalMultiplayer(origin: string, access?: FriendsAccess, databasePath = DEFAULT_FRIENDS_VOYAGE_DB) {
+  const store = access && openFriendsVoyageStore(databasePath);
+  let restored: VoyageCheckpoint | null;
+  try {
+    restored = store?.read(performance.now()) ?? null;
+    if (store && restored && finishedVoyageExpired(restored.finishedAt, Date.now())) {
+      if (!store.discard(restored.voyage.state.seed, restored.revision)) throw new Error("Could not clear the expired friends voyage.");
+      restored = null;
+    }
+  } catch (error) {
+    store?.close();
+    throw error;
+  }
   const roomCreationKey = randomUUID();
   if (access) matchMaker.controller.exposedMethods = [];
   const httpServer = createServer();
   const server = defineServer({
-    rooms: access
-      ? { [FRIENDS_MATCH_ROOM]: defineRoom(createFriendsRoom(access.authorize, roomCreationKey)) }
+    rooms: access && store
+      ? { [FRIENDS_MATCH_ROOM]: defineRoom(createFriendsRoom(access.authorize, roomCreationKey, store, restored)) }
       : { [LOCAL_MATCH_ROOM]: defineRoom(LocalMatchRoom) },
     express: access ? (app) => {
       app.use((request: IncomingMessage, response: ServerResponse, next: () => void) => {
@@ -63,15 +76,22 @@ export async function startLocalMultiplayer(origin: string, access?: FriendsAcce
     greet: false,
     gracefullyShutdown: false,
   });
+  const close = async () => {
+    try {
+      await server.gracefullyShutdown(false);
+    } finally {
+      store?.close();
+    }
+  };
   try {
     await server.listen(0, "127.0.0.1");
     const address = httpServer.address();
     if (!address || typeof address === "string") throw new Error("The loopback match server did not bind.");
     if (access) await matchMaker.createRoom(FRIENDS_MATCH_ROOM, { roomCreationKey });
     else await openLocalMatchRoom();
-    return { port: address.port, close: () => server.gracefullyShutdown(false) };
+    return { port: address.port, close };
   } catch (error) {
-    await server.gracefullyShutdown(false);
+    await close();
     throw error;
   }
 }

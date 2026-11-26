@@ -13,7 +13,8 @@ export type LocalMatchCommand = Extract<GameCommand, { type:
 }>;
 
 export type FriendsCommand = Exclude<GameCommand, { type: "TIMER_EXPIRED" }>;
-export type FriendsCommandMessage = { round: number; phase: MatchPhase; command: FriendsCommand };
+export type FriendsCommandMessage = { id: string; round: number; phase: MatchPhase; command: FriendsCommand };
+export type FriendsCommandReceipt = { id: string; revision: number; error?: string };
 
 type RegattaSession = NonNullable<MatchView["carouselSession"]>;
 export type FriendsRegattaFrame = Pick<RegattaSession, "tick" | "finishAtTick" | "events"> & {
@@ -45,6 +46,8 @@ export type LocalMatchSnapshot =
       ready: boolean;
       durationMs: number;
       remainingMs: number;
+      lobbyCode?: string;
+      revision?: number;
       view: MatchSnapshot;
     };
 

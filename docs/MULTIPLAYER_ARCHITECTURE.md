@@ -1,5 +1,40 @@
 # Private multiplayer architecture
 
+## MP4 persistent friends voyages
+
+Friends mode stores the active voyage in `.codex-local/multiplayer-voyage.sqlite`. Set `MULTIPLAYER_VOYAGE_DB` in `.env.multiplayer.local` to choose another local path. Each checkpoint carries the match ID, private lobby code, host and seat assignments, revision, phase time, authoritative state, save schema 6, and the content version and hash. The online checkpoint format has its own version.
+
+The room saves the start, phase changes, Regatta claims and every command and receipt before broadcasting the resulting state. A receipt is keyed by match, account and command ID. Retries return the saved receipt. Clock and movement have a periodic checkpoint every second. On restart the server resumes from the stored time and Regatta tick. Downtime is excluded. The newest authorized tab takes the account's existing seat. The invite link remains valid for its original captains.
+
+An incompatible or invalid checkpoint stops friends-server startup with a message. Use the matching game version or select a separate database path.
+
+After all captains leave the results screen, the server removes the completed checkpoint and its command receipts. If a captain loses the connection or misses the results, the server keeps the finished checkpoint until ten minutes after match end and removes it once all captains are disconnected. Startup also clears an expired completed voyage. Creating a fresh lobby can clear a completed voyage once everyone is disconnected. The SQLite database is reused for the next game.
+
+### Back up and restore
+
+The automatic checkpoint covers ordinary server restarts. Use this optional export when you want a separate recovery copy for a server move or maintenance. Manage those exports yourself. The room's cleanup applies only to its live database.
+
+Run these commands in the repository root. Stop the friends server before taking a paired backup to keep the voyage and account files at the same operational point. The backup command accepts an optional source path and requires a new destination. SQLite makes a consistent copy of each database. [Node SQLite backup](https://nodejs.org/api/sqlite.html#sqlitebackupsourceDb-path-options)
+
+```powershell
+npm run multiplayer:backup -- .codex-local/backup/voyage.sqlite
+npm run multiplayer:backup -- .codex-local/backup/auth.sqlite .codex-local/multiplayer-auth.sqlite
+```
+
+Use your configured source paths if they differ. Keep the paired SQLite files, allowlist and server sign-in configuration private. The paired authentication database retains the account IDs required to reclaim saved seats.
+
+To exercise a restore, copy both backups to new files and point a separate localhost process at the copies. Use the original game version and Google redirect for the port you choose. Join from the original lobby link with an approved account to inspect the restored phase, time and inventory.
+
+```powershell
+npm run multiplayer:backup -- .codex-local/restore/voyage.sqlite .codex-local/backup/voyage.sqlite
+npm run multiplayer:backup -- .codex-local/restore/auth.sqlite .codex-local/backup/auth.sqlite
+$env:MULTIPLAYER_VOYAGE_DB = '.codex-local/restore/voyage.sqlite'
+$env:MULTIPLAYER_AUTH_DB = '.codex-local/restore/auth.sqlite'
+npm run dev:friends -- 3100
+```
+
+PAC handles live reconnect by matching the authenticated account with its active room and clearing stale reconnect state. MP4 adapts that seat lookup and adds a local SQLite restart checkpoint suited to one friends server. PAC presence and disposal paths are reference only. [Pinned PAC reconnect flow](https://github.com/keldaanCommunity/pokemonAutoChess/blob/a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee/app/rooms/game-room.ts#L728-L761) · [Pinned PAC disposal](https://github.com/keldaanCommunity/pokemonAutoChess/blob/a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee/app/rooms/game-room.ts#L857-L881)
+
 ## MP3 full friends voyage
 
 **Base** `631e72036ce05d58d46b47feb42fb799cd098147`, the MP2 lobby squash on `main`.
@@ -7,7 +42,7 @@
 - The friends room creates the standard voyage for authenticated human seats and fills the remaining seats with bots. Starter, preparation, PvE/PvP, battle economy, item rewards, Regatta, recruitment, harbor and final placements use the shared engine and screens. The MP1 demo still ends after its first battle.
 - The server processes commands in received order and derives the seat from the approved session. Each command carries the player's observed round and phase. After applying any elapsed deadline, the server rejects stale commands, including verbs that are legal in both phases. Online item choices use the 23-second recruitment duration and the existing item-choice fallback.
 - Full snapshots are projected for each seat. Regatta steering uses the domain's 50 ms ticks and compact position, claim and event updates every 100 ms. The renderer interpolates between updates. Entering or rejoining the phase receives a full snapshot.
-- A disconnected human keeps the seat while the in-memory voyage continues. The usual deadlines and default choices apply. The same approved account can rejoin any phase. The battle clock returns at the server's current time. A remounted battle view presents the frozen opening snapshot from the start.
+- A disconnected human keeps the seat while the voyage continues. The usual deadlines and default choices apply. The same approved account can rejoin any phase. The battle clock returns at the server's current time. A remounted battle view presents the frozen opening snapshot from the start.
 
 At the pinned PAC revision, the room derives actor identity from the connection and advances the shared phase clock and minigame server-side. MP3 adapts those behaviors using the existing local engine, transport and screens. The PAC dispatcher and room schema are reference only. Bot takeover and external persistence are outside MP3. [PAC commands](https://github.com/keldaanCommunity/pokemonAutoChess/blob/a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee/app/rooms/game-room.ts#L356-L366) · [PAC phase clock](https://github.com/keldaanCommunity/pokemonAutoChess/blob/a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee/app/rooms/commands/game-commands.ts#L1153-L1190)
 
@@ -44,8 +79,8 @@ The host shares the link with approved friends and starts with two to eight
 connected captains. Bots fill the remaining slots. Lobby and game views
 use display names. The room reserves seats through the verified HTTP
 session and checks that same session again on the WebSocket. During play
-a reload reauthorizes the account and restores its existing seat. The lobby
-and voyage live in memory.
+a reload reauthorizes the account and restores its existing seat. MP4 adds
+restart recovery for started voyages.
 
 PAC verifies the account before admitting it to a room and derives the
 host from the room owner. MP2 adapts these boundaries to one private lobby,

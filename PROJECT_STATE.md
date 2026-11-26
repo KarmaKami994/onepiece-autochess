@@ -23,10 +23,12 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-MP3 full friends voyage is in [PR #83](https://github.com/KarmaKami994/onepiece-autochess/pull/83). MP1 and MP2 landed on `main` as `f7a765a` and `631e720`, respectively. GameContent `1.42.0`, save schema 6, 55 playable recruits, 18 traits and 10 forms.
+MP4 restart recovery is implemented locally on `codex/mp4-friends-voyage-persistence`, based on MP3 squash `d67bfd8`. GameContent `1.42.0`, save schema 6, 55 playable recruits, 18 traits and 10 forms.
 
 ## Last Completed Work
 
+- 2026-11-26 — MP4 adds a SQLite friends voyage checkpoint with authenticated seat recovery, server clock restoration, transactional command receipts, optional backup and automatic completed-voyage cleanup. Material files cover `server/friendsVoyageStore.ts`, the Friends room and launcher, multiplayer protocol and client, the backup command, multiplayer tests and `docs/MULTIPLAYER_ARCHITECTURE.md`.
+- 2026-11-26 — Squash-merged full friends voyages in [PR #83](https://github.com/KarmaKami994/onepiece-autochess/pull/83) as `d67bfd8`. Local `main` matched `origin/main` with a clean tree before MP4.
 - 2026-11-26 — MP3 connects the shared engine and screens to a full server-authoritative friends voyage. The room accepts seat-bound phase commands and sends per-seat snapshots and compact Regatta frames. Material files cover `server/FriendsRoom.ts`, `server/friendsVoyage.ts`, the multiplayer protocol and screens, shared selectors and voyage constructor, focused multiplayer tests and `docs/MULTIPLAYER_ARCHITECTURE.md`.
 - 2026-11-26 — Squash-merged [MP1 #81](https://github.com/KarmaKami994/onepiece-autochess/pull/81) as `f7a765a` and [MP2 #82](https://github.com/KarmaKami994/onepiece-autochess/pull/82) including the harbor redesign as `631e720`. Local `main` matched `origin/main` with a clean tree before starting MP3.
 - 2026-11-26 — MP2 gives the friends sign-in and private lobby a dedicated responsive layout with original harbor artwork, a visible captain-name field, eight crew seats and a separate invite field with a copy button. Material files: `app/multiplayer/FriendsEntry.tsx`, `app/multiplayer/LocalMatchClient.tsx`, `app/multiplayer/FriendsLobbyScreen.tsx`, `app/multiplayer/friends.css`, `public/assets/friends-harbor.webp` and `ASSET_PROVENANCE.md`.
@@ -146,7 +148,9 @@ MP3 full friends voyage is in [PR #83](https://github.com/KarmaKami994/onepiece-
 
 ## Verification
 
-MP3 — Local commands NOT RUN. CI on `2cdd436` passed typecheck, lint and all 1,179 unit tests. Coverage timed out in the full-voyage regression and the existing bot diagnostic fixture. The follow-up gives the single-voyage regression a 15-second budget and separates the existing historical diagnostic control without changing its simulations or assertion coverage. [PR #83 checks](https://github.com/KarmaKami994/onepiece-autochess/pull/83/checks) track the corrected head. No separate soak.
+MP4 — Restart, duplicate receipt, cleanup and backup tests added. Tests, typecheck, lint and PR CI NOT RUN pending approval.
+
+MP3 — [CI PASS](https://github.com/KarmaKami994/onepiece-autochess/actions/runs/45841934791) on `6fce725`, including typecheck, lint, unit and coverage suites, asset validation, production smoke, build and browser E2E. The first typecheck rejected the optional battle-economy flag. The coverage follow-up split the existing three-simulation diagnostic fixture and set a 15-second timeout for the full-voyage test without changing its assertions. No separate local soak.
 
 MP2 visual update — [CI PASS](https://github.com/KarmaKami994/onepiece-autochess/actions/runs/45834968221) on `926e5a2`, including 1,175 unit tests, coverage, production smoke and browser E2E. The first coverage attempt timed out in an unchanged bot diagnostic test. The existing failed job passed on retry. Dedicated local visual checks NOT RUN.
 
@@ -902,6 +906,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- Started friends voyages survive server restarts. Saved receipts prevent duplicate commands from applying again. The automatic checkpoint is removed after all captains leave the results, or after a ten-minute completed-voyage window once all are disconnected. Manual backup exports are managed separately.
 - Friends mode supports a full voyage from starter to results, including battle economy, phase choices and live Regatta steering. The server carries the same approved seat across disconnects and keeps phase deadlines running.
 - The friends lobby shows connected captains and open seats separately. Hosts can copy the invite link or select it for manual copying. The start area explains the two-captain minimum and who can start the match.
 - `npm run dev:friends` enables a separate localhost mode for Google sign-in and the private lobby. Lobby membership uses the verified session and display names, and only the host can start. Account verification takes place during reservation, WebSocket admission and gameplay. The first round retains MP1's rules and in-memory lifetime.
@@ -1068,6 +1073,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- MP4 seat IDs depend on the matching private authentication database. Restore paired copies to reclaim existing seats. Movement and clock progress between periodic checkpoints can roll back by about one second after a crash. Awarded Regatta claims are written before publication.
 - MP3 reconnect uses the authoritative remaining battle time. A newly mounted board replays the frozen presentation from its start, which can cut the animation short if a captain rejoins late.
 - MP2 CI #213 exposed the Better Auth SQLite driver's requirement for Node 22.16+ metadata APIs and flagged PostCSS 8.5.14. CI #214 passed the unit suite on Node 22.23.5 and flagged Vite 8.0.13 when Better Auth brought its optional Vitest peer into dependency review. The lockfile uses PostCSS 8.5.33 and Vite 8.1.7. The build passed on this dependency set on Node 22.23.5.
 - MP2 CI #215 flagged `@vitest/mocker` through the same optional peer. Vitest and its coverage provider now resolve together at 4.1.12.

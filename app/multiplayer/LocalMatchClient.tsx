@@ -14,6 +14,7 @@ import {
   readMatchView,
   type FriendsCommand,
   type FriendsCommandMessage,
+  type FriendsCommandReceipt,
   type FriendsRegattaFrame,
   type LocalMatchSnapshot,
 } from "./protocol";
@@ -24,10 +25,36 @@ const friendsLobbyKey = "grand-line-auto-chess.friends-lobby";
 
 export type FriendsJoin = { code: string | null; name: string; create: boolean };
 
+type PendingCommands = { key: string; messages: FriendsCommandMessage[] };
+const pendingLimit = 12;
+
+function loadPendingCommands(key: string): PendingCommands {
+  try {
+    const saved: unknown = JSON.parse(sessionStorage.getItem(key) ?? "[]");
+    if (Array.isArray(saved)) {
+      return { key, messages: saved.slice(0, pendingLimit).filter((entry: unknown): entry is FriendsCommandMessage =>
+        !!entry && typeof entry === "object" && "id" in entry && typeof entry.id === "string") };
+    }
+  } catch {
+    // In-memory retries still work when storage is unavailable.
+  }
+  return { key, messages: [] };
+}
+
+function savePendingCommands({ key, messages }: PendingCommands) {
+  try {
+    if (messages.length) sessionStorage.setItem(key, JSON.stringify(messages));
+    else sessionStorage.removeItem(key);
+  } catch {
+    // The current tab can still retry its in-memory commands.
+  }
+}
+
 export default function LocalMatchClient({ friends }: { friends?: FriendsJoin }) {
   const router = useRouter();
   const roomRef = useRef<Room | null>(null);
   const lastPhase = useRef<string | null>(null);
+  const pendingCommands = useRef<PendingCommands | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [connection, setConnection] = useState<"loading" | "idle" | "connecting" | "connected" | "reconnecting" | "closed">("loading");
   const [snapshot, setSnapshot] = useState<LocalMatchSnapshot | null>(null);
@@ -49,6 +76,7 @@ export default function LocalMatchClient({ friends }: { friends?: FriendsJoin })
       setSettings(loadStoredSettings());
       try {
         let room: Room;
+        let resumed = false;
         if (friends) {
           const response = await fetch(`${LOCAL_MATCH_PATH}/friends/join`, {
             method: "POST",
@@ -82,15 +110,25 @@ export default function LocalMatchClient({ friends }: { friends?: FriendsJoin })
           room.send("sync");
         };
         room.onMessage<LocalMatchSnapshot>("snapshot", (next) => {
-          if (next.status === "lobby") {
-            sessionStorage.setItem(friendsLobbyKey, next.code);
+          if (disposed) return;
+          const code = next.status === "lobby" ? next.code : next.status === "playing" ? next.lobbyCode : undefined;
+          if (code) {
+            sessionStorage.setItem(friendsLobbyKey, code);
             const link = new URL(window.location.href);
-            link.searchParams.delete("authError");
-            link.searchParams.set("lobby", next.code);
-            window.history.replaceState(window.history.state, "", link.href);
+            if (link.searchParams.get("lobby") !== code || link.searchParams.has("authError")) {
+              link.searchParams.delete("authError");
+              link.searchParams.set("lobby", code);
+              window.history.replaceState(window.history.state, "", link.href);
+            }
           }
           if (friends && next.status === "playing") {
-            if (friends.code) sessionStorage.setItem(friendsLobbyKey, friends.code);
+            if (code && !resumed) {
+              const key = "grand-line-auto-chess.friends-pending." + code + "." + next.view.playerId;
+              const pending = pendingCommands.current?.key === key ? pendingCommands.current : loadPendingCommands(key);
+              pendingCommands.current = pending;
+              resumed = true;
+              for (const message of pending.messages) room.send("command", message);
+            }
             const nextPhase = `${next.view.round}:${next.view.phase}`;
             if (lastPhase.current !== nextPhase) {
               lastPhase.current = nextPhase;
@@ -104,6 +142,13 @@ export default function LocalMatchClient({ friends }: { friends?: FriendsJoin })
           setSnapshot(next);
         });
         room.onMessage<string>("command-error", setError);
+        if (friends) room.onMessage<FriendsCommandReceipt>("command-receipt", (receipt) => {
+          const pending = pendingCommands.current;
+          if (disposed || !pending || !pending.messages.some((message) => message.id === receipt.id)) return;
+          pending.messages = pending.messages.filter((message) => message.id !== receipt.id);
+          savePendingCommands(pending);
+          if (receipt.error) setError(receipt.error);
+        });
         if (friends) room.onMessage<FriendsRegattaFrame>("regatta", (frame) => {
           if (!disposed) setSnapshot((current) => applyRegattaFrame(current, frame));
         });
@@ -160,7 +205,17 @@ export default function LocalMatchClient({ friends }: { friends?: FriendsJoin })
     if (connection !== "connected" || !room || !phase || round === undefined || !alive) return false;
     if (!friends && phase !== "preparation") return false;
     setError("");
-    room.send("command", friends ? { round, phase, command } satisfies FriendsCommandMessage : command);
+    if (friends) {
+      const pending = pendingCommands.current;
+      if (!pending || pending.messages.length >= pendingLimit) {
+        setError("Too many unconfirmed actions. Rejoin to synchronize the voyage.");
+        return false;
+      }
+      const message: FriendsCommandMessage = { id: window.crypto.randomUUID(), round, phase, command };
+      pending.messages.push(message);
+      savePendingCommands(pending);
+      room.send("command", message);
+    } else room.send("command", command);
     return true;
   }, [alive, connection, friends, phase, round]);
 
@@ -185,6 +240,10 @@ export default function LocalMatchClient({ friends }: { friends?: FriendsJoin })
 
   const leave = () => {
     sessionStorage.removeItem(friends ? friendsLobbyKey : seatKey);
+    if (friends && phase === "game-over" && pendingCommands.current) {
+      pendingCommands.current.messages = [];
+      savePendingCommands(pendingCommands.current);
+    }
     const room = roomRef.current;
     roomRef.current = null;
     if (room) void room.leave();

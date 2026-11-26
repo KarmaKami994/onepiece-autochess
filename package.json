@@ -32,6 +32,7 @@
     "dev": "vinext dev",
     "dev:multiplayer": "tsx scripts/run_local_multiplayer.ts",
     "dev:friends": "tsx scripts/run_local_multiplayer.ts --friends",
+    "multiplayer:backup": "tsx scripts/backup_friends_voyage.ts",
     "build": "vinext build",
     "start": "vinext start",
     "test": "vitest run --config vitest.config.ts --exclude tests/soak.test.ts",
