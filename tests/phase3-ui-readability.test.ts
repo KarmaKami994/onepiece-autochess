@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { DEFAULT_SETTINGS } from "../app/gameSettings";
 import {
   interactionAllowsDestination,
   interactionAllowsUnit,
@@ -78,8 +79,8 @@ describe("Phase 3 combat presentation", () => {
       source("app/game.css"),
     ]);
 
-    expect(client).toContain("combatNumbers: true");
-    expect(client).toContain("reducedMotion: false");
+    expect(DEFAULT_SETTINGS.combatNumbers).toBe(true);
+    expect(DEFAULT_SETTINGS.reducedMotion).toBe(false);
     expect(screens).toContain("START BATTLE");
     expect(screens).toContain("SKIP ANIMATION");
     expect(screens).toContain("Battle animation speed");

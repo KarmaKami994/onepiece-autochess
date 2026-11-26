@@ -142,7 +142,7 @@ MP1 local multiplayer is based on deck cleanup in [PR #80](https://github.com/Ka
 
 ## Verification
 
-MP1 — Focused unit tests PASS, 49/49. Local typecheck PASS with a temporary config that excludes pre-existing ignored `tmp/` source snapshots. Lint and build PASS. The two-browser regression at 1280×720 PASS covers separate shops, deployment, reload and the shared fight. The review PR tracks standard CI.
+MP1 — Focused unit tests PASS, 49/49. Settings and MP1 CI follow-up tests PASS, 11/11. Local typecheck PASS with a temporary config that excludes pre-existing ignored `tmp/` source snapshots. Lint and build PASS. The two-browser regression at 1280×720 PASS covers separate shops, deployment, reload and the shared fight. [PR #81](https://github.com/KarmaKami994/onepiece-autochess/pull/81/checks) tracks standard CI.
 
 Deck cleanup — Focused unit tests PASS, 94/94 across initial and CI follow-up runs. Eight focused browser cases PASS at 1280×720 and 1920×1080 for selling, automatic deployment, timer fill, battle economy and Regatta drag. CI #208 passed typecheck, lint and dependency review and found four fixtures that needed to keep a reserve out of combat with a full board. Final CI is recorded on [PR #80](https://github.com/KarmaKami994/onepiece-autochess/pull/80/checks). No separate local production run.
 
@@ -1055,6 +1055,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- MP1 CI #211 flagged Zod 4.4.3 when Colyseus promoted the existing dependency to runtime. The lockfile now uses 4.6.7. CI also identified a source-path assertion tied to the former locations of the shared HUD defaults. The regression now checks the exported default values.
 - B16 expands the number of recruits competing for shop draws in bands 1–4. The authored combat values are covered by focused regressions and have no separate balance baseline.
 - B15 Treasure Cruise contributor credits are unconfirmed. Frame maps use pose holds where the sources lack separate transitions. More recruits in four cost bands change individual availability at existing shop odds.
 - B14 Treasure Cruise #3632 and #1006 contributor credits are unconfirmed. The two duo sheets use individual recoil or braced holds where separate defeat poses are unavailable.
