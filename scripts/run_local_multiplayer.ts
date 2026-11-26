@@ -12,7 +12,10 @@ async function start() {
   const origin = `http://localhost:${appPort}`;
   if (friendsMode && existsSync(".env.multiplayer.local")) process.loadEnvFile(".env.multiplayer.local");
   const access = friendsMode ? await openFriendAccess(origin) : undefined;
-  const server = await startLocalMultiplayer(origin, access);
+  const server = await startLocalMultiplayer(origin, access, process.env.MULTIPLAYER_VOYAGE_DB).catch((error: unknown) => {
+    access?.close();
+    throw error;
+  });
 
   const webEnv: NodeJS.ProcessEnv = { ...process.env, MP1_LOCAL_SERVER_PORT: String(server.port), MP2_FRIENDS_ENABLED: access ? "1" : "" };
   delete webEnv.GOOGLE_CLIENT_SECRET;

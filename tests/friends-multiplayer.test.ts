@@ -80,7 +80,7 @@ describe("MP2 friends access", () => {
       const hostCookie = await fixture("host@gmail.com", "host-google");
       const mateCookie = await fixture("mate@gmail.com", "mate-google");
       const outsiderCookie = await fixture("other@gmail.com", "other-google", false);
-      server = await startLocalMultiplayer(origin, access);
+      server = await startLocalMultiplayer(origin, access, ":memory:");
       const url = `http://127.0.0.1:${server.port}`;
       vi.stubGlobal("WebSocket", undefined);
       const { Client } = await import("@colyseus/sdk");
@@ -139,9 +139,25 @@ describe("MP2 friends access", () => {
       const rejoined = await joinRoom(mateCookie, { code: lobby.code, name: "Different display name" });
       expect(await snapshot(rejoined)).toMatchObject({ status: "playing", view: { playerId: "player-2" } });
       const starter = { round: 1, phase: "starter-choice", command: { type: "CHOOSE_STARTER_RECRUIT", definitionId: null } };
-      host.send("command", starter);
-      rejoined.send("command", starter);
+      host.send("command", { ...starter, id: randomUUID() });
+      rejoined.send("command", { ...starter, id: randomUUID() });
       await expect.poll(async () => snapshot(host)).toMatchObject({ status: "playing", view: { phase: "preparation" } });
+      const purchase = { id: randomUUID(), round: 1, phase: "preparation", command: { type: "BUY_UNIT", shopIndex: 0 } };
+      function sendPurchase() {
+        const receipt = new Promise<{ id: string; revision: number; error?: string }>((resolve) => {
+          host.onMessage<{ id: string; revision: number; error?: string }>("command-receipt", (value) => {
+            if (value.id === purchase.id) resolve(value);
+          });
+        });
+        host.send("command", purchase);
+        return receipt;
+      }
+      const firstReceipt = await sendPurchase();
+      expect(firstReceipt.error).toBeUndefined();
+      expect(await sendPurchase()).toEqual(firstReceipt);
+      const afterPurchase = await snapshot(host);
+      if (afterPurchase.status !== "playing") throw new Error("Host lost the voyage after buying.");
+      expect(afterPurchase.view.shop[0]).toBeNull();
 
       const disconnected = new Promise<number>((resolve) => { rejoined.onLeave(resolve); });
       await writeFile(friendsFile, '["host@gmail.com"]');

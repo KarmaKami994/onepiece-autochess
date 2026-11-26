@@ -54,7 +54,7 @@ export function tickFriendsVoyage(voyage: FriendsVoyage, now: number): FriendsVo
 export function applyFriendsCommand(
   voyage: FriendsVoyage,
   actorPlayerId: string,
-  message: NonNullable<ReturnType<typeof readFriendsCommand>>,
+  message: { round: number; phase: string; command: FriendsCommand },
   now: number,
 ): { voyage: FriendsVoyage; error?: string } {
   const current = tickFriendsVoyage(voyage, now);
@@ -104,10 +104,11 @@ function readVoyageAction(value: unknown): FriendsCommand | null {
   }
 }
 
-export function readFriendsCommand(value: unknown): { round: number; phase: string; command: FriendsCommand } | null {
+export function readFriendsCommand(value: unknown): { id: string; round: number; phase: string; command: FriendsCommand } | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
-  const { round, phase, command } = value as Record<string, unknown>;
+  const { id, round, phase, command } = value as Record<string, unknown>;
   const action = readVoyageAction(command);
-  return typeof round === "number" && Number.isInteger(round) && typeof phase === "string" && action
-    ? { round, phase, command: action } : null;
+  return typeof id === "string" && /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(id) &&
+    typeof round === "number" && Number.isInteger(round) && typeof phase === "string" && action
+    ? { id, round, phase, command: action } : null;
 }
