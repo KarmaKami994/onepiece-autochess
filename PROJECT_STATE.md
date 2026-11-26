@@ -1059,7 +1059,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
-- MP2 CI #213 exposed the Better Auth SQLite driver's requirement for Node 22.16+ metadata APIs and flagged PostCSS 8.5.14. The CI runtime is pinned to Node 22.23.5 and the lockfile updates PostCSS to 8.5.33.
+- MP2 CI #213 exposed the Better Auth SQLite driver's requirement for Node 22.16+ metadata APIs and flagged PostCSS 8.5.14. CI #214 passed the unit suite on Node 22.23.5 and flagged Vite 8.0.13 when Better Auth brought its optional Vitest peer into dependency review. The lockfile uses PostCSS 8.5.33 and Vite 8.1.7. The build passed on this dependency set on Node 22.23.5.
 - MP2 requires the owner's Google OAuth client before the real provider callback can be accepted. CI and local tests use simulated provider profiles and actual local sessions.
 - MP1 CI #211 flagged Zod 4.4.3 when Colyseus promoted the existing dependency to runtime. The lockfile now uses 4.6.7. CI also identified a source-path assertion tied to the former locations of the shared HUD defaults. The regression now checks the exported default values.
 - B16 expands the number of recruits competing for shop draws in bands 1–4. The authored combat values are covered by focused regressions and have no separate balance baseline.
