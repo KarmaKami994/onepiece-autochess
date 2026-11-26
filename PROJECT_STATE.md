@@ -23,10 +23,12 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-MP2 delivers the friends-only localhost lobby in [PR #82](https://github.com/KarmaKami994/onepiece-autochess/pull/82). MP1 landed on `main` as `f7a765a` in [PR #81](https://github.com/KarmaKami994/onepiece-autochess/pull/81). GameContent `1.42.0`, save schema 6, 55 playable recruits, 18 traits and 10 forms.
+MP3 full friends voyage is implemented locally on `codex/mp3-full-voyage` and awaits verification. MP1 and MP2 landed on `main` as `f7a765a` and `631e720`, respectively. GameContent `1.42.0`, save schema 6, 55 playable recruits, 18 traits and 10 forms.
 
 ## Last Completed Work
 
+- 2026-11-26 — MP3 connects the shared engine and screens to a full server-authoritative friends voyage. The room accepts seat-bound phase commands and sends per-seat snapshots and compact Regatta frames. Material files cover `server/FriendsRoom.ts`, `server/friendsVoyage.ts`, the multiplayer protocol and screens, shared selectors and voyage constructor, focused multiplayer tests and `docs/MULTIPLAYER_ARCHITECTURE.md`.
+- 2026-11-26 — Squash-merged [MP1 #81](https://github.com/KarmaKami994/onepiece-autochess/pull/81) as `f7a765a` and [MP2 #82](https://github.com/KarmaKami994/onepiece-autochess/pull/82) including the harbor redesign as `631e720`. Local `main` matched `origin/main` with a clean tree before starting MP3.
 - 2026-11-26 — MP2 gives the friends sign-in and private lobby a dedicated responsive layout with original harbor artwork, a visible captain-name field, eight crew seats and a separate invite field with a copy button. Material files: `app/multiplayer/FriendsEntry.tsx`, `app/multiplayer/LocalMatchClient.tsx`, `app/multiplayer/FriendsLobbyScreen.tsx`, `app/multiplayer/friends.css`, `public/assets/friends-harbor.webp` and `ASSET_PROVENANCE.md`.
 - 2026-11-26 — MP2 adds Google sign-in with self-hosted Better Auth and SQLite, fixed Gmail/Workspace access with stable account binding and live revocation, and a host-started private lobby for two to eight approved captains. Material files cover auth, room and launch code under `server/` and `scripts/`, the multiplayer UI and protocol, focused auth/lobby tests, dependencies, and the multiplayer architecture notes.
 - 2026-11-26 — MP1 adds a loopback-only Colyseus room for two captains and six bots, with per-seat views, preparation actions, a shared server clock and short seat reconnection. Material files cover the engine and selectors, Colyseus room and local launcher, multiplayer route and shared HUD/settings, focused tests, dependencies, and the multiplayer architecture notes.
@@ -144,7 +146,9 @@ MP2 delivers the friends-only localhost lobby in [PR #82](https://github.com/Kar
 
 ## Verification
 
-MP2 visual update — Dedicated local browser check, typecheck and lint NOT RUN. [PR #82 checks](https://github.com/KarmaKami994/onepiece-autochess/pull/82/checks) track CI for the final head.
+MP3 — Focused tests, typecheck, lint, browser checks and PR CI NOT RUN pending approval. No soak.
+
+MP2 visual update — [CI PASS](https://github.com/KarmaKami994/onepiece-autochess/actions/runs/45834968221) on `926e5a2`, including 1,175 unit tests, coverage, production smoke and browser E2E. The first coverage attempt timed out in an unchanged bot diagnostic test. The existing failed job passed on retry. Dedicated local visual checks NOT RUN.
 
 MP2 — Focused MP1/MP2 tests PASS, 7/7, with Node 22.23.5 and Vitest 4.1.12. The localhost Chromium lobby check PASS with two Better Auth test sessions, host start and reload. The existing MP1 browser case PASS after the Vite update. Local Typecheck PASS with ignored temporary snapshot files excluded. Lint and Build PASS. The project owner confirmed a live Google login and lobby creation on localhost before the visual update. [PR #82](https://github.com/KarmaKami994/onepiece-autochess/pull/82/checks) tracks standard CI.
 
@@ -898,6 +902,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- Friends mode supports a full voyage from starter to results, including battle economy, phase choices and live Regatta steering. The server carries the same approved seat across disconnects and keeps phase deadlines running.
 - The friends lobby shows connected captains and open seats separately. Hosts can copy the invite link or select it for manual copying. The start area explains the two-captain minimum and who can start the match.
 - `npm run dev:friends` enables a separate localhost mode for Google sign-in and the private lobby. Lobby membership uses the verified session and display names, and only the host can start. Account verification takes place during reservation, WebSocket admission and gameplay. The first round retains MP1's rules and in-memory lifetime.
 - `npm run dev:multiplayer` enables a separate Local Multiplayer menu and round-1 room. Both living captains' readiness or the server deadline starts combat. The first battle runs to completion, and each captain's shop, bench and loose inventory are private. Solo uses its local phase clock and saves.
@@ -1063,6 +1068,7 @@ Final current-roster high-cost identity pack:
 
 ## Problems / Risks Found
 
+- MP3 reconnect uses the authoritative remaining battle time. A newly mounted board replays the frozen presentation from its start, which can cut the animation short if a captain rejoins late.
 - MP2 CI #213 exposed the Better Auth SQLite driver's requirement for Node 22.16+ metadata APIs and flagged PostCSS 8.5.14. CI #214 passed the unit suite on Node 22.23.5 and flagged Vite 8.0.13 when Better Auth brought its optional Vitest peer into dependency review. The lockfile uses PostCSS 8.5.33 and Vite 8.1.7. The build passed on this dependency set on Node 22.23.5.
 - MP2 CI #215 flagged `@vitest/mocker` through the same optional peer. Vitest and its coverage provider now resolve together at 4.1.12.
 - MP2 requires the owner's Google OAuth client in local configuration. Automated checks use simulated provider profiles and actual local sessions.

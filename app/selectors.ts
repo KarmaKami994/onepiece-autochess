@@ -1433,9 +1433,11 @@ function resultCrewUnits(
 export function selectCarouselView(
   state: MatchState,
   content: GameContent = DEFAULT_CONTENT,
+  perspectivePlayerId?: string,
 ) {
-  const player =
-    state.players.find((candidate) => !candidate.isBot) ?? state.players[0];
+  const player = perspectivePlayerId === undefined
+    ? state.players.find((candidate) => !candidate.isBot) ?? state.players[0]
+    : state.players.find((candidate) => candidate.id === perspectivePlayerId);
   if (!player) throw new Error("Carousel view requires a living captain.");
   const choices = state.carouselChoices.map((choice) => ({
     ...createItemView(choice.itemId, content),
@@ -1622,7 +1624,7 @@ export function selectMatchView(
   }), meal: pendingMeal ? { name: getFoodDefinition(pendingMeal.foodId, content)?.name ?? pendingMeal.foodId,
     target: player.units[pendingMeal.unitId] ? getUnitDefinition(player.units[pendingMeal.unitId].definitionId, content)?.name ?? "Crew" : "departed crew (portion forfeited)" } : null };
   const carouselSlice =
-    state.phase === "carousel" ? selectCarouselView(state, content) : null;
+    state.phase === "carousel" ? selectCarouselView(state, content, player.id) : null;
   const events = combatEvents(state, player.id, content);
   const interest = Math.min(
     content.config.maxInterest,

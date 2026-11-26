@@ -1,5 +1,16 @@
 # Private multiplayer architecture
 
+## MP3 full friends voyage
+
+**Base** `631e72036ce05d58d46b47feb42fb799cd098147`, the MP2 lobby squash on `main`.
+
+- The friends room creates the standard voyage for authenticated human seats and fills the remaining seats with bots. Starter, preparation, PvE/PvP, battle economy, item rewards, Regatta, recruitment, harbor and final placements use the shared engine and screens. The MP1 demo still ends after its first battle.
+- The server processes commands in received order and derives the seat from the approved session. Each command carries the player's observed round and phase. After applying any elapsed deadline, the server rejects stale commands, including verbs that are legal in both phases. Online item choices use the 23-second recruitment duration and the existing item-choice fallback.
+- Full snapshots are projected for each seat. Regatta steering uses the domain's 50 ms ticks and compact position, claim and event updates every 100 ms. The renderer interpolates between updates. Entering or rejoining the phase receives a full snapshot.
+- A disconnected human keeps the seat while the in-memory voyage continues. The usual deadlines and default choices apply. The same approved account can rejoin any phase. The battle clock returns at the server's current time. A remounted battle view presents the frozen opening snapshot from the start.
+
+At the pinned PAC revision, the room derives actor identity from the connection and advances the shared phase clock and minigame server-side. MP3 adapts those behaviors using the existing local engine, transport and screens. The PAC dispatcher and room schema are reference only. Bot takeover and external persistence are outside MP3. [PAC commands](https://github.com/keldaanCommunity/pokemonAutoChess/blob/a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee/app/rooms/game-room.ts#L356-L366) · [PAC phase clock](https://github.com/keldaanCommunity/pokemonAutoChess/blob/a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee/app/rooms/commands/game-commands.ts#L1153-L1190)
+
 ## MP2 Google sign-in and private lobby
 
 Run `npm run dev:friends` with Node.js 22.16 or later for the authenticated
@@ -34,7 +45,7 @@ connected captains. Bots fill the remaining slots. Lobby and game views
 use display names. The room reserves seats through the verified HTTP
 session and checks that same session again on the WebSocket. During play
 a reload reauthorizes the account and restores its existing seat. The lobby
-and round live in memory and the round ends after its first battle.
+and voyage live in memory.
 
 PAC verifies the account before admitting it to a room and derives the
 host from the room owner. MP2 adapts these boundaries to one private lobby,
