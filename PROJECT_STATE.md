@@ -23,7 +23,7 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-MP3 full friends voyage is implemented locally on `codex/mp3-full-voyage` and awaits verification. MP1 and MP2 landed on `main` as `f7a765a` and `631e720`, respectively. GameContent `1.42.0`, save schema 6, 55 playable recruits, 18 traits and 10 forms.
+MP3 full friends voyage is in [PR #83](https://github.com/KarmaKami994/onepiece-autochess/pull/83). MP1 and MP2 landed on `main` as `f7a765a` and `631e720`, respectively. GameContent `1.42.0`, save schema 6, 55 playable recruits, 18 traits and 10 forms.
 
 ## Last Completed Work
 
@@ -146,7 +146,7 @@ MP3 full friends voyage is implemented locally on `codex/mp3-full-voyage` and aw
 
 ## Verification
 
-MP3 — Focused tests, typecheck, lint, browser checks and PR CI NOT RUN pending approval. No soak.
+MP3 — Local commands NOT RUN. The first CI head failed typecheck on the optional battle economy flag. The follow-up converts that flag to an explicit boolean. [PR #83 checks](https://github.com/KarmaKami994/onepiece-autochess/pull/83/checks) track verification of the corrected head. No separate soak.
 
 MP2 visual update — [CI PASS](https://github.com/KarmaKami994/onepiece-autochess/actions/runs/45834968221) on `926e5a2`, including 1,175 unit tests, coverage, production smoke and browser E2E. The first coverage attempt timed out in an unchanged bot diagnostic test. The existing failed job passed on retry. Dedicated local visual checks NOT RUN.
 

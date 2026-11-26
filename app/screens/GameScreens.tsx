@@ -737,7 +737,7 @@ export function MatchScreen({
   const scouting = planning && Boolean(scoutedStanding);
   const watching = view.phase === "battle" && Boolean(scoutedStanding);
   const observing = scouting || watching;
-  const battleEconomy = (!online || (online.battleEconomy && online.connected)) && view.phase === "battle" && tutorialStep === null;
+  const battleEconomy = (!online || (online.battleEconomy === true && online.connected)) && view.phase === "battle" && tutorialStep === null;
   const economyPhase = (planning && (online?.connected ?? true)) || battleEconomy;
   const tacticalUnits = scouting
     ? scoutedStanding?.boardUnits ?? []
