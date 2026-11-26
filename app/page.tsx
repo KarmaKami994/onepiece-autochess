@@ -11,5 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  return <GameClient />;
+  return <GameClient localMultiplayer={Boolean(process.env.MP1_LOCAL_SERVER_PORT)} />;
 }

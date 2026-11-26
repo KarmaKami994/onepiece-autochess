@@ -143,13 +143,14 @@ function commandFailure(
 function createPlayer(
   index: number,
   content: GameContent,
+  humanPlayerCount: number,
 ): PlayerState {
-  const isBot = index > 0;
+  const isBot = index >= humanPlayerCount;
   const personality =
     content.botPersonalities[(index - 1) % content.botPersonalities.length];
   return {
-    id: isBot ? `bot-${index}` : "player-1",
-    name: isBot ? `Rival ${index}` : "You",
+    id: isBot ? `bot-${index}` : `player-${index + 1}`,
+    name: isBot ? `Rival ${index}` : humanPlayerCount === 1 ? "You" : `Captain ${index + 1}`,
     isBot,
     personalityId: isBot ? personality?.id ?? "balanced" : null,
     alive: true,
@@ -177,7 +178,11 @@ function createPlayer(
 export function createMatch(
   seed: string | number,
   content: GameContent = DEFAULT_CONTENT,
+  humanPlayerCount = 1,
 ): MatchState {
+  if (!Number.isInteger(humanPlayerCount) || humanPlayerCount < 1 || humanPlayerCount > content.config.playerCount) {
+    throw new RangeError("Human player count must fit the match seats.");
+  }
   const firstStage = getStageDefinition(1, content);
   const state: MatchState = {
     schemaVersion: CURRENT_SAVE_SCHEMA_VERSION,
@@ -190,7 +195,7 @@ export function createMatch(
     battleEnvironment: stageBattleEnvironment(1, content),
     players: Array.from(
       { length: content.config.playerCount },
-      (_, index) => createPlayer(index, content),
+      (_, index) => createPlayer(index, content, humanPlayerCount),
     ),
     pool: Object.fromEntries(
       content.units.map((unit) => [
@@ -2845,7 +2850,8 @@ export function applyCommand(
     }
     case "END_PREPARATION": {
       player.ready = true;
-      if (player.isBot) {
+      if (player.isBot || (context.waitForAllHumanPlayers &&
+        next.players.some((candidate) => candidate.alive && !candidate.isBot && !candidate.ready))) {
         return { ok: true, state: next };
       }
       next = runAllBotTurns(next, content);

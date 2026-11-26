@@ -23,10 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-Deck cleanup follows the roster expansion merged in [PR #79](https://github.com/KarmaKami994/onepiece-autochess/pull/79) at `a2fd62e`. GameContent `1.42.0`, save schema 6, 55 playable recruits, 18 traits and 10 forms.
+MP1 local multiplayer is based on deck cleanup in [PR #80](https://github.com/KarmaKami994/onepiece-autochess/pull/80) at `a301304`. GameContent `1.42.0`, save schema 6, 55 playable recruits, 18 traits and 10 forms.
 
 ## Last Completed Work
 
+- 2026-11-26 — MP1 adds a loopback-only Colyseus room for two captains and six bots, with per-seat views, preparation actions, a shared server clock and short seat reconnection. Material files cover the engine and selectors, Colyseus room and local launcher, multiplayer route and shared HUD/settings, focused tests, dependencies, and the multiplayer architecture notes.
 - 2026-11-24 — Deck cleanup adds pre-battle bench deployment, selected-crew sale with S, a temporary sale target and a readable timer with separate track and fill. Material files cover `game/engine.ts`, `app/GameClient.tsx`, `app/screens/GameScreens.tsx`, `components/PhaserBoard.tsx`, the phase clock and HUD styles, and focused domain and browser fixtures.
 - 2026-11-24 — PR #80 CI follow-up fills board slots in the existing food and combat economy fixtures so their reserve units remain benched. The new meal regression covers a served recipient auto-deployed before combat.
 - 2026-11-24 — PR #79 combines the completed B13–B16 branches for one squash. The first combined CI exposed a stale Captain tier expectation in `tests/game/roster-expansion-pack-f.test.ts`. The fixture now pins Captain 5 and 7 alongside the original tiers.
@@ -140,6 +141,8 @@ Deck cleanup follows the roster expansion merged in [PR #79](https://github.com/
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+MP1 — Focused unit tests PASS, 49/49. Local typecheck PASS with a temporary config that excludes pre-existing ignored `tmp/` source snapshots. Lint and build PASS. The two-browser regression at 1280×720 PASS covers separate shops, deployment, reload and the shared fight. The review PR tracks standard CI.
 
 Deck cleanup — Focused unit tests PASS, 94/94 across initial and CI follow-up runs. Eight focused browser cases PASS at 1280×720 and 1920×1080 for selling, automatic deployment, timer fill, battle economy and Regatta drag. CI #208 passed typecheck, lint and dependency review and found four fixtures that needed to keep a reserve out of combat with a full board. Final CI is recorded on [PR #80](https://github.com/KarmaKami994/onepiece-autochess/pull/80/checks). No separate local production run.
 
@@ -889,6 +892,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- `npm run dev:multiplayer` enables a separate Local Multiplayer menu and round-1 room. Both living captains' readiness or the server deadline starts combat. The first battle runs to completion, and each captain's shop, bench and loose inventory are private. Solo uses its local phase clock and saves.
 - At actual battle start, open slots for living human captains fill in left-to-right bench order. Melee prefers the front, range 2 the middle and longer range the back. Existing deployments stay in place, and this runs for both Start Battle and timeout. The selected shortcut, drag target and inspector all use `SELL_UNIT`. Sale remains available in preparation and for bench units during combat after the tutorial. The timer's display now separates phase, seconds and progress while retaining existing phase timing.
 - B16 counts nine deployed Big Mom Pirates without requiring Big Mom. Tier 9 triggers one Homie Special strike per team on the fourth distinct completed cast. Five recruits join the shared pool, and the existing schema-6 loader backfills their keys.
 - B15 adds four shared-pool recruits and a holder-scoped emergency Shield at Big Mom Pirates 2/4. The four-member tier is reachable without Big Mom. Captain, Navy and Specialist gain additional tiers. The schema-6 load path fills missing pool keys for the new recruits.
