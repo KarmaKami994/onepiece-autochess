@@ -73,6 +73,7 @@ export async function openFriendAccess(origin: string) {
       secret: BETTER_AUTH_SECRET,
       database: db,
       trustedOrigins: [origin],
+      advanced: { useSecureCookies: new URL(origin).protocol === "https:" },
       account: { accountLinking: { enabled: false }, updateAccountOnSignIn: false },
       socialProviders: {
         google: {

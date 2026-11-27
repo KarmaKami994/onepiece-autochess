@@ -114,6 +114,10 @@ an explicitly unclassified saved crew.
 
 ## Architecture
 
+The [system and game architecture](docs/ARCHITECTURE.md) explains the game
+loop, core functions, browser UI, private multiplayer, deployment and the
+reasoning behind the design choices.
+
 - React renders menus, match HUD, shop, standings, traits, tooltips, drafts, and
   results.
 - Phaser renders the board, bench, draggable units, combat interpolation, and
@@ -158,7 +162,7 @@ an explicitly unclassified saved crew.
   in `art/ui-icons/food-provenance.json`. B09 local checks are complete after
   owner approval; normal PR CI remains the integration gate.
 - All artwork is bundled under `public/assets`; Web Audio effects are generated
-  locally. Gameplay makes no network requests.
+  locally. Solo gameplay runs without a game server.
 
 ## Contributing
 
@@ -175,8 +179,8 @@ npm run build
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the branch, review, asset-provenance,
 and deterministic-engine rules. The repository is public for source
-collaboration; the game itself is not deployed or hosted as a public service.
-Product, architecture, future multiplayer, and release notes live under
+collaboration. The hosted Friends playtest requires explicit account approval.
+Product, architecture, multiplayer, and release notes live under
 [`docs/`](docs/).
 
 ## Rights and fan-project notice

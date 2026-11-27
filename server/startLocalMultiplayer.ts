@@ -6,12 +6,18 @@ import { toNodeHandler } from "better-auth/node";
 import { FRIENDS_MATCH_ROOM, LOCAL_MATCH_ROOM } from "../app/multiplayer/protocol";
 import { createFriendsRoom } from "./FriendsRoom";
 import { DEFAULT_FRIENDS_VOYAGE_DB, finishedVoyageExpired, openFriendsVoyageStore, type VoyageCheckpoint } from "./friendsVoyageStore";
+import { createHostedFriendsAccess } from "./hostedFriendsAccess";
 import type { openFriendAccess } from "./friendAccess";
 import { LocalMatchRoom, openLocalMatchRoom } from "./LocalMatchRoom";
 
 type FriendsAccess = Pick<Awaited<ReturnType<typeof openFriendAccess>>, "auth" | "authorize">;
 
-export async function startLocalMultiplayer(origin: string, access?: FriendsAccess, databasePath = DEFAULT_FRIENDS_VOYAGE_DB) {
+export async function startLocalMultiplayer(
+  origin: string,
+  access?: FriendsAccess,
+  databasePath = DEFAULT_FRIENDS_VOYAGE_DB,
+  listenPort = 0,
+) {
   const store = access && openFriendsVoyageStore(databasePath);
   let restored: VoyageCheckpoint | null;
   try {
@@ -27,6 +33,8 @@ export async function startLocalMultiplayer(origin: string, access?: FriendsAcce
   const roomCreationKey = randomUUID();
   if (access) matchMaker.controller.exposedMethods = [];
   const httpServer = createServer();
+  let ready = false;
+  const hostedAccess = access && listenPort ? createHostedFriendsAccess(origin, access.authorize) : undefined;
   const server = defineServer({
     rooms: access && store
       ? { [FRIENDS_MATCH_ROOM]: defineRoom(createFriendsRoom(access.authorize, roomCreationKey, store, restored)) }
@@ -41,6 +49,17 @@ export async function startLocalMultiplayer(origin: string, access?: FriendsAcce
         next();
       });
       app.all(/^\/api\/auth(?:\/|$)/, toNodeHandler(access.auth));
+      if (hostedAccess) {
+        app.get("/friends/access", toNodeHandler({ handler: hostedAccess.check }));
+        app.get("/friends-sign-in", toNodeHandler({ handler: hostedAccess.signIn }));
+        app.get("/friends-sign-in.js", toNodeHandler({ handler: async () => hostedAccess.script() }));
+      }
+      app.get("/healthz", toNodeHandler({ handler: async () =>
+        Response.json({ status: ready ? "ready" : "starting" }, {
+          status: ready ? 200 : 503,
+          headers: { "Cache-Control": "no-store" },
+        }),
+      }));
       app.get("/friends/session", toNodeHandler({ handler: async (request) => {
         const session = await access.authorize(request.headers);
         return Response.json({ approved: Boolean(session) }, { headers: { "Cache-Control": "no-store" } });
@@ -77,6 +96,7 @@ export async function startLocalMultiplayer(origin: string, access?: FriendsAcce
     gracefullyShutdown: false,
   });
   const close = async () => {
+    ready = false;
     try {
       await server.gracefullyShutdown(false);
     } finally {
@@ -84,11 +104,12 @@ export async function startLocalMultiplayer(origin: string, access?: FriendsAcce
     }
   };
   try {
-    await server.listen(0, "127.0.0.1");
+    await server.listen(listenPort, "127.0.0.1");
     const address = httpServer.address();
     if (!address || typeof address === "string") throw new Error("The loopback match server did not bind.");
     if (access) await matchMaker.createRoom(FRIENDS_MATCH_ROOM, { roomCreationKey });
     else await openLocalMatchRoom();
+    ready = true;
     return { port: address.port, close };
   } catch (error) {
     await close();

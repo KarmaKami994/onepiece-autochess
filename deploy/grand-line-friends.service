@@ -1,0 +1,28 @@
+[Unit]
+Description=Grand Line Auto Chess friends server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=grandline
+Group=grandline
+WorkingDirectory=/opt/grand-line
+Environment=NODE_ENV=production
+Environment=MULTIPLAYER_AUTH_DB=/var/lib/grand-line/auth.sqlite
+Environment=MULTIPLAYER_VOYAGE_DB=/var/lib/grand-line/voyage.sqlite
+Environment=MULTIPLAYER_FRIENDS_FILE=/var/lib/grand-line/friends.json
+EnvironmentFile=/etc/grand-line/friends.env
+StateDirectory=grand-line
+StateDirectoryMode=0700
+UMask=0077
+ExecStart=/usr/bin/node --import tsx scripts/run_local_multiplayer.ts --hosted-friends
+Restart=on-failure
+RestartSec=3s
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
