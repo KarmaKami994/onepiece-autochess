@@ -27,6 +27,7 @@ Abendhafen updates the main menu. The MP6 hosted playtest still has capacity, fu
 
 ## Last Completed Work
 
+- 2026-11-27 — Restored the approved Abendhafen menu symbols and added a first-frame render of the same ship for loading, reduced motion and WebGL fallback. Removed routine order and transition toasts. Material files: `app/GameClient.tsx`, `app/screens/{MainMenu.tsx,HarborBackdrop.tsx,main-menu.css}`, local ship and icon assets, and `ASSET_PROVENANCE.md`.
 - 2026-11-27 — Implemented the Abendhafen main menu on `codex/abendhafen-main-menu` from `9697a7b`. Added original harbor art, a locally bundled Three.js scene and a compact Voyage group. Material files include `app/screens/{MainMenu,HarborBackdrop}.tsx`, `app/screens/{harborScene.ts,main-menu.css}`, the menu wiring and retired styles in `app/`, npm manifests, local artwork and font assets, and `ASSET_PROVENANCE.md`.
 - 2026-11-27 — Added `docs/MP6_PRIVATE_PLAYTEST.md` with two-network acceptance, capacity steps up to eight human seats, access management, update, rollback, restore and the zero-additional-fee decision. Linked it from both architecture guides. `tests/friends-multiplayer.test.ts` and `tests/friends-voyage.test.ts` cover the solo start rejection and the two/eight-human seat counts. Base is MP5 squash `be32d2b` ([PR #85](https://github.com/KarmaKami994/onepiece-autochess/pull/85)).
 - 2026-11-27 — Prepared MP5 for publication with deployment templates and documentation that omit live deployment details. Expanded `docs/ARCHITECTURE.md` into the central guide to game systems, saves, presentation, multiplayer and hosting. Linked it from `README.md`.
@@ -152,6 +153,8 @@ Abendhafen updates the main menu. The MP6 hosted playtest still has capacity, fu
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+Abendhafen presentation correction — Local typecheck, lint, build verification and browser checks NOT RUN at the owner's request. PR checks are recorded on GitHub.
 
 Abendhafen — Local typecheck, lint, build and browser checks NOT RUN at the owner's request. PR checks are recorded on GitHub. No release has been deployed.
 
@@ -923,6 +926,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- The Abendhafen always shows the boat, including during startup and without WebGL or motion. The main menu uses the approved line icons. Routine order confirmations and voyage/phase notices are suppressed. Battle results, guide prompts and errors remain visible.
 - The main menu groups New Voyage, Continue and the enabled multiplayer route. The harbor animates when WebGL 2 and motion preferences permit. It can be paused and shows the local illustration when reduced motion is enabled or WebGL cannot run.
 - The playtest Compose stack publishes no host ports. It gives the game and gateway a private Docker network and restricts the gateway health endpoint to loopback. The Cloudflare connector is opt-in.
 - Hosted friends mode uses a built web app and one browser origin. The Google allowlist protects the application, assets and authorized multiplayer sessions before the proxy serves the game.

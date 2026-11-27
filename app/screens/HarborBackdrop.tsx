@@ -20,6 +20,7 @@ export default function HarborBackdrop({ reducedMotion }: { reducedMotion: boole
   return (
     <div className="menu-harbor">
       <div className="menu-harbor-art" aria-hidden="true" />
+      <div className="menu-harbor-ship" aria-hidden="true" />
       {!reducedMotion && !systemReduced && <AnimatedHarbor />}
       <div className="menu-harbor-shade" aria-hidden="true" />
     </div>
@@ -60,7 +61,7 @@ function AnimatedHarbor() {
 
   return (
     <>
-      <div className="menu-harbor-scene" ref={mountRef} aria-hidden="true" />
+      <div className="menu-harbor-scene" ref={mountRef} data-ready={ready} aria-hidden="true" />
       {ready && (
         <button type="button" className="menu-motion" onClick={() => {
           sceneRef.current?.setPaused(!paused);

@@ -50,6 +50,20 @@ body:has(.menu-screen),
   background: url("/assets/abendhafen.webp") center 52% / cover no-repeat;
 }
 
+.menu-harbor-ship {
+  position: absolute;
+  top: 48.2%;
+  left: 67%;
+  height: 80%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  background: url("/assets/abendhafen-ship.webp") center / contain no-repeat;
+}
+
+.menu-harbor:has(.menu-harbor-scene[data-ready="true"]) .menu-harbor-ship {
+  visibility: hidden;
+}
+
 .menu-harbor-scene canvas {
   display: block;
   width: 100%;
@@ -96,7 +110,7 @@ body:has(.menu-screen),
 
 .menu-voyages .menu-voyage {
   display: grid;
-  grid-template-columns: 22px minmax(0, 1fr) auto;
+  grid-template-columns: 22px minmax(0, 1fr) 17px;
   align-items: center;
   gap: clamp(5px, 1vw, 12px);
   min-height: 54px;
@@ -114,16 +128,27 @@ body:has(.menu-screen),
   letter-spacing: .035em;
 }
 
+.menu-voyage-label {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
 .menu-voyage small {
   color: var(--menu-muted);
   font-size: 12px;
-  text-align: right;
 }
 
-.menu-voyage-icon {
+.menu-voyage-icon,
+.menu-voyage-arrow {
+  width: 19px;
+  height: 19px;
   color: var(--menu-gold);
-  font: 700 20px/1 system-ui, sans-serif;
-  text-align: center;
+}
+
+.menu-voyage-arrow {
+  width: 17px;
+  height: 17px;
 }
 
 .menu-voyage,
@@ -157,7 +182,7 @@ body:has(.menu-screen),
   cursor: not-allowed;
 }
 
-.menu-voyage:disabled .menu-voyage-icon {
+.menu-voyage:disabled :is(.menu-voyage-icon, .menu-voyage-arrow) {
   color: #a3b3b9;
 }
 
@@ -186,6 +211,22 @@ body:has(.menu-screen),
 .menu-tools button:disabled {
   opacity: .65;
   cursor: not-allowed;
+}
+
+.menu-tools .menu-settings {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  padding: 0;
+  border: 1px solid #d1b17e60;
+  border-radius: 4px;
+  color: var(--menu-gold);
+  background: #0b2b3bd9;
+}
+
+.menu-settings svg {
+  width: 18px;
+  height: 18px;
 }
 
 .menu-actions a:focus-visible,
@@ -255,6 +296,11 @@ body:has(.menu-screen),
 
   .menu-harbor-art {
     background-position: 76% 55%;
+  }
+
+  .menu-harbor-ship {
+    top: 41%;
+    left: 54%;
   }
 
   .menu-screen .menu-harbor-shade {

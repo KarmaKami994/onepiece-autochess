@@ -351,7 +351,6 @@ export default function GameClient({ multiplayer }: { multiplayer?: MenuMultipla
     (
       command: GameCommand,
       successSound: SoundName | null = "click",
-      successMessage: string | null = "The crew carried out your order.",
     ) => {
       const current = engineStateRef.current;
       if (!current) {
@@ -376,9 +375,6 @@ export default function GameClient({ multiplayer }: { multiplayer?: MenuMultipla
           return false;
         }
         setEngineState(outcome.state);
-        if (successMessage) {
-          showToast("success", "ORDER COMPLETE", successMessage);
-        }
         if (successSound) playSound(successSound);
         return true;
       } catch (error) {
@@ -470,9 +466,7 @@ export default function GameClient({ multiplayer }: { multiplayer?: MenuMultipla
 
       setEngineState(next);
       if (next.phase !== currentPhase) setPacingPaused(false);
-      if (currentPhase === "preparation") {
-        showToast("info", "SET SAIL", "Cannons ready — battle begins!");
-      } else if (resolvedOutcome) {
+      if (resolvedOutcome) {
         const remaining = resolvedOutcome.survivorHpPercent ?? 0;
         showToast(
           resolvedOutcome.outcome === "win"
@@ -486,12 +480,6 @@ export default function GameClient({ multiplayer }: { multiplayer?: MenuMultipla
             : resolvedOutcome.outcome === "loss"
               ? `${resolvedOutcome.opponentName} dealt ${resolvedOutcome.captainDamage} Captain damage · ${remaining}% enemy health remained.`
               : `${resolvedOutcome.opponentName} held the line · no Captain damage.`,
-        );
-      } else {
-        showToast(
-          "info",
-          "ROUND RESOLVED",
-          "The tide turns. Prepare for the next encounter.",
         );
       }
       playSound(currentPhase === "preparation" ? "battle" : "click");
@@ -565,11 +553,6 @@ export default function GameClient({ multiplayer }: { multiplayer?: MenuMultipla
       setTutorialStep(
         hasCompletedFirstVoyage() ? null : "welcome",
       );
-      showToast(
-        "info",
-        "NEW VOYAGE",
-        "Build your crew and prepare to cross the Grand Line.",
-      );
       playSound("reward");
     } catch (error) {
       recordDiagnostic(error, {
@@ -637,11 +620,6 @@ export default function GameClient({ multiplayer }: { multiplayer?: MenuMultipla
           setTutorialStep(restoredStep);
         }
         setScreen("match");
-        showToast(
-          "info",
-          "SHIP'S LOG RESTORED",
-          "Welcome back, Captain.",
-        );
         playSound("click");
       })
       .catch(() => {
@@ -706,9 +684,6 @@ export default function GameClient({ multiplayer }: { multiplayer?: MenuMultipla
       const accepted = issueCommand(
         { type: "BUY_UNIT", shopIndex },
         "coin",
-        recruit.purchaseUpgrade
-          ? `Recruited ${recruit.name} and merged to ${"★".repeat(recruit.purchaseUpgrade)}.`
-          : `Recruited ${recruit.name} to the bench.`,
       );
       if (!accepted || !engineStateRef.current) return;
       const nextView = selectMatchView(engineStateRef.current);
@@ -750,10 +725,6 @@ export default function GameClient({ multiplayer }: { multiplayer?: MenuMultipla
                   y: move.y ?? 3,
                 },
         },
-        "click",
-        `${unit?.name ?? "Crew member"} moved ${
-          move.zone === "bench" ? "to the bench" : "onto the deck"
-        }.`,
       );
     },
     [issueCommand, scoutedPlayerId, tutorialStep, view],
@@ -766,7 +737,6 @@ export default function GameClient({ multiplayer }: { multiplayer?: MenuMultipla
     const sold = issueCommand(
       { type: "SELL_UNIT", unitId: persistentUnitId(view, unitId) },
       "coin",
-      `Sold ${unit.name}; equipped treasure was returned.`,
     );
     if (sold) setSelectedUnitId(current => current === unitId ? null : current);
     return sold;
@@ -775,12 +745,10 @@ export default function GameClient({ multiplayer }: { multiplayer?: MenuMultipla
   const chooseReward = useCallback(
     (choiceId: string) => {
       if (!view || view.phase !== "item-choice") return;
-      const choice = view.choices.find((candidate) => candidate.id === choiceId);
       if (
         issueCommand(
           { type: "CHOOSE_ITEM", choiceId },
           "reward",
-          `Claimed ${choice?.name ?? "a Grand Line treasure"}.`,
         )
       ) {
         const current = engineStateRef.current;
@@ -808,13 +776,12 @@ export default function GameClient({ multiplayer }: { multiplayer?: MenuMultipla
     issueCommand(
       { type: "CHOOSE_VOYAGE_RECRUIT", definitionId },
       "reward",
-      `Recruited ${view.voyageRecruits.find((unit) => unit.id === definitionId)?.name ?? "a crewmate"}.`,
     );
   }, [issueCommand, view]);
 
   const chooseStarter = useCallback((definitionId: string | null) => {
     if (tutorialStep !== null && tutorialStep !== "recruit") return;
-    if (!issueCommand({ type: "CHOOSE_STARTER_RECRUIT", definitionId }, "reward", definitionId ? "Your first crewmate is aboard." : "Set sail without a starter.")) return;
+    if (!issueCommand({ type: "CHOOSE_STARTER_RECRUIT", definitionId }, "reward")) return;
     setPacingPaused(false);
     const player = engineStateRef.current?.players.find(candidate => !candidate.isBot);
     const unit = Object.values(player?.units ?? {}).filter(candidate => candidate.definitionId === definitionId)
@@ -823,7 +790,7 @@ export default function GameClient({ multiplayer }: { multiplayer?: MenuMultipla
   }, [engineStateRef, issueCommand, tutorialStep]);
 
   const chooseHarbor = useCallback((choiceId: string) => {
-    if (issueCommand({ type: "CHOOSE_HARBOR_OFFER", choiceId }, "reward", choiceId === "skip" ? "Sailing on." : "Harbor supplies received.")) setPacingPaused(false);
+    if (issueCommand({ type: "CHOOSE_HARBOR_OFFER", choiceId }, "reward")) setPacingPaused(false);
   }, [issueCommand]);
 
   const setCarouselTarget = useCallback(
@@ -846,7 +813,6 @@ export default function GameClient({ multiplayer }: { multiplayer?: MenuMultipla
           y: target.y,
         },
         null,
-        null,
       );
     },
     [issueCommand, view],
@@ -858,7 +824,6 @@ export default function GameClient({ multiplayer }: { multiplayer?: MenuMultipla
     issueCommand(
       { type: "TIMER_EXPIRED" },
       "reward",
-      "The Log Pose secured the best remaining bounty.",
     );
   }, [engineStateRef, issueCommand]);
 
@@ -1068,7 +1033,6 @@ export default function GameClient({ multiplayer }: { multiplayer?: MenuMultipla
             type: "REROLL_SHOP",
           },
           "coin",
-          "The Recruitment Dock has six fresh offers.",
         );
       } else if (key === "l") {
         event.preventDefault();
@@ -1077,16 +1041,12 @@ export default function GameClient({ multiplayer }: { multiplayer?: MenuMultipla
             type: "TOGGLE_SHOP_LOCK",
           },
           "click",
-          view.shopLocked
-            ? "The shop will refresh next round."
-            : "These recruits will be held for the next round.",
         );
       } else if (key === "x") {
         event.preventDefault();
         issueCommand(
           { type: "BUY_XP" },
           "coin",
-          "Bought 4 XP.",
         );
       }
     }
@@ -1299,7 +1259,6 @@ export default function GameClient({ multiplayer }: { multiplayer?: MenuMultipla
                 type: "REROLL_SHOP",
               },
               "coin",
-              "The Recruitment Dock has six fresh offers.",
             )
           }
           onToggleLock={() =>
@@ -1308,27 +1267,22 @@ export default function GameClient({ multiplayer }: { multiplayer?: MenuMultipla
                 type: "TOGGLE_SHOP_LOCK",
               },
               "click",
-              view.shopLocked
-                ? "The shop will refresh next round."
-                : "These recruits will be held for the next round.",
             )
           }
           onBuyXp={() =>
             issueCommand(
               { type: "BUY_XP" },
               "coin",
-              "Bought 4 XP.",
             )
           }
           onSellUnit={sellUnit}
           onServeFood={(foodId) => {
             if (scoutedPlayerId || !selectedUnitId) return;
-            issueCommand({ type: "USE_FOOD", unitId: selectedUnitId, foodId }, "reward", "Meal served for the next battle.");
+            issueCommand({ type: "USE_FOOD", unitId: selectedUnitId, foodId }, "reward");
           }}
           onEquipItem={(itemId) => {
             if (scoutedPlayerId) return;
             if (!selectedUnitId) return;
-            const item = view.itemsById.get(itemId);
             issueCommand(
               {
                 type: "EQUIP_ITEM",
@@ -1336,9 +1290,6 @@ export default function GameClient({ multiplayer }: { multiplayer?: MenuMultipla
                 itemId,
               },
               "reward",
-              `Equipped ${item?.name ?? "treasure"} to ${
-                selectedDefinition?.name ?? "the selected crew member"
-              }.`,
             );
           }}
           onChangeSettings={setSettings}
