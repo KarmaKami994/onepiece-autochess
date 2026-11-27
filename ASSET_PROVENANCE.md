@@ -10,6 +10,8 @@ On `2026-08-14`, the project owner explicitly attested in the project conversati
 
 - `public/assets/abendhafen.webp` is original ImageGen artwork of a fictional port at sunset. The project serves the 1536 × 1024 WebP locally. SHA-256 `0e451f919ddc04ad08b0ff66a9689a160a484d1b7dc0dd6fc0ab68c7e69faed1`.
 - The ship, sail textures and water motion are authored in `app/screens/harborScene.ts`.
+- `public/assets/abendhafen-ship.webp` is a transparent 720 × 720 still rendered from the existing Three.js ship at the initial camera position. SHA-256 `9aada72ce7909bac5fa3cd1b87ed92c7a23d41bf00d91ae0cd632c6bfe98e68f`.
+- `public/assets/ui/abendhafen-icons.svg` contains the six menu symbols from [Lucide 0.468.0](https://github.com/lucide-icons/lucide/tree/0.468.0/icons), served locally. Their license text is adjacent in `Lucide-LICENSE.txt`.
 - `public/assets/ui/BarlowCondensed-Black.ttf` is from [Google Fonts at 89f5431](https://github.com/google/fonts/tree/89f5431ff0db41bd2fe3f7ba21a723a01622428b/ofl/barlowcondensed). SHA-256 `e74b750df582c608f35db467b711b2b60d2217618e85e60b72b42dfd00446cab`. The adjacent `BarlowCondensed-OFL.txt` contains the SIL Open Font License.
 
 ## MP2 private lobby — 2026-11-26

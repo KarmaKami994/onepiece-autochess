@@ -20,6 +20,17 @@ type MainMenuProps = {
   onChronicle: () => void;
 };
 
+type MenuIconName = "compass" | "book-open" | "users" | "arrow-right" | "chevron-right" | "settings";
+
+function MenuIcon({ name, className }: { name: MenuIconName; className?: string }) {
+  return (
+    <svg className={className} aria-hidden="true" focusable="false" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <use href={`/assets/ui/abendhafen-icons.svg#${name}`} />
+    </svg>
+  );
+}
+
 export default function MainMenu({
   hasSave,
   saveReady,
@@ -47,20 +58,29 @@ export default function MainMenu({
         <nav className="menu-actions" aria-label="Main menu">
           <div className="menu-voyages">
             <button type="button" className="menu-voyage menu-voyage-primary" disabled={!saveReady} onClick={onNew}>
-              <span className="menu-voyage-icon" aria-hidden="true">✧</span>
-              <strong>NEW VOYAGE</strong>
-              <small>{saveReady ? "Solo voyage" : "Reading ship's log…"}</small>
+              <MenuIcon name="compass" className="menu-voyage-icon" />
+              <span className="menu-voyage-label">
+                <strong>NEW VOYAGE</strong>
+                {!saveReady && <small>Reading ship&apos;s log…</small>}
+              </span>
+              <MenuIcon name="arrow-right" className="menu-voyage-arrow" />
             </button>
             <button type="button" className="menu-voyage" disabled={!hasSave} onClick={onContinue}>
-              <span className="menu-voyage-icon" aria-hidden="true">➜</span>
-              <strong>CONTINUE</strong>
-              {continueDetail && <small>{continueDetail}</small>}
+              <MenuIcon name="book-open" className="menu-voyage-icon" />
+              <span className="menu-voyage-label">
+                <strong>CONTINUE</strong>
+                {continueDetail && <small>{continueDetail}</small>}
+              </span>
+              <MenuIcon name="chevron-right" className="menu-voyage-arrow" />
             </button>
             {multiplayer && (
               <Link href="/multiplayer" className="menu-voyage">
-                <span className="menu-voyage-icon" aria-hidden="true">⚓</span>
-                <strong>{multiplayer === "friends" ? "FRIENDS MULTIPLAYER" : "LOCAL MULTIPLAYER"}</strong>
-                {multiplayer === "friends" && <small>2–8 players</small>}
+                <MenuIcon name="users" className="menu-voyage-icon" />
+                <span className="menu-voyage-label">
+                  <strong>{multiplayer === "friends" ? "FRIENDS MULTIPLAYER" : "LOCAL MULTIPLAYER"}</strong>
+                  {multiplayer === "friends" && <small>Private lobby · 2–8 players</small>}
+                </span>
+                <MenuIcon name="chevron-right" className="menu-voyage-arrow" />
               </Link>
             )}
           </div>
@@ -68,7 +88,9 @@ export default function MainMenu({
             <button type="button" disabled={!saveReady} onClick={onCrewTools}>CREW TOOLS</button>
             <button type="button" disabled={!saveReady} onClick={onChronicle}>VOYAGE CHRONICLE</button>
             <button type="button" disabled={!saveReady} onClick={onAnimationLab}>ANIMATION LAB</button>
-            <button type="button" onClick={onSettings}>SETTINGS</button>
+            <button type="button" className="menu-settings" aria-label="SETTINGS" onClick={onSettings}>
+              <MenuIcon name="settings" />
+            </button>
           </div>
         </nav>
       </div>
