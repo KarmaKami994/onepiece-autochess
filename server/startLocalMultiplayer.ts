@@ -52,12 +52,14 @@ export async function startLocalMultiplayer(
       if (hostedAccess) {
         app.get("/friends/access", toNodeHandler({ handler: hostedAccess.check }));
         app.get("/friends-sign-in", toNodeHandler({ handler: hostedAccess.signIn }));
-        app.get("/friends-sign-in.js", toNodeHandler({ handler: hostedAccess.script }));
+        app.get("/friends-sign-in.js", toNodeHandler({ handler: async () => hostedAccess.script() }));
       }
-      app.get("/healthz", (_request, response) => {
-        response.setHeader("Cache-Control", "no-store");
-        response.status(ready ? 200 : 503).json({ status: ready ? "ready" : "starting" });
-      });
+      app.get("/healthz", toNodeHandler({ handler: async () =>
+        Response.json({ status: ready ? "ready" : "starting" }, {
+          status: ready ? 200 : 503,
+          headers: { "Cache-Control": "no-store" },
+        }),
+      }));
       app.get("/friends/session", toNodeHandler({ handler: async (request) => {
         const session = await access.authorize(request.headers);
         return Response.json({ approved: Boolean(session) }, { headers: { "Cache-Control": "no-store" } });

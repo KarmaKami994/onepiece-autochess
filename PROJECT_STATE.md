@@ -157,6 +157,8 @@ MP5 hosted reference deployment — Container startup, game health, no published
 
 MP5 prior loopback runtime — Dependency installation, production build, Caddy validation and loopback production proxy smoke PASS. Focused tests PASS, 7/7. OAuth initiation used test credentials and the expected localhost callback. Standalone local typecheck and lint NOT RUN.
 
+MP5 PR #85 — CI #228 rejected the hosted HTTP handler types and the environment parser's fixture type. The handlers now use the Promise-based HTTP adapter and the parser accepts an environment key/value map.
+
 MP4 — [CI PASS](https://github.com/KarmaKami994/onepiece-autochess/actions/runs/45846756688) on `fbf1bf0`, including typecheck, lint, unit/coverage, asset validation, production smoke, build and browser E2E. No separate local soak.
 
 MP3 — [CI PASS](https://github.com/KarmaKami994/onepiece-autochess/actions/runs/45841934791) on `6fce725`, including typecheck, lint, unit and coverage suites, asset validation, production smoke, build and browser E2E. The first typecheck rejected the optional battle-economy flag. The coverage follow-up split the existing three-simulation diagnostic fixture and set a 15-second timeout for the full-voyage test without changing its assertions. No separate local soak.

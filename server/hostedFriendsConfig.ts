@@ -11,7 +11,7 @@ function readPort(value: string | undefined, fallback: number, key: string): num
   return port;
 }
 
-export function readHostedFriendsConfig(env: NodeJS.ProcessEnv): HostedFriendsConfig {
+export function readHostedFriendsConfig(env: Readonly<Record<string, string | undefined>>): HostedFriendsConfig {
   let url: URL;
   try {
     url = new URL(env.MULTIPLAYER_PUBLIC_ORIGIN ?? "http://localhost:3000");
