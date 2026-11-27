@@ -289,10 +289,10 @@ gemeldet. Live-Inventar und Freigabelisten werden separat geführt.
   Vinext führt Entwicklung und Produktionsbuild auf Vite aus und benötigt
   die passenden React/RSC-Peers. Der Build wird als Node-Anwendung serviert.
   Cloudflare ist der Zugangsweg zum Heimserver.
-- **Prüfungen.** [ci.yml](../.github/workflows/ci.yml) führt TypeScript, Lint,
-  Vitest, Coverage, Asset-Prüfung, 50-Match-Produktionssmoke, Build und
-  Playwright-Browserfälle aus. Pull Requests erhalten zusätzlich Dependency
-  Review. [release-soak.yml](../.github/workflows/release-soak.yml) hält die
+- **Prüfungen.** [ci.yml](../.github/workflows/ci.yml) wählt die Prüfungen
+  anhand der geänderten Dateien. Reine Dokumentation braucht keine Spieltests.
+  Die breite CI prüft Kernänderungen und wird auch manuell angeboten.
+  [release-soak.yml](../.github/workflows/release-soak.yml) hält die
   1.000-Seed-Messung separat für bewusst freigegebene Läufe.
   [Release-Verifikation](RELEASE.md)
 - **Messungen.** [run_production_soak.ts](../scripts/run_production_soak.ts)

@@ -4,16 +4,69 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  validate:
+  changes:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 5
+    outputs:
+      plan: ${{ steps.plan.outputs.result }}
 
     steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github
+          persist-credentials: false
+      - name: Select checks for the changed files
+        id: plan
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { resolve } = require("node:path");
+            const { pathToFileURL } = require("node:url");
+            const { planChecks } = await import(pathToFileURL(resolve(".github/ci-plan.mjs")).href);
+            const base = context.payload.pull_request?.base.sha ?? context.payload.before;
+            let files;
+            if (base && !/^0+$/.test(base)) {
+              try {
+                const { data } = await github.rest.repos.compareCommitsWithBasehead({
+                  ...context.repo, basehead: `${base}...${context.sha}`, per_page: 1,
+                });
+                if (["ahead", "identical"].includes(data.status) && data.files?.length < 300) {
+                  files = data.files;
+                }
+              } catch {
+                core.warning("The exact comparison is unavailable. Running the full checks.");
+              }
+            }
+            const plan = planChecks(files);
+            core.info(JSON.stringify(plan));
+            return plan;
+      - name: Verify CI selection
+        if: ${{ fromJSON(steps.plan.outputs.result).routing }}
+        run: node --test .github/ci-plan.test.mjs
+
+  validate:
+    needs: changes
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || fromJSON(needs.changes.outputs.plan).validate) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CI_PLAN: ${{ needs.changes.outputs.plan }}
+
+    steps:
+      - name: Require successful check selection
+        if: ${{ needs.changes.result != 'success' }}
+        run: exit 1
+
       - name: Check out repository
         uses: actions/checkout@v4
 
@@ -27,34 +80,52 @@ jobs:
         run: npm ci
 
       - name: Type-check
+        if: ${{ fromJSON(needs.changes.outputs.plan).typecheck }}
         run: npm run typecheck
 
       - name: Lint
+        if: ${{ fromJSON(needs.changes.outputs.plan).lint }}
         run: npm run lint
 
-      - name: Test
-        run: npm test
-
-      - name: Coverage
-        run: npm run test:coverage
+      - name: Unit tests
+        if: ${{ fromJSON(needs.changes.outputs.plan).unit[0] != null }}
+        run: |
+          mapfile -t tests < <(jq -r '.unit[]' <<< "$CI_PLAN")
+          if [[ "${tests[0]}" == coverage ]]; then
+            npm run test:coverage
+          else
+            npm test -- "${tests[@]}"
+          fi
 
       - name: Validate local assets
+        if: ${{ fromJSON(needs.changes.outputs.plan).assets }}
         run: npm run assets:validate
 
       - name: Production smoke
+        if: ${{ fromJSON(needs.changes.outputs.plan).smoke }}
         run: npm run test:production-smoke
 
       - name: Build
+        if: ${{ fromJSON(needs.changes.outputs.plan).build }}
         run: npm run build
 
       - name: Install Playwright Chromium
+        if: ${{ fromJSON(needs.changes.outputs.plan).browser[0] != null }}
         run: npx playwright install --with-deps chromium
 
       - name: Browser end-to-end
-        run: npm run test:e2e
+        if: ${{ fromJSON(needs.changes.outputs.plan).browser[0] != null }}
+        run: |
+          mapfile -t specs < <(jq -r '.browser[]' <<< "$CI_PLAN")
+          if [[ "${specs[0]}" == all ]]; then
+            npm run test:e2e
+          else
+            npm run test:e2e -- "${specs[@]}"
+          fi
 
   dependency-review:
-    if: github.event_name == 'pull_request'
+    needs: changes
+    if: ${{ github.event_name == 'pull_request' && fromJSON(needs.changes.outputs.plan).dependencies }}
     runs-on: ubuntu-latest
     permissions:
       contents: read

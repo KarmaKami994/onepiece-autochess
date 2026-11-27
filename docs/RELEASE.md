@@ -2,22 +2,24 @@
 
 ## Routine change
 
-```bash
-npm ci
-npm run typecheck
-npm run lint
-npm test
-npm run test:coverage
-npm run assets:validate
-npm run test:production-smoke
-npm run build
-npm run test:e2e
-git diff --check
-```
+GitHub CI selects checks from the files changed against the base. The `changes`
+job prints the selection. Changes in multiple areas combine their checks without
+running the same suite twice.
 
-The production smoke runs 50 unchanged-production matches and is appropriate
-for CI and normal hardening. Browser tests assert no console errors, missing
-local assets, failed requests, or required external gameplay traffic.
+| Change | What CI runs |
+| --- | --- |
+| Repository Markdown and license | Change detection only. |
+| One existing or new unit test or browser spec | The changed test file plus applicable build and static checks. |
+| Mapped feature areas, such as the lobby, HUD, clock or Chronicle | The feature's unit and browser tests. Style-only changes use the browser checks. |
+| Assets | Asset validation, asset tests, build and representative browser specs. |
+| Game core, dependencies, or uncertain comparison | Full unit coverage once and full browser checks. Game-affecting changes and uncertain comparisons also run the 50-match production smoke. |
+| Dependency manifests | GitHub Dependency Review on the pull request. |
+
+Use local checks relevant to the change. For example, run
+`npm test -- tests/phase-clock.test.ts` for the clock unit test or
+`npm run test:e2e -- e2e/pac-hud.spec.ts` for the HUD browser checks.
+The manual `CI` workflow runs the full integration checks. Browser specs
+continue to cover both configured desktop sizes.
 
 ## Deliberate release/balance audit
 

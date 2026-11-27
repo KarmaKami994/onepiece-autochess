@@ -166,16 +166,9 @@ reasoning behind the design choices.
 
 ## Contributing
 
-Development happens through short-lived branches and pull requests. Before
-opening a PR, run:
-
-```powershell
-npm run typecheck
-npm run lint
-npm test
-npm run test:e2e
-npm run build
-```
+Development happens through short-lived branches and pull requests. Run the
+checks for the part you're changing. [Release verification](docs/RELEASE.md)
+explains which checks GitHub runs for each change.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the branch, review, asset-provenance,
 and deterministic-engine rules. The repository is public for source

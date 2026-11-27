@@ -25,23 +25,12 @@ directories are ignored and must never be committed.
 
 ## Required checks
 
-Run these before opening a pull request:
-
-```powershell
-npm run typecheck
-npm run lint
-npm test
-npm run test:coverage
-npm run assets:validate
-npm run test:e2e
-npm run build
-```
-
-Use `npm run test:soak` for engine, economy, bot, pairing, or match-flow changes.
-Normal CI runs the 50-match `test:production-smoke`. Run the 1,000-match
-`test:production-soak` only for a deliberate release/balance audit; reports are
-written below `tmp/` and intentionally remain untracked. The same audit can be
-started through the manual GitHub Actions `Release Production Soak` workflow.
+Run local checks for the part of the project you change. GitHub CI selects
+the affected suites and keeps the broader safety checks for shared game and
+toolchain changes. See [release verification](docs/RELEASE.md) for the check
+selection and commands. Run the 1,000-match `test:production-soak` only for
+a deliberate release or balance audit. Reports are written below `tmp/`.
+The audit is also available through the manual `Release Production Soak` workflow.
 Run `npx playwright install chromium` once before the first local E2E check.
 
 Use `npm run assets:v2` to rebuild the standard 128×128 animation atlases.
