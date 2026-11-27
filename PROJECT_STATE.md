@@ -152,7 +152,7 @@ MP6 prepares a closed Friends playtest and operator handoff. The target is eight
 
 ## Verification
 
-MP6 — New focused tests, PR CI, hosted full voyage, reconnect/capacity acceptance and update/restore rehearsal NOT RUN. Login and basic private-device access remain documented under MP5.
+MP6 — Automated results are recorded on the integration PR. Separate local tests, hosted full voyage, reconnect/capacity acceptance and update/restore rehearsal NOT RUN. Login and basic private-device access remain documented under MP5.
 
 Central architecture guide — local Markdown links and whitespace PASS. Runtime tests NOT RUN for the documentation changes.
 

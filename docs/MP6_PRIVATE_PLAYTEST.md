@@ -68,11 +68,12 @@ Rohlogs gehören in private Aufzeichnungen.
 
 ## 3. Freunde freigeben und entfernen
 
-1. **Hinzufügen.** Genau das gewünschte Konto in der Access-Anwendung des
-   Playtests und in der privaten `friends.json` des Spiels eintragen. Die
-   Datei ist ein JSON-Array von E-Mail-Adressen. Beim Schreiben andere Einträge
-   erhalten und die fertige Datei atomar ersetzen. Der Spielserver liest die
-   Liste während der Autorisierung erneut.
+1. **Hinzufügen.** In der gemeinsamen Cloudflare-Access-Regel des Playtests
+   unter `Include > Emails` die vollständige Adresse ergänzen. Dieselbe Adresse
+   in die private `friends.json` des Spiels eintragen. Die Datei lässt sich mit
+   Nano öffnen und speichern. Vorhandene Adressen stehen lassen und die Einträge
+   mit Kommas trennen. Der Spielserver liest die Liste beim Autorisieren erneut.
+   Für eine Freigabe genügt Speichern ohne Git-Commit oder Neustart.
 2. **Beitreten.** Jeder bestätigt bei Cloudflare den E-Mail-Code und meldet sich
    im Spiel mit seinem freigeschalteten Google-Konto an. Der Host teilt den
    Lobby-Link erst danach. Beim Zwei-Geräte-Test bleiben zwei unterschiedliche
