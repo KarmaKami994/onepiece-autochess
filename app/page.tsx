@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import GameClient from "./GameClient";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: { absolute: "Grand Line Auto Chess" },
   description:

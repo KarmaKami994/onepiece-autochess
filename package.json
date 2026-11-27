@@ -35,6 +35,7 @@
     "multiplayer:backup": "tsx scripts/backup_friends_voyage.ts",
     "build": "vinext build",
     "start": "vinext start",
+    "start:friends": "tsx scripts/run_local_multiplayer.ts --hosted-friends",
     "test": "vitest run --config vitest.config.ts --exclude tests/soak.test.ts",
     "test:watch": "vitest --config vitest.config.ts",
     "test:soak": "vitest run --config vitest.config.ts tests/soak.test.ts",

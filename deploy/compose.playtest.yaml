@@ -1,0 +1,87 @@
+name: grand-line-playtest
+
+services:
+  game:
+    image: node:22.23.5-bookworm-slim
+    user: "${GRAND_LINE_UID:-1000}:${GRAND_LINE_GID:-1000}"
+    working_dir: /opt/game
+    command: [node, --import, tsx, scripts/run_local_multiplayer.ts, --hosted-friends]
+    init: true
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    tmpfs: ["/tmp:rw,nosuid,nodev,mode=1777"]
+    environment:
+      NODE_ENV: production
+      MULTIPLAYER_PUBLIC_ORIGIN: "${GRAND_LINE_PUBLIC_ORIGIN:?Set the browser HTTPS origin}"
+      MULTIPLAYER_WEB_PORT: "3100"
+      MULTIPLAYER_ROOM_PORT: "3101"
+      MULTIPLAYER_AUTH_DB: /state/auth.sqlite
+      MULTIPLAYER_VOYAGE_DB: /state/voyage.sqlite
+      MULTIPLAYER_FRIENDS_FILE: /state/friends.json
+    volumes:
+      - type: bind
+        source: "${GRAND_LINE_RELEASE_DIR:?Set the built release directory}"
+        target: /opt/game
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: "${GRAND_LINE_STATE_DIR:?Set the private state directory}"
+        target: /state
+        bind:
+          create_host_path: false
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3101/healthz').then(response => process.exit(Number(!response.ok)), () => process.exit(1))"
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+
+  proxy:
+    image: caddy:2.11.9-alpine
+    user: "${GRAND_LINE_UID:-1000}:${GRAND_LINE_GID:-1000}"
+    network_mode: "service:game"
+    depends_on:
+      game:
+        condition: service_healthy
+        restart: true
+    command: [caddy, run, --config, /etc/caddy/Caddyfile, --adapter, caddyfile]
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    tmpfs:
+      - "/config:rw,nosuid,nodev,mode=0700,uid=${GRAND_LINE_UID:-1000},gid=${GRAND_LINE_GID:-1000}"
+      - "/data:rw,nosuid,nodev,mode=0700,uid=${GRAND_LINE_UID:-1000},gid=${GRAND_LINE_GID:-1000}"
+      - "/tmp:rw,nosuid,nodev,mode=1777"
+    environment:
+      MULTIPLAYER_GATEWAY_BIND: 0.0.0.0
+    volumes:
+      - type: bind
+        source: "${GRAND_LINE_CADDYFILE:?Set the private gateway config path}"
+        target: /etc/caddy/Caddyfile
+        read_only: true
+        bind:
+          create_host_path: false
+
+  tunnel:
+    profiles: [cloudflare]
+    image: cloudflare/cloudflared:2026.11.2
+    user: "${GRAND_LINE_UID:-1000}:${GRAND_LINE_GID:-1000}"
+    command: [tunnel, --no-autoupdate, run, --token-file, /run/secrets/grand-line-tunnel-token]
+    depends_on: [proxy]
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    secrets: [grand-line-tunnel-token]
+
+secrets:
+  grand-line-tunnel-token:
+    file: "${GRAND_LINE_TUNNEL_TOKEN_FILE:-./cloudflared.token}"

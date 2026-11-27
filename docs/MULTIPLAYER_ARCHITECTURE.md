@@ -1,5 +1,9 @@
 # Private multiplayer architecture
 
+## MP5 home hosting
+
+See the [home hosting runbook](MP5_HOME_HOSTING.md) for the production launcher, loopback proxy, Google access gate and browser URL setup.
+
 ## MP4 persistent friends voyages
 
 Friends mode stores the active voyage in `.codex-local/multiplayer-voyage.sqlite`. Set `MULTIPLAYER_VOYAGE_DB` in `.env.multiplayer.local` to choose another local path. Each checkpoint carries the match ID, private lobby code, host and seat assignments, revision, phase time, authoritative state, save schema 6, and the content version and hash. The online checkpoint format has its own version.

@@ -1,0 +1,32 @@
+{
+	admin off
+}
+
+http://:{$MULTIPLAYER_GATEWAY_PORT:3000} {
+	bind {$MULTIPLAYER_GATEWAY_BIND:127.0.0.1}
+
+	@signIn path /friends-sign-in /friends-sign-in.js /api/auth /api/auth/*
+	handle @signIn {
+		reverse_proxy 127.0.0.1:{$MULTIPLAYER_ROOM_PORT:3101}
+	}
+
+	handle_path /mp1-socket/* {
+		reverse_proxy 127.0.0.1:{$MULTIPLAYER_ROOM_PORT:3101}
+	}
+
+	handle /healthz {
+		@localHealth remote_ip 127.0.0.1 ::1
+		route {
+			reverse_proxy @localHealth 127.0.0.1:{$MULTIPLAYER_ROOM_PORT:3101}
+			respond 404
+		}
+	}
+
+	handle {
+		forward_auth 127.0.0.1:{$MULTIPLAYER_ROOM_PORT:3101} {
+			uri /friends/access
+		}
+		header >Cache-Control "private, no-store"
+		reverse_proxy 127.0.0.1:{$MULTIPLAYER_WEB_PORT:3100}
+	}
+}
