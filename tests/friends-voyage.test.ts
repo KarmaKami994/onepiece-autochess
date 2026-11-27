@@ -4,6 +4,14 @@ import { advanceMatchPhase, CAROUSEL_TICK_MS, createMatch, getCarouselChoicePosi
 import { applyFriendsCommand, createFriendsVoyage, friendsRegattaFrame, friendsVoyageSnapshot, readFriendsCommand, tickFriendsVoyage } from "../server/friendsVoyage";
 
 describe("MP3 friends voyage", () => {
+  it.each([2, 8])("keeps eight total seats when %i human captains start", (humanCount) => {
+    const captains = Array.from({ length: humanCount }, (_, index) => "Captain " + (index + 1));
+    const { state } = createFriendsVoyage("friends-seat-count", 0, captains);
+    expect(state.players).toHaveLength(8);
+    expect(state.players.filter((player) => !player.isBot).map((player) => player.name)).toEqual(captains);
+    expect(state.players.filter((player) => player.isBot)).toHaveLength(8 - humanCount);
+  });
+
   it("waits for both starters or the deadline and rejects commands from the previous phase", () => {
     const initial = createFriendsVoyage("mp3-starter", 1_000, ["Mara", "Taro"]);
     expect(initial.state.phase).toBe("starter-choice");

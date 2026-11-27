@@ -124,6 +124,10 @@ describe("MP2 friends access", () => {
       const lobby = await snapshot(host);
       expect(lobby).toMatchObject({ status: "lobby", host: true, captains: ["Mara"] });
       if (lobby.status !== "lobby") throw new Error("The host did not receive a lobby.");
+      const soloStart = new Promise<string>((resolve) => { host.onMessage<string>("command-error", resolve); });
+      host.send("start");
+      expect(await soloStart).toBe("At least two captains must be connected to start.");
+      expect(await snapshot(host)).toMatchObject({ status: "lobby", code: lobby.code });
       expect((await reserve(outsiderCookie, { code: lobby.code, name: "Other" })).status).toBe(401);
       const mate = await joinRoom(mateCookie, { code: lobby.code, name: "Taro", accountId: "host" });
       expect(await snapshot(mate)).toMatchObject({ status: "lobby", host: false, captains: ["Mara", "Taro"] });
