@@ -1,5 +1,9 @@
 # Private multiplayer architecture
 
+## MP6 closed playtest and operator handoff
+
+The [playtest and operator guide](MP6_PRIVATE_PLAYTEST.md) describes external acceptance, capacity measurements, access changes, backups and rollback. Hosted capacity and full-voyage acceptance are based on real player sessions.
+
 ## MP5 home hosting
 
 See the [home hosting runbook](MP5_HOME_HOSTING.md) for the production launcher, loopback proxy, Google access gate and browser URL setup.

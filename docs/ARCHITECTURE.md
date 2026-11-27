@@ -271,6 +271,8 @@ flowchart LR
   GitHub-Merge und Serverdeployment sind zwei eigene Schritte.
 
 Die Startbefehle und Pfade stehen im [Hosting-Runbook](MP5_HOME_HOSTING.md).
+Das [MP6-Betriebshandbuch](MP6_PRIVATE_PLAYTEST.md) führt durch Spielabend,
+Kapazitätsmessung, Zugangsverwaltung, Updates und Wiederherstellung.
 Login über beide Stufen und der gehostete Playtest wurden bestätigt.
 Ein vollständiger gehosteter Durchlauf wurde bisher nicht als abgeschlossen
 gemeldet. Live-Inventar und Freigabelisten werden separat geführt.

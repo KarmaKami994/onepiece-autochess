@@ -23,10 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-MP5 implements an isolated home-hosting option for the private Friends playtest. The reference deployment uses a dedicated Cloudflare Tunnel with Access token validation and a separate game allowlist. Deployment inventory and credentials are managed outside the repository. GameContent `1.42.0`, save schema 6, 55 playable recruits, 18 traits and 10 forms.
+MP6 prepares a closed Friends playtest and operator handoff. The target is eight human captains in one lobby. The host can start with two connected captains, and bots fill the eight total seats. Hosted capacity, a full external voyage and the operational rehearsal are pending. GameContent `1.42.0`, save schema 6, 55 playable recruits, 18 traits and 10 forms.
 
 ## Last Completed Work
 
+- 2026-11-27 — Added `docs/MP6_PRIVATE_PLAYTEST.md` with two-network acceptance, capacity steps up to eight human seats, access management, update, rollback, restore and the zero-additional-fee decision. Linked it from both architecture guides. `tests/friends-multiplayer.test.ts` and `tests/friends-voyage.test.ts` cover the solo start rejection and the two/eight-human seat counts. Base is MP5 squash `be32d2b` ([PR #85](https://github.com/KarmaKami994/onepiece-autochess/pull/85)).
 - 2026-11-27 — Prepared MP5 for publication with deployment templates and documentation that omit live deployment details. Expanded `docs/ARCHITECTURE.md` into the central guide to game systems, saves, presentation, multiplayer and hosting. Linked it from `README.md`.
 - 2026-11-26 — MP5 adds a built-app Friends launcher with a canonical HTTPS origin, loopback-only upstreams, room health and a game allowlist gate for hosted pages and assets. The reference deployment uses a dedicated Docker project and a separately authenticated Cloudflare route. Material files cover the launcher and hosted auth under `scripts/` and `server/`, templates under `deploy/`, focused tests and `docs/MP5_HOME_HOSTING.md`.
 - 2026-11-26 — Squash-merged restart recovery and cleanup in [PR #84](https://github.com/KarmaKami994/onepiece-autochess/pull/84) as `13fb3a6`. Local `main` matched `origin/main` with a clean tree before MP5.
@@ -150,6 +151,8 @@ MP5 implements an isolated home-hosting option for the private Friends playtest.
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+MP6 — Automated results are recorded on the integration PR. Separate local tests, hosted full voyage, reconnect/capacity acceptance and update/restore rehearsal NOT RUN. Login and basic private-device access remain documented under MP5.
 
 Central architecture guide — local Markdown links and whitespace PASS. Runtime tests NOT RUN for the documentation changes.
 
