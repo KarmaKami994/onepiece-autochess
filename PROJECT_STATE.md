@@ -160,6 +160,8 @@ MP5 hosted reference deployment — Container startup, game health, no published
 
 MP5 prior loopback runtime — Dependency installation, production build, Caddy validation and loopback production proxy smoke PASS. Focused tests PASS, 7/7. OAuth initiation used test credentials and the expected localhost callback. Standalone local typecheck and lint NOT RUN.
 
+Targeted CI — Local check-selection tests PASS, 5/5. All explicitly mapped unit and browser suites exist. No local game suite, production smoke or release soak ran for this change. GitHub results are recorded on the integration PR.
+
 MP5 PR #85 — CI #228 rejected the hosted HTTP handler types and the environment parser's fixture type. The handlers now use the Promise-based HTTP adapter and the parser accepts an environment key/value map.
 
 MP4 — [CI PASS](https://github.com/KarmaKami994/onepiece-autochess/actions/runs/45846756688) on `fbf1bf0`, including typecheck, lint, unit/coverage, asset validation, production smoke, build and browser E2E. No separate local soak.
@@ -1158,6 +1160,8 @@ Final current-roster high-cost identity pack:
 
 ## Important Decisions
 
+- GitHub automatically deletes merged PR head branches. Before merging a branch that an open PR still uses as its base, rebase or retarget that PR deliberately. The initial cleanup removed 75 remote heads after confirming their unchanged PR tips and squash commits on `main`.
+- GitHub CI selects checks from the changed files. Documentation skips game checks, mapped feature work runs its own suites, and core, toolchain or uncertain changes use the full set. A full unit run collects coverage once. A manual full CI run remains available.
 - MP2 uses the owner's selected fixed Gmail/Google Workspace allowlist. Better Auth uses a local SQLite database. The localhost OAuth client requests basic identity access. Hosting and domain selection remain in MP5.
 - 2026-11-12 — Preserve the accepted PAC arrangement/interactions; owner now requests a One Piece timber/parchment/brass finish. Keep compact synergy thresholds, tier/crew highlights and item/recipe hovers, existing React/Phaser ownership and gameplay. Direct PAC reuse remains authorized with its existing notices; the project-authored color/material layer is separate. Do not replace the accepted layout.
 - 2026-11-11 — Owner's explicit B10 squash/B11 instruction accepts the B10 pilot/style contract for series completion: keep Koala/Kaido/Demonio masters, source-first curation, frozen local exports and separate body/FX. No new style/provider experiment or automatic B12 work.
