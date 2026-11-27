@@ -12,6 +12,7 @@ import type {
   BoardMove,
 } from "@/components/PhaserBoard";
 import AnimationLab from "@/components/AnimationLab";
+import MainMenu, { type MenuMultiplayer } from "./screens/MainMenu";
 import CrewToolsScreen from "./screens/CrewToolsScreen";
 import ChronicleScreen from "./screens/ChronicleScreen";
 import { useChronicleRecorder } from "./useChronicleRecorder";
@@ -51,7 +52,6 @@ import {
   ActionToast,
   CarouselScreen,
   ConfirmNewVoyageScreen,
-  MainMenu,
   MatchScreen,
   ResultsScreen,
   RewardScreen,
@@ -94,7 +94,7 @@ function persistentUnitId(view: MatchView, presentationId: string): string {
     : presentationId;
 }
 
-export default function GameClient({ localMultiplayer = false }: { localMultiplayer?: boolean }) {
+export default function GameClient({ multiplayer }: { multiplayer?: MenuMultiplayer }) {
   const [screen, setScreen] = useState<Screen>("menu");
   const [returnScreen, setReturnScreen] = useState<Screen>("menu");
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
@@ -1216,14 +1216,17 @@ export default function GameClient({ localMultiplayer = false }: { localMultipla
       }`}
       aria-label="Grand Line Auto Chess"
     >
-      <div className="ambient-sea" aria-hidden="true">
-        <span />
-        <span />
-        <span />
-      </div>
+      {screen !== "menu" && (
+        <div className="ambient-sea" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
+      )}
       {screen === "menu" && (
         <MainMenu
-          localMultiplayer={localMultiplayer}
+          multiplayer={multiplayer}
+          reducedMotion={settings.reducedMotion}
           hasSave={hasSave}
           saveReady={saveReady}
           saveDate={saveDate}

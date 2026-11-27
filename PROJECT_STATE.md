@@ -23,10 +23,11 @@ Expand gameplay depth and One Piece content while preserving the deterministic p
 
 ## Current Phase
 
-MP6 prepares a closed Friends playtest and operator handoff. The target is eight human captains in one lobby. The host can start with two connected captains, and bots fill the eight total seats. Hosted capacity, a full external voyage and the operational rehearsal are pending. GameContent `1.42.0`, save schema 6, 55 playable recruits, 18 traits and 10 forms.
+Abendhafen updates the main menu. The MP6 hosted playtest still has capacity, full external voyage and operational rehearsal pending. The host can start with two connected captains, and bots fill the eight total seats. GameContent `1.42.0`, save schema 6, 55 playable recruits, 18 traits and 10 forms.
 
 ## Last Completed Work
 
+- 2026-11-27 — Implemented the Abendhafen main menu on `codex/abendhafen-main-menu` from `9697a7b`. Added original harbor art, a locally bundled Three.js scene and a compact Voyage group. Material files include `app/screens/{MainMenu,HarborBackdrop}.tsx`, `app/screens/{harborScene.ts,main-menu.css}`, the menu wiring and retired styles in `app/`, npm manifests, local artwork and font assets, and `ASSET_PROVENANCE.md`.
 - 2026-11-27 — Added `docs/MP6_PRIVATE_PLAYTEST.md` with two-network acceptance, capacity steps up to eight human seats, access management, update, rollback, restore and the zero-additional-fee decision. Linked it from both architecture guides. `tests/friends-multiplayer.test.ts` and `tests/friends-voyage.test.ts` cover the solo start rejection and the two/eight-human seat counts. Base is MP5 squash `be32d2b` ([PR #85](https://github.com/KarmaKami994/onepiece-autochess/pull/85)).
 - 2026-11-27 — Prepared MP5 for publication with deployment templates and documentation that omit live deployment details. Expanded `docs/ARCHITECTURE.md` into the central guide to game systems, saves, presentation, multiplayer and hosting. Linked it from `README.md`.
 - 2026-11-26 — MP5 adds a built-app Friends launcher with a canonical HTTPS origin, loopback-only upstreams, room health and a game allowlist gate for hosted pages and assets. The reference deployment uses a dedicated Docker project and a separately authenticated Cloudflare route. Material files cover the launcher and hosted auth under `scripts/` and `server/`, templates under `deploy/`, focused tests and `docs/MP5_HOME_HOSTING.md`.
@@ -151,6 +152,8 @@ MP6 prepares a closed Friends playtest and operator handoff. The target is eight
 - Materially changed hardening areas: application/session boundaries, game domain and persistence modules, selectors/screens, Phaser board presentation, deterministic/portability tests, CI/release tooling, and architecture documentation.
 
 ## Verification
+
+Abendhafen — Local typecheck, lint, build and browser checks NOT RUN at the owner's request. PR checks are recorded on GitHub. No release has been deployed.
 
 MP6 — Automated results are recorded on the integration PR. Separate local tests, hosted full voyage, reconnect/capacity acceptance and update/restore rehearsal NOT RUN. Login and basic private-device access remain documented under MP5.
 
@@ -920,6 +923,7 @@ Final current-roster high-cost identity pack:
 
 ## Behavioral Changes
 
+- The main menu groups New Voyage, Continue and the enabled multiplayer route. The harbor animates when WebGL 2 and motion preferences permit. It can be paused and shows the local illustration when reduced motion is enabled or WebGL cannot run.
 - The playtest Compose stack publishes no host ports. It gives the game and gateway a private Docker network and restricts the gateway health endpoint to loopback. The Cloudflare connector is opt-in.
 - Hosted friends mode uses a built web app and one browser origin. The Google allowlist protects the application, assets and authorized multiplayer sessions before the proxy serves the game.
 - Started friends voyages survive server restarts. Saved receipts prevent duplicate commands from applying again. The automatic checkpoint is removed after all captains leave the results, or after a ten-minute completed-voyage window once all are disconnected. Manual backup exports are managed separately.
@@ -1008,6 +1012,7 @@ Final current-roster high-cost identity pack:
 
 ## Deviations From Plan
 
+- The Abendhafen preview started animation on request. The game starts it automatically when permitted and provides a pause control.
 - The PAC reference supplies the bench order, range-aware placement and drag target. The local S shortcut uses explicit selection and existing sale permissions. PAC-specific unit exceptions and server infrastructure stay reference-only. [PAC deployment](https://github.com/keldaanCommunity/pokemonAutoChess/blob/a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee/app/rooms/commands/game-commands.ts#L1820) · [PAC sale target](https://github.com/keldaanCommunity/pokemonAutoChess/blob/a3fa225e11f49c07e8ac7bdf262773d4cc4a94ee/app/public/src/game/components/sell-zone.ts)
 - The four batches were implemented on separate branches and use the existing PR #79 for a single squash delivery, as requested.
 - B16 uses a generated Daifuku pose board because the surveyed sprite catalogues lacked a suitable combat sheet. The other four recruits use original Treasure Cruise sheets.

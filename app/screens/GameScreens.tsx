@@ -7,7 +7,6 @@ import {
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
-import Link from "next/link";
 import { KOBY_TRAINING_BATTLES_REQUIRED } from "@/game";
 import { copiesForStar } from "@/game/state";
 import {
@@ -81,106 +80,6 @@ export function standingsInteraction(
   return phase === "battle" ? "watch" : null;
 }
 
-export function MainMenu({
-  hasSave,
-  saveReady,
-  saveDate,
-  onNew,
-  onContinue,
-  onSettings,
-  onAnimationLab,
-  onCrewTools,
-  onChronicle,
-  localMultiplayer,
-}: {
-  hasSave: boolean;
-  saveReady: boolean;
-  saveDate: number | null;
-  onNew: () => void;
-  onContinue: () => void;
-  onSettings: () => void;
-  onAnimationLab: () => void;
-  onCrewTools: () => void;
-  onChronicle: () => void;
-  localMultiplayer?: boolean;
-}) {
-  return (
-    <section className="menu-screen">
-      <div className="menu-cloud cloud-one" aria-hidden="true" />
-      <div className="menu-cloud cloud-two" aria-hidden="true" />
-      <div className="menu-island" aria-hidden="true">
-        <span className="island-palm" />
-      </div>
-      <header className="title-lockup">
-        <span className="title-kicker">A LOCAL AUTO-BATTLER</span>
-        <div className="title-emblem" aria-hidden="true">
-          <span className="emblem-wheel">✦</span>
-        </div>
-        <h1>
-          <span>GRAND LINE</span>
-          <strong>AUTO CHESS</strong>
-        </h1>
-        <p>Build a crew. Read the tides. Become King of the Pirates.</p>
-      </header>
-      <nav className="menu-actions" aria-label="Main menu">
-        <button
-          type="button"
-          className="pixel-button primary"
-          disabled={!saveReady}
-          onClick={onNew}
-        >
-          <span className="button-icon">☠</span>
-          NEW VOYAGE
-          <small>
-            {saveReady ? "Start with a fresh Log Pose" : "Reading ship's log…"}
-          </small>
-        </button>
-        <button
-          type="button"
-          className="pixel-button"
-          disabled={!hasSave}
-          onClick={onContinue}
-        >
-          <span className="button-icon">➜</span>
-          CONTINUE
-          <small>
-            {hasSave && saveDate
-              ? `Ship's log · ${new Date(saveDate).toLocaleDateString()}`
-              : "No voyage in the ship's log"}
-          </small>
-        </button>
-        <button type="button" className="pixel-button compact" onClick={onSettings}>
-          <span className="button-icon">⚙</span>
-          SETTINGS
-        </button>
-        <button type="button" className="pixel-button compact" disabled={!saveReady} onClick={onAnimationLab}>
-          <span className="button-icon">▦</span>
-          ANIMATION LAB
-        </button>
-        <button type="button" className="pixel-button compact" disabled={!saveReady} onClick={onCrewTools}>
-          <span className="button-icon">⌘</span>
-          CREW TOOLS
-        </button>
-        <button type="button" className="pixel-button compact" disabled={!saveReady} onClick={onChronicle}>
-          <span className="button-icon">▤</span>
-          VOYAGE CHRONICLE
-        </button>
-        {localMultiplayer && <Link href="/multiplayer" className="pixel-button compact">LOCAL MULTIPLAYER</Link>}
-      </nav>
-      <footer className="menu-footer">
-        <span>OFFLINE</span>
-        <i aria-hidden="true" />
-        <span>LOCAL SAVE</span>
-        <i aria-hidden="true" />
-        <span>v0.1 PROTOTYPE</span>
-      </footer>
-      <p className="fan-disclaimer">
-        Unofficial private local fan prototype. Franchise rights remain with
-        their respective owners. Not endorsed or affiliated.
-      </p>
-    </section>
-  );
-}
 export function ConfirmNewVoyageScreen({
   onCancel,
   onReplace,

@@ -1,0 +1,276 @@
+@font-face {
+  font-family: "Barlow Condensed";
+  src: url("/assets/ui/BarlowCondensed-Black.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+}
+
+html:has(.menu-screen),
+body:has(.menu-screen),
+.game-shell:has(> .menu-screen) {
+  width: 100%;
+  min-width: 0;
+}
+
+.menu-screen {
+  --menu-cream: #fff0d1;
+  --menu-muted: #c2d5d7;
+  --menu-gold: #ffc66d;
+  --menu-panel: #0b2b3bf5;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  align-items: center;
+  gap: 26px;
+  min-height: 100svh;
+  padding: 40px clamp(28px, 7vw, 134px) 24px;
+  color: var(--menu-cream);
+  background-color: #082936;
+  font-family: Jost, system-ui, sans-serif;
+  image-rendering: auto;
+}
+
+.menu-harbor {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.menu-harbor-art,
+.menu-harbor-scene,
+.menu-harbor-shade {
+  position: absolute;
+  inset: 0;
+}
+
+.menu-harbor-art {
+  background: url("/assets/abendhafen.webp") center 52% / cover no-repeat;
+}
+
+.menu-harbor-scene canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.menu-harbor-shade {
+  background: linear-gradient(90deg, #071e2aef, #082735df 25%, #0b2b3982 43%, transparent 62%),
+    linear-gradient(0deg, #041924d9, transparent 29%);
+}
+
+.menu-content,
+.menu-attribution {
+  position: relative;
+  z-index: 1;
+}
+
+.menu-content {
+  width: min(100%, 445px);
+}
+
+.menu-title {
+  margin: 0 0 clamp(20px, 4vh, 38px) -2px;
+  font: 900 clamp(68px, 8.5vw, 132px)/.82 "Barlow Condensed", Impact, "Arial Narrow", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: -.022em;
+  text-shadow: 0 3px #402620, 0 8px 20px #041218c9;
+  white-space: nowrap;
+}
+
+.menu-title span {
+  display: block;
+  margin-top: 9px;
+  color: var(--menu-gold);
+  font-size: .67em;
+  letter-spacing: .035em;
+}
+
+.menu-voyages {
+  display: grid;
+  gap: 8px;
+  width: min(100%, 385px);
+}
+
+.menu-voyages .menu-voyage {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(5px, 1vw, 12px);
+  min-height: 54px;
+  padding: 9px 14px;
+  border: 1px solid #d1b17e73;
+  border-radius: 5px;
+  color: var(--menu-cream);
+  background-color: var(--menu-panel);
+  text-align: left;
+  text-decoration: none;
+}
+
+.menu-voyage strong {
+  font-size: clamp(13px, 1.4vw, 17px);
+  letter-spacing: .035em;
+}
+
+.menu-voyage small {
+  color: var(--menu-muted);
+  font-size: 12px;
+  text-align: right;
+}
+
+.menu-voyage-icon {
+  color: var(--menu-gold);
+  font: 700 20px/1 system-ui, sans-serif;
+  text-align: center;
+}
+
+.menu-voyage,
+.menu-tools button,
+.menu-motion {
+  cursor: pointer;
+}
+
+.menu-voyages .menu-voyage-primary {
+  border-color: #edb86c;
+  background: linear-gradient(115deg, #a84432, #742923);
+}
+
+.menu-voyage-primary small {
+  color: #ffdfc6;
+}
+
+.menu-voyages .menu-voyage:hover:not(:disabled) {
+  border-color: var(--menu-gold);
+  background-color: #174052;
+}
+
+.menu-voyages .menu-voyage-primary:hover:not(:disabled) {
+  background: #993c2f;
+}
+
+.menu-voyages .menu-voyage:disabled {
+  border-color: #94b0b350;
+  color: #bdced1;
+  background: #092633ee;
+  cursor: not-allowed;
+}
+
+.menu-voyage:disabled .menu-voyage-icon {
+  color: #a3b3b9;
+}
+
+.menu-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 15px;
+  margin-top: 15px;
+}
+
+.menu-tools button {
+  min-height: 44px;
+  padding: 4px 0;
+  border: 0;
+  color: var(--menu-muted);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: .035em;
+}
+
+.menu-tools button:not(:disabled):hover {
+  color: var(--menu-gold);
+}
+
+.menu-tools button:disabled {
+  opacity: .65;
+  cursor: not-allowed;
+}
+
+.menu-actions a:focus-visible,
+.menu-actions button:focus-visible,
+.menu-motion:focus-visible {
+  outline: 3px solid var(--menu-gold);
+  outline-offset: 3px;
+}
+
+.menu-harbor .menu-motion {
+  position: absolute;
+  right: clamp(18px, 3.5vw, 54px);
+  bottom: 24px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 7px 13px;
+  border: 1px solid #d8ac6b92;
+  border-radius: 5px;
+  color: var(--menu-cream);
+  background: #0c2634f5;
+  font-size: 13px;
+  font-weight: 700;
+  pointer-events: auto;
+}
+
+.menu-motion span {
+  width: 14px;
+  color: var(--menu-gold);
+  text-align: center;
+}
+
+.menu-harbor .menu-motion:hover {
+  border-color: var(--menu-gold);
+  background: #173748;
+}
+
+.menu-attribution {
+  max-width: 48ch;
+  margin-right: 150px;
+  color: var(--menu-muted);
+  font-size: 12px;
+}
+
+.high-contrast .menu-screen {
+  --menu-cream: #fff8db;
+  --menu-gold: #ffd55c;
+  --menu-panel: #06151d;
+}
+
+.high-contrast .menu-harbor-shade {
+  background: linear-gradient(90deg, #041924, #041924 34%, transparent 67%),
+    linear-gradient(0deg, #041924, transparent 34%);
+}
+
+@media (max-width: 680px) {
+  .menu-screen {
+    grid-template-rows: 1fr auto;
+    padding: clamp(235px, 61vw, 350px) 19px 16px;
+  }
+
+  .menu-harbor {
+    height: clamp(251px, 65vw, 372px);
+  }
+
+  .menu-harbor-art {
+    background-position: 76% 55%;
+  }
+
+  .menu-screen .menu-harbor-shade {
+    background: linear-gradient(0deg, #082936, #0829365c 19%, transparent 48%);
+  }
+
+  .menu-harbor .menu-motion {
+    top: 15px;
+    bottom: auto;
+  }
+
+  .menu-title {
+    font-size: clamp(53px, 11.6vw, 76px);
+  }
+
+  .menu-attribution {
+    margin-right: 0;
+  }
+}

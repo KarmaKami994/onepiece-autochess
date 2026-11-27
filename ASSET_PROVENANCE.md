@@ -6,6 +6,12 @@ This non-commercial, localhost-only fan prototype has both original generated pr
 
 On `2026-08-14`, the project owner explicitly attested in the project conversation that the initial 17 listed source sheets may be used, adapted, and distributed in this public collaboration repository. Later source additions record their own permission basis in `art/animation-v2/source-matrix.json`. An owner attestation is not independent verification of chain of title; a Sprite Database URL is not treated as permission, and this repository grants no downstream asset license. The MIT license applies to code only. Reuse, redistribution, or commercialization of franchise or imported art requires its own appropriate rights clearance.
 
+## Abendhafen main menu — 2026-11-27
+
+- `public/assets/abendhafen.webp` is original ImageGen artwork of a fictional port at sunset. The project serves the 1536 × 1024 WebP locally. SHA-256 `0e451f919ddc04ad08b0ff66a9689a160a484d1b7dc0dd6fc0ab68c7e69faed1`.
+- The ship, sail textures and water motion are authored in `app/screens/harborScene.ts`.
+- `public/assets/ui/BarlowCondensed-Black.ttf` is from [Google Fonts at 89f5431](https://github.com/google/fonts/tree/89f5431ff0db41bd2fe3f7ba21a723a01622428b/ofl/barlowcondensed). SHA-256 `e74b750df582c608f35db467b711b2b60d2217618e85e60b72b42dfd00446cab`. The adjacent `BarlowCondensed-OFL.txt` contains the SIL Open Font License.
+
 ## MP2 private lobby — 2026-11-26
 
 `public/assets/friends-harbor.webp` is an original ImageGen illustration of a fictional sailing ship in port, exported at 900 × 1350. The image is served locally with the friends multiplayer UI.
